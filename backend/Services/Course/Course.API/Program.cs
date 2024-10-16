@@ -1,24 +1,34 @@
+﻿using Microsoft.OpenApi.Models;
+using Course.Application;
+using Course.Infrastructure;
+using Course.API;
+using Serilog;
+using BuildingBlocks.Logging;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//Logging
+builder.Host.UseSerilog();
+builder.Services.ConfigureLogging(builder.Configuration);
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//Add Service
+builder.Services
+    .AddApplicationServices(builder.Configuration)
+    .AddInfrastructureServices(builder.Configuration)
+    .AddApiServices(builder.Configuration);
+
+//Docs API
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+    options.EnableAnnotations();  
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Course API", Version = "v1" });
+});
+
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+app.UseApiServices();
 
 app.Run();

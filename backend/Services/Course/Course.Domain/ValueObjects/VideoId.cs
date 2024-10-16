@@ -1,6 +1,6 @@
 ﻿namespace Course.Domain.ValueObjects;
-public class VideoId {
-    public VideoId(Guid value) => Value = value;
+public record VideoId {
+    private VideoId(Guid value) => Value = value;
     public Guid Value { get; }
     public static VideoId Of(Guid value) {
         ArgumentNullException.ThrowIfNull(value);

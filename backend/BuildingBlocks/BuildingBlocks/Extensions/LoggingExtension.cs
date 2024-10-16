@@ -8,9 +8,11 @@ using Serilog;
 using Serilog.Exceptions;
 using System.Reflection;
 
-namespace BuildingBlocks.Logging;
-public static class ConfigurationLogging {
-    public static void ConfigureLogging(this IServiceCollection services, IConfiguration configuration) {
+namespace BuildingBlocks.Extensions;
+public static class LoggingExtension
+{
+    public static void ConfigureLogging(this IServiceCollection services, IConfiguration configuration)
+    {
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()

@@ -10,4 +10,3 @@ global using Course.Infrastructure.Services;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Course.Domain.Abstractions;
-global using MassTransit.Mediator;

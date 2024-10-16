@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Course.Infrastructure.Data.Interceptors;
 public class DispatchDomainEventsInterceptor(IMediator mediator)

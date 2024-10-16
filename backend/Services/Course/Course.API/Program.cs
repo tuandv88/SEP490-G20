@@ -3,7 +3,7 @@ using Course.Application;
 using Course.Infrastructure;
 using Course.API;
 using Serilog;
-using BuildingBlocks.Logging;
+using BuildingBlocks.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 //Logging

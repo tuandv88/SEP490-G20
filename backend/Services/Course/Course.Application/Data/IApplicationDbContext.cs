@@ -16,5 +16,6 @@ public interface IApplicationDbContext {
     DbSet<ProblemSolution> ProblemSolutions { get; }
     DbSet<ProblemTestCase> ProblemTestCases { get; }
     DbSet<DiscountCode> DiscountCodes { get; }
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 

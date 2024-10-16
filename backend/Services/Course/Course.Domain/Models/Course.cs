@@ -22,13 +22,15 @@ public class Course : Aggregate<CourseId> {
     public CourseLevel CourseLevel { get; set; } = CourseLevel.Basic;
     public double Price {  get; set; } // giá bán của khóa học
 
-    public static Course Create(string title, string description, string headline, double timeEstimation, 
-        string prerequisites, string objectives, string targetAudiences, string imageUrl, int orderIndex) {
+    public static Course Create(CourseId courseId, string title, string description, string headline, double timeEstimation, 
+        string prerequisites, string objectives, string targetAudiences, string imageUrl, int orderIndex, double price) {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(headline);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(timeEstimation);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(orderIndex);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
         var course = new Course() {
+            Id = courseId,
             Title = title, 
             Description = description,
             Headline = headline,
@@ -36,7 +38,8 @@ public class Course : Aggregate<CourseId> {
             Prerequisites = prerequisites,
             Objectives = objectives,
             TargetAudiences = targetAudiences,
-            ImageUrl = imageUrl
+            ImageUrl = imageUrl,
+            Price = price
         };
         course.AddDomainEvent(new CourseCreatedEvent(course));
         return course;

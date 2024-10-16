@@ -1,15 +1,15 @@
-﻿using BuildingBlocks.ValueObjects;
-
-namespace Course.Domain.Models;
+﻿namespace Course.Domain.Models;
 public class Quiz : Aggregate<QuizId> {
-    public LectureId LectureId { get; set; } = default!; // unique mỗi quiz có thể thuộc về một lecture
-    public UserAssessmentId UserAssessmentId { get; set; } = default!; // unique - mỗi quiz có thể thuộc về một bài đánh giá đánh giá tổng hợp nào đó
+    private readonly List<Question>_question = new();
+    public IReadOnlyList<Question> Questions => _question.AsReadOnly();
     public bool IsActive { get; set; }
-    public bool IsPublished {  get; set; }
     public bool IsRandomized {  get; set; }
     public string Title { get; set; } = default!;
     public string Description { get; set; } = default!;
-    public long PassingMark { get; set; } = default!;
-    public long TimeLimit {  get; set; } = default!;
+    public int PassingMark { get; set; } = default!;
+    public double TimeLimit {  get; set; } = default!; // giới hạn thời gian làm bài
+    public bool HasTimeLimit { get; set; } = false; // xác định xem có giới hạn thời gian làm bài không 
+    public int AttemptLimit { get; set; } = 1;
+    public bool HasAttemptLimit { get; set; } = false;
 }
 

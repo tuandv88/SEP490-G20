@@ -1,6 +1,6 @@
 ﻿namespace Course.Domain.ValueObjects;
-public class QuizId {
-    public QuizId(Guid value) => Value = value;
+public record QuizId {
+    private QuizId(Guid value) => Value = value;
     public Guid Value { get; }
     public static QuizId Of(Guid value) {
         ArgumentNullException.ThrowIfNull(value);

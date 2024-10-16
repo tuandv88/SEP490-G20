@@ -7,7 +7,8 @@ namespace AuthServer.Data
     {
         public static void Initialize(ApplicationDbContext context)
         {
-            context.Database.EnsureCreated(); // Đảm bảo cơ sở dữ liệu được tạo ra
+            // Đảm bảo cơ sở dữ liệu được tạo ra
+            context.Database.EnsureCreated();
 
             // Kiểm tra nếu đã có dữ liệu trong bảng Users
             if (context.Users.Any())
@@ -27,7 +28,8 @@ namespace AuthServer.Data
                     Id = Guid.NewGuid(),
                     FirstName = $"FirstName{i}",
                     LastName = $"LastName{i}",
-                    DateOfBirth = DateTime.Now.AddYears(-20).AddDays(-i),
+                    // Chuyển đổi DateOfBirth sang UTC
+                    DateOfBirth = DateTime.Now.AddYears(-20).AddDays(-i).ToUniversalTime(),
                     ProfilePicture = $"profile{i}.jpg",
                     Bio = "{}",
                     Address = "{}",
@@ -57,10 +59,10 @@ namespace AuthServer.Data
 
             // Dữ liệu seeding cho Roles
             var roles = new List<Roles>
-            {
-                new Roles { Id = Guid.NewGuid(), Name = "Admin", NormalizedName = "ADMIN", ConcurrencyStamp = Guid.NewGuid().ToString() },
-                new Roles { Id = Guid.NewGuid(), Name = "User", NormalizedName = "USER", ConcurrencyStamp = Guid.NewGuid().ToString() }
-            };
+    {
+        new Roles { Id = Guid.NewGuid(), Name = "Admin", NormalizedName = "ADMIN", ConcurrencyStamp = Guid.NewGuid().ToString() },
+        new Roles { Id = Guid.NewGuid(), Name = "User", NormalizedName = "USER", ConcurrencyStamp = Guid.NewGuid().ToString() }
+    };
             context.Roles.AddRange(roles);
             context.SaveChanges();
 
@@ -89,7 +91,7 @@ namespace AuthServer.Data
             }
             context.SaveChanges();
 
-            // Seeding UserTokens
+            // Nếu cần seeding UserTokens và UserLogins, giữ lại, nếu không thì bỏ đi
             for (int i = 1; i <= 5; i++) // Seeding cho 5 người dùng
             {
                 context.UserTokens.Add(new UserTokens
@@ -99,12 +101,7 @@ namespace AuthServer.Data
                     Name = $"TokenName{i}",
                     Value = $"TokenValue{i}"
                 });
-            }
-            context.SaveChanges();
 
-            // Seeding UserLogins
-            for (int i = 1; i <= 5; i++) // Seeding cho 5 người dùng
-            {
                 context.UserLogins.Add(new UserLogins
                 {
                     UserId = users[i - 1].Id,
@@ -115,5 +112,6 @@ namespace AuthServer.Data
             }
             context.SaveChanges();
         }
+
     }
 }

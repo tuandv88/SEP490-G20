@@ -8,6 +8,7 @@ namespace AuthServer.Data
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
     public class ApplicationDbContext : IdentityDbContext<Users, Roles, Guid>
     {
@@ -54,6 +55,20 @@ namespace AuthServer.Data
                 entity.ToTable("UserRoles");
             });
 
+            // Tự động chuyển đổi tất cả DateTime thành UTC
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetValueConverter(new ValueConverter<DateTime, DateTime>(
+                            v => v.ToUniversalTime(), // Khi lưu, chuyển thành UTC
+                            v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Khi lấy dữ liệu, đặt DateTimeKind thành UTC
+                        ));
+                    }
+                }
+            }
         }
     }
 

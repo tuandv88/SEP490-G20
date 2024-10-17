@@ -1,0 +1,262 @@
+﻿@using AuthServer.Models.AccountViewModel
+
+@model LoginViewModel
+
+@{
+    Layout = null;
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="toast" class="toast">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - ICoder</title>
+
+    <!-- Add styles directly for now -->
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .login-box {
+            width: 400px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo img {
+            display: block;
+            margin: 0 auto;
+            width: 100px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+            .form-footer a {
+                color: #007bff;
+                text-decoration: none;
+            }
+
+        /* Styles for validation error messages */
+        .text-danger {
+            font-size: 12px;
+            color: #e74c3c; /* Đồng bộ với tệp trước */
+            margin-top: -10px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .social-login {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .social-login p {
+                margin-bottom: 10px;
+            }
+
+        .btn-facebook, .btn-google, .btn-github {
+            display: inline-block;
+            width: 100px;
+            padding: 10px;
+            margin: 5px;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-facebook {
+            background-color: #3b5998;
+        }
+
+        .btn-google {
+            background-color: #db4437;
+        }
+
+        .btn-github {
+            background-color: #333;
+        }
+
+        .error-message {
+            color: #e74c3c; /* Đỏ đồng nhất với thông báo lỗi */
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .text-danger {
+            font-size: 12px;
+            color: #e74c3c;
+            margin-top: 5px; /* Thêm khoảng cách phía trên */
+            display: block; /* Đảm bảo thông báo lỗi được hiển thị dưới dạng khối */
+        }
+
+        .form-group {
+            margin-bottom: 15px; /* Điều chỉnh khoảng cách giữa các nhóm form */
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px; /* Điều chỉnh vị trí nếu cần */
+            right: 20px; /* Điều chỉnh vị trí nếu cần */
+            background-color: #4CAF50; /* Màu nền */
+            color: white; /* Màu chữ */
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000; /* Đảm bảo nó nằm trên cùng */
+            display: none; /* Ẩn đi ban đầu */
+            transition: opacity 1s ease; /* Hiệu ứng mờ dần */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-box">
+            <!-- Logo -->
+            <div class="logo">
+                <!-- Replace with your logo URL -->
+                <img src="~/path-to-logo.png" alt="Icoder" />
+            </div>
+
+            <!-- Title below the logo -->
+            <div class="title">Sign In to ICoder</div>
+
+            <!-- Display validation error message -->
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            <!-- Form starts here -->
+            <form asp-action="Login" method="post">
+
+                <!-- Hidden returnUrl -->
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+                <!-- Username field -->
+                <div class="form-group">
+                    <input asp-for="UsernameOrEmail" class="form-control" placeholder="UserName / Email" value="@Model?.UsernameOrEmail" />
+                    <span asp-validation-for="UsernameOrEmail" class="text-danger"></span>
+                </div>
+
+                <!-- Password field -->
+                <div class="form-group">
+                    <input asp-for="Password" class="form-control" type="password" placeholder="Password" value="@Model?.Password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- Remember Me checkbox -->
+                <div class="form-group">
+                    <div class="form-check">
+                        <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                        <label asp-for="RememberMe" class="form-check-label">Remember Me</label>
+                    </div>
+                </div>
+
+                <!-- Submit button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                </div>
+
+                <!-- Forgot password and Register links -->
+                <div class="form-footer">
+                    <a href="@Url.Action("ForgotPassword", "Account")">Forgot Password?</a>
+                    <span> | </span>
+                    <a href="@Url.Action("Register", "Account")">Register</a>
+                </div>
+            </form>
+
+            <!-- Social login options -->
+            <div class="social-login">
+                <p>Sign in with</p>
+
+                <form asp-action="ExternalLogin" method="post">
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                    <button type="submit" class="btn btn-google">Google</button>
+                </form>
+
+                <a href="#" class="btn btn-facebook">Facebook</a>
+                <a href="#" class="btn btn-github">Github</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include validation scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var toast = document.getElementById("toast");
+            if (toast) {
+                toast.style.display = "block"; // Hiện thông báo
+                setTimeout(function () {
+                    toast.style.opacity = "0"; // Bắt đầu hiệu ứng mờ dần
+                    setTimeout(function () {
+                        toast.style.display = "none"; // Ẩn thông báo hoàn toàn sau khi mờ
+                    }, 1000); // Thời gian cho hiệu ứng mờ
+                }, 10000); // Hiện thông báo trong 10 giây
+            }
+        });
+    </script>
+
+</body>
+</html>

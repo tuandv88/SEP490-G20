@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Email Confirmation";
+}
+
+<h2 class="align-content-center">Status Confirm Email</h2>
+
+@if (TempData["MessageInfo"] != null)
+{
+    <div class="alert alert-dark align-content-center">
+        @TempData["MessageInfo"]
+    </div>
+
+    <a asp-controller="Account" asp-action="Login">Back To Login.</a>
+}

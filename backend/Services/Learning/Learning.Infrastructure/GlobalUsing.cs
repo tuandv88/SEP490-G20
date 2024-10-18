@@ -1,0 +1,12 @@
+﻿global using Microsoft.EntityFrameworkCore;
+global using Learning.Domain.Enums;
+global using Learning.Domain.ValueObjects;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Learning.Domain.Models;
+global using Learning.Application.Common;
+global using Learning.Application.Data;
+global using Learning.Infrastructure.Data;
+global using Learning.Infrastructure.Services;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Learning.Domain.Abstractions;

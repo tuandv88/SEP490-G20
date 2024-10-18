@@ -1,0 +1,232 @@
+﻿@using AuthServer.Models.AccountViewModel
+
+@model RegisterViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - ICoder</title>
+
+    <!-- Add styles directly for now -->
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .login-box {
+            width: 400px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo img {
+            display: block;
+            margin: 0 auto;
+            width: 100px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+            .form-footer a {
+                color: #007bff;
+                text-decoration: none;
+            }
+
+        /* Styles for validation error messages */
+        .text-danger {
+            font-size: 12px;
+            color: #e74c3c; /* Đỏ tươi */
+            margin-top: -10px; /* Giảm khoảng cách giữa thông báo và input */
+            margin-bottom: 10px; /* Tạo khoảng cách đều phía dưới */
+            display: block;
+        }
+
+        .social-login {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .social-login p {
+                margin-bottom: 10px;
+            }
+
+        .btn-facebook,
+        .btn-google,
+        .btn-github {
+            display: inline-block;
+            width: 100px;
+            padding: 10px;
+            margin: 5px;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-facebook {
+            background-color: #3b5998;
+        }
+
+        .btn-google {
+            background-color: #db4437;
+        }
+
+        .btn-github {
+            background-color: #333;
+        }
+
+        .text-danger {
+            font-size: 12px;
+            color: #e74c3c;
+            margin-top: 5px; /* Thêm khoảng cách phía trên */
+            display: block; /* Đảm bảo thông báo lỗi được hiển thị dưới dạng khối */
+        }
+
+        .form-group {
+            margin-bottom: 15px; /* Điều chỉnh khoảng cách giữa các nhóm form */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="login-box">
+            <!-- Logo -->
+            <div class="logo">
+                <!-- Replace with your logo URL -->
+                <img src="~/path-to-logo.png" alt="Icoder" />
+            </div>
+
+            <!-- Title below the logo -->
+            <div class="title">Register to ICoder</div>
+
+            <!-- Display validation error message -->
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            <!-- Form starts here -->
+            <form asp-action="Register" method="post">
+
+                <!-- Hidden returnUrl -->
+                <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+                <!-- First Name field -->
+                <div class="form-group">
+                    <input asp-for="FirstName" class="form-control" placeholder="First Name" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <!-- Last Name field -->
+                <div class="form-group">
+                    <input asp-for="LastName" class="form-control" placeholder="Last Name" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <!-- Date of Birth field -->
+                <div class="form-group">
+                    <input asp-for="Dob" class="form-control" type="date" />
+                    <span asp-validation-for="Dob" class="text-danger"></span>
+                </div>
+
+                <!-- Email field -->
+                <div class="form-group">
+                    <input asp-for="Email" class="form-control" placeholder="Email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <!-- Username field -->
+                <div class="form-group">
+                    <input asp-for="UserName" class="form-control" placeholder="UserName" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <!-- Password field -->
+                <div class="form-group">
+                    <input asp-for="Password" class="form-control" type="password" placeholder="Password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <!-- Confirm Password field -->
+                <div class="form-group">
+                    <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="Confirm Password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <!-- Submit button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Register</button>
+                </div>
+
+                <!-- Already have an account -->
+                <div class="form-footer">
+                    <a href="@Url.Action("Login", "Account")">Already have an account? Sign In</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Include validation scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+</body>
+
+</html>

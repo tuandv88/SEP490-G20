@@ -1,5 +1,7 @@
-namespace AuthServer.Models {
-    public class ErrorViewModel {
+namespace MoviesClient.Models
+{
+    public class ErrorViewModel
+    {
         public string? RequestId { get; set; }
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);

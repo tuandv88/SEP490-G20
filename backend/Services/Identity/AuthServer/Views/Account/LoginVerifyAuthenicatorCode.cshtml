@@ -85,6 +85,11 @@
                 <div class="card">
                     <form asp-action="LoginVerifyAuthenicatorCode" asp-controller="Account" method="post" asp-route-returnUrl="@ViewData["ReturnUrl"]">
                         
+                        <div class="form-group">
+                            <input asp-for="UserOrEmail" class="form-control" placeholder="UserName / Email" value="@Model?.UserOrEmail" type="hidden"/>
+                            <span asp-validation-for="UserOrEmail" class="text-danger"></span>
+                        </div>
+
                         <input type="hidden" asp-for="RememberMe"  />
 
                         <div class="form-group mb-3">

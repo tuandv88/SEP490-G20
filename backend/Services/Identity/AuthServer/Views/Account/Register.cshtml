@@ -1,5 +1,4 @@
 ﻿@using AuthServer.Models.AccountViewModel
-
 @model RegisterViewModel
 
 @{
@@ -27,115 +26,268 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            height: 100vh; /* Chiếm toàn bộ chiều cao của cửa sổ */
             background-color: #f4f4f4;
         }
 
         .login-box {
-            width: 400px;
+            width: 600px; /* Tăng chiều rộng form */
             background-color: white;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         .logo img {
             display: block;
-            margin: 0 auto;
-            width: 100px;
+            margin: 0 auto 20px;
+            width: 80px;
         }
 
         .title {
             text-align: center;
             font-size: 24px;
             font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            color: #3b7ed0;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px; /* Thêm khoảng cách giữa các trường */
         }
 
         .form-group {
+            width: 100%;
             margin-bottom: 20px;
         }
 
+            .form-group.half-width {
+                width: calc(50% - 10px); /* Mỗi trường chiếm 50% chiều rộng, trừ khoảng cách giữa */
+            }
+
         .form-control {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 10px;
             box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
         }
+
+            .form-control:focus {
+                border-color: #3b7ed0;
+                outline: none;
+                box-shadow: 0 0 5px rgba(59, 126, 208, 0.5);
+            }
 
         .btn-primary {
             width: 100%;
-            padding: 10px;
-            background-color: #007bff;
+            padding: 12px;
+            background-color: #3b7ed0;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
+            font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
+            .btn-primary:hover {
+                background-color: #356db1;
+            }
+
         .form-footer {
-            text-align: center;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-size: 14px;
         }
 
             .form-footer a {
-                color: #007bff;
+                color: #3b7ed0;
                 text-decoration: none;
             }
 
-        /* Styles for validation error messages */
-        .text-danger {
-            font-size: 12px;
-            color: #e74c3c; /* Đỏ tươi */
-            margin-top: -10px; /* Giảm khoảng cách giữa thông báo và input */
-            margin-bottom: 10px; /* Tạo khoảng cách đều phía dưới */
-            display: block;
+        ul li {
+            list-style: none; /* Bỏ marker cho các phần tử li */
+        }
+        /* Error message styling */
+        .error-message {
+            background-color: #fdecea;
+            color: #e74c3c;
+            padding: 0px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 10px;
+            text-align: left;
+            font-size: 14px;
+            box-shadow: 0px 2px 10px rgba(231, 76, 60, 0.1);
+            transition: all 0.3s ease;
         }
 
-        .social-login {
-            text-align: center;
-            margin-top: 20px;
-        }
 
-            .social-login p {
-                margin-bottom: 10px;
+
+            .error-message .text-danger {
+                display: inline-block;
+                margin-left: 5px;
             }
 
-        .btn-facebook,
-        .btn-google,
-        .btn-github {
-            display: inline-block;
-            width: 100px;
-            padding: 10px;
-            margin: 5px;
-            color: white;
-            border-radius: 5px;
-            text-align: center;
-            text-decoration: none;
-        }
+            /* Error message fade-in animation */
+            .error-message.show {
+                opacity: 1;
+            }
 
-        .btn-facebook {
-            background-color: #3b5998;
-        }
+            .error-message.hide {
+                opacity: 0;
+                display: none;
+            }
 
-        .btn-google {
-            background-color: #db4437;
-        }
-
-        .btn-github {
-            background-color: #333;
-        }
 
         .text-danger {
             font-size: 12px;
             color: #e74c3c;
-            margin-top: 5px; /* Thêm khoảng cách phía trên */
-            display: block; /* Đảm bảo thông báo lỗi được hiển thị dưới dạng khối */
+            margin-top: 5px;
+            margin-bottom: 5px;
+            display: block;
+            text-align: left;
         }
 
-        .form-group {
-            margin-bottom: 15px; /* Điều chỉnh khoảng cách giữa các nhóm form */
+        .intro-text {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+            .intro-text h1 {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: #333; /* Màu tiêu đề */
+            }
+
+            .intro-text p {
+                font-size: 16px;
+                color: #555; /* Màu chữ cho đoạn văn */
+                line-height: 1.6;
+            }
+
+            .intro-text strong {
+                font-weight: bold;
+                color: #000; /* Màu nhấn mạnh cho phần "Nền tảng Viblo" */
+            }
+
+        /* Social login styles */
+        .social-login .btn-facebook, .social-login .btn-google, .social-login .btn-github {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: 2px solid #333; /* Thêm viền cho tất cả các nút */
+        }
+
+        .social-login .btn-facebook {
+            background-color: #3b5998;
+            border-color: #3b5998; /* Đặt viền cùng màu với nút Facebook */
+        }
+
+        .social-login .btn-google {
+            background-color: #db4437;
+            border-color: #db4437; /* Đặt viền cùng màu với nút Google */
+        }
+
+        .social-login .btn-github {
+            background-color: #333;
+            border-color: #333; /* Đặt viền cùng màu với nút Github */
+        }
+
+        .social-login .btn-facebook:hover {
+            background-color: #324b7a;
+        }
+
+        .social-login .btn-google:hover {
+            background-color: #b33a2f;
+        }
+
+        .social-login .btn-github:hover {
+            background-color: #242424;
+        }
+
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #dff0d8;
+            color: #3c763d;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            border: 1px solid #d6e9c6;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            transition: opacity 1s ease;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+            .toast.show {
+                display: block;
+                opacity: 1;
+            }
+
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .login-box {
+                width: 90%; /* Giảm chiều rộng của hộp form trên thiết bị di động */
+                padding: 20px;
+            }
+
+            .form-row {
+                flex-direction: column; /* Đặt các trường form theo cột thay vì hàng */
+                gap: 10px; /* Giảm khoảng cách giữa các trường */
+            }
+
+            .form-group.half-width {
+                width: 100%; /* Đặt chiều rộng 100% cho các trường form trên thiết bị nhỏ */
+            }
+        }
+
+       @@media (max-width: 576px) {
+            .title {
+                font-size: 20px; /* Giảm kích thước font cho tiêu đề trên màn hình nhỏ */
+            }
+
+            .form-control {
+                padding: 10px; /* Giảm padding cho các trường form để phù hợp với màn hình nhỏ */
+                font-size: 13px; /* Giảm kích thước font cho form control */
+            }
+
+            .btn-primary {
+                font-size: 14px; /* Giảm kích thước font của nút trên màn hình nhỏ */
+            }
+
+            .intro-text h1 {
+                font-size: 22px; /* Điều chỉnh kích thước font tiêu đề của phần giới thiệu */
+            }
+
+            .intro-text p {
+                font-size: 14px; /* Điều chỉnh kích thước font cho đoạn văn giới thiệu */
+            }
+        }
+
+        @@media (max-width: 400px) {
+            .login-box {
+                width: 100%; /* Chiếm toàn bộ chiều rộng màn hình */
+            }
+
+            .title {
+                font-size: 18px; /* Giảm kích thước tiêu đề thêm một chút cho màn hình cực nhỏ */
+            }
         }
     </style>
 </head>
@@ -153,11 +305,19 @@
             <!-- Title below the logo -->
             <div class="title">Register to ICoder</div>
 
+            <!-- Introduction text above the registration form -->
+            <div class="intro-text">
+                <p>
+                    Welcome to <strong>ICoder Platform!</strong> Join us to find useful information
+                    necessary to improve your programming skills. Please fill in your information in the form below to continue.
+                </p>
+            </div>
+
             <!-- Display validation error message -->
             @if (!ViewData.ModelState.IsValid)
             {
-                <div class="alert alert-danger">
-                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="error-message show">
+                    <span> @Html.ValidationSummary(true, "", new { @class = "text-danger" })</span>
                 </div>
             }
 
@@ -167,51 +327,49 @@
                 <!-- Hidden returnUrl -->
                 <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
 
-                <!-- First Name field -->
-                <div class="form-group">
-                    <input asp-for="FirstName" class="form-control" placeholder="First Name" />
-                    <span asp-validation-for="FirstName" class="text-danger"></span>
-                </div>
-
-                <!-- Last Name field -->
-                <div class="form-group">
-                    <input asp-for="LastName" class="form-control" placeholder="Last Name" />
-                    <span asp-validation-for="LastName" class="text-danger"></span>
+                <!-- First Name and Last Name in the same row -->
+                <div class="form-row">
+                    <div class="form-group half-width">
+                        <input asp-for="FirstName" class="form-control" placeholder="First Name" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group half-width">
+                        <input asp-for="LastName" class="form-control" placeholder="Last Name" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
                 </div>
 
                 <!-- Date of Birth field -->
-                <div class="form-group">
+                <div class="form-group full-width">
                     <input asp-for="Dob" class="form-control" type="date" />
                     <span asp-validation-for="Dob" class="text-danger"></span>
                 </div>
 
-                <!-- Email field -->
-                <div class="form-group">
-                    <input asp-for="Email" class="form-control" placeholder="Email" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                <!-- Email and Username in the same row -->
+                <div class="form-row">
+                    <div class="form-group half-width">
+                        <input asp-for="Email" class="form-control" placeholder="Email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group half-width">
+                        <input asp-for="UserName" class="form-control" placeholder="Username" />
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
                 </div>
 
-                <!-- Username field -->
-                <div class="form-group">
-                    <input asp-for="UserName" class="form-control" placeholder="UserName" />
-                    <span asp-validation-for="UserName" class="text-danger"></span>
-                </div>
-
-                <!-- Password field -->
-                <div class="form-group">
+                <!-- Password and Confirm Password fields -->
+                <div class="form-group full-width">
                     <input asp-for="Password" class="form-control" type="password" placeholder="Password" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
-
-                <!-- Confirm Password field -->
-                <div class="form-group">
+                <div class="form-group full-width">
                     <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="Confirm Password" />
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
 
                 <!-- Submit button -->
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-block">Register</button>
+                    <button type="submit" class="btn-primary">Register</button>
                 </div>
 
                 <!-- Already have an account -->
@@ -219,6 +377,20 @@
                     <a href="@Url.Action("Login", "Account")">Already have an account? Sign In</a>
                 </div>
             </form>
+
+            <!-- Social login options -->
+            <div class="social-login">
+                <p>Sign In With</p>
+
+                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+                    <button type="submit" class="btn-google">Google</button>
+                </form>
+
+                <a href="#" class="btn-facebook">Facebook</a>
+                <a href="#" class="btn-github">Github</a>
+            </div>
+
         </div>
     </div>
 

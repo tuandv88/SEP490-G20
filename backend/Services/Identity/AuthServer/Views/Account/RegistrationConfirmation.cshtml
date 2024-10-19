@@ -1,0 +1,242 @@
+﻿@{
+    ViewBag.Title = "Registration Confirmation";
+    string fullName = ViewData["FullName"]?.ToString();
+    string email = ViewData["Email"]?.ToString();
+}
+
+<!-- Thông báo thành công -->
+@if (TempData["ConfirmEmailSuccessMessage"] != null)
+{
+    <div id="toast-success" class="toast-success">
+        @TempData["ConfirmEmailSuccessMessage"]
+    </div>
+}
+
+<!-- Thông báo thất bại -->
+@if (TempData["ConfirmEmailFailMessage"] != null)
+{
+    <div id="toast-fail" class="toast-fail">
+        @TempData["ConfirmEmailFailMessage"]
+    </div>
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Confirmation</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f9fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .confirmation-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+        }
+
+        .logo img {
+            display: block;
+            margin: 0 auto 20px;
+            width: 140px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #3b7ed0;
+        }
+
+        p {
+            font-size: 16px;
+            color: #555;
+            text-align: left;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .highlight-text {
+            font-weight: bold;
+            color: #1e88e5;
+        }
+
+        .success-message {
+            background-color: #f1f8e9;
+            border: 1px solid #c8e6c9;
+            color: #388e3c;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+            .success-message p {
+                color: #388e3c; /* Chữ xanh nhạt bên trong hộp */
+            }
+
+            .success-message strong {
+                color: #2e7d32; /* Chữ xanh đậm hơn cho thông tin chính */
+            }
+
+        a {
+            color: #1e88e5;
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+        .resend-link {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .back-to-login {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn-back {
+            display: inline-block;
+            padding: 15px 25px;
+            background-color: #3b7ed0;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+            .btn-back:hover {
+                background-color: #356db1;
+            }
+
+        /* CSS cho thông báo thành công */
+        .toast-success {
+            background-color: #dff0d8; /* Light green background */
+            color: #3c763d; /* Dark green text */
+            border: 1px solid #d6e9c6;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+            transition: opacity 1s ease;
+            font-size: 14px;
+        }
+
+        /* CSS cho thông báo thất bại */
+        .toast-fail {
+            background-color: #f8d7da; /* Light red background */
+            color: #721c24; /* Dark red text */
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+            transition: opacity 1s ease;
+            font-size: 14px;
+        }
+
+            .toast-success.show, .toast-fail.show {
+                display: block;
+                opacity: 1;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="confirmation-container">
+        <div class="logo">
+            <img src="~/path-to-logo.png" alt="Logo" />
+        </div>
+
+        <!-- Title below the logo -->
+        <div class="title">Register to ICoder</div>
+
+        <p>
+            Welcome to the <span class="highlight-text">ICoder Platform!</span>  Join us to find useful information necessary to improve your programming skills. Please fill in your information in the form below to continue.
+        </p>
+
+        <div class="success-message">
+            <p>Welcome <strong>@fullName</strong>, your account has been <strong>successfully registered</strong>. We have sent an activation email to the address <strong>@email</strong>. Please check your inbox to complete the process.</p>
+        </div>
+
+        <div class="resend-link">
+            <p>If you did not receive the activation email, please click <a href="@Url.Action("ResendEmailConfirmation", "Account", new { email = @email, fullName = @fullName})">resend</a> to send the activation email again.</p>
+        </div>
+
+
+        <!-- Back to Login Button -->
+        <div class="back-to-login">
+            <a href="@Url.Action("Login", "Account")" class="btn-back">Back to Sign In</a>
+        </div>
+    </div>
+
+    <div class="footer-text">
+        © 2024 ICoder Platform. All rights reserved.
+    </div>
+
+    <!-- Include validation scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var toastSuccess = document.getElementById("toast-success");
+            var toastFail = document.getElementById("toast-fail");
+
+            // Hiển thị thông báo thành công
+            if (toastSuccess) {
+                toastSuccess.classList.add("show");
+                setTimeout(function () {
+                    toastSuccess.style.opacity = "0";
+                    setTimeout(function () {
+                        toastSuccess.style.display = "none";
+                    }, 1000);
+                }, 10000); // Hiển thị trong 10 giây
+            }
+
+            // Hiển thị thông báo thất bại
+            if (toastFail) {
+                toastFail.classList.add("show");
+                setTimeout(function () {
+                    toastFail.style.opacity = "0";
+                    setTimeout(function () {
+                        toastFail.style.display = "none";
+                    }, 1000);
+                }, 10000); // Hiển thị trong 10 giây
+            }
+        });
+    </script>
+</body>
+</html>

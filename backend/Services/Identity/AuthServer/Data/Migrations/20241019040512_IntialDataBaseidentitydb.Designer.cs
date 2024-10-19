@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuthServer.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241016151449_IntialDatabaseIdentity")]
-    partial class IntialDatabaseIdentity
+    [Migration("20241019040512_IntialDataBaseidentitydb")]
+    partial class IntialDataBaseidentitydb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

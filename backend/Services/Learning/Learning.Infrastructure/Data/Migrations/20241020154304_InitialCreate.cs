@@ -40,21 +40,6 @@ namespace Learning.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Lessons",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedBy = table.Column<string>(type: "text", nullable: true),
-                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Lessons", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Problems",
                 columns: table => new
                 {
@@ -139,7 +124,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    EnrollmentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 20, 6, 56, 56, 698, DateTimeKind.Utc).AddTicks(7581)),
+                    EnrollmentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 20, 15, 43, 4, 177, DateTimeKind.Utc).AddTicks(4557)),
                     CompletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UserCourseStatus = table.Column<string>(type: "text", nullable: false, defaultValue: "InProgress"),
                     Rating = table.Column<int>(type: "integer", nullable: false, defaultValue: -1),
@@ -156,61 +141,6 @@ namespace Learning.Infrastructure.Data.Migrations
                         name: "FK_UserCourses_Courses_CourseId",
                         column: x => x.CourseId,
                         principalTable: "Courses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Documents",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    LessonId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedBy = table.Column<string>(type: "text", nullable: true),
-                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: true),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    FileName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Url = table.Column<string>(type: "text", nullable: false),
-                    Format = table.Column<string>(type: "text", nullable: false),
-                    FileSize = table.Column<double>(type: "double precision", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Documents", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Documents_Lessons_LessonId",
-                        column: x => x.LessonId,
-                        principalTable: "Lessons",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Videos",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    LessonId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Duration = table.Column<double>(type: "double precision", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedBy = table.Column<string>(type: "text", nullable: true),
-                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: true),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    FileName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Url = table.Column<string>(type: "text", nullable: false),
-                    Format = table.Column<string>(type: "text", nullable: false),
-                    FileSize = table.Column<double>(type: "double precision", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Videos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Videos_Lessons_LessonId",
-                        column: x => x.LessonId,
-                        principalTable: "Lessons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -248,7 +178,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProblemId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 20, 6, 56, 56, 670, DateTimeKind.Utc).AddTicks(7698)),
+                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 20, 15, 43, 4, 160, DateTimeKind.Utc).AddTicks(9562)),
                     SourceCode = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
                     LanguageCode = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     ExecutionTime = table.Column<double>(type: "double precision", nullable: false),
@@ -341,7 +271,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     QuizId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 20, 6, 56, 56, 688, DateTimeKind.Utc).AddTicks(8893)),
+                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 20, 15, 43, 4, 171, DateTimeKind.Utc).AddTicks(9922)),
                     Score = table.Column<long>(type: "bigint", nullable: false),
                     TotalQuestions = table.Column<int>(type: "integer", nullable: false),
                     CorrectAnswers = table.Column<int>(type: "integer", nullable: false),
@@ -370,9 +300,8 @@ namespace Learning.Infrastructure.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ChapterId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LessonId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProblemId = table.Column<Guid>(type: "uuid", nullable: false),
-                    QuizId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProblemId = table.Column<Guid>(type: "uuid", nullable: true),
+                    QuizId = table.Column<Guid>(type: "uuid", nullable: true),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Summary = table.Column<string>(type: "text", nullable: false),
                     TimeEstimation = table.Column<double>(type: "double precision", nullable: false),
@@ -395,23 +324,15 @@ namespace Learning.Infrastructure.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Lectures_Lessons_LessonId",
-                        column: x => x.LessonId,
-                        principalTable: "Lessons",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Lectures_Problems_ProblemId",
                         column: x => x.ProblemId,
                         principalTable: "Problems",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Lectures_Quizs_QuizId",
                         column: x => x.QuizId,
                         principalTable: "Quizs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -461,6 +382,35 @@ namespace Learning.Infrastructure.Data.Migrations
                         name: "FK_QuestionOption_Questions_QuestionId",
                         column: x => x.QuestionId,
                         principalTable: "Questions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "File",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    LectureId = table.Column<Guid>(type: "uuid", nullable: false),
+                    FileName = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    Url = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Format = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    FileSize = table.Column<long>(type: "bigint", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    FileType = table.Column<string>(type: "text", nullable: false, defaultValue: "DOCUMENT"),
+                    Duration = table.Column<double>(type: "double precision", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_File", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_File_Lectures_LectureId",
+                        column: x => x.LectureId,
+                        principalTable: "Lectures",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -528,9 +478,9 @@ namespace Learning.Infrastructure.Data.Migrations
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Documents_LessonId",
-                table: "Documents",
-                column: "LessonId");
+                name: "IX_File_LectureId",
+                table: "File",
+                column: "LectureId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LectureComment_LectureId",
@@ -541,12 +491,6 @@ namespace Learning.Infrastructure.Data.Migrations
                 name: "IX_Lectures_ChapterId",
                 table: "Lectures",
                 column: "ChapterId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Lectures_LessonId",
-                table: "Lectures",
-                column: "LessonId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Lectures_ProblemId",
@@ -615,19 +559,13 @@ namespace Learning.Infrastructure.Data.Migrations
                 name: "IX_UserCourses_CourseId",
                 table: "UserCourses",
                 column: "CourseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Videos_LessonId",
-                table: "Videos",
-                column: "LessonId",
-                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Documents");
+                name: "File");
 
             migrationBuilder.DropTable(
                 name: "LectureComment");
@@ -651,9 +589,6 @@ namespace Learning.Infrastructure.Data.Migrations
                 name: "TestCases");
 
             migrationBuilder.DropTable(
-                name: "Videos");
-
-            migrationBuilder.DropTable(
                 name: "Lectures");
 
             migrationBuilder.DropTable(
@@ -667,9 +602,6 @@ namespace Learning.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Chapters");
-
-            migrationBuilder.DropTable(
-                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "Quizs");

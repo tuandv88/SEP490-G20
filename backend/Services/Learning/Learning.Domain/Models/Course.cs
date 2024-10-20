@@ -63,5 +63,6 @@ public class Course : Aggregate<CourseId> {
         Price = price;
         //TODO add event vào domain
     }
+
 }
 

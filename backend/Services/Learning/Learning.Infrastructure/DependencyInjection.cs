@@ -3,7 +3,6 @@ using Learning.Infrastructure.Data.Interceptors;
 using Learning.Infrastructure.Data.Repositories.Chapters;
 using Learning.Infrastructure.Data.Repositories.Courses;
 using Learning.Infrastructure.Data.Repositories.Lectures;
-using Learning.Infrastructure.Data.Repositories.Videos;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 
@@ -35,11 +34,6 @@ public static class DependencyInjection {
 
         //LectureRepository
         services.AddScoped<ILectureRepository, LectureRepository>();
-
-        //Video
-        services.AddScoped<IVideoRepository, VideoRepository>();
-
-        services.AddScoped<IGFI, GFI>();
         return services;
     }
 }

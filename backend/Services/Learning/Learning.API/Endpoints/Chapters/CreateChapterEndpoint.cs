@@ -17,7 +17,7 @@ public class CreateChapterEndpoint : ICarterModule {
             return Results.Created($"/courses/{CourseId}/chapters{response.Id}", response);
         })
         .WithName("CreateChapter")
-        .Produces<CreateCourseResponse>(StatusCodes.Status201Created)
+        .Produces<CreateChapterResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Create chapter");
     }

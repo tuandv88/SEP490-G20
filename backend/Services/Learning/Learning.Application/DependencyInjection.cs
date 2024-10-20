@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Behaviors;
-using BuildingBlocks.Extensions;
 using BuildingBlocks.Messaging.MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

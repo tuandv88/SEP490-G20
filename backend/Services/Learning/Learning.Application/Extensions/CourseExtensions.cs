@@ -1,9 +1,9 @@
-﻿using Learning.Application.Models.Courses.Dtos;
-using Learning.Domain.Enums;
+﻿using Learning.Application.Models.Chapters.Dtos;
+using Learning.Application.Models.Courses.Dtos;
 
 namespace Learning.Application.Extensions;
 public static class CourseExtensions {
-    public static List<CourseDto> ToCourseDtoList(this List<Domain.Models.Course> courses) {
+    public static List<CourseDto> ToCourseDtoList(this List<Course> courses) {
         return courses.Select(c => new CourseDto(
             Id: c.Id.Value,
             Title: c.Title,
@@ -22,7 +22,7 @@ public static class CourseExtensions {
             )).ToList();
     }
 
-    public static CourseDto ToCourseDto(this Domain.Models.Course course) {
+    public static CourseDto ToCourseDto(this Course course) {
         return new CourseDto(
             Id: course.Id.Value,
             Title: course.Title,
@@ -39,6 +39,13 @@ public static class CourseExtensions {
             CourseLevel: course.CourseLevel.ToString(),
             Price: course.Price
             );
+    }
+    public static CourseDetailsDto ToCourseDetailsDto(this Course course) {
+        var courseDetail = new CourseDetailsDto(
+            CourseDto: course.ToCourseDto(),
+            ChapterDetailsDtos: course.Chapters.Select(c => c.ToChapterDetailDto()).ToList()
+            );
+        return courseDetail;
     }
 }
 

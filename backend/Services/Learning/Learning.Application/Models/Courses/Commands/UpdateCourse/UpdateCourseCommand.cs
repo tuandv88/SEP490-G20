@@ -49,7 +49,7 @@ public class UpdateCourseCommandValidator : AbstractValidator<UpdateCourseComman
             .NotEmpty().WithMessage("ImageUrl must not be empty.");
 
         RuleFor(x => x.UpdateCourseDto.OrderIndex)
-            .GreaterThanOrEqualTo(0).WithMessage("OrderIndex must be greater than or equal to zero.");
+            .GreaterThan(0).WithMessage("OrderIndex must be greater than to zero.");
 
         RuleFor(x => x.UpdateCourseDto.CourseLevel)
            .NotNull().WithMessage("CourseLevel must not be null.")

@@ -6,7 +6,7 @@ using StackExchange.Redis;
 using System.Text;
 
 namespace Learning.Application.Models.Submissions.Commands.CreateSubmission;
-public class CreateSubmissionHandler(IApplicationDbContext dbContext, ISubmissionService submissionService, IGFI compressionService)
+public class CreateSubmissionHandler(IApplicationDbContext dbContext, ISubmissionService submissionService)
     : ICommandHandler<CreateSubmissionCommand, CreateSubmissionResult>
 {
     public async Task<CreateSubmissionResult> Handle(CreateSubmissionCommand request, CancellationToken cancellationToken)

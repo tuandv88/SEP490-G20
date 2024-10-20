@@ -16,7 +16,7 @@ public class UpdateCourseEndpoint : ICarterModule {
             return Results.Ok(response);
         })
         .WithName("UpdateCourse")
-        .Produces<CreateCourseResponse>(StatusCodes.Status200OK)
+        .Produces<UpdateCourseResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Update course");
     }

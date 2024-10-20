@@ -1,6 +1,6 @@
 ﻿namespace Learning.Domain.ValueObjects;
 public record VideoId {
-    private VideoId(Guid value) => Value = value;
+    public VideoId(Guid value) => Value = value;
     public Guid Value { get; }
     public static VideoId Of(Guid value) {
         ArgumentNullException.ThrowIfNull(value);

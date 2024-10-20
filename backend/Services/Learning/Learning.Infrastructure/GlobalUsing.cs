@@ -10,3 +10,7 @@ global using Learning.Infrastructure.Services;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Learning.Domain.Abstractions;
+global using BuildingBlocks.Caching;
+global using Learning.Application.Data.Repositories;
+global using Learning.Infrastructure.Constants;
+global using Learning.Domain.Model;

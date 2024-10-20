@@ -1,20 +1,23 @@
-﻿namespace Learning.API.Endpoints.Courses;
+﻿using Learning.Application.Models.Courses.Commands.UpdateCourse;
 
-//public class UpdateCourseEndpoint : ICarterModule {
-//    public void AddRoutes(IEndpointRouteBuilder app) {
+namespace Learning.API.Endpoints.Courses;
+public record UpdateCourseRequest(UpdateCourseDto UpdateCourseDto);
+public record UpdateCourseResponse(bool IsSuccess);
+public class UpdateCourseEndpoint : ICarterModule {
+    public void AddRoutes(IEndpointRouteBuilder app) {
 
-//        app.MapPut("/course", async (CreateCourseRequest request, ISender sender) => {
-//            var command = request.Adapt<CreateSubmissionCommand>();
+        app.MapPut("/courses", async (UpdateCourseRequest request, ISender sender) => {
+            var command = request.Adapt<UpdateCourseCommand>();
 
-//            var result = await sender.Send(command);
+            var result = await sender.Send(command);
 
-//            var response = result.Adapt<CreateCourseResponse>();
+            var response = result.Adapt<UpdateCourseResponse>();
 
-//            return Results.Created($"/api/v1/course/{response}", response);
-//        })
-//        .WithName("UpdateCourse")
-//        .Produces<CreateCourseResponse>(StatusCodes.Status201Created)
-//        .ProducesProblem(StatusCodes.Status400BadRequest)
-//        .WithSummary("Create course");
-//    }
-//}
+            return Results.Ok(response);
+        })
+        .WithName("UpdateCourse")
+        .Produces<CreateCourseResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Update course");
+    }
+}

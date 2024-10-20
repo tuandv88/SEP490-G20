@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System.Text.Json;
 
 namespace BuildingBlocks.Caching;
@@ -54,7 +55,7 @@ public class CacheService : ICacheService {
 
             var result = await _database.GetStringAsync(key);
             if (!string.IsNullOrEmpty(result)) {
-                return JsonSerializer.Deserialize<T>(result)!;
+                return JsonConvert.DeserializeObject<T>(result)!;
             }
 
             return default(T)!;
@@ -87,11 +88,11 @@ public class CacheService : ICacheService {
             if (isMemoryCached) {
                 _memoryCache.Set(key, value, expirationTime.Value);
             } else {
-                await _database.SetStringAsync(key, JsonSerializer.Serialize(value), new DistributedCacheEntryOptions() { SlidingExpiration = expirationTime });
+                await _database.SetStringAsync(key, JsonConvert.SerializeObject(value), new DistributedCacheEntryOptions() { SlidingExpiration = expirationTime });
             }
         } catch (Exception ex) {
             _logger.LogError("SetAsync key= " + key);
-            _logger.LogError("SetAsync value = " + JsonSerializer.Serialize(value));
+            _logger.LogError("SetAsync value = " + JsonConvert.SerializeObject(value));
             _logger.LogError(ex, ex.Message + " " + ex.StackTrace);
         }
     }

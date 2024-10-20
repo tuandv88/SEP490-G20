@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Behaviors;
-using BuildingBlocks.Extensions;
 using BuildingBlocks.Messaging.MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +18,9 @@ public static class DependencyInjection {
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         //RabbitMQ
         services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());
+
+        //Storage
+        services.AddStorage(configuration);
         return services;
     }
 }

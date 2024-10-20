@@ -1,4 +1,4 @@
-﻿global using FluentValidation;
+global using FluentValidation;
 global using Judge0.DotNet.Models.Submissions;
 global using Learning.Domain.Models;
 global using Judge0.DotNet;
@@ -9,3 +9,4 @@ global using Microsoft.EntityFrameworkCore;
 global using BuildingBlocks.Pagination;
 global using Learning.Application.Extensions;
 global using BuildingBlocks.Exceptions;
+global using BuidingBlocks.Storage;

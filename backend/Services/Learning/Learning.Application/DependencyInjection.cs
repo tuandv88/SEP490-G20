@@ -19,6 +19,9 @@ public static class DependencyInjection {
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         //RabbitMQ
         services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());
+
+        //Storage
+        services.AddStorage(configuration);
         return services;
     }
 }

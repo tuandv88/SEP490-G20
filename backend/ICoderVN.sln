@@ -1,4 +1,3 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
@@ -80,6 +79,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Learning.Domain", "Services\Learning\Learning.Domain\Learning.Domain.csproj", "{A0E12382-8078-41CE-A7D7-347C3D1B481C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Learning.Infrastructure", "Services\Learning\Learning.Infrastructure\Learning.Infrastructure.csproj", "{DA52D004-536F-46D9-B4EE-763DD2775F2F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuidingBlocks.Storage", "BuildingBlocks\BuidingBlocks.Storage\BuidingBlocks.Storage.csproj", "{A7078181-4D55-48A4-9453-E25D3EC8AACF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -203,6 +204,10 @@ Global
 		{DA52D004-536F-46D9-B4EE-763DD2775F2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA52D004-536F-46D9-B4EE-763DD2775F2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA52D004-536F-46D9-B4EE-763DD2775F2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7078181-4D55-48A4-9453-E25D3EC8AACF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7078181-4D55-48A4-9453-E25D3EC8AACF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7078181-4D55-48A4-9453-E25D3EC8AACF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7078181-4D55-48A4-9453-E25D3EC8AACF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -244,6 +249,7 @@ Global
 		{569F5F7B-3BFE-4430-A96B-E74F9DB8B3AB} = {6864B3FD-3322-493B-8BEF-31CFCA4F6380}
 		{A0E12382-8078-41CE-A7D7-347C3D1B481C} = {6864B3FD-3322-493B-8BEF-31CFCA4F6380}
 		{DA52D004-536F-46D9-B4EE-763DD2775F2F} = {6864B3FD-3322-493B-8BEF-31CFCA4F6380}
+		{A7078181-4D55-48A4-9453-E25D3EC8AACF} = {F206F08A-9989-4F04-9C0C-AD18DCC8462B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4626AD2C-426F-460F-A1D9-DD0D48F0D9DE}

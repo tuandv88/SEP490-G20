@@ -1,6 +1,8 @@
 ﻿namespace Learning.Infrastructure.Constants;
 public static class CacheKey {
     public const string COURSES = "Courses";
+    public const string COURSES_DETAILS = "CoursesDetails_{0}";
+
     public const string CHAPTERS = "Chapters";
     public const string LECTURES = "Lectures";
     public const string LESSONS = "Lessons";

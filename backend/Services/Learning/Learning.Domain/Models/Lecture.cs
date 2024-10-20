@@ -4,13 +4,10 @@ public class Lecture : Entity<LectureId> {
     public ChapterId ChapterId { get; set; } = default!;
     public ProblemId? ProblemId { get; set; } = default!; // Unique
     public QuizId? QuizId { get; set; } = default!; // Unique
-    private readonly List<LectureProgress> _lectureProgress = new();
-    public IReadOnlyList<LectureProgress> LectureProgress => _lectureProgress.AsReadOnly();
+    public List<LectureProgress> LectureProgress = new();
 
-    private readonly List<LectureComment> _lectureComment = new();
-    public IReadOnlyList<LectureComment> LectureComments => _lectureComment.AsReadOnly();
-    private readonly List<File> _files = new();
-    public IReadOnlyList<File> Files => _files.AsReadOnly();
+    public List<LectureComment> LectureComments = new();
+    public List<File> Files = new();
     public string Title { get; set; } = default!;
     public string Summary { get; set; } = default!;
     public double TimeEstimation { get; set; }

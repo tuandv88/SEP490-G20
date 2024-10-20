@@ -5,7 +5,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
 
-    public DbSet<Domain.Models.Course> Courses => Set<Domain.Models.Course>();
+    public DbSet<Course> Courses => Set<Course>();
 
     public DbSet<Chapter> Chapters => Set<Chapter>();
 
@@ -31,6 +31,9 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext {
     public DbSet<QuizSubmission> QuizSubmissions => Set<QuizSubmission>();
 
     public DbSet<ProblemSubmission> ProblemSubmissions => Set<ProblemSubmission>();
+
+    public DbSet<Domain.Models.File> Files => Set<Domain.Models.File>();
+
     public async new Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class {
         await Set<T>().AddAsync(entity, cancellationToken);
     }

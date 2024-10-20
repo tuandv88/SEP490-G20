@@ -3,10 +3,8 @@
 namespace Learning.Domain.Models;
 public class Course : Aggregate<CourseId> {
 
-    private readonly List<Chapter> _chapters = new();
-    public IReadOnlyList<Chapter> Chapters => _chapters.AsReadOnly();
-    private readonly List<UserCourse> _userCourse = new();
-    public IReadOnlyList<UserCourse> UserCourses => _userCourse.AsReadOnly();
+    public List<Chapter> Chapters = new();
+    public List<UserCourse> UserCourses = new();
     public string Title { get; set; } = default!;
     public string Description { get; set; } = default!;
     public string Headline { get; set; } = default!; //Tên dưới title
@@ -44,7 +42,7 @@ public class Course : Aggregate<CourseId> {
     }
 
     public void AddChapter(Chapter chapter) {
-        _chapters.Add(chapter);
+        Chapters.Add(chapter);
     }
 
     public void Update(string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, string imageUrl, int orderIndex, CourseLevel courseLevel, double price) {

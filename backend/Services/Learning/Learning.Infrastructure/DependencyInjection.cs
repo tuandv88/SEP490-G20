@@ -31,9 +31,11 @@ public static class DependencyInjection {
 
         //ChapterRepository
         services.AddScoped<IChapterRepository, ChapterRepository>();
+        services.Decorate<IChapterRepository, CachedChapterRepository>();
 
         //LectureRepository
         services.AddScoped<ILectureRepository, LectureRepository>();
+        services.Decorate<ILectureRepository, CachedLectureRepository>();
         return services;
     }
 }

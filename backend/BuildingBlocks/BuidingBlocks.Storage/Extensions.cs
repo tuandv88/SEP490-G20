@@ -19,11 +19,10 @@ namespace BuidingBlocks.Storage
             var accessKey = configuration["AWS:AccessKey"];
             var secretKey = configuration["AWS:SecretKey"];
             var url = configuration["AWS:Url"];
-          
             AmazonS3Config config = new AmazonS3Config
             {
-                RegionEndpoint = RegionEndpoint.APNortheast1,
-                ServiceURL = "https://contabostorage.com/icoder"
+                ServiceURL = url,
+                ForcePathStyle = true
             };
 
             AmazonS3Client s3Client = new AmazonS3Client(

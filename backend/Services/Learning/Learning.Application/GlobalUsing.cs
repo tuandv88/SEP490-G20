@@ -9,3 +9,4 @@ global using Microsoft.EntityFrameworkCore;
 global using BuildingBlocks.Pagination;
 global using Learning.Application.Extensions;
 global using BuildingBlocks.Exceptions;
+global using BuidingBlocks.Storage;

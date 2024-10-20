@@ -257,7 +257,7 @@
             }
         }
 
-       @@media (max-width: 576px) {
+        @@media (max-width: 576px) {
             .title {
                 font-size: 20px; /* Giảm kích thước font cho tiêu đề trên màn hình nhỏ */
             }
@@ -327,35 +327,84 @@
                 <!-- Hidden returnUrl -->
                 <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
 
-                <!-- First Name and Last Name in the same row -->
-                <div class="form-row">
+                @if (Model == null ||  Model?.ExternalLogin == false)
+                    {
                     <div class="form-group half-width">
-                        <input asp-for="FirstName" class="form-control" placeholder="First Name" />
-                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                        <input type="hidden" name="ExternalLogin" value="@(Model?.ExternalLogin.ToString().ToLower() ?? "false")" />
+                        <span asp-validation-for="ExternalLogin" class="text-danger"></span>
                     </div>
-                    <div class="form-group half-width">
-                        <input asp-for="LastName" class="form-control" placeholder="Last Name" />
-                        <span asp-validation-for="LastName" class="text-danger"></span>
-                    </div>
-                </div>
 
-                <!-- Date of Birth field -->
-                <div class="form-group full-width">
-                    <input asp-for="Dob" class="form-control" type="date" />
-                    <span asp-validation-for="Dob" class="text-danger"></span>
-                </div>
+                    <!-- First Name and Last Name in the same row -->
+                    <div class="form-row">
+                        <div class="form-group half-width">
+                            <input asp-for="FirstName" class="form-control" placeholder="First Name" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group half-width">
+                            <input asp-for="LastName" class="form-control" placeholder="Last Name" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
 
-                <!-- Email and Username in the same row -->
-                <div class="form-row">
-                    <div class="form-group half-width">
-                        <input asp-for="Email" class="form-control" placeholder="Email" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
+                    <!-- Date of Birth field -->
+                    <div class="form-group full-width">
+                        <input asp-for="Dob" class="form-control" type="date" />
+                        <span asp-validation-for="Dob" class="text-danger"></span>
                     </div>
-                    <div class="form-group half-width">
-                        <input asp-for="UserName" class="form-control" placeholder="Username" />
-                        <span asp-validation-for="UserName" class="text-danger"></span>
+
+                    <!-- Email and Username in the same row -->
+                    <div class="form-row">
+
+                        <div class="form-group half-width">
+                            <input asp-for="Email" class="form-control" placeholder="Email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group half-width">
+                            <input asp-for="UserName" class="form-control" placeholder="Username" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
                     </div>
-                </div>
+
+                }
+                else
+                {
+                    <div class="form-group half-width">
+                        <input type="hidden" name="ExternalLogin" value="@(Model?.ExternalLogin.ToString().ToLower() ?? "false")" />
+                        <span asp-validation-for="ExternalLogin" class="text-danger"></span>
+                    </div>
+
+                    <!-- First Name and Last Name in the same row -->
+                    <div class="form-row">
+                        <div class="form-group half-width">
+                            <input asp-for="FirstName" class="form-control" placeholder="First Name" value="@(Model?.FirstName)" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group half-width">
+                            <input asp-for="LastName" class="form-control" placeholder="Last Name" value="@(Model?.LastName)" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Date of Birth field -->
+                    <div class="form-group full-width">
+                        <input asp-for="Dob" class="form-control" type="date" value="@Model?.Dob.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="Dob" class="text-danger"></span>
+                    </div>
+
+                    <!-- Email and Username in the same row -->
+                    <div class="form-row">
+                        <div class="form-group half-width">
+                            <input asp-for="Email" class="form-control" placeholder="Email" value="@Model?.Email" readonly />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group half-width">
+                            <input asp-for="UserName" class="form-control" placeholder="Username" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                    </div>
+                }
 
                 <!-- Password and Confirm Password fields -->
                 <div class="form-group full-width">
@@ -366,6 +415,7 @@
                     <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="Confirm Password" />
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
+
 
                 <!-- Submit button -->
                 <div class="form-group">

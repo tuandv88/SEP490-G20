@@ -7,8 +7,15 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div id="toast" class="toast">
+    <div id="toast-success" class="toast toast-success">
         @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div id="toast-error" class="toast toast-error">
+        @TempData["ErrorMessage"]
     </div>
 }
 
@@ -174,22 +181,20 @@
             transition: all 0.3s ease;
         }
 
-       
+            .error-message .text-danger {
+                display: inline-block;
+                margin-left: 5px;
+            }
 
-        .error-message .text-danger {
-            display: inline-block;
-            margin-left: 5px;
-        }
+            /* Error message fade-in animation */
+            .error-message.show {
+                opacity: 1;
+            }
 
-        /* Error message fade-in animation */
-        .error-message.show {
-            opacity: 1;
-        }
-
-        .error-message.hide {
-            opacity: 0;
-            display: none;
-        }
+            .error-message.hide {
+                opacity: 0;
+                display: none;
+            }
 
         .text-danger {
             font-size: 12px;
@@ -200,21 +205,33 @@
             text-align: left;
         }
 
+        /* Toast cho thông báo thành công */
+        .toast-success {
+            background-color: #dff0d8; /* Màu xanh nhạt cho thành công */
+            color: #3c763d; /* Màu xanh đậm cho chữ */
+            border: 1px solid #d6e9c6; /* Viền phù hợp với màu nền */
+        }
+
+        /* Toast cho thông báo thất bại */
+        .toast-error {
+            background-color: #f8d7da; /* Màu đỏ nhạt cho lỗi */
+            color: #721c24; /* Màu đỏ đậm cho chữ */
+            border: 1px solid #f5c6cb; /* Viền đỏ nhạt */
+        }
+
+        /* Toast chung */
         .toast {
             position: fixed;
             top: 20px;
             right: 20px;
-            background-color: #dff0d8; /* Light green background similar to the example */
-            color: #3c763d; /* Dark green text color */
             padding: 15px;
             border-radius: 5px;
             z-index: 1000;
-            border: 1px solid #d6e9c6; /* Border matching the background */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Slight shadow for a polished look */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             display: none;
             transition: opacity 1s ease;
-            font-family: Arial, sans-serif; /* Match font to the image example */
-            font-size: 14px; /* Adjust font size for readability */
+            font-family: Arial, sans-serif;
+            font-size: 14px;
         }
 
             .toast.show {
@@ -305,13 +322,27 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            var toast = document.getElementById("toast");
-            if (toast) {
-                toast.classList.add("show"); // Hiện thông báo
+            var toastSuccess = document.getElementById("toast-success");
+            var toastError = document.getElementById("toast-error");
+
+            // Hiển thị và tự động ẩn toast thành công
+            if (toastSuccess) {
+                toastSuccess.classList.add("show"); // Hiện thông báo
                 setTimeout(function () {
-                    toast.style.opacity = "0"; // Bắt đầu hiệu ứng mờ dần
+                    toastSuccess.style.opacity = "0"; // Bắt đầu hiệu ứng mờ dần
                     setTimeout(function () {
-                        toast.style.display = "none"; // Ẩn thông báo hoàn toàn sau khi mờ
+                        toastSuccess.style.display = "none"; // Ẩn thông báo hoàn toàn sau khi mờ
+                    }, 1000); // Thời gian cho hiệu ứng mờ
+                }, 10000); // Hiện thông báo trong 10 giây
+            }
+
+            // Hiển thị và tự động ẩn toast thất bại
+            if (toastError) {
+                toastError.classList.add("show"); // Hiện thông báo
+                setTimeout(function () {
+                    toastError.style.opacity = "0"; // Bắt đầu hiệu ứng mờ dần
+                    setTimeout(function () {
+                        toastError.style.display = "none"; // Ẩn thông báo hoàn toàn sau khi mờ
                     }, 1000); // Thời gian cho hiệu ứng mờ
                 }, 10000); // Hiện thông báo trong 10 giây
             }

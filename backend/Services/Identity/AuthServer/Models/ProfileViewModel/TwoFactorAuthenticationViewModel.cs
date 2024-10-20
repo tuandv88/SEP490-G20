@@ -1,4 +1,4 @@
-﻿namespace AuthServer.Models.AccountViewModel
+﻿namespace AuthServer.Models.ProfileViewModel
 {
     public class TwoFactorAuthenticationViewModel
     {

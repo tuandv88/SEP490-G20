@@ -17,6 +17,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Remove="Views\Account\Accessdenied.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Views\Account\Accessdenied.cshtml" />
 	  <None Include="Views\Home\Index.cshtml" />
 	  <None Include="Views\Home\Privacy.cshtml" />
 	  <None Include="Views\Shared\Error.cshtml" />
@@ -54,6 +59,14 @@
 	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <UpToDateCheckInput Remove="Views\Account\Accessdenied.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Views\Account\Accessdenied.cshtml" />
 	</ItemGroup>
 
 </Project>

@@ -41,8 +41,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Lockout.AllowedForNewUsers = true;
 
     // Cấu hình về User.
-    options.User.AllowedUserNameCharacters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;                                 // Email là duy nhất
 
     // Cấu hình đăng nhập.
@@ -71,12 +70,14 @@ builder.Services.AddIdentityServer(options =>
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    //options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 })
 .AddCookie(options =>
 {
     options.ExpireTimeSpan = TimeSpan.FromMinutes(15);   // Thời gian sống của cookie là 15 phút
-    options.SlidingExpiration = false;                   // Tự động gia hạn thời gian sống khi người dùng hoạt động
+    options.SlidingExpiration = true;                    // Tự động gia hạn thời gian sống khi người dùng hoạt động
+    options.AccessDeniedPath = "/account/accessdenied";  // Đường dẫn khi truy cập bị từ chối
     options.LoginPath = "/account/login";
     options.LogoutPath = "/account/logout";
 })
@@ -124,6 +125,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

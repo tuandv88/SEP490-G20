@@ -11,17 +11,11 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext {
 
     public DbSet<Lecture> Lectures => Set<Lecture>();
 
-    public DbSet<Lesson> Lessons => Set<Lesson>();
-
     public DbSet<Quiz> Quizs => Set<Quiz>();
 
     public DbSet<Question> Questions => Set<Question>();
 
     public DbSet<QuestionOption> QuestionOption => Set<QuestionOption>();
-
-    public DbSet<Video> Videos => Set<Video>();
-
-    public DbSet<Document> Documents => Set<Document>();
 
     public DbSet<Problem> Problems => Set<Problem>();
 

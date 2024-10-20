@@ -31,6 +31,10 @@ public class CachedCourseRepository(ICourseRepository repository, ICacheService 
         return course;
     }
 
+    public async Task<Course?> GetByIdDetailAsync(Guid id) {
+        return await repository.GetByIdDetailAsync(id);
+    }
+
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken) {
         int n = await repository.SaveChangesAsync(cancellationToken);
         //Xóa cached

@@ -1,5 +1,6 @@
 ﻿using Learning.Application.Models.Chapters.Commands.CreateChapter;
 using Learning.Application.Models.Lectures.Dtos;
+using Learning.Domain.Enums;
 
 namespace Learning.Application.Models.Lectures.Commands.CreateLecture;
 public record CreateLectureCommand : ICommand<CreateLectureResult> {
@@ -10,19 +11,33 @@ public record CreateLectureResult(Guid Id);
 public class CreateLectureCommandValidator : AbstractValidator<CreateLectureCommand> {
     public CreateLectureCommandValidator() {
         RuleFor(x => x.CreateLectureDto.Title)
-            .NotNull()
-            .NotEmpty().WithMessage("Title is required.");
+            .NotNull().WithMessage("Title must not be null.")
+            .NotEmpty().WithMessage("Title must not be empty.");
 
         RuleFor(x => x.CreateLectureDto.Summary)
-            .NotNull()
-            .NotEmpty().WithMessage("Description is required.");
+            .NotNull().WithMessage("Summary must not be null.")
+            .NotEmpty().WithMessage("Summary must not be empty.");
 
         RuleFor(x => x.CreateLectureDto.TimeEstimation)
             .GreaterThan(0).WithMessage("Time estimation must be greater than zero.");
 
         RuleFor(x => x.CreateLectureDto.OrderIndex)
-            .GreaterThanOrEqualTo(0).WithMessage("Order index must be greater than or equal to zero.");
+            .GreaterThan(0).WithMessage("Order index must be greater than to zero.");
+
+        RuleFor(x => x.CreateLectureDto.Point)
+            .GreaterThanOrEqualTo(0).WithMessage("Point must be greater than or equal to zero.");
+
+        RuleFor(x => x.CreateLectureDto.LectureType)
+            .Must(BeValidLectureType).WithMessage("Lecture type must be a valid value (Lesson, Quiz, Practice).");
+
+        RuleFor(x => x.CreateLectureDto.IsFree)
+            .NotNull().WithMessage("IsFree must not be null.");
+    }
+    private bool BeValidLectureType(string lectureType) {
+        return Enum.TryParse(typeof(LectureType), lectureType, true, out _);
     }
 }
+
+
 
 

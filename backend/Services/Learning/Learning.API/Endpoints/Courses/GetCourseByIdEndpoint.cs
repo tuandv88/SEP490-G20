@@ -14,7 +14,7 @@ public class GetCourseByIdEndpoint : ICarterModule {
 
         })
         .WithName("GetCourseById")
-        .Produces<GetCourseResponse>(StatusCodes.Status200OK)
+        .Produces<GetCourseByIdResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithSummary("Get Course by Id");

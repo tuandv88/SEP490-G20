@@ -18,5 +18,15 @@ public class CourseRepository : Repository<Course>, ICourseRepository {
                         .FirstOrDefault(c => c.Id.Value == id);
         return course;
     }
+
+    public async Task<Course?> GetByIdDetailAsync(Guid id) {
+        var course = _dbContext.Courses
+            .Include(c => c.Chapters)
+            .ThenInclude(c => c.Lectures)
+            .AsNoTracking()
+            .AsEnumerable()
+            .FirstOrDefault(c => c.Id.Value == id);
+        return course;
+    }
 }
 

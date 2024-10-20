@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Extensions;
+using BuildingBlocks.Extensions;
 using Learning.Infrastructure.Data.Interceptors;
 using Learning.Infrastructure.Data.Repositories.Chapters;
 using Learning.Infrastructure.Data.Repositories.Courses;

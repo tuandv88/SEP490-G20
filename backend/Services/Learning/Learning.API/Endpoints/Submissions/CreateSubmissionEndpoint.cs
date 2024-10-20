@@ -1,4 +1,7 @@
-﻿namespace Learning.API.Endpoints.Submissions;
+﻿using Learning.Application.Models.Submissions.Commands.CreateSubmission;
+using Learning.Application.Models.Submissions.Dtos;
+
+namespace Learning.API.Endpoints.Submissions;
 public record CreateSubmissionRequest(SubmissionDto SubmissionDto);
 public record CreateSubmissionResponse(SubmissionResponse SubmissionResponse);
 public class CreateSubmissionEndpoint : ICarterModule {

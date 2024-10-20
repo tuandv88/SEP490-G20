@@ -18,12 +18,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Submissions\CodeTemplates\Java\SolutionTemplate\additional_files\run">
+    <None Update="Models\Submissions\CodeTemplates\Java\SolutionTemplate\additional_files\run">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Submissions\CodeTemplates\Java\SolutionTemplate\additional_files\Solution.java">
+    <None Update="Models\Submissions\CodeTemplates\Java\SolutionTemplate\additional_files\Solution.java">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Lectures\Queries\" />
   </ItemGroup>
 
 </Project>

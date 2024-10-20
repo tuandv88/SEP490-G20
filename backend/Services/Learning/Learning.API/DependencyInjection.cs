@@ -7,8 +7,6 @@ public static class DependencyInjection {
 
         //Authentication
         services.ConfigureAuthentication(configuration);
-        //Caching
-        services.ConfigureCaching(configuration);
         //Exceptions
         services.AddExceptionHandler<CustomExceptionHandler>();
 

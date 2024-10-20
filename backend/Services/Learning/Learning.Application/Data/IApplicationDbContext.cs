@@ -1,5 +1,4 @@
 ﻿using Learning.Domain.Model;
-using Microsoft.EntityFrameworkCore;
 
 namespace Learning.Application.Data;
 public interface IApplicationDbContext {
@@ -20,9 +19,11 @@ public interface IApplicationDbContext {
     DbSet<LectureProgress> LecturesProgress { get; }
     DbSet<QuizSubmission> QuizSubmissions { get; }
     DbSet<ProblemSubmission> ProblemSubmissions { get; }
+    DbSet<TEntity> Set<TEntity>() where TEntity : class;
 
-
-
+    Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class;
+    void Update<T>(T entity) where T : class;
+    void Remove<T>(T entity) where T : class;
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 

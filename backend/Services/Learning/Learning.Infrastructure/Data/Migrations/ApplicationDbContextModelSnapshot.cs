@@ -242,6 +242,10 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<Guid>("QuizId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<double>("TimeEstimation")
                         .HasColumnType("double precision");
 
@@ -526,7 +530,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 18, 18, 16, 10, 580, DateTimeKind.Utc).AddTicks(2444));
+                        .HasDefaultValue(new DateTime(2024, 10, 20, 6, 56, 56, 670, DateTimeKind.Utc).AddTicks(7698));
 
                     b.Property<string>("TestCasesFailed")
                         .IsRequired()
@@ -750,7 +754,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 18, 18, 16, 10, 594, DateTimeKind.Utc).AddTicks(4751));
+                        .HasDefaultValue(new DateTime(2024, 10, 20, 6, 56, 56, 688, DateTimeKind.Utc).AddTicks(8893));
 
                     b.Property<int>("TotalQuestions")
                         .HasColumnType("integer");
@@ -883,7 +887,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 18, 18, 16, 10, 604, DateTimeKind.Utc).AddTicks(7660));
+                        .HasDefaultValue(new DateTime(2024, 10, 20, 6, 56, 56, 698, DateTimeKind.Utc).AddTicks(7581));
 
                     b.Property<string>("Feedback")
                         .IsRequired()

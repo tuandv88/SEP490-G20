@@ -1,22 +1,24 @@
-﻿namespace Learning.API.Endpoints.Courses;
-//public record CreateCourseRequest();
-//public record CreateCourseResponse();
-//public class CreateCourseEndpoint : ICarterModule {
-//    public void AddRoutes(IEndpointRouteBuilder app) {
+﻿using Learning.Application.Models.Courses.Commands.CreateCourse;
 
-//        app.MapPost("/course", async (CreateCourseRequest request, ISender sender) => {
-//            var command = request.Adapt<CreateSubmissionCommand>();
+namespace Learning.API.Endpoints.Courses;
+public record CreateCourseRequest(CreateCourseDto CreateCourseDto);
+public record CreateCourseResponse(Guid Id);
+public class CreateCourseEndpoint : ICarterModule {
+    public void AddRoutes(IEndpointRouteBuilder app) {
 
-//            var result = await sender.Send(command);
+        app.MapPost("/courses", async (CreateCourseRequest request, ISender sender) => {
+            var command = request.Adapt<CreateCourseCommand>();
 
-//            var response = result.Adapt<CreateCourseResponse>();
+            var result = await sender.Send(command);
 
-//            return Results.Created($"/api/v1/course/{response}", response);
-//        })
-//        .WithName("CreateCourse")
-//        .Produces<CreateCourseResponse>(StatusCodes.Status201Created)
-//        .ProducesProblem(StatusCodes.Status400BadRequest)
-//        .WithSummary("Create course");
-//    }
-//}
+            var response = result.Adapt<CreateCourseResponse>();
+
+            return Results.Created($"/courses/{response.Id}", response);
+        })
+        .WithName("CreateCourse")
+        .Produces<CreateCourseResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Create course");
+    }
+}
 

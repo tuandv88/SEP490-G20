@@ -77,9 +77,9 @@ builder.Services.AddAuthentication(options =>
 {
     options.ExpireTimeSpan = TimeSpan.FromMinutes(15);   // Thời gian sống của cookie là 15 phút
     options.SlidingExpiration = true;                    // Tự động gia hạn thời gian sống khi người dùng hoạt động
-    options.AccessDeniedPath = "/account/accessdenied";  // Đường dẫn khi truy cập bị từ chối
-    options.LoginPath = "/account/login";
-    options.LogoutPath = "/account/logout";
+    options.AccessDeniedPath = "/Account/accessdenied";  // Đường dẫn khi truy cập bị từ chối
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
 })
 .AddGoogle(googleOptions =>
 {

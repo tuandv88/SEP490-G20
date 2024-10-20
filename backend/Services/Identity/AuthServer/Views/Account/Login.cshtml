@@ -305,7 +305,8 @@
             <div class="social-login">
                 <p>Sign In With</p>
 
-                <form asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                <form asp-controller="Account" asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                    <input type="hidden" name="provider" value="Google" />
                     <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
                     <button type="submit" class="btn-google">Google</button>
                 </form>

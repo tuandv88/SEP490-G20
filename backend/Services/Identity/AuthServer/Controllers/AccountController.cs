@@ -561,13 +561,18 @@ namespace AuthServer.Controllers
             }
         }
 
-
         // Phương thức xử lý đăng nhập bằng Google
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
-            // Redirect to Google for authentication
+            if (string.IsNullOrEmpty(provider))
+            {
+                // Nếu provider rỗng, trả về thông báo lỗi
+                TempData["ErrorMessage"] = "Provider is missing.";
+                return RedirectToAction(nameof(Login));
+            }
+
             var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { ReturnUrl = returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return Challenge(properties, provider);

@@ -1,6 +1,6 @@
 ﻿namespace Learning.Domain.ValueObjects;
 public record LessonId {
-    private LessonId(Guid value) => Value = value;
+    public LessonId(Guid value) => Value = value;
     public Guid Value { get; }
     public static LessonId Of(Guid value) {
         ArgumentNullException.ThrowIfNull(value);

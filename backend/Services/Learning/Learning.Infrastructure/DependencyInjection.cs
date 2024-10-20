@@ -1,4 +1,8 @@
-﻿using Learning.Infrastructure.Data.Interceptors;
+﻿using BuildingBlocks.Extensions;
+using Learning.Infrastructure.Data.Interceptors;
+using Learning.Infrastructure.Data.Repositories.Chapters;
+using Learning.Infrastructure.Data.Repositories.Courses;
+using Learning.Infrastructure.Data.Repositories.Lectures;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 
@@ -17,6 +21,20 @@ public static class DependencyInjection {
 
         services.AddHttpContextAccessor();
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+
+        //Caching
+        services.ConfigureCaching(configuration);
+
+        //Caching CourseRepository
+        services.AddScoped<ICourseRepository, CourseRepository>();
+        services.Decorate<ICourseRepository, CachedCourseRepository>();
+
+        //ChapterRepository
+        services.AddScoped<IChapterRepository, ChapterRepository>();
+
+        //LectureRepository
+        services.AddScoped<ILectureRepository, LectureRepository>();
+
         services.AddScoped<IGFI, GFI>();
         return services;
     }

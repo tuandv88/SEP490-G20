@@ -1,7 +1,7 @@
 ﻿namespace Learning.Infrastructure.Data.Configurations;
-public class CourseConfiguration : IEntityTypeConfiguration<Domain.Models.Course>
+public class CourseConfiguration : IEntityTypeConfiguration<Course>
 {
-    public void Configure(EntityTypeBuilder<Domain.Models.Course> builder)
+    public void Configure(EntityTypeBuilder<Course> builder)
     {
 
         builder.HasKey(c => c.Id);

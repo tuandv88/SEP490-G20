@@ -33,6 +33,8 @@ public class LectureConfiguration : IEntityTypeConfiguration<Lecture> {
         builder.HasIndex(l => l.QuizId).IsUnique();
 
         builder.Property(c => c.Title).IsRequired();
+        builder.Property(c => c.Summary).IsRequired();
+
         builder.Property(c => c.TimeEstimation);
 
         builder.Property(l => l.LectureType)

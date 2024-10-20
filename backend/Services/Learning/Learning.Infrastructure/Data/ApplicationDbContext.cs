@@ -1,5 +1,4 @@
-﻿using Learning.Domain.Model;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Learning.Infrastructure.Data;
 public class ApplicationDbContext : DbContext, IApplicationDbContext {
@@ -38,6 +37,15 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext {
     public DbSet<QuizSubmission> QuizSubmissions => Set<QuizSubmission>();
 
     public DbSet<ProblemSubmission> ProblemSubmissions => Set<ProblemSubmission>();
+    public async new Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class {
+        await Set<T>().AddAsync(entity, cancellationToken);
+    }
+    public new void  Update<T>(T entity) where T : class {
+        Set<T>().Update(entity);
+    }
+    public new void Remove<T>(T entity) where T : class {
+        Set<T>().Remove(entity);
+    }
 
     protected override void OnModelCreating(ModelBuilder builder) {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

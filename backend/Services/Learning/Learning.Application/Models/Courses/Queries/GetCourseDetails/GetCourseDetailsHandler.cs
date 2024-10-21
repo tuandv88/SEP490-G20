@@ -1,10 +1,18 @@
-﻿namespace Learning.Application.Models.Courses.Queries.GetCourseDetails;
-public class GetCourseDetailsHandler : IQueryHandler<GetCourseDetailsQuery, GetCourseDetailsResult>
+﻿using Learning.Application.Data.Repositories;
+
+namespace Learning.Application.Models.Courses.Queries.GetCourseDetails;
+public class GetCourseDetailsHandler(ICourseRepository courseRepository, IChapterRepository chapterRepository, ILectureRepository lectureRepository) 
+    : IQueryHandler<GetCourseDetailsQuery, GetCourseDetailsResult>
 {
-    public Task<GetCourseDetailsResult> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)
+    public async Task<GetCourseDetailsResult> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)
     {
-        //TODO
-        throw new NotImplementedException();
+        var course = await courseRepository.GetByIdDetailAsync(request.Id);
+        if(course == null) {
+            throw new NotFoundException("Course", request.Id);
+        }
+        var courseDto = course.ToCourseDetailsDto();
+
+        return new GetCourseDetailsResult(courseDto);
     }
 }
 

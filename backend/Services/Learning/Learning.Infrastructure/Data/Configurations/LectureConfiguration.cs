@@ -7,12 +7,6 @@ public class LectureConfiguration : IEntityTypeConfiguration<Lecture> {
                         lecture => lecture.Value,
                         dbId => LectureId.Of(dbId));
 
-        builder.HasOne<Lesson>()
-               .WithOne()
-               .HasForeignKey<Lecture>(l => l.LessonId);
-
-        builder.HasIndex(l => l.LessonId).IsUnique();
-
         builder.HasOne<Problem>()
                .WithOne()
                .HasForeignKey<Lecture>(l => l.ProblemId);
@@ -30,6 +24,11 @@ public class LectureConfiguration : IEntityTypeConfiguration<Lecture> {
         builder.HasMany(l => l.LectureComments)
             .WithOne()
             .HasForeignKey(l => l.LectureId);
+
+        builder.HasMany(l => l.Files)
+            .WithOne()
+            .HasForeignKey(l => l.LectureId);
+
         builder.HasIndex(l => l.QuizId).IsUnique();
 
         builder.Property(c => c.Title).IsRequired();

@@ -1,7 +1,7 @@
-﻿namespace Learning.Domain.Models;
+﻿
+namespace Learning.Domain.Models;
 public class Chapter : Aggregate<ChapterId> {
-    private readonly List<Lecture> _lectures = new();
-    public IReadOnlyList<Lecture> Lectures => _lectures.AsReadOnly();
+    public List<Lecture> Lectures = new();
     public CourseId CourseId { get; set; } = default!;
     public string Title { get; set; } = default!;
     public string Description { get; set; } = default!;
@@ -22,4 +22,7 @@ public class Chapter : Aggregate<ChapterId> {
         return chapter;
     }
 
+    public void AddLecture(Lecture lecture) {
+        Lectures.Add(lecture);
+    }
 }

@@ -1,22 +1,23 @@
 ﻿using Learning.Application.Models.Chapters.Queries.GetChapterById;
-using Learning.Application.Models.Courses.Queries.GetCourseById;
 
-namespace Learning.API.Endpoints.Chapters {
-    public class GetChapterByIdEndpoint : ICarterModule {
-        public void AddRoutes(IEndpointRouteBuilder app) {
-            app.MapGet("/courses/{CourseId}/chapters/{ChapterId}", async (Guid CourseId, Guid ChapterId, ISender sender) => {
-                var result = await sender.Send(new GetChapterByIdQuery(CourseId, ChapterId));
+namespace Learning.API.Endpoints.Chapters;
 
-                var response = result.Adapt<GetCourseByIdResponse>();
+public record GetChapterByIdResponse(ChapterDto ChapterDto);
+public class GetChapterByIdEndpoint : ICarterModule {
+    public void AddRoutes(IEndpointRouteBuilder app) {
+        app.MapGet("/courses/{CourseId}/chapters/{ChapterId}", async (Guid CourseId, Guid ChapterId, ISender sender) => {
+            var result = await sender.Send(new GetChapterByIdQuery(CourseId, ChapterId));
 
-                return Results.Ok(result);
+            var response = result.Adapt<GetCourseByIdResponse>();
 
-            })
-            .WithName("GetChapterById")
-            .Produces<GetCourseResponse>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithSummary("Get chapter by Id");
-        }
+            return Results.Ok(result);
+
+        })
+        .WithName("GetChapterById")
+        .Produces<GetChapterByIdResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Get chapter by Id");
     }
 }
+

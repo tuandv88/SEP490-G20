@@ -21,6 +21,6 @@ public class CreateChapterCommandValidator : AbstractValidator<CreateChapterComm
             .GreaterThan(0).WithMessage("Time estimation must be greater than zero.");
 
         RuleFor(x => x.CreateChapterDto.OrderIndex)
-            .GreaterThanOrEqualTo(0).WithMessage("Order index must be greater than or equal to zero.");
+            .GreaterThan(0).WithMessage("Order index must be greater than to zero.");
     }
 }

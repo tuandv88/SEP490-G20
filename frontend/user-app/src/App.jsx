@@ -1,13 +1,13 @@
-import { MainRouter } from './routers'
-import { Button } from "@/components/ui/button"
 import './styles/index.css'
+import { AppRouter } from './router/AppRouter'
+import { ThemeProvider } from '@/components/theme-provider'
 
 function App() {
   return (
     <div className='bg-baseBackground h-[100vh] w-[100vw]'>
-      <h1 className='text-3xl font-bold underline'>Hello Icoder</h1>
-      <Button>Click me</Button>
-      <MainRouter />
+      <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
+        <AppRouter />
+      </ThemeProvider>
     </div>
   )
 }

@@ -56,6 +56,10 @@ namespace AuthServer.Controllers
         [HttpGet]
         public IActionResult Register(string returnUrl = null)
         {
+            returnUrl ??= Url.Content("~/");
+
+            ViewData["ReturnUrl"] = returnUrl;
+
             return View();
         }
 
@@ -85,40 +89,58 @@ namespace AuthServer.Controllers
                 {
                     Console.WriteLine("User created a new account with password.");
 
-                    var userId = await _userManager.GetUserIdAsync(user);
+                    if (model.ExternalLogin)
+                    {
+                        var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        await _userManager.ConfirmEmailAsync(user, emailConfirmationToken);
+                        await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", "InvalidToken");
 
-                    // Tạo mới Token
-                    string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var info = await _signInManager.GetExternalLoginInfoAsync();
+                        await _userManager.AddLoginAsync(user, info);
 
-                    // Đặt thời gian hết hạn mới (ví dụ 5 phút sau)
-                    DateTime newExpirationTime = DateTime.UtcNow.AddMinutes(5);
+                        // Đăng nhập ngay mà không cần xác nhận email
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return RedirectToAction("Index", "Profile");
+                    }
+                    else
+                    {
+                        var userId = await _userManager.GetUserIdAsync(user);
 
-                    // Lưu token mới vào cơ sở dữ liệu
-                    await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
+                        // Tạo mới Token
+                        string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-                    // Mã hóa token 
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        // Đặt thời gian hết hạn mới (ví dụ 5 phút sau)
+                        DateTime newExpirationTime = DateTime.UtcNow.AddMinutes(5);
 
-                    var callbackUrl = Url.Action(
-                        action: "ConfirmEmail",
-                        controller: "Account",
-                        values: new { userId = userId, code = code, expiration = newExpirationTime.Ticks, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                        // Lưu token mới vào cơ sở dữ liệu
+                        await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
 
-                    var emailBody = $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>Confirm Email</a>";
+                        // Mã hóa token 
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-                    var emailMetadata = new EmailMetadata(
-                        toAddress: model.Email,
-                        subject: "Confirm your email",
-                        body: emailBody
-                    );
+                        var callbackUrl = Url.Action(
+                            action: "ConfirmEmail",
+                            controller: "Account",
+                            values: new { userId = userId, code = code, expiration = newExpirationTime.Ticks, returnUrl = returnUrl },
+                            protocol: Request.Scheme);
 
+                        var emailBody = $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>Confirm Email</a>";
 
-                    await _emailService.Send(emailMetadata);
+                        var emailMetadata = new EmailMetadata(
+                            toAddress: model.Email,
+                            subject: "Confirm your email",
+                            body: emailBody
+                        );
 
-                    TempData["SuccessMessage"] = "Registration successful! Please check your email and confirm your account.";
+                        await _emailService.Send(emailMetadata);
 
-                    return RedirectToAction("Login", "Account");
+                        TempData["ConfirmEmailSuccessMessage"] = "Registration successful! Please check your email and confirm your account.";
+
+                        // Chuyển hướng đến trang thông báo thành công
+                        return RedirectToAction("RegistrationConfirmation", "Account", new { fullName = $"{model.FirstName} {model.LastName}", email = model.Email });
+
+                        //return RedirectToAction("Login", "Account");
+                    }
                 }
 
                 foreach (var error in result.Errors)
@@ -130,7 +152,47 @@ namespace AuthServer.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult RegistrationConfirmation(string fullName, string email)
+        {
+            ViewData["FullName"] = fullName;
+            ViewData["Email"] = email;
+            return View();
+        }
 
+        [HttpGet]
+        public async Task<IActionResult> ResendEmailConfirmation(string email, string fullName, string returnUrl = null)
+        {
+            returnUrl ??= Url.Content("~/");
+
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["ConfirmEmailFailMessage"] = "Email address is required.";
+                return RedirectToAction("RegistrationConfirmation", "Account");
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                TempData["ConfirmEmailFailMessage"] = "We could not find a user with that email address.";
+                return RedirectToAction("RegistrationConfirmation", "Account");
+            }
+
+            // Kiểm tra xem email đã được xác nhận chưa
+            if (await _userManager.IsEmailConfirmedAsync(user))
+            {
+                TempData["ConfirmEmailFailMessage"] = "Email is already confirmed.";
+                return RedirectToAction("RegistrationConfirmation", "Account");
+            }
+
+            await HandleEmailConfirmationAsync(user, returnUrl);
+
+            TempData["ConfirmEmailSuccessMessage"] = "A new confirmation email has been sent. Please check your inbox.";
+            return RedirectToAction("RegistrationConfirmation", "Account", new { fullName = fullName, email = user.Email });
+        }
+
+
+        // Dùng cho Register
         private async Task<(string token, DateTime? expiration)> GetEmailConfirmationTokenAsync(Users user, string nameUserToken)
         {
             // Lấy token đã tồn tại trong bảng AspNetUserTokens
@@ -169,7 +231,6 @@ namespace AuthServer.Controllers
             // Nếu không có token hoặc token đã hết hạn, trả về null
             return (null, null);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> ConfirmEmail(string userId, string code, long? expiration, string returnUrl = null)
@@ -238,18 +299,15 @@ namespace AuthServer.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Login(string returnUrl)
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
             // Kiểm tra xem người dùng đã đăng nhập chưa
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Profile");
             }
 
-            if (String.IsNullOrEmpty(returnUrl))
-            {
-                returnUrl = "~/";
-            }
+            returnUrl ??= Url.Content("~/");
 
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -277,14 +335,9 @@ namespace AuthServer.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            if (string.IsNullOrEmpty(returnUrl))
-            {
-                returnUrl = Url.Content("~/");
-            }
-
-            ViewData["ReturnUrl"] = returnUrl;
+            returnUrl ??= Url.Content("~/");
 
             if (!ModelState.IsValid)
             {
@@ -358,7 +411,7 @@ namespace AuthServer.Controllers
                 }
                 else
                 {
-                    return Redirect("/Home");
+                    return RedirectToAction("Index", "Profile");
                 }
             }
 
@@ -368,135 +421,50 @@ namespace AuthServer.Controllers
 
                 if (!emailConfirmAccount)
                 {
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var userEmail = await _userManager.GetEmailAsync(user);
-
-                    // Gọi phương thức để lấy token và thời hạn của token
-                    string nameTokenUser = "EmailConfirmationToken";
-                    var tokenResult = await GetEmailConfirmationTokenAsync(user, nameTokenUser);
-
-                    // Gán giá trị trả về vào các biến
-                    var existingToken = tokenResult.token;       // Token hiện tại (nếu có)
-                    var expirationTime = tokenResult.expiration; // Thời gian hết hạn của token (nếu có)
-
-                    string code;
-                    DateTime newExpirationTime;
-
-                    // Kiểm tra token hiện tại
-                    if (existingToken != null && expirationTime.HasValue)
-                    {
-                        if (DateTime.UtcNow > expirationTime.Value)
-                        {
-                            // Nếu token đã hết hạn, tạo lại token mới
-                            code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-                            // Cập nhật thời gian hết hạn mới (ví dụ 5 phút sau)
-                            newExpirationTime = DateTime.UtcNow.AddMinutes(5);
-
-                            // Cập nhật lại token mới và thời hạn vào cơ sở dữ liệu
-                            await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
-                        }
-                        else
-                        {
-                            // Sử dụng lại token cũ nếu vẫn còn hạn
-                            code = existingToken;
-                            newExpirationTime = expirationTime.Value;
-                        }
-                    }
-                    else
-                    {
-                        // Nếu không có token, tạo mới
-                        code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-                        // Đặt thời gian hết hạn mới (ví dụ 5 phút sau)
-                        newExpirationTime = DateTime.UtcNow.AddMinutes(5);
-
-                        // Lưu token mới vào cơ sở dữ liệu
-                        await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
-                    }
-
-                    // Mã hóa token
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
-                    var callbackUrl = Url.Action(
-                        action: "ConfirmEmail",
-                        controller: "Account",
-                        values: new { userId = userId, code = code, expiration = newExpirationTime.Ticks, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
-
-                    var emailBody = $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>Confirm Email</a>";
-
-                    var emailMetadata = new EmailMetadata(
-                        toAddress: userEmail,
-                        subject: "Confirm your email",
-                        body: emailBody
-                    );
-
-                    // Gửi email xác nhận
-                    await _emailService.Send(emailMetadata);
+                    await HandleEmailConfirmationAsync(user, returnUrl);
 
                     ModelState.AddModelError(string.Empty, "Check your email & verify your account !");
                     return View(model);
                 }
             }
 
-            if (result.RequiresTwoFactor)
-            {
-                //if (user != null)
-                //{
-                //    Console.WriteLine("Login - Two Face.");
-
-                //    var userEmail = await _userManager.GetEmailAsync(user);
-                //    // Tạo mã xác nhận email
-                //    var token = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
-
-                //    var emailBody = $"Icoder: Your verification code is: {token}";
-
-                //    var emailMetadata = new EmailMetadata(
-                //        toAddress: userEmail,
-                //        subject: "Confirm your email",
-                //        body: emailBody
-                //    );
-
-                //    // Gửi email xác nhận
-                //    await _emailService.Send(emailMetadata);
-
-                //    return RedirectToAction("TwoFaceLogin", "Account", new { email = userEmail });
-                //}
-
-                if(user != null)
-                {
-                    return RedirectToAction("LoginVerifyAuthenicatorCode", "Account", new { returnUrl, model.RememberMe });
-                }
-            }
-
-
             //if (result.RequiresTwoFactor)
             //{
+            //    if (user != null)
+            //    {
+            //        Console.WriteLine("Login - Two Face.");
 
+            //        var userEmail = await _userManager.GetEmailAsync(user);
+            //        // Tạo mã xác nhận email
+            //        var token = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
+
+            //        var emailBody = $"Icoder: Your verification code is: {token}";
+
+            //        var emailMetadata = new EmailMetadata(
+            //            toAddress: userEmail,
+            //            subject: "Confirm your email",
+            //            body: emailBody
+            //        );
+
+            //        // Gửi email xác nhận
+            //        await _emailService.Send(emailMetadata);
+
+            //        return RedirectToAction("TwoFaceLogin", "Account", new { email = userEmail });
+            //    }
             //}
 
 
+            if (result.RequiresTwoFactor)
+            {
+                if (user != null)
+                {
+                    return RedirectToAction("LoginVerifyAuthenicatorCode", "Account", new { usernameOrEmail = user.Email, rememberMe = model.RememberMe, returnUrl = returnUrl });
+                }
+            }
+
             if (result.IsLockedOut)
             {
-                Console.WriteLine("Login Faild: Account is Locked");
-
-                // Kiểm tra nếu tài khoản bị khóa và thời gian khóa còn hiệu lực
-                if (user != null && user.LockoutEnd.HasValue && user.LockoutEnd.Value.UtcDateTime > DateTime.UtcNow)
-                {
-                    // Tính thời gian khóa còn lại
-                    var lockoutEndTime = user.LockoutEnd.Value.UtcDateTime;
-                    var minutesLeft = (lockoutEndTime - DateTime.UtcNow).TotalMinutes;
-
-                    // Thêm thông báo hiển thị số phút còn lại
-                    ModelState.AddModelError(string.Empty, $"Account locked - Please try again later after {Math.Ceiling(minutesLeft)} minutes!");
-                }
-                else
-                {
-                    // Nếu không thể xác định thời gian, sử dụng thông báo mặc định
-                    ModelState.AddModelError(string.Empty, "Account locked - Please try again later!");
-                }
-
+                await HandleLockedOutUser(user);
                 return View(model);
             }
 
@@ -504,13 +472,107 @@ namespace AuthServer.Controllers
             return View(model);
         }
 
+        private async Task HandleEmailConfirmationAsync(Users user, string returnUrl)
+        {
+            var userId = await _userManager.GetUserIdAsync(user);
+            var userEmail = await _userManager.GetEmailAsync(user);
+
+            string nameTokenUser = "EmailConfirmationToken";
+            var tokenResult = await GetEmailConfirmationTokenAsync(user, nameTokenUser);
+
+            var existingToken = tokenResult.token;       // Token hiện tại (nếu có)
+            var expirationTime = tokenResult.expiration; // Thời gian hết hạn của token (nếu có)
+
+            string code;
+            DateTime newExpirationTime;
+
+            // Kiểm tra token hiện tại
+            if (existingToken != null && expirationTime.HasValue)
+            {
+                if (DateTime.UtcNow > expirationTime.Value)
+                {
+                    // Nếu token đã hết hạn, tạo lại token mới
+                    code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                    // Cập nhật thời gian hết hạn mới (ví dụ 5 phút sau)
+                    newExpirationTime = DateTime.UtcNow.AddMinutes(5);
+
+                    // Cập nhật lại token mới và thời hạn vào cơ sở dữ liệu
+                    await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
+                }
+                else
+                {
+                    // Sử dụng lại token cũ nếu vẫn còn hạn
+                    code = existingToken;
+                    newExpirationTime = expirationTime.Value;
+                }
+            }
+            else
+            {
+                // Nếu không có token, tạo mới
+                code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                // Đặt thời gian hết hạn mới (ví dụ 5 phút sau)
+                newExpirationTime = DateTime.UtcNow.AddMinutes(5);
+
+                // Lưu token mới vào cơ sở dữ liệu
+                await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
+            }
+
+            // Mã hóa token
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+            var callbackUrl = Url.Action(
+                action: "ConfirmEmail",
+                controller: "Account",
+                values: new { userId = userId, code = code, expiration = newExpirationTime.Ticks, returnUrl = returnUrl },
+                protocol: Request.Scheme);
+
+            var emailBody = $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>Confirm Email</a>";
+
+            var emailMetadata = new EmailMetadata(
+                toAddress: userEmail,
+                subject: "Confirm your email",
+                body: emailBody
+            );
+
+            // Gửi email xác nhận
+            await _emailService.Send(emailMetadata);
+        }
+
+        private async Task HandleLockedOutUser(Users user)
+        {
+            Console.WriteLine("Login Failed: Account is Locked");
+
+            // Kiểm tra nếu tài khoản bị khóa và thời gian khóa còn hiệu lực
+            if (user != null && user.LockoutEnd.HasValue && user.LockoutEnd.Value.UtcDateTime > DateTime.UtcNow)
+            {
+                // Tính thời gian khóa còn lại
+                var lockoutEndTime = user.LockoutEnd.Value.UtcDateTime;
+                var minutesLeft = (lockoutEndTime - DateTime.UtcNow).TotalMinutes;
+
+                // Thêm thông báo hiển thị số phút còn lại
+                ModelState.AddModelError(string.Empty, $"Account locked - Please try again later after {Math.Ceiling(minutesLeft)} minutes!");
+            }
+            else
+            {
+                // Nếu không thể xác định thời gian, sử dụng thông báo mặc định
+                ModelState.AddModelError(string.Empty, "Account locked - Please try again later!");
+            }
+        }
 
         // Phương thức xử lý đăng nhập bằng Google
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
-            // Redirect to Google for authentication
+            if (string.IsNullOrEmpty(provider))
+            {
+                // Nếu provider rỗng, trả về thông báo lỗi
+                TempData["ErrorMessage"] = "Provider is missing.";
+                return RedirectToAction(nameof(Login));
+            }
+
             var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { ReturnUrl = returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return Challenge(properties, provider);
@@ -520,6 +582,7 @@ namespace AuthServer.Controllers
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null)
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
+
             if (info == null)
             {
                 return RedirectToAction(nameof(Login));
@@ -527,37 +590,53 @@ namespace AuthServer.Controllers
 
             // Kiểm tra người dùng đã tồn tại trong cơ sở dữ liệu chưa
             var user = await _userManager.FindByEmailAsync(info.Principal.FindFirstValue(ClaimTypes.Email));
+
             if (user == null)
             {
-                // Người dùng chưa tồn tại, tạo mới
-                user = new Users
+                // Người dùng chưa tồn tại, chuyển hướng đến trang đăng ký với thông tin từ ExternalLoginInfo
+                var model = new RegisterViewModel
                 {
-                    UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
                     Email = info.Principal.FindFirstValue(ClaimTypes.Email),
                     FirstName = info.Principal.FindFirstValue("given_name") ?? string.Empty,
                     LastName = info.Principal.FindFirstValue("family_name") ?? string.Empty,
-                    DateOfBirth = DateTime.TryParse(info.Principal.FindFirstValue("birthdate"), out var birthDate) ? birthDate : DateTime.MinValue,
-                    ProfilePicture = info.Principal.FindFirstValue("picture") ?? string.Empty,
-                    Bio = string.Empty,
-                    Address = string.Empty
+                    Dob = DateTime.TryParse(info.Principal.FindFirstValue("birthdate"), out var birthDate) ? birthDate : DateTime.MinValue,
+                    ExternalLogin = true  // Đánh dấu là đăng ký qua dịch vụ ngoài
                 };
 
-                var result = await _userManager.CreateAsync(user);
+                // Chuyển hướng đến trang Register để người dùng hoàn tất thông tin
+                return View("Register", model);
+            }
+            else
+            {
+                // Đăng nhập người dùng
+                var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: false);
 
-                if (result.Succeeded)
+                if (signInResult.Succeeded)
                 {
-                    await _userManager.AddLoginAsync(user, info);
+                    // Đăng nhập thành công, chuyển đến trang tiếp theo
+                    return RedirectToAction("Index", "Profile");
+                }
+                else if (signInResult.RequiresTwoFactor)
+                {
+                    // Người dùng yêu cầu xác thực hai yếu tố (2FA)
+                    return RedirectToAction("LoginVerifyAuthenicatorCode", "Account", new { usernameOrEmail = user.Email, rememberMe = false, returnUrl = returnUrl });
+                }
+                else if (signInResult.IsLockedOut)
+                {
+                    TempData["ErrorMessage"] = "Account is Locked!";
+                    return RedirectToAction("Login", "Account");
                 }
                 else
                 {
-                    return RedirectToAction(nameof(Login));
+                    // Xử lý lỗi nếu đăng nhập thất bại vì lý do khác
+                    TempData["ErrorMessage"] = "Login failed. Please try again.";
+                    return RedirectToAction("Login", "Account");
                 }
             }
-
-            // Đăng nhập người dùng
-            await _signInManager.SignInAsync(user, isPersistent: false);
-            return LocalRedirect(returnUrl ?? "/");
         }
+
+
+
 
         [HttpGet]
         public IActionResult TwoFaceLogin(string email)
@@ -781,75 +860,7 @@ namespace AuthServer.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> EnableAuthenticator()
-        {
-            // Lấy thông tin người dùng hiện tại từ _userManager
-            var user = await _userManager.GetUserAsync(User);
-
-            // Đặt lại (reset) khóa Authenticator của người dùng
-            // Việc này sẽ tạo ra một khóa mới, bắt buộc người dùng phải thiết lập lại ứng dụng Authenticator
-            await _userManager.ResetAuthenticatorKeyAsync(user);
-
-            // Lấy khóa Authenticator mới (sau khi reset) 
-            // Khóa này chỉ có 1 sau khi đăng nhập thành công, dùng cho từng người dùng, mã này tồn tại trong 1 time và tự reset lại.
-            // Khóa này sẽ được cung cấp cho người dùng để họ thiết lập ứng dụng Authenticator ( GoogleAuthenicator or Micsoft )
-            var token = await _userManager.GetAuthenticatorKeyAsync(user);
-
-
-            string authenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
-            string authUri = string.Format(authenticatorUriFormat, _urlEncoder.Encode("ICoder.VN"), _urlEncoder.Encode(user.Email), token);
-
-
-            // Tạo mô hình ViewModel với khóa Authenticator (Token) mới
-            // Token này sẽ được sử dụng để hiển thị cho người dùng thiết lập ứng dụng Authenticator
-            var model = new TwoFactorAuthenticationViewModel()
-            {
-                Token = token,  // Gán khóa mới vào thuộc tính Token của ViewModel
-                QRCodeUrl = authUri
-            };
-
-            // Trả về view cùng với mô hình (model) chứa khóa Authenticator mới
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize] // ~ Login trc
-        public async Task<IActionResult> EnableAuthenticator(TwoFactorAuthenticationViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.GetUserAsync(User);
-                var succeded = await _userManager.VerifyTwoFactorTokenAsync(user, _userManager.Options.Tokens.AuthenticatorTokenProvider, model.Code);
-
-                Console.WriteLine(user.Email);
-                Console.WriteLine(model.Code);
-
-                if (succeded)
-                {
-                    await _userManager.SetTwoFactorEnabledAsync(user, true);
-                }
-                else
-                {
-                    ModelState.AddModelError("Verify", "Your two factor auth code not validated.");
-                    return View(model);
-                }
-
-                return RedirectToAction(nameof(AuthenicatorConfirmation));
-            }
-
-            ModelState.AddModelError("Error", "Errorrrr");
-            return View("Error");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> AuthenicatorConfirmation()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> LoginVerifyAuthenicatorCode(bool rememberMe, string returnUrl = null)
+        public async Task<IActionResult> LoginVerifyAuthenicatorCode(string usernameOrEmail = null, bool rememberMe = false, string returnUrl = null)
         {
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
 
@@ -858,9 +869,10 @@ namespace AuthServer.Controllers
                 return View("Error");
             }
 
+            Console.WriteLine(usernameOrEmail); 
             ViewData["ReturnUrl"] = returnUrl;
 
-            return View(new VerifyAuthenicatorViewModel { ReturnUrl = returnUrl, RememberMe = rememberMe });
+            return View(new VerifyAuthenicatorViewModel { UserOrEmail = usernameOrEmail, RememberMe = rememberMe , ReturnUrl = returnUrl});
         }
 
 
@@ -870,34 +882,42 @@ namespace AuthServer.Controllers
         {
             model.ReturnUrl = model.ReturnUrl ?? Url.Content("~/");
 
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                             .Select(e => e.ErrorMessage)
+                                             .ToList();
+
+                var errorMessage = string.Join(", ", errors);
+                ModelState.AddModelError(string.Empty, errorMessage);
+                return View(model);
             }
 
             var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(model.Code, model.RememberMe, rememberClient: false);
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Profile");
             }
 
             if (result.IsLockedOut)
             {
+                Users user = null;
 
+                user = await _userManager.FindByNameAsync(model.UserOrEmail);
+
+                if (user == null)
+                {
+                    user = await _userManager.FindByEmailAsync(model.UserOrEmail);
+                }
+
+                await HandleLockedOutUser(user);
+
+                return View(model);
             }
 
-            ModelState.AddModelError(string.Empty, "Invalid Login Attemp.");
+            ModelState.AddModelError(string.Empty, "Code Validated Invalid. Please try again.");
             return View(model);
-
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> RemoveAuthenicator()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            await _userManager.ResetAuthenticatorKeyAsync(user);
-            await _userManager.SetTwoFactorEnabledAsync(user, false);
-            return RedirectToAction(nameof(Index), "Home");
 
         }
 
@@ -905,14 +925,12 @@ namespace AuthServer.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
-
             // Xóa cookie khi đăng xuất
             //Response.Cookies.Delete("Username");
             //Response.Cookies.Delete("Password");
 
-
-            return RedirectToAction("Login", "Account");
+            await _signInManager.SignOutAsync(); // Xóa cookie xác thực
+            return RedirectToAction("Login", "Account"); // Chuyển hướng về trang đăng nhập
         }
     }
 }

@@ -3,23 +3,7 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-
-    @if (User.Identity.IsAuthenticated)
-    {
-
-        var twofactor = ViewData["TwoFactorEnabled"];
-        if (twofactor != null && twofactor.ToString().ToLower() == "true")
-        {
-            <a asp-controller="Account" asp-action="RemoveAuthenicator" class="btn btn-danger">Removetwo factor authentication</a> <br />
-        }
-        else
-        {
-            <a asp-controller="Account" asp-action="EnableAuthenticator">Setup two factor authentication</a> <br />
-        }
-    }
-    <br />
-
+    <h1 class="display-4">Welcome to Home</h1>
 </div>
 
 

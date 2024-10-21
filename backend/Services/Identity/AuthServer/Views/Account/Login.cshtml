@@ -1,5 +1,4 @@
 ﻿@using AuthServer.Models.AccountViewModel
-
 @model LoginViewModel
 
 @{
@@ -8,11 +7,17 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div id="toast" class="toast">
+    <div id="toast-success" class="toast toast-success">
         @TempData["SuccessMessage"]
     </div>
 }
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div id="toast-error" class="toast toast-error">
+        @TempData["ErrorMessage"]
+    </div>
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -41,22 +46,23 @@
             width: 400px;
             background-color: white;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         .logo img {
             display: block;
-            margin: 0 auto;
-            width: 100px;
+            margin: 0 auto 20px;
+            width: 80px;
         }
 
         .title {
             text-align: center;
             font-size: 24px;
             font-weight: bold;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            color: #3b7ed0;
         }
 
         .form-group {
@@ -65,102 +71,173 @@
 
         .form-control {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 10px;
             box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
         }
+
+            .form-control:focus {
+                border-color: #3b7ed0;
+                outline: none;
+                box-shadow: 0 0 5px rgba(59, 126, 208, 0.5);
+            }
 
         .btn-primary {
             width: 100%;
-            padding: 10px;
-            background-color: #007bff;
+            padding: 12px;
+            background-color: #3b7ed0;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
+            font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
+            .btn-primary:hover {
+                background-color: #356db1;
+            }
+
         .form-footer {
-            text-align: center;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-size: 14px;
         }
 
             .form-footer a {
-                color: #007bff;
+                color: #3b7ed0;
                 text-decoration: none;
             }
 
-        /* Styles for validation error messages */
-        .text-danger {
-            font-size: 12px;
-            color: #e74c3c; /* Đồng bộ với tệp trước */
-            margin-top: -10px;
-            margin-bottom: 10px;
-            display: block;
+        ul li {
+            list-style: none; /* Bỏ marker cho các phần tử li */
         }
 
-        .social-login {
-            text-align: center;
-            margin-top: 20px;
+        /* Align Remember Me checkbox */
+        .form-check {
+            display: flex;
+            align-items: center;
+            text-align: left;
+            margin-top: 10px;
         }
 
-            .social-login p {
-                margin-bottom: 10px;
+            .form-check input {
+                margin-right: 10px;
             }
 
-        .btn-facebook, .btn-google, .btn-github {
+        /* Social login styles */
+        .social-login .btn-facebook, .social-login .btn-google, .social-login .btn-github {
             display: inline-block;
-            width: 100px;
-            padding: 10px;
-            margin: 5px;
-            color: white;
+            padding: 10px 20px;
             border-radius: 5px;
+            color: white;
             text-align: center;
-            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: 2px solid #333; /* Thêm viền cho tất cả các nút */
         }
 
-        .btn-facebook {
+        .social-login .btn-facebook {
             background-color: #3b5998;
+            border-color: #3b5998; /* Đặt viền cùng màu với nút Facebook */
         }
 
-        .btn-google {
+        .social-login .btn-google {
             background-color: #db4437;
+            border-color: #db4437; /* Đặt viền cùng màu với nút Google */
         }
 
-        .btn-github {
+        .social-login .btn-github {
             background-color: #333;
+            border-color: #333; /* Đặt viền cùng màu với nút Github */
         }
 
-        .error-message {
-            color: #e74c3c; /* Đỏ đồng nhất với thông báo lỗi */
-            margin-bottom: 20px;
-            text-align: center;
+        .social-login .btn-facebook:hover {
+            background-color: #324b7a;
         }
+
+        .social-login .btn-google:hover {
+            background-color: #b33a2f;
+        }
+
+        .social-login .btn-github:hover {
+            background-color: #242424;
+        }
+
+        /* Error message styling */
+        .error-message {
+            background-color: #fdecea;
+            color: #e74c3c;
+            padding: 0px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 10px;
+            text-align: left;
+            font-size: 14px;
+            box-shadow: 0px 2px 10px rgba(231, 76, 60, 0.1);
+            transition: all 0.3s ease;
+        }
+
+            .error-message .text-danger {
+                display: inline-block;
+                margin-left: 5px;
+            }
+
+            /* Error message fade-in animation */
+            .error-message.show {
+                opacity: 1;
+            }
+
+            .error-message.hide {
+                opacity: 0;
+                display: none;
+            }
 
         .text-danger {
             font-size: 12px;
             color: #e74c3c;
-            margin-top: 5px; /* Thêm khoảng cách phía trên */
-            display: block; /* Đảm bảo thông báo lỗi được hiển thị dưới dạng khối */
+            margin-top: 5px;
+            margin-bottom: 5px;
+            display: block;
+            text-align: left;
         }
 
-        .form-group {
-            margin-bottom: 15px; /* Điều chỉnh khoảng cách giữa các nhóm form */
+        /* Toast cho thông báo thành công */
+        .toast-success {
+            background-color: #dff0d8; /* Màu xanh nhạt cho thành công */
+            color: #3c763d; /* Màu xanh đậm cho chữ */
+            border: 1px solid #d6e9c6; /* Viền phù hợp với màu nền */
         }
 
+        /* Toast cho thông báo thất bại */
+        .toast-error {
+            background-color: #f8d7da; /* Màu đỏ nhạt cho lỗi */
+            color: #721c24; /* Màu đỏ đậm cho chữ */
+            border: 1px solid #f5c6cb; /* Viền đỏ nhạt */
+        }
+
+        /* Toast chung */
         .toast {
             position: fixed;
-            top: 20px; /* Điều chỉnh vị trí nếu cần */
-            right: 20px; /* Điều chỉnh vị trí nếu cần */
-            background-color: #4CAF50; /* Màu nền */
-            color: white; /* Màu chữ */
+            top: 20px;
+            right: 20px;
             padding: 15px;
             border-radius: 5px;
-            z-index: 1000; /* Đảm bảo nó nằm trên cùng */
-            display: none; /* Ẩn đi ban đầu */
-            transition: opacity 1s ease; /* Hiệu ứng mờ dần */
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            transition: opacity 1s ease;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
         }
+
+            .toast.show {
+                display: block;
+                opacity: 1;
+            }
 
     </style>
 </head>
@@ -171,7 +248,7 @@
             <!-- Logo -->
             <div class="logo">
                 <!-- Replace with your logo URL -->
-                <img src="~/path-to-logo.png" alt="Icoder" />
+                <img src="~/path-to-logo.png" alt="ICoder Logo" />
             </div>
 
             <!-- Title below the logo -->
@@ -180,8 +257,8 @@
             <!-- Display validation error message -->
             @if (!ViewData.ModelState.IsValid)
             {
-                <div class="alert alert-danger">
-                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="error-message show">
+                    <span> @Html.ValidationSummary(true, "", new { @class = "text-danger" })</span>
                 </div>
             }
 
@@ -213,28 +290,29 @@
 
                 <!-- Submit button -->
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                    <button type="submit" class="btn-primary">Sign In</button>
                 </div>
 
                 <!-- Forgot password and Register links -->
                 <div class="form-footer">
                     <a href="@Url.Action("ForgotPassword", "Account")">Forgot Password?</a>
                     <span> | </span>
-                    <a href="@Url.Action("Register", "Account")">Register</a>
+                    <a href="@Url.Action("Register", "Account")">Register Account</a>
                 </div>
             </form>
 
             <!-- Social login options -->
             <div class="social-login">
-                <p>Sign in with</p>
+                <p>Sign In With</p>
 
-                <form asp-action="ExternalLogin" method="post">
+                <form asp-controller="Account" asp-action="ExternalLogin" method="post" style="display: inline-block;">
+                    <input type="hidden" name="provider" value="Google" />
                     <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
-                    <button type="submit" class="btn btn-google">Google</button>
+                    <button type="submit" class="btn-google">Google</button>
                 </form>
 
-                <a href="#" class="btn btn-facebook">Facebook</a>
-                <a href="#" class="btn btn-github">Github</a>
+                <a href="#" class="btn-facebook">Facebook</a>
+                <a href="#" class="btn-github">Github</a>
             </div>
         </div>
     </div>
@@ -245,17 +323,32 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            var toast = document.getElementById("toast");
-            if (toast) {
-                toast.style.display = "block"; // Hiện thông báo
+            var toastSuccess = document.getElementById("toast-success");
+            var toastError = document.getElementById("toast-error");
+
+            // Hiển thị và tự động ẩn toast thành công
+            if (toastSuccess) {
+                toastSuccess.classList.add("show"); // Hiện thông báo
                 setTimeout(function () {
-                    toast.style.opacity = "0"; // Bắt đầu hiệu ứng mờ dần
+                    toastSuccess.style.opacity = "0"; // Bắt đầu hiệu ứng mờ dần
                     setTimeout(function () {
-                        toast.style.display = "none"; // Ẩn thông báo hoàn toàn sau khi mờ
+                        toastSuccess.style.display = "none"; // Ẩn thông báo hoàn toàn sau khi mờ
+                    }, 1000); // Thời gian cho hiệu ứng mờ
+                }, 10000); // Hiện thông báo trong 10 giây
+            }
+
+            // Hiển thị và tự động ẩn toast thất bại
+            if (toastError) {
+                toastError.classList.add("show"); // Hiện thông báo
+                setTimeout(function () {
+                    toastError.style.opacity = "0"; // Bắt đầu hiệu ứng mờ dần
+                    setTimeout(function () {
+                        toastError.style.display = "none"; // Ẩn thông báo hoàn toàn sau khi mờ
                     }, 1000); // Thời gian cho hiệu ứng mờ
                 }, 10000); // Hiện thông báo trong 10 giây
             }
         });
+
     </script>
 
 </body>

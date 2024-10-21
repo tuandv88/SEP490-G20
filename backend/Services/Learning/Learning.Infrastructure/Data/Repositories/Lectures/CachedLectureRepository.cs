@@ -38,7 +38,7 @@ public class CachedLectureRepository(ILectureRepository lectureRepository, IChap
     private void DeleteCached(string cachedKey) {
         _ = cacheService.DeleteAsync(cachedKey);
     }
-    private async void RemoveCachedCourseDetails(Lecture lecture) {
+    private async void RemoveCachedCourseDetails(Lecture? lecture) {
         if (lecture != null) {
             var chapters = await chapterRepository.GetAllAsync();
             var chapter = chapters.Where(c => c.Id.Value == lecture.ChapterId.Value).FirstOrDefault();

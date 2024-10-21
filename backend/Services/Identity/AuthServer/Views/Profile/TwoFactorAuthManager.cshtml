@@ -1,0 +1,695 @@
+﻿@using AuthServer.Models.ProfileViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Information Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container-fluid {
+            padding: 0; /* Xóa khoảng cách xung quanh container */
+        }
+
+        .content {
+            padding: 30px;
+            margin-top: 60px; /* Khoảng cách top luôn cố định */
+            transition: margin-left 0.3s ease, width 0.3s ease;
+            max-width: 800px; /* Giới hạn chiều rộng tối đa */
+            width: calc(100% - 250px); /* Chiều rộng khi sidebar mở */
+            margin: 0 auto; /* Căn giữa */
+        }
+
+            .content.collapsed {
+                width: calc(100% - 80px); /* Chiều rộng khi sidebar thu gọn */
+                margin-top: 60px; /* Giữ nguyên khoảng cách top */
+                margin: 0 auto; /* Giữ căn giữa */
+            }
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            transition: width 0.3s ease; /* Hiệu ứng mở rộng và thu gọn sidebar */
+            position: fixed; /* Đảm bảo sidebar luôn sát lề trái */
+            left: 0;
+            top: 60px; /* Điều chỉnh chiều cao top dựa trên chiều cao của navbar */
+            z-index: 900;
+        }
+
+            .sidebar.collapsed {
+                width: 80px; /* Khi sidebar thu gọn */
+            }
+
+            .sidebar .nav-link {
+                font-weight: normal; /* Sửa font-weight về bình thường */
+                font-size: 15px;
+                color: #333;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                transition: background-color 0.3s, color 0.3s;
+                position: relative;
+            }
+
+            .sidebar.collapsed .nav-link {
+                justify-content: center; /* Icon được căn giữa khi thanh bên thu gọn */
+            }
+
+            .sidebar .nav-link i {
+                color: #6c757d; /* Đặt màu xám cho biểu tượng */
+            }
+
+            .sidebar .nav-link span {
+                margin-left: 10px;
+            }
+
+            .sidebar.collapsed .nav-link span,
+            .sidebar.collapsed .nav-link .toggle-arrow {
+                display: none; /* Ẩn văn bản và mũi tên khi thu gọn */
+            }
+
+            .sidebar .nav-link:hover {
+                background-color: #e9ecef;
+                color: #007bff; /* Màu xanh dương khi hover */
+            }
+
+            .sidebar .nav-item .nav-link.active,
+            .sidebar .nav-link.active {
+                background-color: #e7f1ff; /* Màu xanh dương nhạt khi mục được chọn */
+                color: #007bff;
+            }
+
+            .sidebar .collapse.show {
+                background-color: #f1f3f5;
+            }
+
+            .sidebar .icon {
+                margin-right: 10px;
+            }
+
+            /* Căn chỉnh mục con luôn thụt vào */
+            .sidebar .nav-link.toggle-btn {
+                padding-left: 40px; /* Luôn thụt lề cho các mục con */
+            }
+
+        .toggle-arrow {
+            margin-left: auto;
+            transition: transform 0.3s;
+        }
+
+            .toggle-arrow.rotate {
+                transform: rotate(90deg);
+            }
+
+        .user-header {
+            margin-bottom: 30px;
+        }
+
+            .user-header h2 {
+                margin: 0;
+                font-size: 28px;
+            }
+
+        /* Popup menu */
+        .popup-menu {
+            display: none;
+            position: absolute;
+            left: calc(100% + 10px); /* Hiển thị ngay bên phải phần tử cha */
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            width: 200px;
+            z-index: 10;
+            border-radius: 4px;
+        }
+
+            .popup-menu a {
+                padding: 10px;
+                font-size: 14px;
+                display: block;
+                color: #333;
+                text-decoration: none;
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+                .popup-menu a:hover {
+                    background-color: #e9ecef;
+                    color: #007bff; /* Màu xanh dương khi hover */
+                }
+
+        /* Đảm bảo chữ trong header không bị in đậm và căn lề cho hợp lý */
+        .navbar {
+            display: flex;
+            justify-content: space-between; /* Căn đều hai bên */
+            align-items: center; /* Căn giữa theo chiều dọc */
+            background-color: #f8f9fa; /* Màu nền navbar */
+            padding-right: 20px; /* Tạo khoảng cách giữa nội dung và hai mép của navbar */
+            padding-left: 20px; /* Thêm khoảng cách bên trái để chữ không dính vào lề */
+        }
+
+            .navbar .navbar-brand {
+                font-weight: normal; /* Đặt lại kiểu chữ mặc định */
+                font-size: 1.25rem; /* Đặt kích thước chữ phù hợp */
+            }
+
+            .navbar .nav-link {
+                font-weight: normal; /* Đặt lại kiểu chữ mặc định */
+                font-size: 1rem; /* Thiết lập kích thước chữ cho các link */
+            }
+
+        .content {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 800px; /* Form sẽ có độ rộng tối đa là 800px */
+            width: 100%; /* Form sẽ chiếm 100% màn hình trên các kích thước nhỏ hơn */
+        }
+
+        .personal-info h4 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .personal-info p {
+            font-size: 1rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 500;
+        }
+
+        .text-center img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .btn {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @@media (max-width: 768px) {
+            /* Trên màn hình nhỏ hơn 768px (máy tính bảng và điện thoại) */
+            .row {
+                flex-direction: column; /* Chuyển các input từ dạng ngang sang dọc */
+            }
+
+            .col-md-6 {
+                width: 100%; /* Các phần tử trong row sẽ chiếm 100% chiều rộng */
+                margin-bottom: 15px; /* Thêm khoảng cách giữa các input */
+            }
+
+            .content {
+                padding: 15px; /* Giảm padding để vừa với màn hình nhỏ */
+            }
+        }
+
+        @@media (max-width: 576px) {
+            /* Trên màn hình nhỏ hơn 576px (điện thoại) */
+            .personal-info h4 {
+                font-size: 1.2rem; /* Giảm kích thước chữ trên màn hình nhỏ */
+            }
+
+            .personal-info p {
+                font-size: 0.9rem; /* Giảm kích thước chữ trên màn hình nhỏ */
+            }
+
+            .text-center img {
+                width: 80px;
+                height: 80px; /* Giảm kích thước avatar trên màn hình nhỏ */
+            }
+
+            .btn {
+                font-size: 0.9rem; /* Giảm kích thước nút trên màn hình nhỏ */
+            }
+        }
+
+        /* Style cho nút Bỏ qua */
+        .btn-cancel {
+            background-color: white;
+            color: #6c757d;
+            border: 1px solid #ced4da;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.95rem;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+            /* Hover effect cho nút Bỏ qua */
+            .btn-cancel:hover {
+                background-color: #f8f9fa;
+                color: #495057;
+                border-color: #adb5bd;
+            }
+
+        /* Style cho nút Thêm */
+        .btn-add {
+            background-color: #e7f1ff;
+            color: #007bff;
+            border: 1px solid #b3d7ff;
+            padding: 0.5rem 1.25rem;
+            font-size: 0.95rem;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+            /* Hover effect cho nút Thêm */
+            .btn-add:hover {
+                background-color: #cfe2ff;
+                color: #0056b3;
+                border-color: #80bfff;
+            }
+
+        /* Error message styling */
+        .error-message {
+            background-color: #fdecea;
+            color: #e74c3c;
+            padding: 0px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 10px;
+            text-align: left;
+            font-size: 14px;
+            min-height: 30px;
+            height: auto;
+            box-shadow: 0px 2px 10px rgba(231, 76, 60, 0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+            .error-message .text-danger {
+                display: inline-block;
+                margin-left: 5px;
+            }
+
+            /* Error message fade-in animation */
+            .error-message.show {
+                opacity: 1;
+            }
+
+            .error-message.hide {
+                opacity: 0;
+                display: none;
+            }
+
+        .text-danger {
+            font-size: 12px;
+            color: #e74c3c;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            display: block;
+            text-align: left;
+        }
+
+        ul li {
+            list-style: none; /* Bỏ marker cho các phần tử li */
+        }
+
+        /* Tiêu đề section */
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #343a40;
+        }
+
+        /* Mô tả section */
+        .section-description {
+            font-size: 1rem;
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* Button chung */
+        .btn {
+            font-size: 1.1rem;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        /* Nút Remove màu đỏ */
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: #fff;
+        }
+
+            .btn-danger:hover {
+                background-color: #c82333;
+                border-color: #bd2130;
+                box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2); /* Hiệu ứng đổ bóng */
+            }
+
+        /* Nút Setup màu xanh */
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+                border-color: #004085;
+                box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* Hiệu ứng đổ bóng */
+            }
+
+        /* Hiệu ứng chung khi hover */
+        .btn:hover {
+            transform: translateY(-2px); /* Nâng nút lên nhẹ khi hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hiệu ứng đổ bóng nhẹ */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container-fluid d-flex">
+        <div class="sidebar p-3" id="sidebar">
+            <nav class="nav flex-column">
+                <!-- Phần Trang Chủ -->
+                <a class="nav-link" asp-controller="Profile" asp-action="Index">
+                    <i class="fas fa-home icon"></i>
+                    <span>Home</span>
+                </a>
+
+                <!-- Phần Thông Tin Của Tôi -->
+                <a class="nav-link" id="toggleMyInfo" href="javascript:void(0)">
+                    <i class="fas fa-address-card icon"></i>
+                    <span>My Information</span>
+                    <i class="fas fa-chevron-right toggle-arrow" id="arrowMyInfo"></i>
+                </a>
+                <div class="collapse" id="myInfo">
+                    <a class="nav-link toggle-btn" asp-controller="Profile" asp-action="Personal">
+                        <i class="fas fa-user icon"></i>
+                        <span>Personal Information</span>
+                    </a>
+                    <a class="nav-link toggle-btn" asp-controller="Profile" asp-action="Contact">
+                        <i class="fas fa-id-badge icon"></i>
+                        <span>Contact Information</span>
+                    </a>
+                    <a class="nav-link toggle-btn" asp-controller="Profile" asp-action="Emails">
+                        <i class="fas fa-envelope icon"></i>
+                        <span>Emails</span>
+                    </a>
+                </div>
+
+                <!-- Pop-up khi thanh bên thu gọn -->
+                <div class="popup-menu" id="popupMyInfo">
+                    <a asp-controller="Profile" asp-action="Personal">
+                        <i class="fas fa-user icon"></i>Personal Information
+                    </a>
+                    <a asp-controller="Profile" asp-action="Contact">
+                        <i class="fas fa-id-badge icon"></i>Contact Information
+                    </a>
+                    <a asp-controller="Profile" asp-action="Emails">
+                        <i class="fas fa-envelope icon"></i>Emails
+                    </a>
+                </div>
+
+                <!-- Phần Bảo Mật -->
+                <a class="nav-link" id="toggleSecurity" href="javascript:void(0)">
+                    <i class="fas fa-shield-alt icon"></i>
+                    <span>Security</span>
+                    <i class="fas fa-chevron-right toggle-arrow" id="arrowSecurity"></i>
+                </a>
+                <div class="collapse" id="security">
+                    <a class="nav-link toggle-btn" asp-controller="Profile" asp-action="ChangePassword">
+                        <i class="fas fa-key icon"></i>
+                        <span>Password</span>
+                    </a>
+                    <a class="nav-link toggle-btn" asp-controller="Profile" asp-action="TwoFactorAuthManager">
+                        <i class="fas fa-mobile-alt icon"></i>
+                        <span>Two-Factor Authentication</span>
+                    </a>
+                    <a class="nav-link toggle-btn" href="#!">
+                        <i class="fas fa-link icon"></i>
+                        <span>Linked Accounts</span>
+                    </a>
+                </div>
+
+                <!-- Pop-up khi thanh bên thu gọn -->
+                <div class="popup-menu" id="popupSecurity">
+                    <a asp-controller="Profile" asp-action="ChangePassword">
+                        <i class="fas fa-key icon"></i> Password
+                    </a>
+                    <a class="nav-link toggle-btn" asp-controller="Profile" asp-action="TwoFactorAuthManager">
+                        <i class="fas fa-mobile-alt icon"></i>
+                        <span>Two-Factor Authentication</span>
+                    </a>
+                    <a href="#!">
+                        <i class="fas fa-link icon"></i> Linked Accounts
+                    </a>
+                </div>
+
+                <!-- Phần Cài Đặt Nhà Phát Triển -->
+                <a class="nav-link" id="toggleDeveloperSettings" href="javascript:void(0)">
+                    <i class="fas fa-cogs icon"></i>
+                    <span>Developer Settings</span>
+                    <i class="fas fa-chevron-right toggle-arrow" id="arrowDeveloperSettings"></i>
+                </a>
+                <div class="collapse" id="developerSettings">
+                    <a class="nav-link toggle-btn" href="#!">
+                        <i class="fas fa-code icon"></i>
+                        <span>OAuth Applications</span>
+                    </a>
+                    <a class="nav-link toggle-btn" href="#!">
+                        <i class="fas fa-key icon"></i>
+                        <span>Access security code</span>
+                    </a>
+                    <a class="nav-link toggle-btn" href="#!">
+                        <i class="fas fa-user-shield icon"></i>
+                        <span>Authorized OAuth Applications</span>
+                    </a>
+                </div>
+
+                <!-- Pop-up khi thanh bên thu gọn -->
+                <div class="popup-menu" id="popupDeveloperSettings">
+                    <a href="#!">
+                        <i class="fas fa-code icon"></i>OAuth Applications
+                    </a>
+                    <a href="#!">
+                        <i class="fas fa-key icon"></i>Access security code
+                    </a>
+                    <a href="#!">
+                        <i class="fas fa-user-shield icon"></i>Authorized OAuth Applications
+                    </a>
+                </div>
+
+                <div>
+                    <a class="nav-link" id="toggleSidebar" href="javascript:void(0)">
+                        <i class="fas fa-angle-double-left icon"></i>
+                        <span id="sidebarToggleText">Collapse sidebar</span>
+                    </a>
+                </div>
+
+            </nav>
+
+        </div>
+
+        <div class="content" id="content">
+            <div class="personal-info">
+                <h4 class="section-title">Manage Two-Factor Authentication</h4>
+                <p class="section-description">
+                    Enable two-factor authentication to enhance the security of your account and prevent unauthorized access.
+                </p>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    var twofactor = ViewData["TwoFactorAuthEnabled"];
+                    if (twofactor != null && twofactor.ToString().ToLower() == "true")
+                    {
+                        <a asp-controller="Profile" asp-action="RemoveAuthenicator" class="btn btn-danger btn-lg w-100">Remove Two-Factor Authentication</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Profile" asp-action="EnableTwoFactorAuth" class="btn btn-primary btn-lg w-100">Setup Two-Factor Authentication</a>
+                    }
+                }
+                <br />
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        // JavaScript để thu gọn thanh bên
+        document.getElementById("toggleSidebar").addEventListener("click", function () {
+            var sidebar = document.getElementById("sidebar");
+            var content = document.getElementById("content");
+            var toggleIcon = this.querySelector("i");
+            var toggleText = document.getElementById("sidebarToggleText");
+
+            closeAllCollapses(); // Đóng các collapse nếu cần
+            sidebar.classList.toggle("collapsed"); // Toggle trạng thái collapsed cho sidebar
+            content.classList.toggle("collapsed"); // Toggle trạng thái collapsed cho content
+
+            // Kiểm tra nếu sidebar đang thu gọn
+            if (sidebar.classList.contains("collapsed")) {
+                toggleIcon.classList.remove("fa-angle-double-left");
+                toggleIcon.classList.add("fa-angle-double-right");
+                toggleText.style.display = "none"; // Ẩn text khi thu gọn
+            } else {
+                toggleIcon.classList.remove("fa-angle-double-right");
+                toggleIcon.classList.add("fa-angle-double-left");
+                toggleText.style.display = "inline"; // Hiển thị text khi sidebar mở
+            }
+
+            closeAllPopups(); // Đóng các pop-up nếu cần
+            resetArrows(); // Reset mũi tên nếu cần
+        });
+
+
+        function closeAllCollapses() {
+            // Đóng tất cả các collapse nếu đang mở
+            var bsCollapseMyInfo = new bootstrap.Collapse(document.getElementById("myInfo"), {
+                toggle: false
+            });
+            bsCollapseMyInfo.hide();
+
+            var bsCollapseSecurity = new bootstrap.Collapse(document.getElementById("security"), {
+                toggle: false
+            });
+            bsCollapseSecurity.hide();
+
+            var bsCollapseDeveloperSettings = new bootstrap.Collapse(document.getElementById("developerSettings"), {
+                toggle: false
+            });
+            bsCollapseDeveloperSettings.hide();
+        }
+
+        function closeAllPopups() {
+            document.getElementById("popupMyInfo").style.display = "none";
+            document.getElementById("popupSecurity").style.display = "none";
+            document.getElementById("popupDeveloperSettings").style.display = "none";
+        }
+
+        function resetArrows() {
+            document.getElementById("arrowMyInfo").classList.remove("rotate");
+            document.getElementById("arrowSecurity").classList.remove("rotate");
+            document.getElementById("arrowDeveloperSettings").classList.remove("rotate");
+        }
+
+        document.getElementById("toggleMyInfo").addEventListener("click", function (e) {
+            var sidebar = document.getElementById("sidebar");
+            var myInfoCollapse = document.getElementById("myInfo");
+            var arrowMyInfo = document.getElementById("arrowMyInfo");
+            var popupMyInfo = document.getElementById("popupMyInfo");
+            closeAllPopups(); // Đóng tất cả pop-up trước khi mở pop-up mới
+
+            // Kiểm tra xem sidebar có thu gọn không
+            if (sidebar.classList.contains("collapsed")) {
+                var iconRect = e.currentTarget.getBoundingClientRect(); // Lấy vị trí chính xác của phần tử
+                popupMyInfo.style.top = (iconRect.top - 60) + 'px'; // Điều chỉnh vị trí của pop-up theo vị trí phần tử
+                popupMyInfo.style.display = "block";
+            } else {
+                var bsCollapse = new bootstrap.Collapse(myInfoCollapse, {
+                    toggle: false
+                });
+                if (myInfoCollapse.classList.contains("show")) {
+                    bsCollapse.hide();
+                    arrowMyInfo.classList.remove("rotate");
+                } else {
+                    bsCollapse.show();
+                    arrowMyInfo.classList.add("rotate");
+                }
+            }
+        });
+
+        document.getElementById("toggleSecurity").addEventListener("click", function (e) {
+            var sidebar = document.getElementById("sidebar");
+            var securityCollapse = document.getElementById("security");
+            var arrowSecurity = document.getElementById("arrowSecurity");
+            var popupSecurity = document.getElementById("popupSecurity");
+            closeAllPopups(); // Đóng tất cả pop-up trước khi mở pop-up mới
+
+            // Kiểm tra xem sidebar có thu gọn không
+            if (sidebar.classList.contains("collapsed")) {
+                var iconRect = e.currentTarget.getBoundingClientRect(); // Lấy vị trí chính xác của phần tử
+                popupSecurity.style.top = (iconRect.top - 60) + 'px'; // Điều chỉnh vị trí của pop-up theo vị trí phần tử
+                popupSecurity.style.display = "block";
+            } else {
+                var bsCollapse = new bootstrap.Collapse(securityCollapse, {
+                    toggle: false
+                });
+                if (securityCollapse.classList.contains("show")) {
+                    bsCollapse.hide();
+                    arrowSecurity.classList.remove("rotate");
+                } else {
+                    bsCollapse.show();
+                    arrowSecurity.classList.add("rotate");
+                }
+            }
+        });
+
+        document.getElementById("toggleDeveloperSettings").addEventListener("click", function (e) {
+            var sidebar = document.getElementById("sidebar");
+            var developerSettingsCollapse = document.getElementById("developerSettings");
+            var arrowDeveloperSettings = document.getElementById("arrowDeveloperSettings");
+            var popupDeveloperSettings = document.getElementById("popupDeveloperSettings");
+            closeAllPopups(); // Đóng tất cả pop-up trước khi mở pop-up mới
+
+            // Kiểm tra xem sidebar có thu gọn không
+            if (sidebar.classList.contains("collapsed")) {
+                var iconRect = e.currentTarget.getBoundingClientRect(); // Lấy vị trí chính xác của phần tử
+                popupDeveloperSettings.style.top = (iconRect.top - 60) + 'px'; // Điều chỉnh vị trí của pop-up theo vị trí phần tử
+                popupDeveloperSettings.style.display = "block";
+            } else {
+                var bsCollapse = new bootstrap.Collapse(developerSettingsCollapse, {
+                    toggle: false
+                });
+                if (developerSettingsCollapse.classList.contains("show")) {
+                    bsCollapse.hide();
+                    arrowDeveloperSettings.classList.remove("rotate");
+                } else {
+                    bsCollapse.show();
+                    arrowDeveloperSettings.classList.add("rotate");
+                }
+            }
+        });
+
+        // Thêm sự kiện lắng nghe click cho toàn bộ tài liệu để đóng pop-up khi nhấn chuột ra ngoài
+        document.addEventListener("click", function (event) {
+            var popupMyInfo = document.getElementById("popupMyInfo");
+            var popupSecurity = document.getElementById("popupSecurity");
+            var popupDeveloperSettings = document.getElementById("popupDeveloperSettings");
+
+            // Kiểm tra nếu nhấp vào bên ngoài pop-up hoặc các nút kích hoạt
+            if (!popupMyInfo.contains(event.target) && !document.getElementById("toggleMyInfo").contains(event.target)) {
+                popupMyInfo.style.display = "none"; // Đóng pop-up Thông Tin Của Tôi
+            }
+            if (!popupSecurity.contains(event.target) && !document.getElementById("toggleSecurity").contains(event.target)) {
+                popupSecurity.style.display = "none"; // Đóng pop-up Bảo Mật
+            }
+            if (!popupDeveloperSettings.contains(event.target) && !document.getElementById("toggleDeveloperSettings").contains(event.target)) {
+                popupDeveloperSettings.style.display = "none"; // Đóng pop-up Cài Đặt Nhà Phát Triển
+            }
+        });
+    </script>
+</body>
+</html>

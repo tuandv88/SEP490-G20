@@ -20,17 +20,6 @@ namespace AuthServer.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
-
-            if(user == null)
-            {
-                ViewData["TwoFactorEnabled"] = false;
-            }
-            else
-            {
-                ViewData["TwoFactorEnabled"] = user.TwoFactorEnabled;
-            }
-
             return View();
         }
 

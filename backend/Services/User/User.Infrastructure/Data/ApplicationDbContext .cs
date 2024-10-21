@@ -15,12 +15,6 @@ namespace User.Infrastructure.Data
 
         public DbSet<PathStep> PathSteps => Set<PathStep>();
 
-        public DbSet<NotificationHistory> NotificationHistories => Set<NotificationHistory>();
-
-        public DbSet<NotificationType> NotificationTypes => Set<NotificationType>();
-
-        public DbSet<UserNotification> UserNotifications => Set<UserNotification>();
-
         public DbSet<UserGoal> UserGoals => Set<UserGoal>();
 
         public async new Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class

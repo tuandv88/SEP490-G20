@@ -8,9 +8,6 @@ namespace User.Application.Data
         DbSet<PointHistory> PointHistories { get; }
         DbSet<LearningPath> LearningPaths { get; }
         DbSet<PathStep> PathSteps { get; }
-        DbSet<NotificationHistory> NotificationHistories { get; }
-        DbSet<NotificationType> NotificationTypes { get; }
-        DbSet<UserNotification> UserNotifications { get; }
         DbSet<UserGoal> UserGoals { get; }
 
         DbSet<TEntity> Set<TEntity>() where TEntity : class;

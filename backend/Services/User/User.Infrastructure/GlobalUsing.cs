@@ -6,4 +6,7 @@ global using User.Domain.Abstractions;
 global using User.Application.Data.Repositories;
 global using User.Application.Data;
 global using User.Infrastructure.Data;
-global using User.Application.Common;
+global using BuildingBlocks.Exceptions;
+global using BuidingBlocks.Storage;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;

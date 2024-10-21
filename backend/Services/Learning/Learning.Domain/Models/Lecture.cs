@@ -29,4 +29,8 @@ public class Lecture : Entity<LectureId> {
         };
         return lecture;
     }
+
+    public void AddFile(File file) {
+        Files.Add(file);
+    }
 }

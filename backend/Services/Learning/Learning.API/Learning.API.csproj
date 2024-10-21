@@ -27,8 +27,4 @@
     <ProjectReference Include="..\Learning.Infrastructure\Learning.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Endpoints\Files\" />
-  </ItemGroup>
-
 </Project>

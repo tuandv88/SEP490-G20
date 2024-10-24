@@ -33,32 +33,35 @@ namespace AuthServer.Config
                 //////////////////////////////////////////
                 new Client
                 {
-                    ClientId = "movies_mvc_client",
+                     ClientId = "movies_client",
+                     ClientSecrets = { new Secret("secret".Sha256()) },  // Secret được mã hóa theo Sha256
+                     AllowedGrantTypes = GrantTypes.Code,                // Authorization Code Flow
+                     RequireConsent = false,                             // Không yêu cầu người dùng xác nhận lại
+                     RequirePkce = true,                                 // Yêu cầu PKCE để tăng cường bảo mật
+                     AllowedCorsOrigins = { "https://localhost:5003" },  // Cho phép nguồn gốc từ máy khách
 
-                     // SecretKey mã hóa theo Sha256
-                    ClientSecrets = { new Secret("secret".Sha256()) },
+                     RedirectUris = { "https://localhost:5003/callback.html" },         // URL callback sau khi đăng nhập
+                     PostLogoutRedirectUris = { "https://localhost:5003/index.html" },  // URL sau khi đăng xuất
 
-                    AllowedGrantTypes = GrantTypes.Code,    // Tự tìm đến Account/Login của identityServer đẻ Author
-                    RequireConsent = false,
-                    RequirePkce = true,
-                    AllowOfflineAccess = true,
-                    AllowedCorsOrigins = { "https://localhost" },
-
-                    // đăng nhập thành công thì redirect lại theo đường dẫn này
-                    RedirectUris = { "https://localhost:5003/signin-oidc" },
-                    // khi logout nó chạy cổng này và xử lý logout thì nó redirect đến url: 5001 logout của identityServer
-                    PostLogoutRedirectUris = { "https://localhost:5003/signout-callback-oidc" },
-
-                    // ở client này cho phép chuy cập đến những cái này
-                    AllowedScopes = new List<string>
-                    {
-                        // ở đây chúng ta cho chuy cập cả thông tin user lần api
+                     AllowedScopes = new List<string>
+                        {
+                        "offline_access",                               // (refresh token) 
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
-                        IdentityServerConstants.StandardScopes.Email
-                    }
-                 }
+                        IdentityServerConstants.StandardScopes.Email,
+                        "moviesApi",
+                        "roles"  // Thêm scope roles để yêu cầu cấp phát claim role
 
+                        },
+                     // Bật tính năng cấp refresh token - Cho phép offline access (refresh token) - Mặc định Flow Code 
+                    AllowOfflineAccess = true,
+                     // Tùy chọn khác để refresh token
+                    RefreshTokenUsage = TokenUsage.ReUse,  // Sử dụng lại refresh token hoặc thay thế mỗi lần dùng
+                    RefreshTokenExpiration = TokenExpiration.Sliding,  // Hết hạn dựa trên sự hoạt động của người dùng
+                    
+                    //RedirectUris = { "https://localhost:5003/signin-oidc" },
+                    //PostLogoutRedirectUris = { "https://localhost:5003/signout-callback-oidc" },
+                 }
             };
     }
 }

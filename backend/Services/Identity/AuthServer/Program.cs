@@ -1,7 +1,7 @@
 ﻿using AuthServer.Config;
 using AuthServer.Data;
 using AuthServer.Models;
-using AuthServer.Repository.Services;
+using AuthServer.Repository.Services.Profile;
 using AuthServer.Repository.Services.SendMailWithModoboa;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -64,7 +64,7 @@ builder.Services.AddIdentityServer(options =>
   .AddInMemoryApiResources(ApiResourcesConfig.GetApiResources)
   .AddInMemoryApiScopes(ApiScopesConfig.GetApiScopes)
   .AddInMemoryIdentityResources(IdentityResourcesConfig.GetIdentityResources)
-  .AddProfileService<ProfileService>();
+  .AddProfileService<CustomProfileService>();                                   // Đăng ký CustomProfileService
 
 // Cấu hình Google Authentication
 builder.Services.AddAuthentication(options =>
@@ -94,6 +94,18 @@ builder.Services.AddFluentEmail(builder.Configuration);
 builder.Services.AddTransient<IEmailService, EmailService>();
 
 
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowSpecificOrigin",
+//        policy =>
+//        {
+//            policy.WithOrigins("https://localhost:5003") // Cho phép origin của client (5003)
+//                  .AllowAnyHeader()
+//                  .AllowAnyMethod()
+//                  .AllowCredentials(); // Cho phép gửi cookie/authorization headers
+//        });
+//});
+
 var app = builder.Build();
 
 // Kiểm tra tham số đầu vào
@@ -117,6 +129,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+//app.UseCors("AllowSpecificOrigin"); // Sử dụng policy CORS đã cấu hình
 
 app.UseIdentityServer();
 

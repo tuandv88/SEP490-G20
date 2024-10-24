@@ -100,19 +100,6 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddFluentEmail(builder.Configuration);
 builder.Services.AddTransient<IEmailService, EmailService>();
 
-
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowSpecificOrigin",
-//        policy =>
-//        {
-//            policy.WithOrigins("https://localhost:5003") // Cho phép origin của client (5003)
-//                  .AllowAnyHeader()
-//                  .AllowAnyMethod()
-//                  .AllowCredentials(); // Cho phép gửi cookie/authorization headers
-//        });
-//});
-
 var app = builder.Build();
 
 // Kiểm tra tham số đầu vào

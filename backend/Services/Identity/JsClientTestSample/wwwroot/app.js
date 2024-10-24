@@ -1,18 +1,18 @@
 ﻿
 // Cấu hình OIDC client để kết nối với IdentityServer
 var config = {
-	authority: "https://localhost:5001",                        // URL của IdentityServer
-	client_id: "movies_client",                                 // Client ID cấu hình trên IdentityServer
-	redirect_uri: "https://localhost:5003/callback.html",       // Trang callback sau khi đăng nhập thành công
-	post_logout_redirect_uri: "https://localhost:5003/index.html", // Trang sau khi đăng xuất
-	response_type: "code",                                      // Sử dụng Authorization Code Flow
-	scope: "offline_access openid profile email moviesApi roles",     // Các scope yêu cầu
-	client_secret: "secret",                                    // Client secret(plain-text)
-	requirePkce: true,                                          // Bật PKCE để tăng cường bảo mật
-	automaticSilentRenew: true,                                 // Tự động gia hạn token
-	loadUserInfo: true                                          // Tải thêm thông tin người dùng từ UserInfo endpoint
+	client_id: "client_id_sample_01",										  // Client ID cấu hình trên IdentityServer
+	response_type: "code",													  // Sử dụng Authorization Code Flow
+	requirePkce: true,														  // Bật PKCE để tăng cường bảo mật
+	authority: "https://localhost:5001",									  // URL của IdentityServer
+	redirect_uri: "https://localhost:5003/callback.html",					  // Trang callback sau khi đăng nhập thành công
+	post_logout_redirect_uri: "https://localhost:5003/index.html",			  // Trang sau khi đăng xuất
+	scope: "openid profile email moviesApi roles offline_access",			  // Các scope yêu cầu
+	loadUserInfo: true,														  // Tải thêm thông tin người dùng từ UserInfo endpoint
+	silent_redirect_uri: "https://localhost:5003/silent-renew.html",          // Trang chạy ngầm để gia hạn token
+	automaticSilentRenew: false 											  // Tự động gia hạn token
 
-	 // Sử dụng localStorage để lưu trữ token thay vì sessionStorage (mặc định)
+	// Sử dụng localStorage để lưu trữ token thay vì sessionStorage (mặc định)
     //userStore: new Oidc.WebStorageStateStore({ store: window.localStorage })
 };
 
@@ -36,7 +36,7 @@ function callApi() {
 			console.log("User's access token: ", user.access_token);
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", "https://localhost:6001/api/movies");                   // URL API bảo vệ
-			xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);  // Gửi kèm access token
+			xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);   // Gửi kèm access token
 			xhr.onload = function () {
 				log("API response: " + xhr.responseText);
 				console.log("API response: ", xhr.responseText);
@@ -85,4 +85,48 @@ document.getElementById('login').addEventListener('click', login);
 document.getElementById('api').addEventListener('click', callApi);
 document.getElementById('logout').addEventListener('click', logout);
 
+userManager.events.addAccessTokenExpired(() => {
+	log("Access token đã hết hạn. Đăng xuất người dùng...");
+	userManager.signoutRedirect();  // Chuyển hướng người dùng tới trang đăng xuất
+});
 
+//// Đăng nhập ngầm (silent renew) khi token gần hết hạn
+//userManager.events.addAccessTokenExpiring(() => {
+//	userManager.signinSilent()
+//		.then(user => {
+//			console.log("Token đã được gia hạn:", user.access_token);
+//		})
+//		.catch(err => {
+//			console.error("Lỗi gia hạn token:", err);
+//		});
+//});
+
+//// Lắng nghe lỗi khi quá trình gia hạn thất bại
+//userManager.events.addSilentRenewError(err => {
+//	console.error("Gia hạn token ngầm thất bại:", err);
+//});
+
+//userManager.events.addAccessTokenExpiring(() => {
+//	console.log("Access token sắp hết hạn. Bắt đầu gia hạn token...");
+
+// Gọi hàm gia hạn token thủ công
+//userManager.signinSilent()
+//	.then(user => {
+//		log("Access token mới: " + user.access_token);
+//		log("Refresh token mới: " + user.refresh_token);			// Hiển thị refresh token mới
+
+//		// Lưu lại access token và refresh token mới
+//		localStorage.setItem("access_token", user.access_token);    // Lưu access token mới
+//		if (user.refresh_token) {
+//			localStorage.setItem("refresh_token", user.refresh_token);  // Lưu refresh token mới
+//		}
+//	})
+//	.catch(err => {
+//		console.error("Lỗi gia hạn token:", err);
+//	});
+
+
+
+// - signinSilent() đã có sẵn trong oidc-client.js 
+// - Để hàm này hoạt động, cần cấu hình silent_redirect_uri và tạo trang silent - renew.html
+// - Hàm này cho phép gia hạn access token ngầm mà không cần người dùng phải đăng nhập lại.

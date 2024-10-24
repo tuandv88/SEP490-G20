@@ -56,9 +56,7 @@ function callApi() {
 //Hàm hiển thị thông tin người dùng
 function displayUserInfo(user) {
 	log("User Profile Information:");
-	log("Profile: " + user.profile);
-	log("Role: " + user.profile.role);
-	log("Email: " + user.profile.email);  // Email của người dùng (nếu có)
+	log("Profile: " + JSON.stringify(user.profile, null, 2));
 	log("OpenID: " + user.profile.sub);   // OpenID của người dùng (sub)
 	log("Access Token: " + user.access_token);  // Hiển thị access token
 	log("Refresh Token: " + (user.refresh_token || "No refresh token available"));  // Hiển thị refresh token nếu có

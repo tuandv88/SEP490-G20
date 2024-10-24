@@ -60,6 +60,15 @@ builder.Services.AddAuthentication("Bearer")
         options.RequireHttpsMetadata = true;
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    // Cấu hình chính sách xác thực role User
+    options.AddPolicy("UserPolicy", policy =>
+    {
+        policy.RequireRole("User");
+    });
+});
+
 
 builder.Services.AddControllers();
 

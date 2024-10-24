@@ -1,3 +1,26 @@
 * {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
+
+/* body h1 {
+  font-size: 2em;
+  font-weight: bold;
+} */
+
+/* body h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+} */
+
+/* body ul { */
+  /* list-style-type: disc; */
+  /* display: block; */
+  /* margin-block-start: 1em;
+  margin-block-end: 1em;
+  padding-inline-start: 40px;
+  unicode-bidi: isolate; */
+/* } */
+
+/* body li {
+  padding-bottom: 10px;
+} */

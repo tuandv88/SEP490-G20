@@ -84,3 +84,5 @@ userManager.getUser().then(function (user) {
 document.getElementById('login').addEventListener('click', login);
 document.getElementById('api').addEventListener('click', callApi);
 document.getElementById('logout').addEventListener('click', logout);
+
+

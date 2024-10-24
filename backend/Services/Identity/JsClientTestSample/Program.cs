@@ -26,12 +26,15 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapGet("/", async context =>
     {
-        context.Response.Redirect("/index.html"); // Chuyển hướng đến wwwroot/index.html
+        context.Response.Redirect("/index.html"); // Chuyển hướng tới wwwroot/index.html
     });
-
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
 });
-
 app.Run();
+
+
+/*
+ 
+npm i oidc-client
+copy node_modules\oidc-client\dist\* wwwroot
+ 
+ */

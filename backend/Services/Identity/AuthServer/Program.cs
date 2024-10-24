@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,12 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 
+// Tạo hoặc tải RSA Key từ tệp nếu đã tồn tại, nếu không sẽ tạo mới và lưu vào tệp
+var rsaKey = RsaKeyHelper.GenerateOrLoadRsaKey(Path.Combine(Directory.GetCurrentDirectory(), "Keys/rsa_key"));
+
+// Tạo đối tượng SigningCredentials từ RSA Key và sử dụng thuật toán ký RsaSha256
+var signingCredentials = new SigningCredentials(rsaKey, SecurityAlgorithms.RsaSha256);
+
 // Add IdentityServer4.AspNetCoreIdentity
 builder.Services.AddIdentityServer(options =>
 {
@@ -58,7 +65,7 @@ builder.Services.AddIdentityServer(options =>
     options.Events.RaiseFailureEvents = true;
     options.Events.RaiseSuccessEvents = true;
 
-}).AddDeveloperSigningCredential()
+}).AddSigningCredential(signingCredentials)  // AddSigningCredential yêu cầu một SigningCredentials
   .AddAspNetIdentity<Users>()
   .AddInMemoryClients(ClientConfig.GetClients)
   .AddInMemoryApiResources(ApiResourcesConfig.GetApiResources)

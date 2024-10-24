@@ -5,7 +5,7 @@ function ScrollToTop() {
   const { pathname } = useLocation()
 
   useEffect(() => {
-    console.log('Changing to:', pathname) // Log ra pathname
+    console.log('Changing to:', pathname)
     window.scrollTo(0, 0)
   }, [pathname])
 

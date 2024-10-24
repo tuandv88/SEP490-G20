@@ -91,7 +91,9 @@ function HomePage() {
                         <Star className='w-5 h-5 mr-1 text-yellow-400' />
                         <span className='text-sm'>4.8 (120 đánh giá)</span>
                       </div>
-                      <Button className='text-white bg-green-500 hover:bg-green-600'>Xem chi tiết</Button>
+                      <Button className='text-white bg-green-500 hover:bg-green-600'>
+                        <Link to='/courseDetail'>Xem chi tiết</Link>
+                      </Button>
                     </div>
                   </Card>
                 ))}

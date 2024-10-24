@@ -5,7 +5,8 @@ export const AUTHENTICATION_ROUTERS = {
   ABOUT: '/about',
   NOTFOUND: '*',
   THEME: '/themes',
-  COURSELIST: '/courseList'
+  COURSELIST: '/courseList',
+  COURSEDETAIL: '/courseDetail'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

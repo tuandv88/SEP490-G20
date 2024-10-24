@@ -1,7 +1,7 @@
 ﻿
 // Cấu hình OIDC client để kết nối với IdentityServer
 var config = {
-	client_id: "client_id_sample_01",										  // Client ID cấu hình trên IdentityServer
+	client_id: "icoder.vn",													  // Client ID cấu hình trên IdentityServer
 	response_type: "code",													  // Sử dụng Authorization Code Flow
 	requirePkce: true,														  // Bật PKCE để tăng cường bảo mật
 	authority: "https://localhost:5001",									  // URL của IdentityServer
@@ -10,7 +10,7 @@ var config = {
 	scope: "openid profile email moviesApi roles offline_access",			  // Các scope yêu cầu
 	loadUserInfo: true,														  // Tải thêm thông tin người dùng từ UserInfo endpoint
 	silent_redirect_uri: "https://localhost:5003/silent-renew.html",          // Trang chạy ngầm để gia hạn token
-	automaticSilentRenew: false 											  // Tự động gia hạn token
+	automaticSilentRenew: true 												  // Tự động gia hạn token
 
 	// Sử dụng localStorage để lưu trữ token thay vì sessionStorage (mặc định)
     //userStore: new Oidc.WebStorageStateStore({ store: window.localStorage })

@@ -51,10 +51,13 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 
-// Tạo hoặc tải RSA Key từ tệp nếu đã tồn tại, nếu không sẽ tạo mới và lưu vào tệp
-var rsaKey = RsaKeyHelper.GenerateOrLoadRsaKey(Path.Combine(Directory.GetCurrentDirectory(), "Keys/rsa_key"));
+// Đường dẫn tới file lưu khóa RSA
+var rsaKeyPath = Path.Combine(Directory.GetCurrentDirectory(), "Keys/rsa_key.pem");
 
-// Tạo đối tượng SigningCredentials từ RSA Key và sử dụng thuật toán ký RsaSha256
+// Tạo hoặc tải RSA Key từ tệp (định dạng PEM)
+var rsaKey = RsaKeyHelper.GenerateOrLoadRsaKey(rsaKeyPath);
+
+// Tạo SigningCredentials từ RSA Key và sử dụng thuật toán ký RsaSha256
 var signingCredentials = new SigningCredentials(rsaKey, SecurityAlgorithms.RsaSha256);
 
 // Add IdentityServer4.AspNetCoreIdentity
@@ -65,13 +68,13 @@ builder.Services.AddIdentityServer(options =>
     options.Events.RaiseFailureEvents = true;
     options.Events.RaiseSuccessEvents = true;
 
-}).AddSigningCredential(signingCredentials)  // AddSigningCredential yêu cầu một SigningCredentials
+}).AddSigningCredential(signingCredentials)                                      // AddSigningCredential yêu cầu một SigningCredentials
   .AddAspNetIdentity<Users>()
-  .AddInMemoryClients(ClientConfig.GetClients)
+  .AddInMemoryClients(ClientConfig.GetClients(builder.Configuration))
   .AddInMemoryApiResources(ApiResourcesConfig.GetApiResources)
   .AddInMemoryApiScopes(ApiScopesConfig.GetApiScopes)
   .AddInMemoryIdentityResources(IdentityResourcesConfig.GetIdentityResources)
-  .AddProfileService<CustomProfileService>();                                   // Đăng ký CustomProfileService
+  .AddProfileService<CustomProfileService>();                                    // Đăng ký CustomProfileService
 
 // Cấu hình Google Authentication
 builder.Services.AddAuthentication(options =>
@@ -94,7 +97,6 @@ builder.Services.AddAuthentication(options =>
     googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
     googleOptions.CallbackPath = "/signin-google"; // Đảm bảo đường dẫn callback chính xác
 });
-
 
 // Cấu hình SendMail - Nuget: FluentMail
 builder.Services.AddFluentEmail(builder.Configuration);

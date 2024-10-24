@@ -62,13 +62,9 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddAuthorization(options =>
 {
-    // Cấu hình chính sách xác thực role User
-    options.AddPolicy("UserPolicy", policy =>
-    {
-        policy.RequireRole("User");
-    });
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
 });
-
 
 builder.Services.AddControllers();
 

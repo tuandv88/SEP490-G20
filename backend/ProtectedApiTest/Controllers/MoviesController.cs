@@ -10,7 +10,7 @@ namespace ProtectedApiTest.Controllers
     public class MoviesController : ControllerBase
     {
         // Một API trả về danh sách phim
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "UserPolicy")]
         [HttpGet]
         public IActionResult Get()
         {

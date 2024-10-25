@@ -3,9 +3,11 @@ using AuthServer.Data;
 using AuthServer.Models;
 using AuthServer.Repository.Services.Profile;
 using AuthServer.Repository.Services.SendMailWithModoboa;
+using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,9 +18,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 // Add DbContext 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 // Add AspNetCore Identity 
 builder.Services.AddIdentity<Users, Roles>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -60,6 +64,8 @@ var rsaKey = RsaKeyHelper.GenerateOrLoadRsaKey(rsaKeyPath);
 // Tạo SigningCredentials từ RSA Key và sử dụng thuật toán ký RsaSha256
 var signingCredentials = new SigningCredentials(rsaKey, SecurityAlgorithms.RsaSha256);
 
+var migrationsAssembly = typeof(Program).Assembly.GetName().Name;
+
 // Add IdentityServer4.AspNetCoreIdentity
 builder.Services.AddIdentityServer(options =>
 {
@@ -70,11 +76,18 @@ builder.Services.AddIdentityServer(options =>
 
 }).AddSigningCredential(signingCredentials)                                      // AddSigningCredential yêu cầu một SigningCredentials
   .AddAspNetIdentity<Users>()
-  .AddInMemoryClients(ClientConfig.GetClients(builder.Configuration))
-  .AddInMemoryApiResources(ApiResourcesConfig.GetApiResources)
-  .AddInMemoryApiScopes(ApiScopesConfig.GetApiScopes)
-  .AddInMemoryIdentityResources(IdentityResourcesConfig.GetIdentityResources)
-  .AddProfileService<CustomProfileService>();                                    // Đăng ký CustomProfileService
+  .AddProfileService<CustomProfileService>()                                     // Đăng ký CustomProfileServic
+  .AddConfigurationStore(options =>
+  {
+      options.ConfigureDbContext = b => b.UseNpgsql(connectionString, // Sử dụng UseNpgsql cho PostgreSQL
+          npgsql => npgsql.MigrationsAssembly(migrationsAssembly));
+  })
+.AddOperationalStore(options =>
+{
+    options.ConfigureDbContext = b => b.UseNpgsql(connectionString, // Sử dụng UseNpgsql cho PostgreSQL
+        npgsql => npgsql.MigrationsAssembly(migrationsAssembly));
+});
+
 
 // Cấu hình Google Authentication
 builder.Services.AddAuthentication(options =>
@@ -109,10 +122,20 @@ if (args.Contains("/seeddata"))
 {
     using (var scope = app.Services.CreateScope())
     {
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        SeedDataSample.Initialize(context);
+        // Lấy tất cả các DbContext cần thiết
+        var appDbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var configDbContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+        var persistedGrantDbContext = scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>();
+
+        // Lấy IConfiguration từ scope để truyền vào phương thức Initialize
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+        // Thực hiện seeding dữ liệu
+        SeedDataSample.Initialize(appDbContext, configDbContext, persistedGrantDbContext, configuration);
     }
 }
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

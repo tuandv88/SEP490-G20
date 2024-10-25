@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace AuthServer.Data.Migrations
+namespace AuthServer.Data.Migrations.ApplicationDb
 {
     /// <inheritdoc />
-    public partial class IntialDataBaseidentitydb : Migration
+    public partial class InitialIdentityServerApplicationDbMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

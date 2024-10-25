@@ -75,16 +75,37 @@ namespace AuthServer.Data
             appDbContext.Roles.AddRange(roles);
             appDbContext.SaveChanges();
 
+            // Giả sử bạn đã có danh sách người dùng từ trước
+            var userList = appDbContext.Users.ToList();
+            // Đếm số lượng người dùng để chia làm 2
+            int halfUserCount = userList.Count / 2;
+
             // Seed UserRoles
             var userRoles = new List<UserRoles>();
-            foreach (var user in users)
+
+            // Vòng lặp để gán vai trò cho người dùng
+            for (int i = 0; i < userList.Count; i++)
             {
-                userRoles.Add(new UserRoles
+                if (i < halfUserCount)
                 {
-                    UserId = user.Id,
-                    RoleId = roles[1].Id // Gán tất cả người dùng vào vai trò User
-                });
+                    // Gán vai trò Admin cho nửa đầu danh sách
+                    userRoles.Add(new UserRoles
+                    {
+                        UserId = users[i].Id,
+                        RoleId = roles[0].Id // Vai trò Admin
+                    });
+                }
+                else
+                {
+                    // Gán vai trò User cho nửa sau danh sách
+                    userRoles.Add(new UserRoles
+                    {
+                        UserId = users[i].Id,
+                        RoleId = roles[1].Id // Vai trò User
+                    });
+                }
             }
+
             appDbContext.UserRoles.AddRange(userRoles);
             appDbContext.SaveChanges();
 

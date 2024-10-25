@@ -75,19 +75,20 @@ builder.Services.AddIdentityServer(options =>
     options.Events.RaiseSuccessEvents = true;
 
 }).AddSigningCredential(signingCredentials)                                      // AddSigningCredential yêu cầu một SigningCredentials
-  .AddAspNetIdentity<Users>()
-  .AddProfileService<CustomProfileService>()                                     // Đăng ký CustomProfileServic
-  .AddConfigurationStore(options =>
+  .AddAspNetIdentity<Users>()                                                    // Sử dụng Identity cho quản lý người dùng
+  .AddProfileService<CustomProfileService>()                                     // ProfileService quản lí claims của người dùng
+  .AddConfigurationStore(options =>                                              // Quản lý Client, Resource, ApiScope, IdentityResource của IdentityServer một cách động.
   {
-      options.ConfigureDbContext = b => b.UseNpgsql(connectionString, // Sử dụng UseNpgsql cho PostgreSQL
+      options.ConfigureDbContext = b => b.UseNpgsql(connectionString,            // Sử dụng UseNpgsql cho PostgreSQL
           npgsql => npgsql.MigrationsAssembly(migrationsAssembly));
   })
-.AddOperationalStore(options =>
+.AddOperationalStore(options =>                                                  // Cấu hình lưu trữ cho dữ liệu vận hành của IdentityServer như Auth Code và refresh token.
 {
-    options.ConfigureDbContext = b => b.UseNpgsql(connectionString, // Sử dụng UseNpgsql cho PostgreSQL
+    options.ConfigureDbContext = b => b.UseNpgsql(connectionString,              // Sử dụng UseNpgsql cho PostgreSQL
         npgsql => npgsql.MigrationsAssembly(migrationsAssembly));
+    options.EnableTokenCleanup = builder.Configuration["TokenCleanupOptions:EnableTokenCleanup"] == "true";             // Bật xóa token tự động
+    options.TokenCleanupInterval = int.Parse(builder.Configuration["TokenCleanupOptions:TokenCleanupInterval"]); ;      // Thời gian dọn dẹp token (giây)
 });
-
 
 // Cấu hình Google Authentication
 builder.Services.AddAuthentication(options =>
@@ -149,12 +150,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-//app.UseCors("AllowSpecificOrigin"); // Sử dụng policy CORS đã cấu hình
-
 app.UseIdentityServer();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",

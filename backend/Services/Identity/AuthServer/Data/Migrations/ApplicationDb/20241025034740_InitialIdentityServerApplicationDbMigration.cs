@@ -6,10 +6,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AuthServer.Data.Migrations.ApplicationDb
 {
-    /// <inheritdoc />
     public partial class InitialIdentityServerApplicationDbMigration : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -201,7 +199,6 @@ namespace AuthServer.Data.Migrations.ApplicationDb
                 unique: true);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

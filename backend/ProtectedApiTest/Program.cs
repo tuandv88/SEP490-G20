@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddControllers();
 
 // Thêm dịch vụ Swagger
 // dotnet add package Swashbuckle.AspNetCore
@@ -65,8 +66,6 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminPolicy", policy => policy.RequireRole("admin"));
     options.AddPolicy("UserPolicy", policy => policy.RequireRole("user"));
 });
-
-builder.Services.AddControllers();
 
 var app = builder.Build();
 

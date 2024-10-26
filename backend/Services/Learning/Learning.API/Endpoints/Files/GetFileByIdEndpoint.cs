@@ -11,7 +11,7 @@ public class GetFileByIdEndpoint : ICarterModule {
 
             var response = result.Adapt<GetFileByIdResponse>();
 
-            return Results.Ok(result);
+            return Results.Ok(response);
 
         })
         .WithName("GetFileById")

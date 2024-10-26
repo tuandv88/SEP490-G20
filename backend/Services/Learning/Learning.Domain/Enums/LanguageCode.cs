@@ -1,5 +1,5 @@
 ﻿namespace Learning.Domain.Enums;
 public enum LanguageCode {
-    Java // code java
+    Java = 4 // code java
 }
 

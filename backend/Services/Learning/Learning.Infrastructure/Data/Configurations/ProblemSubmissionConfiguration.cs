@@ -1,5 +1,5 @@
-﻿
-using System.Text.Json;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Newtonsoft.Json;
 
 namespace Learning.Infrastructure.Data.Configurations;
 public class ProblemSubmissionConfiguration : IEntityTypeConfiguration<ProblemSubmission> {
@@ -15,19 +15,30 @@ public class ProblemSubmissionConfiguration : IEntityTypeConfiguration<ProblemSu
 
         builder.Property(ps => ps.SubmissionDate).HasDefaultValue(DateTime.UtcNow);
         builder.Property(ps => ps.SourceCode).HasMaxLength(int.MaxValue);
-        builder.Property(ps => ps.LanguageCode).HasDefaultValue(LanguageCode.Java);
+
+        builder.Property(ps => ps.LanguageCode)
+            .HasDefaultValue(LanguageCode.Java)
+            .HasConversion(
+                s => s.ToString(), dbStatus => (LanguageCode)Enum.Parse(typeof(LanguageCode), dbStatus));
         builder.Property(ps => ps.ExecutionTime);
         builder.Property(ps => ps.MemoryUsage);
 
-        builder.Property(ps => ps.TestCasesPassed).HasConversion(
-                    testCasesPassed => JsonSerializer.Serialize(testCasesPassed, (JsonSerializerOptions)null!),
-                    dbJson => JsonSerializer.Deserialize<JsonDocument>(dbJson, (JsonSerializerOptions)null!)!
+        builder.Property(ps => ps.TestResults)
+            .HasConversion(
+                testResult => JsonConvert.SerializeObject(testResult),
+                dbJson => JsonConvert.DeserializeObject<List<TestResult>>(dbJson)!)
+            .Metadata.SetValueComparer(new ValueComparer<List<TestResult>>(
+                (c1, c2) => JsonConvert.SerializeObject(c1) == JsonConvert.SerializeObject(c2),
+                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                c => JsonConvert.DeserializeObject<List<TestResult>>(JsonConvert.SerializeObject(c))!));
+
+        builder.Property(ps => ps.Status).HasConversion(
+                    status => JsonConvert.SerializeObject(status),
+                    dbJson => JsonConvert.DeserializeObject<SubmissionStatus>(dbJson)!
                 );
-        builder.Property(ps => ps.TestCasesFailed).HasConversion(
-                    testCasesFailed => JsonSerializer.Serialize(testCasesFailed, (JsonSerializerOptions)null!),
-                    dbJson => JsonSerializer.Deserialize<JsonDocument>(dbJson, (JsonSerializerOptions)null!)!
-                );
-        builder.Property(ps => ps.RunTimeErrors);
+        builder.Property(ps => ps.TokenReference);
+        builder.Property(ps => ps.RunTimeErrors).HasDefaultValue(null);
+        builder.Property(ps => ps.CompileErrors).HasDefaultValue(null);
     }
 }
 

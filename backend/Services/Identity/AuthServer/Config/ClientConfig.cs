@@ -33,25 +33,20 @@ namespace AuthServer.Config
                 //////////////////////////////////////////
                 new Client
                 {
-                    ClientId = "movies_mvc_client",
-
-                     // SecretKey mã hóa theo Sha256
-                    ClientSecrets = { new Secret("secret".Sha256()) },
-
+                    ClientId = "ICoderVN",
                     AllowedGrantTypes = GrantTypes.Code,    // Tự tìm đến Account/Login của identityServer đẻ Author
-                    RequireConsent = false,
-                    RequirePkce = true,
                     AllowOfflineAccess = true,
-                    AllowedCorsOrigins = { "https://localhost" },
+                    RequireClientSecret = false,
+                    AllowedCorsOrigins = { "https://localhost:5004" },
 
                     // đăng nhập thành công thì redirect lại theo đường dẫn này
-                    RedirectUris = { "https://localhost:5003/signin-oidc" },
+                    RedirectUris = { "https://localhost:5004/callback.html" },
                     // khi logout nó chạy cổng này và xử lý logout thì nó redirect đến url: 5001 logout của identityServer
-                    PostLogoutRedirectUris = { "https://localhost:5003/signout-callback-oidc" },
+                    PostLogoutRedirectUris = { "https://localhost:5004/index.html" },
 
                     // ở client này cho phép chuy cập đến những cái này
                     AllowedScopes = new List<string>
-                    {
+                    { 
                         // ở đây chúng ta cho chuy cập cả thông tin user lần api
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,

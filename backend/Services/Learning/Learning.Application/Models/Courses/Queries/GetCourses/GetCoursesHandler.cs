@@ -1,15 +1,15 @@
-﻿using Learning.Application.Data.Repositories;
+﻿using BuidingBlocks.Storage.Interfaces;
+using BuidingBlocks.Storage.Models;
+using Learning.Application.Data.Repositories;
 using Learning.Application.Models.Courses.Dtos;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Learning.Application.Models.Courses.Queries.GetCourses;
 
-public class GetCoursesHandler(ICourseRepository repository)
+public class GetCoursesHandler(ICourseRepository repository, IFilesService filesService)
     : IQueryHandler<GetCoursesQuery, GetCoursesResult>
 {
     public async Task<GetCoursesResult> Handle(GetCoursesQuery query, CancellationToken cancellationToken)
     {
-
         var allData = await repository.GetAllAsync();
         //Phân trang
         var pageIndex = query.PaginationRequest.PageIndex;
@@ -20,9 +20,8 @@ public class GetCoursesHandler(ICourseRepository repository)
                             .Skip(pageSize * (pageIndex - 1))
                             .Take(pageSize)
                             .ToList();
-
         return new GetCoursesResult(
-            new PaginatedResult<CourseDto>(pageIndex, pageSize, totalCount, courses.ToCourseDtoList()));
+            new PaginatedResult<CourseDto>(pageIndex, pageSize, totalCount,await courses.ToCourseDtoListAsync(filesService)));
     }
 }
 

@@ -1,9 +1,16 @@
 using BuildingBlocks.Extensions;
+using Learning.Application.Interfaces;
 using Learning.Infrastructure.Data.Interceptors;
 using Learning.Infrastructure.Data.Repositories.Chapters;
 using Learning.Infrastructure.Data.Repositories.Courses;
 using Learning.Infrastructure.Data.Repositories.Files;
 using Learning.Infrastructure.Data.Repositories.Lectures;
+using Learning.Infrastructure.Data.Repositories.Problems;
+using Learning.Infrastructure.Data.Repositories.ProblemSolutions;
+using Learning.Infrastructure.Data.Repositories.Quizs;
+using Learning.Infrastructure.Data.Repositories.TestCases;
+using Learning.Infrastructure.Data.Repositories.TestScripts;
+using Learning.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 
@@ -26,6 +33,18 @@ public static class DependencyInjection {
         //Caching
         services.ConfigureCaching(configuration);
 
+        //Configuration Repository
+        ConfigureRepository(services, configuration);
+
+        //Configuration Service
+        services.AddScoped<ISourceCombiner, SourceCombiner>();
+
+        //IBase64Converter
+        services.AddScoped<IBase64Converter, Base64Converter>();
+
+        return services;
+    }
+    private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration) {
         //Caching CourseRepository
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.Decorate<ICourseRepository, CachedCourseRepository>();
@@ -41,6 +60,19 @@ public static class DependencyInjection {
         //FileRepository
         services.AddScoped<IFileRepository, FileRepository>();
 
-        return services;
+        //ProblemRepository
+        services.AddScoped<IProblemRepository, ProblemRepository>();
+
+        //ProblemSolutionRepository
+        services.AddScoped<IProblemSolutionRepository, ProblemSolutionRepository>();
+
+        //TestScriptRepository
+        services.AddScoped<ITestScriptRepository, TestScriptRepository>();
+
+        //TestCaseRepository
+        services.AddScoped<ITestCaseRepository, TestCaseRepository>();
+
+        //QuizRepository
+        services.AddScoped<IQuizRepository, QuizRepository>();
     }
 }

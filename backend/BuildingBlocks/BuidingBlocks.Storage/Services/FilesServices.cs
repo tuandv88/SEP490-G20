@@ -36,7 +36,23 @@ namespace BuidingBlocks.Storage.Services
 
             return fileName;
         }
+        public async Task<string> UploadFileAsync(MemoryStream memoryStream, string originFileName, string contentType, string bucketName, string? prefix = null) {
+            var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
+            if (!bucketExists) {
+                throw new InvalidOperationException($"Bucket '{bucketName}' does not exist.");
+            }
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(originFileName)}";
 
+            var request = new PutObjectRequest() {
+                BucketName = bucketName,
+                Key = String.IsNullOrEmpty(prefix) ? fileName : $"{prefix?.TrimEnd('/')}/{fileName}",
+                InputStream = memoryStream
+            };
+            request.Metadata.Add("Content-type", contentType);
+            await _s3Client.PutObjectAsync(request);
+
+            return fileName;
+        }
         public async Task<IEnumerable<S3ObjectDto>> GetAllFileAsync(string bucketName, string? prefix, int expiryMinutes = 1) {
             var bucketExists = await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName);
             if (!bucketExists) {

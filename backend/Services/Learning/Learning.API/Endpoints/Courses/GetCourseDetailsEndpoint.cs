@@ -10,7 +10,7 @@ public class GetCourseDetailsEndpoint : ICarterModule {
 
             var response = result.Adapt<GetCourseDetailsResponse>();
 
-            return Results.Ok(result);
+            return Results.Ok(response);
 
         })
         .WithName("GetCourseByIdDetails")

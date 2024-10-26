@@ -1,5 +1,4 @@
-﻿
-namespace Learning.Infrastructure.Data.Configurations;
+﻿namespace Learning.Infrastructure.Data.Configurations;
 public class UserCourseConfiguration : IEntityTypeConfiguration<UserCourse> {
     public void Configure(EntityTypeBuilder<UserCourse> builder) {
         builder.HasKey(uc => uc.Id);

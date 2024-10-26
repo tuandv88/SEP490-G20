@@ -25,6 +25,7 @@ public class CreateLectureHandler(IChapterRepository chapterRepository, ILecture
 
         var lecture = Lecture.Create(
             lectureId: LectureId.Of(Guid.NewGuid()),
+            chapterId: chapter.Id,
             title: createLectureDto.Title,
             summary: createLectureDto.Summary,
             timeEstimation: createLectureDto.TimeEstimation,

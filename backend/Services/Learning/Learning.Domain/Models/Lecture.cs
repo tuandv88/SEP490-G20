@@ -16,9 +16,10 @@ public class Lecture : Entity<LectureId> {
     public int Point {  get; set; } // điểm thường
     public bool IsFree {  get; set; } // bài học này có miễn phí hay không ?
 
-    public static Lecture Create(LectureId lectureId,  string title, string summary, double timeEstimation, LectureType lectureType, int orderIndex, int point, bool isFree) {
+    public static Lecture Create(LectureId lectureId, ChapterId chapterId, string title, string summary, double timeEstimation, LectureType lectureType, int orderIndex, int point, bool isFree) {
         var lecture = new Lecture() {
             Id = lectureId,
+            ChapterId = chapterId,
             Title = title,
             Summary = summary,
             TimeEstimation = timeEstimation,

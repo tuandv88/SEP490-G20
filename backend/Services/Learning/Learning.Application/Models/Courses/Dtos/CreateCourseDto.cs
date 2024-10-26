@@ -9,8 +9,14 @@ public record CreateCourseDto(
     string Objectives,
     string TargetAudiences,
     string ScheduledPublishDate,
-    string ImageUrl,
+    ImageDto Image,
     int OrderIndex,
     string CourseLevel,
     double Price
+);
+
+public record ImageDto(
+    string FileName,
+    string Base64Image,
+    string ContentType
 );

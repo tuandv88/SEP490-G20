@@ -1,7 +1,9 @@
-﻿using Learning.Application.Data.Repositories;
+﻿using BuidingBlocks.Storage.Interfaces;
+using Learning.Application.Data.Repositories;
+using Learning.Application.Extensions;
 
 namespace Learning.Application.Models.Courses.Queries.GetCourseDetails;
-public class GetCourseDetailsHandler(ICourseRepository courseRepository, IChapterRepository chapterRepository, ILectureRepository lectureRepository) 
+public class GetCourseDetailsHandler(ICourseRepository courseRepository, IFilesService filesService) 
     : IQueryHandler<GetCourseDetailsQuery, GetCourseDetailsResult>
 {
     public async Task<GetCourseDetailsResult> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)
@@ -10,7 +12,8 @@ public class GetCourseDetailsHandler(ICourseRepository courseRepository, IChapte
         if(course == null) {
             throw new NotFoundException("Course", request.Id);
         }
-        var courseDto = course.ToCourseDetailsDto();
+        var s3Object = await filesService.GetFileAsync(StorageConstants.BUCKET, course.ImageUrl, 60);
+        var courseDto = course.ToCourseDetailsDto(s3Object.PresignedUrl!);
 
         return new GetCourseDetailsResult(courseDto);
     }

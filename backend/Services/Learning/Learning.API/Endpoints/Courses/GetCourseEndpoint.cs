@@ -9,7 +9,7 @@ public class GetCourseEndpoint : ICarterModule {
 
             var response = result.Adapt<GetCourseResponse>();
 
-            return Results.Ok(result);
+            return Results.Ok(response);
 
         })
         .WithName("GetCourses")

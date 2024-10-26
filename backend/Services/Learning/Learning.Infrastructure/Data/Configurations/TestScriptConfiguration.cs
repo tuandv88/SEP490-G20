@@ -7,10 +7,6 @@ public class TestScriptConfiguration : IEntityTypeConfiguration<TestScript> {
                         testScriptId => testScriptId.Value,
                         dbId => TestScriptId.Of(dbId));
 
-        builder.HasMany(p => p.TestCases)
-            .WithOne()
-            .HasForeignKey(p => p.TestScriptId);
-
         builder.Property(pl => pl.FileName).HasMaxLength(50);
         builder.Property(pl => pl.Template).HasMaxLength(int.MaxValue);
         builder.Property(pl => pl.TestCode).HasMaxLength(int.MaxValue);

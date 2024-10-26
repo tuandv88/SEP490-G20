@@ -1,21 +1,19 @@
-﻿using Learning.Domain.Abstractions;
-
-namespace Learning.Infrastructure.Data.Repositories.Lectures;
+﻿namespace Learning.Infrastructure.Data.Repositories.Lectures;
 public class CachedLectureRepository(ILectureRepository lectureRepository, IChapterRepository chapterRepository, ICacheService cacheService) : ILectureRepository {
     public async Task AddAsync(Lecture entity) {
         await lectureRepository.AddAsync(entity);
-        RemoveCachedCourseDetails(entity);
+        await RemoveCachedCourseDetails(entity);
     }
 
     public async Task DeleteAsync(Lecture entity) {
         await lectureRepository.DeleteAsync(entity);
-        RemoveCachedCourseDetails(entity);
+        await RemoveCachedCourseDetails(entity);
     }
 
     public async Task DeleteByIdAsync(Guid id) {
         await lectureRepository.DeleteByIdAsync(id);
         var lecture = await GetByIdAsync(id);
-        RemoveCachedCourseDetails(lecture);
+        await RemoveCachedCourseDetails(lecture);
     }
 
     public async Task<List<Lecture>> GetAllAsync() {
@@ -26,19 +24,23 @@ public class CachedLectureRepository(ILectureRepository lectureRepository, IChap
         return await lectureRepository.GetByIdAsync(id);
     }
 
+    public async Task<Lecture?> GetLectureByIdDetail(Guid Id) {
+        return await lectureRepository.GetLectureByIdDetail(Id);
+    }
+
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken) {
         return await lectureRepository.SaveChangesAsync(cancellationToken);
     }
 
     public async Task UpdateAsync(Lecture entity) {
         await lectureRepository.UpdateAsync(entity);
-        RemoveCachedCourseDetails(entity);
+        await RemoveCachedCourseDetails(entity);
     }
 
     private void DeleteCached(string cachedKey) {
         _ = cacheService.DeleteAsync(cachedKey);
     }
-    private async void RemoveCachedCourseDetails(Lecture? lecture) {
+    private async Task RemoveCachedCourseDetails(Lecture? lecture) {
         if (lecture != null) {
             var chapters = await chapterRepository.GetAllAsync();
             var chapter = chapters.Where(c => c.Id.Value == lecture.ChapterId.Value).FirstOrDefault();

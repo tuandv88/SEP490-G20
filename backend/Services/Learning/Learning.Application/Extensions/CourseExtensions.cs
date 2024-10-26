@@ -1,28 +1,21 @@
-﻿using Learning.Application.Models.Chapters.Dtos;
+﻿using BuidingBlocks.Storage.Interfaces;
+using Learning.Application.Models.Chapters.Dtos;
 using Learning.Application.Models.Courses.Dtos;
+using System.Linq;
 
 namespace Learning.Application.Extensions;
 public static class CourseExtensions {
-    public static List<CourseDto> ToCourseDtoList(this List<Course> courses) {
-        return courses.Select(c => new CourseDto(
-            Id: c.Id.Value,
-            Title: c.Title,
-            Description: c.Description,
-            Headline: c.Headline,
-            CourseStatus: c.CourseStatus.ToString(),
-            TimeEstimation: c.TimeEstimation,
-            Prerequisites: c.Prerequisites,
-            Objectives: c.Objectives,
-            TargetAudiences: c.TargetAudiences,
-            ScheduledPublishDate: c.ScheduledPublishDate,
-            ImageUrl: c.ImageUrl,
-            OrderIndex: c.OrderIndex,
-            CourseLevel: c.CourseLevel.ToString(),
-            Price: c.Price
-            )).ToList();
+    public static async Task<List<CourseDto>> ToCourseDtoListAsync(this List<Course> courses, IFilesService filesService) {
+        var tasks = courses.Select(async c => {
+            var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, c.ImageUrl, 60);
+            return c.ToCourseDto(imageUrl.PresignedUrl!);
+        });
+
+        var courseDtos = await Task.WhenAll(tasks);
+        return courseDtos.ToList();
     }
 
-    public static CourseDto ToCourseDto(this Course course) {
+    public static CourseDto ToCourseDto(this Course course, string imageUrl) {
         return new CourseDto(
             Id: course.Id.Value,
             Title: course.Title,
@@ -34,15 +27,15 @@ public static class CourseExtensions {
             Objectives: course.Objectives,
             TargetAudiences: course.TargetAudiences,
             ScheduledPublishDate: course.ScheduledPublishDate,
-            ImageUrl: course.ImageUrl,
+            ImageUrl: imageUrl,
             OrderIndex: course.OrderIndex,
             CourseLevel: course.CourseLevel.ToString(),
             Price: course.Price
             );
     }
-    public static CourseDetailsDto ToCourseDetailsDto(this Course course) {
+    public static CourseDetailsDto ToCourseDetailsDto(this Course course, string imageUrl) {
         var courseDetail = new CourseDetailsDto(
-            CourseDto: course.ToCourseDto(),
+            CourseDto: course.ToCourseDto(imageUrl),
             ChapterDetailsDtos: course.Chapters.Select(c => c.ToChapterDetailDto()).ToList()
             );
         return courseDetail;

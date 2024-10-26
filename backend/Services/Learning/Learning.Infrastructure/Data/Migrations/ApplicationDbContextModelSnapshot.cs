@@ -363,10 +363,14 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<float>("CpuExtraTime")
-                        .HasColumnType("real");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("real")
+                        .HasDefaultValue(0.5f);
 
                     b.Property<float>("CpuTimeLimit")
-                        .HasColumnType("real");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("real")
+                        .HasDefaultValue(0.5f);
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -386,7 +390,14 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasDefaultValue("Easy");
 
                     b.Property<bool>("EnableNetwork")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -395,13 +406,19 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("MaxFileSize")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1024);
 
                     b.Property<int>("MaxThread")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(30);
 
-                    b.Property<float>("MemoryLimit")
-                        .HasColumnType("real");
+                    b.Property<int>("MemoryLimit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(64000);
 
                     b.Property<string>("ProblemType")
                         .IsRequired()
@@ -410,7 +427,9 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasDefaultValue("Practice");
 
                     b.Property<int>("StackLimit")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(32000);
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -455,6 +474,11 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
+                    b.Property<bool>("Priority")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<Guid>("ProblemId")
                         .HasColumnType("uuid");
 
@@ -475,6 +499,9 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CompileErrors")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -484,10 +511,11 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<double>("ExecutionTime")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("LanguageCode")
+                    b.Property<string>("LanguageCode")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
+                        .HasColumnType("text")
+                        .HasDefaultValue("Java");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -502,7 +530,6 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("RunTimeErrors")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("SourceCode")
@@ -510,16 +537,20 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasMaxLength(2147483647)
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("SubmissionDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 20, 21, 18, 19, 362, DateTimeKind.Utc).AddTicks(5709));
-
-                    b.Property<string>("TestCasesFailed")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("TestCasesPassed")
+                    b.Property<DateTime>("SubmissionDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValue(new DateTime(2024, 10, 26, 13, 54, 55, 592, DateTimeKind.Utc).AddTicks(3078));
+
+                    b.Property<string>("TestResults")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TokenReference")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -563,7 +594,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<int>("OrderIndex")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ProblemId")
+                    b.Property<Guid?>("ProblemId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("QuestionLevel")
@@ -737,7 +768,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 20, 21, 18, 19, 384, DateTimeKind.Utc).AddTicks(1072));
+                        .HasDefaultValue(new DateTime(2024, 10, 26, 13, 54, 55, 601, DateTimeKind.Utc).AddTicks(4240));
 
                     b.Property<int>("TotalQuestions")
                         .HasColumnType("integer");
@@ -768,9 +799,8 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasMaxLength(2147483647)
                         .HasColumnType("text");
 
-                    b.Property<string>("Input")
+                    b.Property<string>("Inputs")
                         .IsRequired()
-                        .HasMaxLength(2147483647)
                         .HasColumnType("text");
 
                     b.Property<bool>("IsHidden")
@@ -787,12 +817,12 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<int>("OrderIndex")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("TestScriptId")
+                    b.Property<Guid>("ProblemId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TestScriptId");
+                    b.HasIndex("ProblemId");
 
                     b.ToTable("TestCases");
                 });
@@ -870,7 +900,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 20, 21, 18, 19, 394, DateTimeKind.Utc).AddTicks(2464));
+                        .HasDefaultValue(new DateTime(2024, 10, 26, 13, 54, 55, 605, DateTimeKind.Utc).AddTicks(4165));
 
                     b.Property<string>("Feedback")
                         .IsRequired()
@@ -985,9 +1015,7 @@ namespace Learning.Infrastructure.Data.Migrations
                 {
                     b.HasOne("Learning.Domain.Models.Problem", null)
                         .WithOne()
-                        .HasForeignKey("Learning.Domain.Models.Question", "ProblemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Learning.Domain.Models.Question", "ProblemId");
 
                     b.HasOne("Learning.Domain.Models.Quiz", null)
                         .WithMany("Questions")
@@ -1016,9 +1044,9 @@ namespace Learning.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Learning.Domain.Models.TestCase", b =>
                 {
-                    b.HasOne("Learning.Domain.Models.TestScript", null)
+                    b.HasOne("Learning.Domain.Models.Problem", null)
                         .WithMany("TestCases")
-                        .HasForeignKey("TestScriptId")
+                        .HasForeignKey("ProblemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1068,6 +1096,8 @@ namespace Learning.Infrastructure.Data.Migrations
 
                     b.Navigation("ProblemSubmissions");
 
+                    b.Navigation("TestCases");
+
                     b.Navigation("TestScripts");
                 });
 
@@ -1081,11 +1111,6 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Navigation("Questions");
 
                     b.Navigation("QuizSubmissions");
-                });
-
-            modelBuilder.Entity("Learning.Domain.Models.TestScript", b =>
-                {
-                    b.Navigation("TestCases");
                 });
 
             modelBuilder.Entity("Learning.Domain.Models.UserCourse", b =>

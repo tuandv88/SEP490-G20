@@ -1,8 +1,9 @@
-﻿namespace Learning.Application.Models.Submissions.Dtos.CodeExecution;
+﻿using Learning.Application.Models.TestCases.Dtos;
+
+namespace Learning.Application.Models.Submissions.Dtos.CodeExecution;
 public record CreateCodeExecuteDto(
-     Guid ProblemId,
      string LanguageCode,
-     string SourceCode,
-     List<string> TestCaseInput
+     string SolutionCode,
+     List<TestCaseInputDto> TestCases
 );
 

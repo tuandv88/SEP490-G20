@@ -6,7 +6,8 @@ export const AUTHENTICATION_ROUTERS = {
   NOTFOUND: '*',
   THEME: '/themes',
   COURSELIST: '/courseList',
-  COURSEDETAIL: '/courseDetail'
+  COURSEDETAIL: '/courseDetail',
+  LEARNINGSPACE: '/learningSpace'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

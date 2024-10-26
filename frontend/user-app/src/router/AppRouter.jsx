@@ -3,6 +3,7 @@ import CourseDetail from '@/components/course/CourseDetail'
 import { AUTHENTICATION_ROUTERS } from './../data/constants'
 import { HomePage, About, NotFound, CourseList } from './../pages'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import LearningSpace from '@/pages/LearningSpace'
 
 export const AppRouter = () => {
   const router = createBrowserRouter([
@@ -21,6 +22,10 @@ export const AppRouter = () => {
     {
       path: AUTHENTICATION_ROUTERS.COURSEDETAIL,
       element: <CourseDetail />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.LEARNINGSPACE,
+      element: <LearningSpace />
     },
     { path: AUTHENTICATION_ROUTERS.NOTFOUND, element: <NotFound /> }
   ])

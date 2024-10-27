@@ -8,8 +8,7 @@ public class GetProblemDetailsHandler(IProblemRepository problemRepository)
         if(problem == null) {
             throw new NotFoundException("Problem", request.Id);
         }
-        //TODO
-        throw new NotImplementedException();
+        return new GetProblemDetailsResult(problem.ToProblemDetailsDto());
 
     }
 }

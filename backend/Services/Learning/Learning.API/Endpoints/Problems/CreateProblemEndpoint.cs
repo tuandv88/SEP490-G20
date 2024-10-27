@@ -9,7 +9,7 @@ public class CreateProblemEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
 
         app.MapPost("/problems", async (Guid? LectureId, CreateProbleRequest request, ISender sender) => {
-            var command = new CreateProblemCommand() { LectureId = LectureId, CreateProblemDto = request.CreateProblemDto};
+            var command = new CreateProblemCommand() { LectureId = LectureId, CreateProblemDto = request.CreateProblemDto };
 
             var result = await sender.Send(command);
 

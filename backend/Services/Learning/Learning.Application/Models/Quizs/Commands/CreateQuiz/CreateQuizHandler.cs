@@ -1,0 +1,47 @@
+﻿using Learning.Application.Data.Repositories;
+using Learning.Application.Models.Quizs.Dtos;
+using Learning.Domain.Enums;
+using Learning.Domain.ValueObjects;
+
+namespace Learning.Application.Models.Quizs.Commands.CreateQuiz;
+public class CreateQuizHandler(IQuizRepository quizRepository, ILectureRepository lectureRepository) : ICommandHandler<CreateQuizComand, CreateQuizResult> {
+    public async Task<CreateQuizResult> Handle(CreateQuizComand request, CancellationToken cancellationToken) {
+        Lecture? lecture = null;
+        if (request.LectureId.HasValue) {
+            lecture = await lectureRepository.GetByIdAsync(request.LectureId.Value);
+            if (lecture == null) {
+                throw new NotFoundException("Lecture", request.LectureId.Value);
+            }
+            if (lecture.QuizId != null) {
+                throw new ConflictException("Lecture has quiz.");
+            }
+        }
+
+        var quiz = CreateNewQuiz(request.CreateQuizDto);
+        if (lecture != null) {
+            lecture.QuizId = quiz.Id;
+        }
+        await quizRepository.AddAsync(quiz);
+        await quizRepository.SaveChangesAsync(cancellationToken);
+
+        return new CreateQuizResult(quiz.Id.Value);
+    }
+
+    private Quiz CreateNewQuiz(CreateQuizDto createQuizDto) {
+        var quiz = Quiz.Create(
+                    quizId: QuizId.Of(Guid.NewGuid()),
+                    isActive: createQuizDto.IsActive,
+                    isRandomized: createQuizDto.IsRandomized,
+                    title: createQuizDto.Title,
+                    description: createQuizDto.Description,
+                    passingMark: createQuizDto.PassingMark,
+                    timeLimit: createQuizDto.TimeLimit,
+                    hasTimeLimit: createQuizDto.HasTimeLimit,
+                    attemptLimit: createQuizDto.AttemptLimit,
+                    hasAttemptLimit: createQuizDto.HasTimeLimit,
+                    quizType: (QuizType)Enum.Parse(typeof(QuizType), createQuizDto.QuizType)
+                    );
+        return quiz;
+    }
+}
+

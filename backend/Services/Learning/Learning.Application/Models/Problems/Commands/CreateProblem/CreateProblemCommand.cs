@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Learning.Application.Models.Problems.Dtos;
+﻿using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.ProblemSolutions.Dtos;
 using Learning.Application.Models.TestCases.Dtos;
 using Learning.Application.Models.TestScripts.Dtos;

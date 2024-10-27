@@ -7,6 +7,7 @@ using Learning.Infrastructure.Data.Repositories.Files;
 using Learning.Infrastructure.Data.Repositories.Lectures;
 using Learning.Infrastructure.Data.Repositories.Problems;
 using Learning.Infrastructure.Data.Repositories.ProblemSolutions;
+using Learning.Infrastructure.Data.Repositories.Questions;
 using Learning.Infrastructure.Data.Repositories.Quizs;
 using Learning.Infrastructure.Data.Repositories.TestCases;
 using Learning.Infrastructure.Data.Repositories.TestScripts;
@@ -74,5 +75,8 @@ public static class DependencyInjection {
 
         //QuizRepository
         services.AddScoped<IQuizRepository, QuizRepository>();
+
+        //QuestionRepository
+        services.AddScoped<IQuestionRepository, QuestionRepository>();
     }
 }

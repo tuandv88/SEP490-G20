@@ -18,6 +18,10 @@ public class ProblemConfiguration : IEntityTypeConfiguration<Problem> {
             .WithOne()
             .HasForeignKey(p => p.ProblemId);
 
+        builder.HasMany(p => p.TestCases)
+            .WithOne()
+            .HasForeignKey(p => p.ProblemId);
+
         builder.Property(p => p.Title).IsRequired().HasMaxLength(150);
         builder.Property(p => p.Description).HasMaxLength(int.MaxValue);
 
@@ -31,14 +35,14 @@ public class ProblemConfiguration : IEntityTypeConfiguration<Problem> {
             .HasConversion(
                 p => p.ToString(), dbStatus => (DifficultyType)Enum.Parse(typeof(DifficultyType), dbStatus));
 
-        builder.Property(p => p.CpuTimeLimit);
-        builder.Property(p => p.CpuExtraTime);
-        builder.Property(p => p.MemoryLimit);
-        builder.Property(p => p.EnableNetwork);
-        builder.Property(p => p.StackLimit);
-        builder.Property(p => p.MaxThread);
-        builder.Property(p => p.MaxFileSize);
-
+        builder.Property(p => p.CpuTimeLimit).HasDefaultValue(0.5);
+        builder.Property(p => p.CpuExtraTime).HasDefaultValue(0.5);
+        builder.Property(p => p.MemoryLimit).HasDefaultValue(64_000);
+        builder.Property(p => p.EnableNetwork).HasDefaultValue(false);
+        builder.Property(p => p.StackLimit).HasDefaultValue(32_000);
+        builder.Property(p => p.MaxThread).HasDefaultValue(30);
+        builder.Property(p => p.MaxFileSize).HasDefaultValue(1024);
+        builder.Property(p => p.IsActive).HasDefaultValue(true);
     }
 }
 

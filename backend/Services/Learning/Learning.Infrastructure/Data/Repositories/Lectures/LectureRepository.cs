@@ -15,7 +15,16 @@ public class LectureRepository : Repository<Lecture>, ILectureRepository {
     public override async Task<Lecture?> GetByIdAsync(Guid id) {
         var lecture = _dbContext.Lectures
                         .AsEnumerable()
-                        .FirstOrDefault(c => c.Id.Value == id);
+                        .FirstOrDefault(l => l.Id.Value == id);
+        return lecture;
+    }
+
+    public async Task<Lecture?> GetLectureByIdDetail(Guid Id) {
+        var lecture = _dbContext.Lectures
+                        .Include(l => l.Files)
+                        .AsNoTracking()
+                        .AsEnumerable()
+                        .FirstOrDefault(l => l.Id.Value == Id);
         return lecture;
     }
 }

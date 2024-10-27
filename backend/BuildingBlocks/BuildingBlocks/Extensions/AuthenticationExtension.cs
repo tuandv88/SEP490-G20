@@ -21,7 +21,7 @@ public static class AuthenticationExtension
             x.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                //ValidateAudience = true,
+                ValidateAudience = false,
                 ValidateIssuerSigningKey = true,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero,

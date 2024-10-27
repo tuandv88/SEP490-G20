@@ -1,22 +1,25 @@
-﻿using Learning.Application.Data.Repositories;
+﻿using BuidingBlocks.Storage.Interfaces;
+using Learning.Application.Data.Repositories;
+using Learning.Application.Interfaces;
 using Learning.Application.Models.Courses.Dtos;
+using Learning.Application.Models.Files.Dtos;
 using Learning.Domain.Enums;
 using Learning.Domain.ValueObjects;
 
 namespace Learning.Application.Models.Courses.Commands.CreateCourse;
-public class CreateCourseHandler(ICourseRepository repository) : ICommandHandler<CreateCourseCommand, CreateCourseResult>
+public class CreateCourseHandler(ICourseRepository repository, IFilesService filesService, IBase64Converter base64Converter) : ICommandHandler<CreateCourseCommand, CreateCourseResult>
 {
     public async Task<CreateCourseResult> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
     {
 
-        var course = CreateNewCourse(request.CreateCourseDto);
+        var course = await CreateNewCourse(request.CreateCourseDto);
         await repository.AddAsync(course);
         await repository.SaveChangesAsync(cancellationToken);
 
         return new CreateCourseResult(course.Id.Value);
     }
 
-    private Course CreateNewCourse(CreateCourseDto createCourseDto)
+    private async Task<Course> CreateNewCourse(CreateCourseDto createCourseDto)
     {
         var courseStatus = Enum.TryParse<CourseStatus>(createCourseDto.CourseStatus, out var status)
             ? status
@@ -38,6 +41,15 @@ public class CreateCourseHandler(ICourseRepository repository) : ICommandHandler
                 throw new FormatException($"ScheduledPublishDate '{createCourseDto.ScheduledPublishDate}' is not in a valid DateTime format.");
             }
         }
+        var bucket = StorageConstants.BUCKET;
+        var prefix = StorageConstants.IMAGE_PATH;
+        var originFileName = createCourseDto.Image.FileName;
+        var base64Image = createCourseDto.Image.Base64Image;
+        var contentType = createCourseDto.Image.ContentType;
+
+        var fileName = await filesService.UploadFileAsync(base64Converter.ConvertToMemoryStream(base64Image), originFileName, contentType, bucket, prefix);
+        var fileUrl = $"{prefix}/{fileName}";
+
         return Course.Create(
             courseId: CourseId.Of(Guid.NewGuid()),
             title: createCourseDto.Title,
@@ -49,7 +61,7 @@ public class CreateCourseHandler(ICourseRepository repository) : ICommandHandler
             objectives: createCourseDto.Objectives,
             targetAudiences: createCourseDto.TargetAudiences,
             scheduledPublishDate: scheduledPublishDate,
-            imageUrl: createCourseDto.ImageUrl,
+            imageUrl: fileUrl,
             orderIndex: createCourseDto.OrderIndex,
             courseLevel: courseLevel,
             price: createCourseDto.Price

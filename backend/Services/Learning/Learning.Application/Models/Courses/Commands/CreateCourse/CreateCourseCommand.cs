@@ -44,9 +44,8 @@ public class CreateCourseCommandValidator : AbstractValidator<CreateCourseComman
         RuleFor(x => x.CreateCourseDto.ScheduledPublishDate)
             .Must(BeValidDateTimeOrNull).WithMessage("ScheduledPublishDate must be a valid UTC date or null.");
 
-        RuleFor(x => x.CreateCourseDto.ImageUrl)
-            .NotNull().WithMessage("ImageUrl must not be null.")
-            .NotEmpty().WithMessage("ImageUrl must not be empty.");
+        RuleFor(x => x.CreateCourseDto.Image)
+            .NotNull().WithMessage("ImageUrl must not be null.");
 
         RuleFor(x => x.CreateCourseDto.OrderIndex)
             .GreaterThan(0).WithMessage("OrderIndex must be greater than to zero.");

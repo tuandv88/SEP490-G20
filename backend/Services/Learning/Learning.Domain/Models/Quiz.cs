@@ -1,9 +1,7 @@
 ﻿namespace Learning.Domain.Models;
 public class Quiz : Aggregate<QuizId> {
-    private readonly List<Question>_question = new();
-    public IReadOnlyList<Question> Questions => _question.AsReadOnly();
-    private readonly List<QuizSubmission> _quizSubmissions = new();
-    public IReadOnlyList<QuizSubmission> QuizSubmissions => _quizSubmissions.AsReadOnly();
+    public  List<Question> Questions = new();
+    public  List<QuizSubmission> QuizSubmissions = new();
     public bool IsActive { get; set; }
     public bool IsRandomized {  get; set; }
     public string Title { get; set; } = default!;

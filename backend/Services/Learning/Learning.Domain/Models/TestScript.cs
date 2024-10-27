@@ -1,7 +1,5 @@
 ﻿namespace Learning.Domain.Models;
-public class TestScript : Aggregate<TestScriptId> {
-    private readonly List<TestCase> _testCases = new();
-    public IReadOnlyList<TestCase> TestCases => _testCases.AsReadOnly();
+public class TestScript : Entity<TestScriptId> {
     public ProblemId ProblemId { get; set; } = default!;
     public string FileName{ get; set; } = default!; // file name phải khớp với class trong solution dùng để compile
     public string Template { get; set; } = default!; // mẫu code hiển thị

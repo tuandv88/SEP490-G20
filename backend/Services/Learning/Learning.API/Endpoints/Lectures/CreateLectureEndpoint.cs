@@ -16,7 +16,7 @@ public class CreateLectureEndpoint : ICarterModule {
 
             var response = result.Adapt<CreateChapterResponse>();
 
-            return Results.Created($"/courses/{ChapterId}/chapters{response.Id}", response);
+            return Results.Created($"/courses/{ChapterId}/chapters/{response.Id}", response);
         })
         .WithName("CreateLecture")
         .Produces<CreateLectureResponse>(StatusCodes.Status201Created)

@@ -15,7 +15,7 @@ public class CreateFileEndpoint : ICarterModule {
                 return Results.BadRequest("File is required.");
             }
             var fileType = form["fileType"].ToString();
-            var duration = form["furation"].ToString();
+            var duration = form["duration"].ToString();
 
             var createFileDto = new CreateFileDto(file, duration, fileType);
             var command = new CreateFileCommand(LectureId, createFileDto);

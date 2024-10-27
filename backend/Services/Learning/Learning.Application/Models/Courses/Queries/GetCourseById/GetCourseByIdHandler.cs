@@ -1,6 +1,7 @@
-﻿using Learning.Application.Data.Repositories;
+﻿using BuidingBlocks.Storage.Interfaces;
+using Learning.Application.Data.Repositories;
 namespace Learning.Application.Models.Courses.Queries.GetCourseById;
-public class GetCourseByIdHandler(ICourseRepository repository)
+public class GetCourseByIdHandler(ICourseRepository repository, IFilesService filesService)
     : IQueryHandler<GetCourseByIdQuery, GetCourseByIdResult>
 {
     public async Task<GetCourseByIdResult> Handle(GetCourseByIdQuery request, CancellationToken cancellationToken)
@@ -10,7 +11,11 @@ public class GetCourseByIdHandler(ICourseRepository repository)
         {
             throw new NotFoundException("Course", request.Id);
         }
-        return new GetCourseByIdResult(course.ToCourseDto());
+
+        var s3Object = await filesService.GetFileAsync(StorageConstants.BUCKET, course.ImageUrl, 60);
+        var courseDto = course.ToCourseDto(s3Object.PresignedUrl!);
+        
+        return new GetCourseByIdResult(courseDto);
     }
 }
 

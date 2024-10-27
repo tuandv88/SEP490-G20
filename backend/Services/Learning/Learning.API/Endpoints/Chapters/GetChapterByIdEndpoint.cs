@@ -10,7 +10,7 @@ public class GetChapterByIdEndpoint : ICarterModule {
 
             var response = result.Adapt<GetCourseByIdResponse>();
 
-            return Results.Ok(result);
+            return Results.Ok(response);
 
         })
         .WithName("GetChapterById")

@@ -48,13 +48,14 @@ namespace Learning.Infrastructure.Data.Migrations
                     Description = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
                     ProblemType = table.Column<string>(type: "text", nullable: false, defaultValue: "Practice"),
                     DifficultyType = table.Column<string>(type: "text", nullable: false, defaultValue: "Easy"),
-                    CpuTimeLimit = table.Column<float>(type: "real", nullable: false),
-                    CpuExtraTime = table.Column<float>(type: "real", nullable: false),
-                    MemoryLimit = table.Column<float>(type: "real", nullable: false),
-                    EnableNetwork = table.Column<bool>(type: "boolean", nullable: false),
-                    StackLimit = table.Column<int>(type: "integer", nullable: false),
-                    MaxThread = table.Column<int>(type: "integer", nullable: false),
-                    MaxFileSize = table.Column<int>(type: "integer", nullable: false),
+                    CpuTimeLimit = table.Column<float>(type: "real", nullable: false, defaultValue: 0.5f),
+                    CpuExtraTime = table.Column<float>(type: "real", nullable: false, defaultValue: 0.5f),
+                    MemoryLimit = table.Column<int>(type: "integer", nullable: false, defaultValue: 64000),
+                    EnableNetwork = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    StackLimit = table.Column<int>(type: "integer", nullable: false, defaultValue: 32000),
+                    MaxThread = table.Column<int>(type: "integer", nullable: false, defaultValue: 30),
+                    MaxFileSize = table.Column<int>(type: "integer", nullable: false, defaultValue: 1024),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -124,7 +125,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    EnrollmentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 20, 15, 43, 4, 177, DateTimeKind.Utc).AddTicks(4557)),
+                    EnrollmentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 26, 13, 54, 55, 605, DateTimeKind.Utc).AddTicks(4165)),
                     CompletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UserCourseStatus = table.Column<string>(type: "text", nullable: false, defaultValue: "InProgress"),
                     Rating = table.Column<int>(type: "integer", nullable: false, defaultValue: -1),
@@ -155,6 +156,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     SolutionCode = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
                     Description = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
                     LanguageCode = table.Column<string>(type: "text", nullable: false, defaultValue: "Java"),
+                    Priority = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -178,14 +180,16 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProblemId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 20, 15, 43, 4, 160, DateTimeKind.Utc).AddTicks(9562)),
+                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 26, 13, 54, 55, 592, DateTimeKind.Utc).AddTicks(3078)),
                     SourceCode = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
-                    LanguageCode = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    LanguageCode = table.Column<string>(type: "text", nullable: false, defaultValue: "Java"),
                     ExecutionTime = table.Column<double>(type: "double precision", nullable: false),
                     MemoryUsage = table.Column<long>(type: "bigint", nullable: false),
-                    TestCasesPassed = table.Column<string>(type: "text", nullable: false),
-                    TestCasesFailed = table.Column<string>(type: "text", nullable: false),
-                    RunTimeErrors = table.Column<string>(type: "text", nullable: false),
+                    TestResults = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    TokenReference = table.Column<string>(type: "text", nullable: false),
+                    RunTimeErrors = table.Column<string>(type: "text", nullable: true),
+                    CompileErrors = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -196,6 +200,32 @@ namespace Learning.Infrastructure.Data.Migrations
                     table.PrimaryKey("PK_ProblemSubmissions", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ProblemSubmissions_Problems_ProblemId",
+                        column: x => x.ProblemId,
+                        principalTable: "Problems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TestCases",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProblemId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Inputs = table.Column<string>(type: "text", nullable: false),
+                    ExpectedOutput = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
+                    IsHidden = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    OrderIndex = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TestCases", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TestCases_Problems_ProblemId",
                         column: x => x.ProblemId,
                         principalTable: "Problems",
                         principalColumn: "Id",
@@ -235,7 +265,7 @@ namespace Learning.Infrastructure.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     QuizId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProblemId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProblemId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     QuestionLevel = table.Column<string>(type: "text", nullable: false, defaultValue: "EASY"),
@@ -254,8 +284,7 @@ namespace Learning.Infrastructure.Data.Migrations
                         name: "FK_Questions_Problems_ProblemId",
                         column: x => x.ProblemId,
                         principalTable: "Problems",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Questions_Quizs_QuizId",
                         column: x => x.QuizId,
@@ -271,7 +300,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     QuizId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 20, 15, 43, 4, 171, DateTimeKind.Utc).AddTicks(9922)),
+                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 10, 26, 13, 54, 55, 601, DateTimeKind.Utc).AddTicks(4240)),
                     Score = table.Column<long>(type: "bigint", nullable: false),
                     TotalQuestions = table.Column<int>(type: "integer", nullable: false),
                     CorrectAnswers = table.Column<int>(type: "integer", nullable: false),
@@ -336,32 +365,6 @@ namespace Learning.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TestCases",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TestScriptId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Input = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
-                    ExpectedOutput = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
-                    IsHidden = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    OrderIndex = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedBy = table.Column<string>(type: "text", nullable: true),
-                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TestCases", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TestCases_TestScripts_TestScriptId",
-                        column: x => x.TestScriptId,
-                        principalTable: "TestScripts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "QuestionOption",
                 columns: table => new
                 {
@@ -387,7 +390,7 @@ namespace Learning.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "File",
+                name: "Files",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -406,9 +409,9 @@ namespace Learning.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_File", x => x.Id);
+                    table.PrimaryKey("PK_Files", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_File_Lectures_LectureId",
+                        name: "FK_Files_Lectures_LectureId",
                         column: x => x.LectureId,
                         principalTable: "Lectures",
                         principalColumn: "Id",
@@ -478,8 +481,8 @@ namespace Learning.Infrastructure.Data.Migrations
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_File_LectureId",
-                table: "File",
+                name: "IX_Files_LectureId",
+                table: "Files",
                 column: "LectureId");
 
             migrationBuilder.CreateIndex(
@@ -546,9 +549,9 @@ namespace Learning.Infrastructure.Data.Migrations
                 column: "QuizId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TestCases_TestScriptId",
+                name: "IX_TestCases_ProblemId",
                 table: "TestCases",
-                column: "TestScriptId");
+                column: "ProblemId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TestScripts_ProblemId",
@@ -565,7 +568,7 @@ namespace Learning.Infrastructure.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "File");
+                name: "Files");
 
             migrationBuilder.DropTable(
                 name: "LectureComment");
@@ -589,6 +592,9 @@ namespace Learning.Infrastructure.Data.Migrations
                 name: "TestCases");
 
             migrationBuilder.DropTable(
+                name: "TestScripts");
+
+            migrationBuilder.DropTable(
                 name: "Lectures");
 
             migrationBuilder.DropTable(
@@ -598,16 +604,13 @@ namespace Learning.Infrastructure.Data.Migrations
                 name: "Questions");
 
             migrationBuilder.DropTable(
-                name: "TestScripts");
-
-            migrationBuilder.DropTable(
                 name: "Chapters");
 
             migrationBuilder.DropTable(
-                name: "Quizs");
+                name: "Problems");
 
             migrationBuilder.DropTable(
-                name: "Problems");
+                name: "Quizs");
 
             migrationBuilder.DropTable(
                 name: "Courses");

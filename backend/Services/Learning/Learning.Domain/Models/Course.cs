@@ -45,7 +45,7 @@ public class Course : Aggregate<CourseId> {
         Chapters.Add(chapter);
     }
 
-    public void Update(string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, string imageUrl, int orderIndex, CourseLevel courseLevel, double price) {
+    public void Update(string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, int orderIndex, CourseLevel courseLevel, double price) {
         Title = title;
         Description = description;
         Headline = headline;
@@ -55,11 +55,13 @@ public class Course : Aggregate<CourseId> {
         Objectives = objectives;
         TargetAudiences = targetAudiences;
         ScheduledPublishDate = scheduledPublishDate;
-        ImageUrl = imageUrl;
         OrderIndex = orderIndex;
         CourseLevel = courseLevel;
         Price = price;
         //TODO add event vào domain
+    }
+    public void UpdateImage(string imageUrl) {
+        ImageUrl = imageUrl;
     }
 
 }

@@ -3,12 +3,11 @@ using Learning.Application;
 using Learning.Infrastructure;
 using Learning.API;
 using Serilog;
-using BuildingBlocks.Extensions;
+using BuildingBlocks.Logging;
 var builder = WebApplication.CreateBuilder(args);
 
 //Logging
-builder.Host.UseSerilog();
-builder.Services.ConfigureLogging(builder.Configuration);
+builder.Host.UseSerilog(SeriLogger.Configure);
 
 //Add Service
 builder.Services

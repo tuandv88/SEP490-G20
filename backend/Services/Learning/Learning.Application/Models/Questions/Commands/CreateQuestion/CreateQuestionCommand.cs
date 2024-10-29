@@ -3,17 +3,20 @@ using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.Questions.Dtos;
 using Learning.Domain.Enums;
 
-namespace Learning.Application.Models.Questions.Commands;
-public record CreateQuestionCommand : ICommand<CreateQuestionResult> {
+namespace Learning.Application.Models.Questions.Commands.CreateQuestion;
+public record CreateQuestionCommand : ICommand<CreateQuestionResult>
+{
     public required Guid QuizId;
     public required CreateQuestionDto CreateQuestionDto;
 }
 public record CreateQuestionResult(Guid Id);
 
 
-public class CreateQuestionCommandValidator : AbstractValidator<CreateQuestionCommand> {
+public class CreateQuestionCommandValidator : AbstractValidator<CreateQuestionCommand>
+{
     private readonly CreateProblemCommandValidator _problemValidator;
-    public CreateQuestionCommandValidator() {
+    public CreateQuestionCommandValidator()
+    {
         _problemValidator = new CreateProblemCommandValidator();
         RuleFor(x => x.CreateQuestionDto.Content)
             .NotEmpty().WithMessage("Content is required.");

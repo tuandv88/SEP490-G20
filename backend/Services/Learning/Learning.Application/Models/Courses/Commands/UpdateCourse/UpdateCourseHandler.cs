@@ -54,7 +54,6 @@ public class UpdateCourseHandler(ICourseRepository repository) : ICommandHandler
             objectives: updateCourseDto.Objectives,
             targetAudiences: updateCourseDto.TargetAudiences,
             scheduledPublishDate: scheduledPublishDate,
-            imageUrl: updateCourseDto.ImageUrl,
             orderIndex: updateCourseDto.OrderIndex,
             courseLevel: courseLevel,
             price: updateCourseDto.Price

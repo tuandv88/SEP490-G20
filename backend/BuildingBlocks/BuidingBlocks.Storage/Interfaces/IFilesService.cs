@@ -13,5 +13,6 @@ namespace BuidingBlocks.Storage.Interfaces {
         Task<Stream> GetFileBykeyAsync(string bucketName, string key);
         Task<S3ObjectDto> GetFileAsync(string bucketName, string filePath, int expiryMinutes = 1);
         Task<string> UploadFileAsync(MemoryStream memoryStream, string originFileName, string contentType, string bucketName, string? prefix = null);
+        Task DeleteFileAsync(string bucketName, string filePath);
     }
 }

@@ -32,7 +32,7 @@ public static class DependencyInjection {
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
         //Caching
-        services.ConfigureCaching(configuration);
+        services.AddConfigureCaching(configuration);
 
         //Configuration Repository
         ConfigureRepository(services, configuration);

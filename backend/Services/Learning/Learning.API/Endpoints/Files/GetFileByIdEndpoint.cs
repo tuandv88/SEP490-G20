@@ -2,7 +2,7 @@
 
 namespace Learning.API.Endpoints.Files;
 
-public record GetFileByIdResponse(string presignedUrl);
+public record GetFileByIdResponse(string PresignedUrl);
 public class GetFileByIdEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
         app.MapGet("/lectures/{LectureId}/files/{FileId}", async (Guid LectureId, Guid FileId, ISender sender) => {
@@ -11,7 +11,7 @@ public class GetFileByIdEndpoint : ICarterModule {
 
             var response = result.Adapt<GetFileByIdResponse>();
 
-            return Results.Ok(response);
+            return Results.Ok(response);    
 
         })
         .WithName("GetFileById")

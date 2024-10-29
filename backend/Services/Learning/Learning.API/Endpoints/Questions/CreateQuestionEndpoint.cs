@@ -1,4 +1,4 @@
-﻿using Learning.Application.Models.Questions.Commands;
+﻿using Learning.Application.Models.Questions.Commands.CreateQuestion;
 using Learning.Application.Models.Questions.Dtos;
 
 namespace Learning.API.Endpoints.Questions;

@@ -9,7 +9,7 @@ public record QuestionDto(
     string QuestionLevel,
     int Mark,
     int OrderIndex,
-    ProblemDto? Problem,
+    Guid? ProblemId,
     List<QuestionOptionDto> QuestionOptions
 );
 

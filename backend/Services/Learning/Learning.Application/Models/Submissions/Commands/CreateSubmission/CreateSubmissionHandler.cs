@@ -1,11 +1,4 @@
-﻿using Learning.Application.Data;
-using Learning.Domain.ValueObjects;
-using MassTransit;
-using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
-using System.Text;
-
-namespace Learning.Application.Models.Submissions.Commands.CreateSubmission;
+﻿namespace Learning.Application.Models.Submissions.Commands.CreateSubmission;
 public class CreateSubmissionHandler(IApplicationDbContext dbContext, ISubmissionService submissionService)
     : ICommandHandler<CreateSubmissionCommand, CreateSubmissionResult>
 {

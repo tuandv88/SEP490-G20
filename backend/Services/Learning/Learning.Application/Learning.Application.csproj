@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Problems\Queries\" />
     <Folder Include="Models\TestScripts\CreateTestScriptDto\" />
   </ItemGroup>
 

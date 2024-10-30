@@ -4,9 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BuildingBlocks.Extensions;
-public static class AuthenticationExtension
+public static class AuthenticationExtensions
 {
-    public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services
         .AddAuthentication(x =>

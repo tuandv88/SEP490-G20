@@ -3,3 +3,4 @@ global using Community.Domain.Events;
 global using Community.Domain.Abstractions;
 global using Community.Domain.ValueObjects;
 global using Community.Domain.Enums;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;

@@ -4,7 +4,8 @@
     {
         public List<Comment> Comments = new();
         public List<Bookmark> Bookmarks = new();
-        public List<UserDiscussion> UserDiscussions = new();
+        public List<UserDiscussion> UserDiscussions = new(); 
+        public List<Vote> Votes { get; set; } = new();
         public UserId UserId { get; set; } = default!;                      // ID của người tạo thảo luận
         public CategoryId CategoryId { get; set; } = default!;   // ID chuyên mục chứa thảo luận
         public string Title { get; set; } = default!;            // Tiêu đề thảo luận

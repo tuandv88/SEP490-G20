@@ -1,8 +1,9 @@
 ﻿namespace Community.Domain.ValueObjects;
 public record DiscussionId
 {
-    public DiscussionId(Guid value) => Value = value;
     public Guid Value { get; }
+    public DiscussionId() { }
+    public DiscussionId(Guid value) => Value = value;
     public static DiscussionId Of(Guid value)
     {
         ArgumentNullException.ThrowIfNull(value);

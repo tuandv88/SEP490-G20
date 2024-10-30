@@ -1,6 +1,7 @@
 ﻿namespace Community.Domain.ValueObjects;
 public record NotificationTypeId
 {
+    public NotificationTypeId() { }
     public NotificationTypeId(Guid value) => Value = value;
     public Guid Value { get; }
     public static NotificationTypeId Of(Guid value)

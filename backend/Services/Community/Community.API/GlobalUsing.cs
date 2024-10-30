@@ -9,3 +9,4 @@ global using BuildingBlocks.Exceptions.Handler;
 global using BuildingBlocks.Extensions;
 global using Community.Application;
 global using Community.Infrastructure;
+global using Community.Application.Data;

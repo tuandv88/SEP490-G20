@@ -2,6 +2,7 @@
 {
     public class Comment : Aggregate<CommentId>
     {
+        public List<Vote> Votes { get; set; } = new();
         public UserId UserId { get; set; } = default!;                  // ID của người tạo thảo luận
         public DiscussionId DiscussionId { get; set; } = default!;      // ID của thảo luận chứa bình luận
         public string Content { get; set; } = default!;    // Nội dung bình luận

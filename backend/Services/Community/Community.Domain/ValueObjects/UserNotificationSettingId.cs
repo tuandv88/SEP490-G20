@@ -1,6 +1,7 @@
 ﻿namespace Community.Domain.ValueObjects;
 public record UserNotificationSettingId
 {
+    public UserNotificationSettingId() { }
     public UserNotificationSettingId(Guid value) => Value = value;
     public Guid Value { get; }
     public static UserNotificationSettingId Of(Guid value)

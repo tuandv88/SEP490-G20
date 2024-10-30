@@ -1,8 +1,11 @@
-﻿namespace Community.Infrastructure.Data
+﻿using Elastic.CommonSchema;
+using Microsoft.EntityFrameworkCore;
+
+namespace Community.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Discussion> Discussions => Set<Discussion>();
 
@@ -18,10 +21,12 @@
         {
             Set<T>().Remove(entity);
         }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(builder);
+
         }
     }
 }

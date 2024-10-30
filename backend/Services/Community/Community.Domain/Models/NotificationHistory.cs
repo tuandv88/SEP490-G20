@@ -8,8 +8,8 @@
         public DateTime DateSent { get; set; }                               // Thời gian gửi thông báo
         public DateTime? DateRead { get; set; }                              // Thời gian người dùng đọc thông báo (có thể null)
         public bool IsRead { get; set; }                                     // Đánh dấu thông báo đã đọc hay chưa
-        public SentVia SentVia { get; set; } = default!;                     // Phương thức gửi: web, email, cả hai
-        public Status Status { get; set; } = default!;                       // Trạng thái gửi: Đã gửi, Thất bại, Chờ, Đã nhận
+        public SentVia SentVia { get; set; } = SentVia.Web!;                     // Phương thức gửi: web, email, cả hai
+        public Status Status { get; set; } = Status.Sent!;                       // Trạng thái gửi: Đã gửi, Thất bại, Chờ, Đã nhận
 
         // Phương thức khởi tạo một NotificationHistory
         public static NotificationHistory Create(UserId userId, NotificationTypeId notificationTypeId, string message, SentVia sentVia, Status status)
@@ -34,20 +34,4 @@
         }
     }
 
-    // Enum để đại diện cho phương thức gửi thông báo
-    public enum SentVia
-    {
-        Web,
-        Email,
-        Both
-    }
-
-    // Enum để đại diện cho trạng thái của thông báo
-    public enum Status
-    {
-        Sent,
-        Failed,
-        Pending,
-        Received
-    }
 }

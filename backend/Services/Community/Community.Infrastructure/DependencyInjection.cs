@@ -38,5 +38,7 @@ public static class DependencyInjection
 
         services.AddScoped<IDiscussionRepository, DiscussionRepository>();
         //services.Decorate<ICategoryRepository, CategoryRepository>();
+
+
     }
 }

@@ -19,8 +19,4 @@
     <ProjectReference Include="..\Community.Application\Community.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\Repositories\Category\" />
-  </ItemGroup>
-
 </Project>

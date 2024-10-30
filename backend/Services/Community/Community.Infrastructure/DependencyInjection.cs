@@ -13,17 +13,15 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-        services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(connectionString).LogTo(Console.WriteLine, LogLevel.Information));
 
-        services.AddDbContext<ApplicationDbContext>((sp, options) =>
-        {
-            options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseNpgsql(connectionString).LogTo(Console.WriteLine, LogLevel.Information); ;
-        });
+        services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
         services.AddHttpContextAccessor();
-        services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+
+        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
         //Caching
         services.AddConfigureCaching(configuration);

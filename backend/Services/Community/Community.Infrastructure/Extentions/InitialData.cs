@@ -32,19 +32,28 @@ namespace Community.Infrastructure.Extensions
         {
             new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[0].Id, CategoryId = Categories[0].Id,
                 Title = "Future of AI", Description = "The impact of AI on society", ViewCount = 100, IsActive = true,
-                Tags = new List<string> { "AI", "Technology" }, DateCreated = DateTime.UtcNow.AddDays(-10), DateUpdated = DateTime.UtcNow, Closed = false, Pinned = true },
+                Tags = new List<string> { "AI", "Technology" }, DateCreated = DateTime.UtcNow.AddDays(-10), DateUpdated = DateTime.UtcNow,
+                Closed = false, Pinned = true, ImageUrl = "https://example.com/images/ai.jpg" },
+
             new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[1].Id, CategoryId = Categories[1].Id,
                 Title = "Career Growth Tips", Description = "How to grow in your career", ViewCount = 80, IsActive = true,
-                Tags = new List<string> { "Career", "Growth" }, DateCreated = DateTime.UtcNow.AddDays(-20), DateUpdated = DateTime.UtcNow, Closed = false, Pinned = false },
+                Tags = new List<string> { "Career", "Growth" }, DateCreated = DateTime.UtcNow.AddDays(-20), DateUpdated = DateTime.UtcNow,
+                Closed = false, Pinned = false, ImageUrl = "https://example.com/images/career.jpg" },
+
             new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[2].Id, CategoryId = Categories[2].Id,
                 Title = "Health Benefits of Yoga", Description = "Discussing yoga for health", ViewCount = 50, IsActive = true,
-                Tags = new List<string> { "Health", "Yoga" }, DateCreated = DateTime.UtcNow.AddDays(-15), DateUpdated = DateTime.UtcNow, Closed = false, Pinned = false },
+                Tags = new List<string> { "Health", "Yoga" }, DateCreated = DateTime.UtcNow.AddDays(-15), DateUpdated = DateTime.UtcNow,
+                Closed = false, Pinned = false, ImageUrl = "https://example.com/images/yoga.jpg" },
+
             new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[3].Id, CategoryId = Categories[3].Id,
                 Title = "Best Learning Techniques", Description = "Effective learning techniques", ViewCount = 60, IsActive = true,
-                Tags = new List<string> { "Education", "Learning" }, DateCreated = DateTime.UtcNow.AddDays(-5), DateUpdated = DateTime.UtcNow, Closed = false, Pinned = false },
+                Tags = new List<string> { "Education", "Learning" }, DateCreated = DateTime.UtcNow.AddDays(-5), DateUpdated = DateTime.UtcNow,
+                Closed = false, Pinned = false, ImageUrl = "https://example.com/images/learning.jpg" },
+
             new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[4].Id, CategoryId = Categories[4].Id,
                 Title = "Saving for Retirement", Description = "Financial planning for retirement", ViewCount = 30, IsActive = false,
-                Tags = new List<string> { "Finance", "Retirement" }, DateCreated = DateTime.UtcNow.AddDays(-2), DateUpdated = DateTime.UtcNow, Closed = true, Pinned = false }
+                Tags = new List<string> { "Finance", "Retirement" }, DateCreated = DateTime.UtcNow.AddDays(-2), DateUpdated = DateTime.UtcNow,
+                Closed = true, Pinned = false, ImageUrl = "https://example.com/images/retirement.jpg" }
         };
 
         // Danh sách Comment mẫu

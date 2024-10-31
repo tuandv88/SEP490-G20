@@ -56,6 +56,11 @@ namespace Community.Infrastructure.Data.Configurations
             builder.Property(d => d.Description)
                 .HasMaxLength(int.MaxValue);
 
+            // Cấu hình thuộc tính ImageUrl
+            builder.Property(d => d.ImageUrl)
+                .HasMaxLength(500)                        // Đặt giới hạn độ dài cho URL
+                .IsRequired(false);                       // Cho phép giá trị null nếu không có ảnh
+
             builder.Property(d => d.ViewCount)
                 .HasDefaultValue(0);
 

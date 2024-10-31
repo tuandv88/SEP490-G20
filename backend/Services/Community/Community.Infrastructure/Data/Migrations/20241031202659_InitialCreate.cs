@@ -102,6 +102,7 @@ namespace Community.Infrastructure.Data.Migrations
                     CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     Description = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
+                    ImageUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     ViewCount = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     Tags = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),

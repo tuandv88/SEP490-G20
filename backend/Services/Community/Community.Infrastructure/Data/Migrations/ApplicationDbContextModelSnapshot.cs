@@ -186,6 +186,10 @@ namespace Community.Infrastructure.Data.Migrations
                         .HasMaxLength(2147483647)
                         .HasColumnType("text");
 
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")

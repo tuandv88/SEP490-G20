@@ -10,6 +10,7 @@
         public CategoryId CategoryId { get; set; } = default!;   // ID chuyên mục chứa thảo luận
         public string Title { get; set; } = default!;            // Tiêu đề thảo luận
         public string Description { get; set; } = default!;      // Mô tả nội dung thảo luận
+        public string? ImageUrl { get; set; } = default!;        // URL của ảnh thảo luận
         public long ViewCount { get; set; }                      // Số lượt xem
         public bool IsActive { get; set; }                       // Trạng thái hoạt động
         public List<string> Tags { get; set; } = new();          // Tag của thảo luận (dạng JSON)
@@ -19,7 +20,7 @@
         public bool Pinned { get; set; }                         // Đánh dấu nếu thảo luận được ghim
 
         // Phương thức tạo mới một Discussion
-        public static Discussion Create(DiscussionId discussionId, UserId userId, CategoryId categoryId, string title, string description, bool isActive, List<string> tags)
+        public static Discussion Create(DiscussionId discussionId, UserId userId, CategoryId categoryId, string title, string description, bool isActive, List<string> tags, string? imageUrl = null)
         {
             var discussion = new Discussion
             {
@@ -28,6 +29,7 @@
                 CategoryId = categoryId,
                 Title = title,
                 Description = description,
+                ImageUrl = imageUrl,
                 IsActive = isActive,
                 Tags = tags,
                 DateCreated = DateTime.Now,
@@ -42,7 +44,7 @@
         }
 
         // Phương thức cập nhật thông tin của Discussion
-        public void Update(string title, string description, bool isActive, List<string> tags, bool closed, bool pinned)
+        public void Update(string title, string description, bool isActive, List<string> tags, bool closed, bool pinned, string? imageUrl)
         {
             Title = title;
             Description = description;
@@ -51,7 +53,7 @@
             Closed = closed;
             Pinned = pinned;
             DateUpdated = DateTime.Now;
-
+            ImageUrl = imageUrl;
             // Thêm sự kiện cập nhật nếu cần thiết
             // AddDomainEvent(new DiscussionUpdatedEvent(this));
         }

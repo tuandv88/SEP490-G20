@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen(options => {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "Discussion API", Version = "v1" });
 });
 
-//Add Service
+//Add Service to DI Extension
 builder.Services
     .AddApplicationServices(builder.Configuration)
     .AddInfrastructureServices(builder.Configuration)
@@ -26,6 +26,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// DI - UseApiServices
 app.UseApiServices();
 
 app.Run();

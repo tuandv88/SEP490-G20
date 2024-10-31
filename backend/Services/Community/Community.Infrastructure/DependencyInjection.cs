@@ -18,16 +18,18 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
+        //Configuration Repository
+        ConfigureRepository(services, configuration);
+
+        //Caching
+        services.AddConfigureCaching(configuration);
+
         services.AddHttpContextAccessor();
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
-        //Caching
-        services.AddConfigureCaching(configuration);
 
-        //Configuration Repository
-        ConfigureRepository(services, configuration);
 
         return services;
     }

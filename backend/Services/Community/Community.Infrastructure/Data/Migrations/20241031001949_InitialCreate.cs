@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Community.Infrastructure.Migrations
+namespace Community.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -30,7 +30,7 @@ namespace Community.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "NotificationHistory",
+                name: "NotificationHistories",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -49,11 +49,11 @@ namespace Community.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NotificationHistory", x => x.Id);
+                    table.PrimaryKey("PK_NotificationHistories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "NotificationType",
+                name: "NotificationTypes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -69,11 +69,11 @@ namespace Community.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NotificationType", x => x.Id);
+                    table.PrimaryKey("PK_NotificationTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserNotificationSetting",
+                name: "UserNotificationSettings",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -90,7 +90,7 @@ namespace Community.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserNotificationSetting", x => x.Id);
+                    table.PrimaryKey("PK_UserNotificationSettings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -126,7 +126,7 @@ namespace Community.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Bookmark",
+                name: "Bookmarks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -140,9 +140,9 @@ namespace Community.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Bookmark", x => x.Id);
+                    table.PrimaryKey("PK_Bookmarks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Bookmark_Discussions_DiscussionId",
+                        name: "FK_Bookmarks_Discussions_DiscussionId",
                         column: x => x.DiscussionId,
                         principalTable: "Discussions",
                         principalColumn: "Id",
@@ -150,7 +150,7 @@ namespace Community.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Comment",
+                name: "Comments",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -168,9 +168,9 @@ namespace Community.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Comment", x => x.Id);
+                    table.PrimaryKey("PK_Comments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Comment_Discussions_DiscussionId",
+                        name: "FK_Comments_Discussions_DiscussionId",
                         column: x => x.DiscussionId,
                         principalTable: "Discussions",
                         principalColumn: "Id",
@@ -178,7 +178,7 @@ namespace Community.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserDiscussion",
+                name: "UserDiscussions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -195,9 +195,9 @@ namespace Community.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserDiscussion", x => x.Id);
+                    table.PrimaryKey("PK_UserDiscussions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserDiscussion_Discussions_DiscussionId",
+                        name: "FK_UserDiscussions_Discussions_DiscussionId",
                         column: x => x.DiscussionId,
                         principalTable: "Discussions",
                         principalColumn: "Id",
@@ -205,7 +205,7 @@ namespace Community.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Vote",
+                name: "Votes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -221,15 +221,15 @@ namespace Community.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Vote", x => x.Id);
+                    table.PrimaryKey("PK_Votes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Vote_Comment_CommentId",
+                        name: "FK_Votes_Comments_CommentId",
                         column: x => x.CommentId,
-                        principalTable: "Comment",
+                        principalTable: "Comments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Vote_Discussions_DiscussionId",
+                        name: "FK_Votes_Discussions_DiscussionId",
                         column: x => x.DiscussionId,
                         principalTable: "Discussions",
                         principalColumn: "Id",
@@ -237,13 +237,13 @@ namespace Community.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookmark_DiscussionId",
-                table: "Bookmark",
+                name: "IX_Bookmarks_DiscussionId",
+                table: "Bookmarks",
                 column: "DiscussionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookmark_UserId",
-                table: "Bookmark",
+                name: "IX_Bookmarks_UserId",
+                table: "Bookmarks",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -258,23 +258,23 @@ namespace Community.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_Depth",
-                table: "Comment",
+                name: "IX_Comments_Depth",
+                table: "Comments",
                 column: "Depth");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_DiscussionId",
-                table: "Comment",
+                name: "IX_Comments_DiscussionId",
+                table: "Comments",
                 column: "DiscussionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_ParentCommentId",
-                table: "Comment",
+                name: "IX_Comments_ParentCommentId",
+                table: "Comments",
                 column: "ParentCommentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_UserId",
-                table: "Comment",
+                name: "IX_Comments_UserId",
+                table: "Comments",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -298,79 +298,79 @@ namespace Community.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotificationHistory_NotificationTypeId",
-                table: "NotificationHistory",
+                name: "IX_NotificationHistories_NotificationTypeId",
+                table: "NotificationHistories",
                 column: "NotificationTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotificationHistory_UserId",
-                table: "NotificationHistory",
+                name: "IX_NotificationHistories_UserId",
+                table: "NotificationHistories",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotificationType_Name",
-                table: "NotificationType",
+                name: "IX_NotificationTypes_Name",
+                table: "NotificationTypes",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotificationType_Priority",
-                table: "NotificationType",
+                name: "IX_NotificationTypes_Priority",
+                table: "NotificationTypes",
                 column: "Priority");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserDiscussion_DiscussionId",
-                table: "UserDiscussion",
+                name: "IX_UserDiscussions_DiscussionId",
+                table: "UserDiscussions",
                 column: "DiscussionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserDiscussion_IsFollowing",
-                table: "UserDiscussion",
+                name: "IX_UserDiscussions_IsFollowing",
+                table: "UserDiscussions",
                 column: "IsFollowing");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserDiscussion_NotificationsEnabled",
-                table: "UserDiscussion",
+                name: "IX_UserDiscussions_NotificationsEnabled",
+                table: "UserDiscussions",
                 column: "NotificationsEnabled");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserDiscussion_UserId",
-                table: "UserDiscussion",
+                name: "IX_UserDiscussions_UserId",
+                table: "UserDiscussions",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserNotificationSetting_IsNotificationEnabled",
-                table: "UserNotificationSetting",
+                name: "IX_UserNotificationSettings_IsNotificationEnabled",
+                table: "UserNotificationSettings",
                 column: "IsNotificationEnabled");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserNotificationSetting_NotificationFrequency",
-                table: "UserNotificationSetting",
+                name: "IX_UserNotificationSettings_NotificationFrequency",
+                table: "UserNotificationSettings",
                 column: "NotificationFrequency");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserNotificationSetting_NotificationTypeId",
-                table: "UserNotificationSetting",
+                name: "IX_UserNotificationSettings_NotificationTypeId",
+                table: "UserNotificationSettings",
                 column: "NotificationTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserNotificationSetting_UserId",
-                table: "UserNotificationSetting",
+                name: "IX_UserNotificationSettings_UserId",
+                table: "UserNotificationSettings",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vote_CommentId",
-                table: "Vote",
+                name: "IX_Votes_CommentId",
+                table: "Votes",
                 column: "CommentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vote_DiscussionId",
-                table: "Vote",
+                name: "IX_Votes_DiscussionId",
+                table: "Votes",
                 column: "DiscussionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Vote_UserId",
-                table: "Vote",
+                name: "IX_Votes_UserId",
+                table: "Votes",
                 column: "UserId");
         }
 
@@ -378,25 +378,25 @@ namespace Community.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Bookmark");
+                name: "Bookmarks");
 
             migrationBuilder.DropTable(
-                name: "NotificationHistory");
+                name: "NotificationHistories");
 
             migrationBuilder.DropTable(
-                name: "NotificationType");
+                name: "NotificationTypes");
 
             migrationBuilder.DropTable(
-                name: "UserDiscussion");
+                name: "UserDiscussions");
 
             migrationBuilder.DropTable(
-                name: "UserNotificationSetting");
+                name: "UserNotificationSettings");
 
             migrationBuilder.DropTable(
-                name: "Vote");
+                name: "Votes");
 
             migrationBuilder.DropTable(
-                name: "Comment");
+                name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "Discussions");

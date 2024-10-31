@@ -5,15 +5,15 @@
         public static IServiceCollection AddApplicationServices
         (this IServiceCollection services, IConfiguration configuration)
         {
-            //MediatR
+            // Cấu hình MediatR
             services.AddMediatR(config => {
-                config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-                config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+                config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());            // Đăng ký các yêu cầu và xử lý trong assembly hiện tại
+                config.AddOpenBehavior(typeof(ValidationBehavior<,>));                           // Thêm hành vi kiểm tra ValidationBehavior cho các yêu cầu
             });
-            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());                 // Đăng ký các validator từ assembly hiện tại
 
-            //RabbitMQ
-            services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());
+            // Cấu hình RabbitMQ
+            services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());           // Thêm message broker với RabbitMQ để giao tiếp giữa các service
 
             return services;
         }

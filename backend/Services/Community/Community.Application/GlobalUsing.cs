@@ -9,3 +9,4 @@ global using BuildingBlocks.Behaviors;
 global using System.Reflection;
 global using FluentValidation;
 global using Community.Domain.Models;
+global using Community.Application.Data.Repositories;

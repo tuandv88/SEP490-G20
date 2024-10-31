@@ -3,17 +3,20 @@ using System;
 using Community.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Community.Infrastructure.Migrations
+namespace Community.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241031001949_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,7 +57,7 @@ namespace Community.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bookmark");
+                    b.ToTable("Bookmarks");
                 });
 
             modelBuilder.Entity("Community.Domain.Models.Category", b =>
@@ -153,7 +156,7 @@ namespace Community.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Community.Domain.Models.Discussion", b =>
@@ -286,7 +289,7 @@ namespace Community.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("NotificationHistory");
+                    b.ToTable("NotificationHistories");
                 });
 
             modelBuilder.Entity("Community.Domain.Models.NotificationType", b =>
@@ -333,7 +336,7 @@ namespace Community.Infrastructure.Migrations
 
                     b.HasIndex("Priority");
 
-                    b.ToTable("NotificationType");
+                    b.ToTable("NotificationTypes");
                 });
 
             modelBuilder.Entity("Community.Domain.Models.UserDiscussion", b =>
@@ -385,7 +388,7 @@ namespace Community.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserDiscussion");
+                    b.ToTable("UserDiscussions");
                 });
 
             modelBuilder.Entity("Community.Domain.Models.UserNotificationSetting", b =>
@@ -436,7 +439,7 @@ namespace Community.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserNotificationSetting");
+                    b.ToTable("UserNotificationSettings");
                 });
 
             modelBuilder.Entity("Community.Domain.Models.Vote", b =>
@@ -480,7 +483,7 @@ namespace Community.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Vote");
+                    b.ToTable("Votes");
                 });
 
             modelBuilder.Entity("Community.Domain.Models.Bookmark", b =>

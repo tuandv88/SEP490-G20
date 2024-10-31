@@ -2,6 +2,8 @@
 global using Carter;
 global using Mapster;
 global using MediatR;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Routing;
 global using Community.API;
 global using Community.Application.Models.Categories.Dtos;
 global using BuildingBlocks.Exceptions.Handler;

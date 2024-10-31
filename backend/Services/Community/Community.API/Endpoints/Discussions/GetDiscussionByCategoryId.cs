@@ -1,10 +1,5 @@
-﻿using BuildingBlocks.Pagination;
-using Community.Application.Models.Discussions.Queries.GetDiscussionByCategoryId;
+﻿using Community.Application.Models.Discussions.Queries.GetDiscussionByCategoryId;
 using Community.Application.Models.Discussions.Dtos;
-using Mapster;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 
 namespace Community.API.Endpoints.Discussions;
 // Định nghĩa Response bao gồm kết quả phân trang

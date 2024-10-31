@@ -2,8 +2,7 @@
 using Community.Application.Models.Categories.Queries.GetCategories;
 
 namespace Community.API.Endpoints.Categories;
-
-public record GetCategoriesResponse(List<CategoryDto> Categories);          // Định nghĩa kiểu dữ liệu trả về GetCategoriesResponse, chứa danh sách các CategoryDto
+public record GetCategoriesResponse(List<CategoryDto> CategoryDtos);          // Định nghĩa kiểu dữ liệu trả về GetCategoriesResponse, chứa danh sách các CategoryDto
 
 public class GetCategoriesEndpoint : ICarterModule                          // Lớp GetCategoriesEndpoint implement ICarterModule để đăng ký các endpoint
 {
@@ -15,15 +14,16 @@ public class GetCategoriesEndpoint : ICarterModule                          // L
             var result = await sender.Send(new GetCategoriesQuery());
 
             // Chuyển đổi kết quả thành GetCategoriesResponse
+            // Chú ý: Khi sử dụng Adapt name GetCategoriesResult == name GetCategoriesResponse
             var response = result.Adapt<GetCategoriesResponse>();
 
-            return Results.Ok(response);                                    // Trả về kết quả thành công (Status 200) với response dưới dạng JSON
+            return Results.Ok(response);                                    
         })
-        .WithName("GetCategories")                                          // Đặt tên cho endpoint là "GetCategories" để dễ quản lý
-        .Produces<GetCategoriesResponse>(StatusCodes.Status200OK)           // Xác định rằng endpoint sẽ trả về Status200OK với kiểu GetCategoriesResponse nếu thành công
-        .ProducesProblem(StatusCodes.Status400BadRequest)                   // Xác định rằng endpoint có thể trả về lỗi 400 nếu yêu cầu không hợp lệ
-        .ProducesProblem(StatusCodes.Status404NotFound)                     // Xác định rằng endpoint có thể trả về lỗi 404 nếu không tìm thấy dữ liệu
-        .WithSummary("Get all Categories");                                 // Thêm mô tả tóm tắt cho endpoint: lấy tất cả danh mục
+        .WithName("GetCategories")                                          
+        .Produces<GetCategoriesResponse>(StatusCodes.Status200OK)           
+        .ProducesProblem(StatusCodes.Status400BadRequest)                   
+        .ProducesProblem(StatusCodes.Status404NotFound)                   
+        .WithSummary("Get all Categories");                               
     }
 }
 

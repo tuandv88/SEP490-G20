@@ -1,4 +1,5 @@
-﻿namespace Community.Infrastructure.Data.Repositories.Discussions;
+﻿
+namespace Community.Infrastructure.Data.Repositories.Discussions;
 public class DiscussionRepository : Repository<Discussion>, IDiscussionRepository
 {
     private readonly IApplicationDbContext _dbContext;
@@ -28,6 +29,18 @@ public class DiscussionRepository : Repository<Discussion>, IDiscussionRepositor
     {
         return null;
     }
+
+    public async Task<IQueryable<Discussion>> GetByCategoryIdAsync(Guid id)
+    {
+        var discussions = _dbContext.Discussions
+            .Include(d => d.Votes)
+            .AsEnumerable()  // Chuyển truy vấn sang client-side để xử lý
+            .Where(d => d.CategoryId.Value == id)  // So sánh trực tiếp với giá trị `Guid`
+            .AsQueryable();
+
+        return await Task.FromResult(discussions);
+    }
+
 }
 
 

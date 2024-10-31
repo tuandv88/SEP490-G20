@@ -8,7 +8,7 @@ public class GetDiscussionsByCateIdEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/discussions/{categoryId:guid}", async (Guid categoryId, [AsParameters] PaginationRequest request, ISender sender) =>
+        app.MapGet("/discussions/{categoryId:guid}/bycategoryid", async (Guid categoryId, [AsParameters] PaginationRequest request, ISender sender) =>
         {
             var result = await sender.Send(new GetDiscussionByCateIdQuery(categoryId, request));
 

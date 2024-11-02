@@ -52,7 +52,7 @@ export default function Header() {
 
   return (
     <header
-      className={`bg-background text-foreground shadow-md py-3 fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isHidden ? 'hidden' : 'top-0'}`}
+      className={`bg-background text-foreground shadow-md fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isHidden ? 'hidden' : 'top-0'}`}
     >
       <div className='container px-4 py-4 mx-auto'>
         <div className='flex items-center justify-between'>

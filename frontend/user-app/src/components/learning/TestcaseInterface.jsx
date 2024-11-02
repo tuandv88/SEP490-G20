@@ -1,9 +1,13 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react'
-import { Plus } from 'lucide-react'
-import LoadingSkeleton from '../loading/LoadingSkeleton'
+import { Plus, X } from 'lucide-react'
 import styled, { keyframes } from 'styled-components'
+import useStore from '../../data/store'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import TestResultLoading from '../loading/TestResultLoading'
 
 // Định nghĩa animation xoay
 const spinnerAnimation = keyframes`
@@ -16,7 +20,7 @@ const spinnerAnimation = keyframes`
 `
 
 // Tạo button với hiệu ứng loading
-const LoadingButton = styled.button`
+const LoadingButton = styled.div`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -49,28 +53,67 @@ const LoadingButton = styled.button`
   }
 `
 
-const TestcaseInterface = ({ response, loading }) => {
+const TestcaseInterface = ({ response, loading, testCase }) => {
   const [activeTab, setActiveTab] = useState('Testcase')
   const [activeTestCase, setActiveTestCase] = useState(0)
-  const [testCases, setTestCases] = useState([
-    { id: 1, input: '4' },
-    { id: 2, input: '5' },
-    { id: 3, input: '6' }
-  ])
+  const [activeTestResult, setActiveTestResult] = useState(0)
+  const [testCases, setTestCases] = useState(testCase)
+  const setStoreTestCases = useStore((state) => state.setTestCases)
 
-  const [testResult, setTestResult] = useState({
-    status: 'Acceptedd',
-    details: null
-  })
+  useEffect(() => {
+    if (testCase) {
+      setTestCases(testCase)
+    }
+  }, [testCase])
 
   const handleAddTestCase = () => {
-    const newId = testCases.length + 1
-    setTestCases([...testCases, { id: newId, input: '' }])
+    const newId = Object.keys(testCases).length.toString()
+    // Lấy test case đầu tiên làm mẫu
+    const sampleTestCase = testCases[Object.keys(testCases)[0]]
+
+    // Tạo test case mới với cùng cấu trúc nhưng giá trị rỗng
+    const newTestCase = Object.keys(sampleTestCase).reduce((acc, key) => {
+      acc[key] = ''
+      return acc
+    }, {})
+
+    setTestCases((prev) => ({
+      ...prev,
+      [newId]: newTestCase
+    }))
+  }
+
+  const handleRemoveTestCase = (id) => {
+    if (Object.keys(testCases).length <= 1) return
+
+    const updatedTestCases = {}
+    let newIndex = 0
+
+    Object.entries(testCases).forEach(([key, value]) => {
+      if (key !== id) {
+        updatedTestCases[newIndex.toString()] = value
+        newIndex++
+      }
+    })
+
+    setTestCases(updatedTestCases)
+    if (parseInt(id) <= activeTestCase && activeTestCase > 0) {
+      setActiveTestCase((prev) => prev - 1)
+    }
+  }
+
+  const handleInputChange = (caseId, param, value) => {
+    setTestCases((prev) => ({
+      ...prev,
+      [caseId]: { ...prev[caseId], [param]: value }
+    }))
   }
 
   useEffect(() => {
     console.log('Received result in TestcaseInterface:', response)
-  }, [response])
+    //setData(testCases)
+    setStoreTestCases(Object.values(testCases).map((inputs) => ({ inputs }))) // Cập nhật dữ liệu trong store
+  }, [response, setStoreTestCases, testCases])
 
   return (
     <div className='bg-[#111827] p-4 shadow-md w-full h-full'>
@@ -93,7 +136,7 @@ const TestcaseInterface = ({ response, loading }) => {
         >
           {loading ? (
             <>
-              <LoadingButton loading={loading} disabled={loading} />
+              <LoadingButton loading={loading.toString()} disabled={loading} />
               <span style={{ marginLeft: '5px' }}>Running...</span>
             </>
           ) : (
@@ -103,75 +146,121 @@ const TestcaseInterface = ({ response, loading }) => {
       </div>
       {activeTab === 'Testcase' && (
         <>
-          <div className='flex items-center mb-4'>
-            <svg className='w-5 h-5 text-green-500 mr-2' fill='currentColor' viewBox='0 0 20 20'>
-              <path
-                fillRule='evenodd'
-                d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                clipRule='evenodd'
-              />
-            </svg>
-            <span className='font-semibold text-white'>Testcase</span>
-          </div>
-          <div className='flex mb-4'>
-            {testCases.map((testCase, index) => (
-              <button
-                key={testCase.id}
-                className={`mr-2 px-3 py-1 rounded-md text-sm ${
-                  activeTestCase === index ? 'bg-gray-200 text-gray-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-                onClick={() => setActiveTestCase(index)}
-              >
-                Case {testCase.id}
-              </button>
-            ))}
-            <button
-              className='px-3 py-1 rounded-md text-sm bg-gray-100 text-gray-600 hover:bg-gray-200'
-              onClick={handleAddTestCase}
-            >
-              <Plus size={16} />
-            </button>
-          </div>
-          <div className='bg-gray-100 rounded-md p-4'>
-            <p className='text-gray-700 mb-2'>n =</p>
-            <div className='bg-white p-2 rounded-md'>
-              <p className='text-gray-800'>{testCases[activeTestCase].input}</p>
+          <div className='p-4 bg-gray-800 rounded-lg'>
+            <div className='flex items-center mb-4'>
+              <svg className='w-5 h-5 text-green-500 mr-2' fill='currentColor' viewBox='0 0 20 20'>
+                <path
+                  fillRule='evenodd'
+                  d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                  clipRule='evenodd'
+                />
+              </svg>
+              <span className='font-semibold text-white'>Testcase</span>
+            </div>
+            <div className='flex mb-4 flex-wrap'>
+              {Object.keys(testCases).map((caseId, index) => (
+                <div key={caseId} className='relative mr-2 mb-2'>
+                  <Button
+                    variant={activeTestCase === index ? 'secondary' : 'outline'}
+                    size='sm'
+                    className='pr-6'
+                    onClick={() => setActiveTestCase(index)}
+                  >
+                    Case {parseInt(caseId) + 1}
+                  </Button>
+                  {Object.keys(testCases).length > 1 && (
+                    <Button
+                      variant='destructive'
+                      size='icon'
+                      className='absolute -top-1 -right-1 h-5 w-5 rounded-full p-0'
+                      onClick={() => handleRemoveTestCase(caseId)}
+                    >
+                      <X size={12} />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <Button variant='outline' size='icon' className='h-9 w-9' onClick={handleAddTestCase}>
+                <Plus size={16} />
+              </Button>
+            </div>
+            <div className='bg-gray-100 rounded-md p-4'>
+              {Object.entries(testCases[activeTestCase.toString()]).map(([param, value]) => (
+                <div key={param} className='mb-4 last:mb-0'>
+                  <Label htmlFor={`${param}-${activeTestCase}`} className='text-gray-700 mb-2 block'>
+                    {param} =
+                  </Label>
+                  <Input
+                    id={`${param}-${activeTestCase}`}
+                    value={value}
+                    onChange={(e) => handleInputChange(activeTestCase.toString(), param, e.target.value)}
+                    className='bg-white p-2 rounded-md w-full'
+                    placeholder={`Enter value for ${param}`}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </>
       )}
       {activeTab === 'Test Result' && (
-        <div className='bg-gray-100 rounded-md p-4'>
-          {loading && <ResultLoading></ResultLoading>}
-
-          {!loading && response?.submissionResponse?.stdout && (
-            <div>
-              <h2 className='text-2xl font-bold text-green-500 mb-4'>Success</h2>
-              <p className='text-gray-700 mb-2'>Runtime: {response?.submissionResponse?.time} ms</p>
-              <pre className='bg-green-200 p-4 rounded-md text-black whitespace-pre-wrap'>
-                {response?.submissionResponse?.stdout}
-              </pre>
-              {/* {testResult.details.cases.map((testCase) => (
+        <div className='bg-gray-800 rounded-md p-4'>
+          {loading && <TestResultLoading></TestResultLoading>}
+          {!loading && response?.codeExecuteDto?.testResults && response.codeExecuteDto.testResults.length > 0 && (
+            <>
+              <div className='flex mb-4 flex-wrap'>
+                {response.codeExecuteDto.testResults.map((result, index) => (
+                  <div key={index} className='relative mr-2 mb-2'>
+                    <Button
+                      variant={activeTestResult === index ? 'secondary' : 'outline'}
+                      size='sm'
+                      className={`${response.codeExecuteDto.testResults[activeTestResult].isPass ? 'bg-green-400' : 'bg-red-100'}`}
+                      onClick={() => setActiveTestResult(index)}
+                    >
+                      Case {index + 1}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <div className='bg-gray-100 rounded-md p-4'>
                 <div
-                  key={testCase.id}
-                  className="mb-4 p-4 bg-white rounded-md shadow"
+                  className={`mb-4 p-4 rounded-md ${response.codeExecuteDto.testResults[activeTestResult].isPass ? 'bg-green-100' : 'bg-red-100'}`}
                 >
-                  <h3 className="font-semibold mb-2">Case {testCase.id}</h3>
-                  <p className="text-gray-700">
-                    Input: nums = {testCase.input}
+                  {Object.entries(response.codeExecuteDto.testResults[activeTestResult].inputs).map(
+                    ([param, value]) => (
+                      <p key={param} className='text-gray-700 mb-2'>
+                        {param} = {value}
+                      </p>
+                    )
+                  )}
+                  <p className='text-gray-700 mb-2'>
+                    Output: {response.codeExecuteDto.testResults[activeTestResult].output}
                   </p>
-                  <p className="text-gray-700">target = {testCase.target}</p>
-                  <p className="text-gray-700">Output: {testCase.output}</p>
+                  <p className='text-gray-700 mb-2'>
+                    Expected: {response.codeExecuteDto.testResults[activeTestResult].expected}
+                  </p>
+                  <p className='text-gray-700'>
+                    Stdout: {response.codeExecuteDto.testResults[activeTestResult].stdout}
+                  </p>
                 </div>
-              ))} */}
-            </div>
+              </div>
+            </>
           )}
 
-          {!loading && response?.submissionResponse?.compile_output && (
+          {!loading && response?.codeExecuteDto?.compileErrors && (
             <div>
               <h2 className='text-2xl font-bold text-red-500 mb-4'>Compile Error</h2>
               <pre className='bg-red-100 p-4 rounded-md text-red-700 whitespace-pre-wrap'>
-                {response?.submissionResponse?.compile_output}
+                {response.codeExecuteDto.compileErrors}
+              </pre>
+            </div>
+          )}
+
+          {!loading && response?.codeExecuteDto?.runTimeErrors && (
+            <div>
+              <h2 className='text-2xl font-bold text-red-500 mb-4'>Runtime Error</h2>
+              <pre className='bg-red-100 p-4 rounded-md text-red-700 whitespace-pre-wrap'>
+                {response.codeExecuteDto.runTimeErrors}
               </pre>
             </div>
           )}
@@ -185,19 +274,6 @@ const TestcaseInterface = ({ response, loading }) => {
           )}
         </div>
       )}
-    </div>
-  )
-}
-
-const ResultLoading = () => {
-  return (
-    <div>
-      <h2 className=' mb-4'>
-        <LoadingSkeleton height='32px' className='w-full'></LoadingSkeleton>
-      </h2>
-      <pre className='rounded-md whitespace-pre-wrap overflow-hidden'>
-        <LoadingSkeleton height='62px' className='w-full'></LoadingSkeleton>
-      </pre>
     </div>
   )
 }

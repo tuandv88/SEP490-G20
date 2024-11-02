@@ -4,13 +4,18 @@ namespace Community.Application.Extensions;
 
 public static class DiscussionExtensions
 {
-    public static async Task<List<DiscussionDto>> ToDiscussionDtoListAsync(this List<Discussion> discussions)
+    public static async Task<List<DiscussionDto>> ToDiscussionDtoListAsync(this List<Discussion> discussions, IFilesService filesService)
     {
-        var discussionDtos = discussions.Select(d => d.ToDiscussionDto()).ToList();
-        return await Task.FromResult(discussionDtos);
+        var tasks = discussions.Select(async d => {
+            var imageUrl = await filesService.GetFileAsync(StorageConstants.IMAGE_COMMUNITY_PATH, d.ImageUrl, 60);
+            return d.ToDiscussionDto(imageUrl.PresignedUrl!);
+        });
+
+        var discussionDtos = await Task.WhenAll(tasks);
+        return discussionDtos.ToList();
     }
 
-    public static DiscussionDto ToDiscussionDto(this Discussion discussion)
+    public static DiscussionDto ToDiscussionDto(this Discussion discussion, string imageUrl)
     {
         return new DiscussionDto(
             UserName: "Unknown",                        // Placeholder, có thể thay thế bằng dữ liệu từ bảng Users
@@ -20,6 +25,7 @@ public static class DiscussionExtensions
             Id: discussion.Id.Value,
             Title: discussion.Title,
             Description: discussion.Description,
+            ImageUrl: imageUrl,
             DateCreated: discussion.DateCreated,
             DateUpdated: discussion.DateUpdated,
             Tags: discussion.Tags,

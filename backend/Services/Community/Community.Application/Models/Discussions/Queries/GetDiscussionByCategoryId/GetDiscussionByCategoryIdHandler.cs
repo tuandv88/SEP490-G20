@@ -6,10 +6,12 @@ namespace Community.Application.Models.Discussions.Queries.GetDiscussionByCatego
 public class GetDiscussionByCateIdHandler : IQueryHandler<GetDiscussionByCateIdQuery, GetDiscussionByCateIdResult>
 {
     private readonly IDiscussionRepository _repository;
+    private readonly IFilesService _filesService;
 
-    public GetDiscussionByCateIdHandler(IDiscussionRepository repository)
+    public GetDiscussionByCateIdHandler(IDiscussionRepository repository, IFilesService filesService)
     {
         _repository = repository;
+        _filesService = filesService;
     }
 
     public async Task<GetDiscussionByCateIdResult> Handle(GetDiscussionByCateIdQuery query, CancellationToken cancellationToken)
@@ -28,7 +30,7 @@ public class GetDiscussionByCateIdHandler : IQueryHandler<GetDiscussionByCateIdQ
                             .ToList();
 
         // Sử dụng ToDiscussionDtoListAsync để chuyển đổi sang DTO
-        var discussionDtos = await discussions.ToDiscussionDtoListAsync();
+        var discussionDtos = await discussions.ToDiscussionDtoListAsync(_filesService);
 
         var discussionPaginateData = new PaginatedResult<DiscussionDto>(pageIndex, pageSize, totalCount, discussionDtos);
 

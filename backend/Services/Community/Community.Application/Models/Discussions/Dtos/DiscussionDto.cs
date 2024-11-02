@@ -8,6 +8,7 @@ public record DiscussionDto(
         Guid Id,                       // ID của thảo luận
         string Title,                  // Tiêu đề thảo luận
         string Description,            // Mô tả nội dung thảo luận
+        string ImageUrl,               // Url Img
         DateTime DateCreated,          // Thời gian tạo của thảo luận
         DateTime DateUpdated,          // Thời gian cập nhật gần nhất
         List<string> Tags,             // Danh sách tag của thảo luận

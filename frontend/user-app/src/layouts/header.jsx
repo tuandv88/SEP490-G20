@@ -3,7 +3,7 @@ import { Bell, /*User*/ Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS as AR } from '@/data/constants'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/Avatar'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import DropdownMenuUser from '@/components/ui/userdropdown'
 import { ModeToggle } from '@/components/mode-toggle'
 

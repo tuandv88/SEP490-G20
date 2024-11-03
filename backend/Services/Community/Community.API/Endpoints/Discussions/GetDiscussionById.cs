@@ -8,7 +8,7 @@ public class GetDiscussionByIdEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/discussions/{id:guid}", async (Guid id, ISender sender) =>
+        app.MapGet("/discussion/{id:guid}", async (Guid id, ISender sender) =>
         {
             var result = await sender.Send(new GetDiscussionByIdQuery(id));
 

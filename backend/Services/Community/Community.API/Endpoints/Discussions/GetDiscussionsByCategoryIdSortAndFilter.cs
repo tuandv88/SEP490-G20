@@ -11,7 +11,7 @@ public class GetDiscussionsByCategoryIdSortAndFilterEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/discussions/{categoryId:guid}/main", async (Guid categoryId, [AsParameters] PaginationRequest request, string? orderBy, [FromQuery] string? tags, ISender sender) =>
+        app.MapGet("/discussions/{categoryId:guid}/options", async (Guid categoryId, [AsParameters] PaginationRequest request, string? orderBy, [FromQuery] string? tags, ISender sender) =>
         {
             var result = await sender.Send(new GetDiscussionsByCategoryIdSortAndFilterQuery(categoryId, request, orderBy, tags));
 

@@ -16,6 +16,13 @@ public class GetDiscussionByIdHandler : IQueryHandler<GetDiscussionByIdQuery, Ge
     {
         var discussion = await _repository.GetByIdAsync(query.Id);
 
+        // Kiểm tra nếu discussion không tồn tại
+        if (discussion == null)
+        {
+            // Trả về kết quả với giá trị null hoặc xử lý lỗi tùy theo yêu cầu
+            return new GetDiscussionByIdResult(null);
+        }
+
         var s3Object = await _filesService.GetFileAsync(StorageConstants.BUCKET, discussion.ImageUrl, 60);
 
         var discussionDto = discussion?.ToDiscussionDto(s3Object.PresignedUrl!);

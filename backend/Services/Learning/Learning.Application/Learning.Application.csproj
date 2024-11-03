@@ -19,6 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Models\Submissions\CodeTemplates\Java\SolutionTemplate\additional_files\compile">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Models\Submissions\CodeTemplates\Java\SolutionTemplate\additional_files\run">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

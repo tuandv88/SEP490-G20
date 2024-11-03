@@ -14,9 +14,9 @@ public class GetDiscussionByIdHandler : IQueryHandler<GetDiscussionByIdQuery, Ge
 
     public async Task<GetDiscussionByIdResult> Handle(GetDiscussionByIdQuery query, CancellationToken cancellationToken)
     {
-        var discussion = await _repository.GetByIdAsync(query.id);
+        var discussion = await _repository.GetByIdAsync(query.Id);
 
-        var s3Object = await _filesService.GetFileAsync(StorageConstants.IMAGE_COMMUNITY_PATH, discussion.ImageUrl, 60);
+        var s3Object = await _filesService.GetFileAsync(StorageConstants.BUCKET, discussion.ImageUrl, 60);
 
         var discussionDto = discussion?.ToDiscussionDto(s3Object.PresignedUrl!);
 

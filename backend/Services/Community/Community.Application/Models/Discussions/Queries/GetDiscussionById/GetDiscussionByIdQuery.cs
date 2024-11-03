@@ -5,7 +5,7 @@ namespace Community.Application.Models.Discussions.Queries.GetDiscussionById;
 
 public record GetDiscussionByIdResult(DiscussionDto DiscussionDto);
 
-public record GetDiscussionByIdQuery(Guid id) : IQuery<GetDiscussionByIdResult>;
+public record GetDiscussionByIdQuery(Guid Id) : IQuery<GetDiscussionByIdResult>;
 
 
 

@@ -7,7 +7,7 @@ public static class DiscussionExtensions
     public static async Task<List<DiscussionDto>> ToDiscussionDtoListAsync(this List<Discussion> discussions, IFilesService filesService)
     {
         var tasks = discussions.Select(async d => {
-            var imageUrl = await filesService.GetFileAsync(StorageConstants.IMAGE_COMMUNITY_PATH, d.ImageUrl, 60);
+            var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, d.ImageUrl, 60);
             return d.ToDiscussionDto(imageUrl.PresignedUrl!);
         });
 

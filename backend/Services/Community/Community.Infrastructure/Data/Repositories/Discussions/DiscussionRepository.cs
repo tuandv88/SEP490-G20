@@ -41,6 +41,18 @@ public class DiscussionRepository : Repository<Discussion>, IDiscussionRepositor
         return await Task.FromResult(discussions);
     }
 
+    public async Task<IQueryable<Discussion>> GetByCategoryIdIsActiveAsync(Guid id)
+    {
+        // Lấy tất cả các bản ghi có IsActive = true từ database
+        var discussions = _dbContext.Discussions
+            .Include(d => d.Votes)
+            .AsEnumerable()  // Chuyển truy vấn sang client-side để xử lý
+            .Where(d => d.CategoryId.Value == id && d.IsActive) // Điều kiện này được thực thi trên client-side
+            .AsQueryable();
+
+        return await Task.FromResult(discussions);
+    }
+
 }
 
 

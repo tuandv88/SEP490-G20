@@ -70,7 +70,7 @@ namespace Community.Infrastructure.Data.Configurations
             // Chuyển đổi danh sách Tags thành chuỗi và ngược lại
             builder.Property(d => d.Tags)
                 .HasConversion(
-                    tags => string.Join(",", tags),                           // Chuyển danh sách thành chuỗi
+                    tags => string.Join(",", tags),                                          // Chuyển danh sách thành chuỗi
                     tags => tags.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList()) // Chuyển chuỗi thành danh sách
                 .HasMaxLength(int.MaxValue);
 

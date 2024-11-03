@@ -1,4 +1,6 @@
-﻿namespace Community.Application
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Community.Application
 {
     public static class DependencyInjection
     {
@@ -15,9 +17,9 @@
             // Cấu hình RabbitMQ
             services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());           // Thêm message broker với RabbitMQ để giao tiếp giữa các service
 
-            //Storage - BuildingBlock
+            //Storage 
             services.AddStorage(configuration);
-
+            
             return services;
         }
     }

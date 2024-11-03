@@ -1,23 +1,37 @@
 ﻿using Community.Application.Extensions;
+using Community.Application.Models.Comments.Dtos;
 
-namespace Community.Application.Models.Comments.Queries.GetComments;
-public class GetCommentsHandler : IQueryHandler<GetCommentsQuery, GetCommentsResult>
+namespace Community.Application.Models.Comments.Queries.GetCommentsPaging;
+
+public class GetCommentsPagingHandler : IQueryHandler<GetCommentsPagingQuery, GetCommentsPagingResult>
 {
     private readonly ICommentRepository _repository;
 
-    public GetCommentsHandler(ICommentRepository repository)
+    public GetCommentsPagingHandler(ICommentRepository repository)
     {
         _repository = repository;
     }
 
-    public async Task<GetCommentsResult> Handle(GetCommentsQuery query, CancellationToken cancellationToken)
+    public async Task<GetCommentsPagingResult> Handle(GetCommentsPagingQuery query, CancellationToken cancellationToken)
     {
-        var comments = await _repository.GetAllCommentDetailsAsync();
+        var allData = await _repository.GetAllAsync();
 
-        var commentDtos = comments?.Select(c => c.ToCommentDto()).ToList();
+        // Lấy thông tin phân trang
+        var pageIndex = query.PaginationRequest.PageIndex;
+        var pageSize = query.PaginationRequest.PageSize;
 
-        return new GetCommentsResult(commentDtos);
+        var totalCount = allData.Count();
+
+        var comments = allData.OrderBy(c => c.DateCreated)
+                            .Skip(pageSize * (pageIndex - 1))
+                            .Take(pageSize)
+                            .ToList();
+
+        // Sử dụng ToDiscussionDtoListAsync để chuyển đổi sang DTO
+        var commentDtos = comments?.Select(c => c.ToCommentDto()).ToList() ?? new List<CommentDto>();
+
+        var commentsPaginateData = new PaginatedResult<CommentDto>(pageIndex, pageSize, totalCount, commentDtos);
+
+        return new GetCommentsPagingResult(commentsPaginateData);
     }
 }
-
-

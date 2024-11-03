@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Pagination;
-using Community.Application.Models.Discussions.Queries.GetDiscussionsPaging;
+﻿using Community.Application.Models.Discussions.Queries.GetDiscussionsPaging;
 using Community.Application.Models.Discussions.Dtos;
 
 namespace Community.API.Endpoints.Discussions;

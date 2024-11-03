@@ -17,6 +17,19 @@ namespace Community.Application.Extensions
                 ParentCommentId: comment.ParentCommentId?.Value,
                 DateCreated: comment.DateCreated,
                 IsEdited: comment.IsEdited,
+                Depth: comment.Depth
+            );
+        }
+        public static CommentDetailDto ToCommentDetailDto(this Comment comment)
+        {
+            return new CommentDetailDto(
+                Id: comment.Id.Value,
+                UserId: comment.UserId.Value,
+                DiscussionId: comment.DiscussionId.Value,
+                Content: comment.Content,
+                ParentCommentId: comment.ParentCommentId?.Value,
+                DateCreated: comment.DateCreated,
+                IsEdited: comment.IsEdited,
                 Depth: comment.Depth,
                 Votes: comment.Votes.Select(vote => vote.ToVoteDto()).ToList()
             );

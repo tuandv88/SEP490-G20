@@ -12,3 +12,4 @@ global using System.Reflection;
 global using FluentValidation;
 global using Community.Domain.Models;
 global using Community.Application.Data.Repositories;
+global using Community.Domain.Enums;

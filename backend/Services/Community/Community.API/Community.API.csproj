@@ -23,9 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Endpoints\Comments\" />
     <Folder Include="Endpoints\Bookmarks\" />
-    <Folder Include="Endpoints\Votes\" />
     <Folder Include="Endpoints\Notifications\" />
   </ItemGroup>
 

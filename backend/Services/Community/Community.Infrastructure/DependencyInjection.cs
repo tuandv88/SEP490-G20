@@ -1,7 +1,9 @@
 ﻿using BuildingBlocks.Extensions;
 using Community.Infrastructure.Data.Interceptors;
 using Community.Infrastructure.Data.Repositories.Categorys;
+using Community.Infrastructure.Data.Repositories.Comments;
 using Community.Infrastructure.Data.Repositories.Discussions;
+using Community.Infrastructure.Data.Repositories.Votes;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -29,8 +31,6 @@ public static class DependencyInjection
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
-
-
         return services;
     }
     private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration)
@@ -41,6 +41,9 @@ public static class DependencyInjection
         services.AddScoped<IDiscussionRepository, DiscussionRepository>();
         //services.Decorate<ICategoryRepository, CategoryRepository>();
 
+        services.AddScoped<IVoteRepository, VoteRepository>();
+
+        services.AddScoped<ICommentRepository, CommentRepository>();
 
     }
 }

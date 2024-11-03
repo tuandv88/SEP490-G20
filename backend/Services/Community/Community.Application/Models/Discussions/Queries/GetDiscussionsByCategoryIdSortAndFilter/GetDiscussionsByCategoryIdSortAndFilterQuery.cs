@@ -65,20 +65,24 @@ public class GetDiscussionsByCategoryIdSortAndFilterHandler : IQueryHandler<GetD
             allData = allData.Where(d => tagList.All(tag => d.Tags.Contains(tag, StringComparer.OrdinalIgnoreCase)));
         }
 
-        // Sắp xếp theo orderBy
+        // Sắp xếp theo orderBy và ưu tiên thảo luận được ghim lên đầu
         allData = query.OrderBy?.ToLower() switch
         {
-            // Sắp xếp theo mức độ "hot"
-            "hot" => allData.OrderByDescending(d => (d.ViewCount * 0.5) + (d.Comments.Count() * 0.3) + (d.Votes.Count() * 0.2)),
+            // Sắp xếp theo mức độ "hot" và ưu tiên thảo luận được ghim lên đầu
+            "hot" => allData.OrderByDescending(d => d.Pinned)
+                            .ThenByDescending(d => (d.ViewCount * 0.5) + (d.Comments.Count() * 0.3) + (d.Votes.Count() * 0.2)),
 
-            // Sắp xếp theo thời gian tạo
-            "newest" => allData.OrderByDescending(d => d.DateCreated),
+            // Sắp xếp theo thời gian tạo, hiển thị bài viết mới nhất trước và ưu tiên thảo luận được ghim lên đầu
+            "newest" => allData.OrderByDescending(d => d.Pinned)
+                               .ThenByDescending(d => d.DateCreated),
 
-            // Sắp xếp theo số lượt bình chọn
-            "most votes" => allData.OrderByDescending(d => d.Votes.Count()),
+            // Sắp xếp theo số lượt bình chọn và ưu tiên thảo luận được ghim lên đầu
+            "most votes" => allData.OrderByDescending(d => d.Pinned)
+                                   .ThenByDescending(d => d.Votes.Count()),
 
-            // Mặc định là sắp xếp theo "hot"
-            _ => allData.OrderByDescending(d => (d.ViewCount * 0.5) + (d.Comments.Count() * 0.3) + (d.Votes.Count() * 0.2)),
+            // Mặc định là sắp xếp theo "hot" và ưu tiên thảo luận được ghim lên đầu
+            _ => allData.OrderByDescending(d => d.Pinned)
+                        .ThenByDescending(d => (d.ViewCount * 0.5) + (d.Comments.Count() * 0.3) + (d.Votes.Count() * 0.2)),
         };
 
         return allData;

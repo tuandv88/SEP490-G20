@@ -14,6 +14,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import HeaderCode from '@/layouts/learningheader'
 import ToggleCurriculum from '@/components/learning/ToggleCurriculum'
 import useClickOutside from '@/components/hooks/useClickOutside'
+import ChatAI from '@/components/chat/ChatAI'
 
 const LearningSpace = () => {
   const [activeTab, setActiveTab] = useState('descriptions')
@@ -115,7 +116,7 @@ const LearningSpace = () => {
       </div>
       <ResizablePanelGroup direction='horizontal' className='min-h-[200px] rounded-lg border md:min-w-[450px]'>
         <ResizablePanel defaultSize={30}>
-          <div className='scroll-container h-screen min-w-[500px]'>
+          <div className='scroll-container h-screen'>
             <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} />
             {loading && <ChapterLoading />}
             {activeTab === 'descriptions' && !loading && (
@@ -127,6 +128,7 @@ const LearningSpace = () => {
               />
             )}
             {activeTab === 'comments' && !loading && <Comments />}
+            {activeTab === 'chatbot' && !loading && <ChatAI />}
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle className='resize-sha w-[3px]' />

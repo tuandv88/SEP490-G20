@@ -4,6 +4,7 @@ import {
   AlarmClock,
   ArrowRight,
   Bell,
+  BotMessageSquare,
   ChevronLeft,
   ChevronRight,
   CloudUpload,
@@ -77,7 +78,7 @@ const HeaderCode = ({ onButtonClick }) => {
             </div> */}
             <div className='flex items-center space-x-2 mr-4'>
               <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-                <NotebookPen className='w-5 h-5' />
+                <BotMessageSquare className='w-5 h-5' />
               </button>
               <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
                 <Settings className='w-5 h-5' />

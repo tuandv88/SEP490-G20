@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace BuildingBlocks.Extensions;
 public static class AuthenticationExtensions
 {
-    public static IServiceCollection AddConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddConfigureAuthentication(this IServiceCollection services, IConfiguration configuration, JwtBearerOptions? options = null)
     {
         services
         .AddAuthentication(x =>
@@ -27,7 +27,9 @@ public static class AuthenticationExtensions
                 ClockSkew = TimeSpan.Zero,
                 ValidIssuer = configuration["Jwt:Issuer"],
                 //ValidAudience = configuration["Jwt:Audience"],
+                ValidAlgorithms = new[] { SecurityAlgorithms.RsaSha256 }
             };
+            x.Events = options != null ? options.Events : x.Events;
         });
 
         services.AddAuthorization(x =>

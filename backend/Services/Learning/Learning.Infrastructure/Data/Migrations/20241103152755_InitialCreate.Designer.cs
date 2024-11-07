@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learning.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241026135457_InitialCreate")]
+    [Migration("20241103152755_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -547,7 +547,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 26, 13, 54, 55, 592, DateTimeKind.Utc).AddTicks(3078));
+                        .HasDefaultValue(new DateTime(2024, 11, 3, 15, 27, 53, 731, DateTimeKind.Utc).AddTicks(5772));
 
                     b.Property<string>("TestResults")
                         .IsRequired()
@@ -771,7 +771,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 26, 13, 54, 55, 601, DateTimeKind.Utc).AddTicks(4240));
+                        .HasDefaultValue(new DateTime(2024, 11, 3, 15, 27, 53, 743, DateTimeKind.Utc).AddTicks(775));
 
                     b.Property<int>("TotalQuestions")
                         .HasColumnType("integer");
@@ -903,7 +903,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 26, 13, 54, 55, 605, DateTimeKind.Utc).AddTicks(4165));
+                        .HasDefaultValue(new DateTime(2024, 11, 3, 15, 27, 53, 748, DateTimeKind.Utc).AddTicks(2322));
 
                     b.Property<string>("Feedback")
                         .IsRequired()

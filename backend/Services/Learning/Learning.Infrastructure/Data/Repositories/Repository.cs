@@ -8,7 +8,7 @@ public abstract class Repository<T> : IRepository<T> where T : class {
         _dbSet = _dbContext.Set<T>();
     }
     public async Task<List<T>> GetAllAsync() {
-        return await _dbSet.ToListAsync();
+        return await _dbSet.AsNoTracking().ToListAsync();
     }
     public abstract Task<T?> GetByIdAsync(Guid id);
     public async Task AddAsync(T entity) {

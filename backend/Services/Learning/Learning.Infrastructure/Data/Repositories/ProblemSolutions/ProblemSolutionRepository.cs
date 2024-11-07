@@ -1,4 +1,5 @@
-﻿namespace Learning.Infrastructure.Data.Repositories.ProblemSolutions;
+﻿
+namespace Learning.Infrastructure.Data.Repositories.ProblemSolutions;
 
 public class ProblemSolutionRepository : Repository<ProblemSolution>, IProblemSolutionRepository {
     private IApplicationDbContext _dbContext;
@@ -15,8 +16,8 @@ public class ProblemSolutionRepository : Repository<ProblemSolution>, IProblemSo
 
     public override async Task<ProblemSolution?> GetByIdAsync(Guid id) {
         var problemSolution = _dbContext.ProblemSolutions
-                        .AsEnumerable()
-                        .FirstOrDefault(c => c.Id.Value == id);
+                            .AsEnumerable()
+                            .FirstOrDefault(p => p.Id.Value == id);
         return problemSolution;
     }
 }

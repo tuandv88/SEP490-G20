@@ -1,0 +1,7 @@
+Facts:
+{{$facts}}
+======
+Given only the facts above, provide a comprehensive/detailed answer.
+If the facts are insufficient to answer the question, use your own knowledge to provide a response.
+Question: {{$input}}
+Answer:

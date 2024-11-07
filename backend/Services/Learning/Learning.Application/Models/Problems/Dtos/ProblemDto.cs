@@ -1,5 +1,4 @@
 ﻿using Learning.Application.Models.TestCases.Dtos;
-using System.Collections.Generic;
 
 namespace Learning.Application.Models.Problems.Dtos;
 public record ProblemDto(

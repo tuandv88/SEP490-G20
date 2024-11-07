@@ -9,15 +9,15 @@ const CourseDetailLoading = () => {
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
           {/* Left Column - Course Content */}
           <div className='md:col-span-1 p-6 border-r'>
-            <Skeleton className='mb-4 w-[360px] h-[24px]' />
+            <Skeleton className='mb-4 w-full h-[24px]' />
             <div className='mb-3'>
-              <Skeleton className='px-2 py-1 rounded mb-5 w-[360px] h-[24px]' />
+              <Skeleton className='px-2 py-1 rounded mb-5 w-full h-[24px]' />
             </div>
             <div className='text-sm text-gray-600 mb-4'>
-              <Skeleton className='w-[360px] h-[24px]'></Skeleton>
+              <Skeleton className='w-full h-[24px]'></Skeleton>
             </div>
             <div className='space-y-2'>
-              <Skeleton className='w-[360px] h-[500px]'></Skeleton>
+              <Skeleton className='w-full h-[500px]'></Skeleton>
             </div>
           </div>
 
@@ -26,37 +26,37 @@ const CourseDetailLoading = () => {
               <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-6'>
                 {/* Publisher Information */}
                 <div className='bg-white rounded-lg'>
-                  <Skeleton className='mb-4 w-[324px] h-[24px]' />
+                  <Skeleton className='mb-4 w-full h-[24px]' />
                   <div className='flex items-center mb-4'>
-                    <Skeleton className='h-12 w-12 rounded-full mr-4' />
+                    <Skeleton className='h-12 w-full rounded-full mr-4' />
                     <div>
-                      <Skeleton className='w-[260px] h-[48px]' />
+                      <Skeleton className='w-full h-[48px]' />
                     </div>
                   </div>
-                  <Skeleton className='mb-4 w-[324px] h-[24px]' />
+                  <Skeleton className='mb-4 w-full h-[24px]' />
                   <div className='text-sm space-y-2'>
-                    <Skeleton className='w-[324px] h-[195px]' />
+                    <Skeleton className='w-full h-[195px]' />
                   </div>
                 </div>
 
                 {/* Course Information and CTA */}
                 <div className='rounded-lg'>
-                  <Skeleton className='w-[372px] h-[375px]'></Skeleton>
+                  <Skeleton className='w-full h-[375px]'></Skeleton>
                 </div>
               </div>
 
               {/* Course Banner */}
               <div className='relative w-full aspect-video rounded-lg overflow-hidden mb-8'>
-                <Skeleton className='w-[768px] h-[432px]'></Skeleton>
+                <Skeleton className='w-full h-[432px]'></Skeleton>
               </div>
 
               {/* Course Description */}
               <div className='max-w-none mb-8 rounded-lg'>
-                <Skeleton className='w-[768px] h-[536px]' />
+                <Skeleton className='w-full h-[536px]' />
               </div>
 
               {/* Feedback Section */}
-              <Skeleton className='w-[768px] h-[536px] mb-4' />
+              <Skeleton className='w-full h-[536px] mb-4' />
             </div>
           </div>
         </div>

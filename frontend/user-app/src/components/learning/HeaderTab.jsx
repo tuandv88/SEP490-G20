@@ -26,6 +26,12 @@ const HeaderTab = ({ activeTab, setActiveTab }) => {
         >
           Comments
         </button>
+        <button
+          className={`px-3 py-2 rounded-full text-sm font-medium ${activeTab === 'chatbot' ? 'border border-white border-solid' : 'bg-gray-900 hover:bg-gray-700'}`}
+          onClick={() => setActiveTab('chatbot')}
+        >
+          Chat Bot
+        </button>
       </nav>
     </div>
   )

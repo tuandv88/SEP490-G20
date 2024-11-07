@@ -4,6 +4,7 @@ import {
   AlarmClock,
   ArrowRight,
   Bell,
+  BotMessageSquare,
   ChevronLeft,
   ChevronRight,
   CloudUpload,
@@ -27,7 +28,7 @@ const HeaderCode = ({ onButtonClick }) => {
 
   return (
     <div>
-      <nav className='relative flex h-12 w-full shrink-0 items-center px-5 pr-2.5 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'>
+      <nav className='flex h-12 w-full shrink-0 items-center px-5 pr-2.5 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'>
         <div className='flex w-full justify-between'>
           <div className='flex w-full items-center justify-between'>
             <div className='flex items-center'>
@@ -77,7 +78,7 @@ const HeaderCode = ({ onButtonClick }) => {
             </div> */}
             <div className='flex items-center space-x-2 mr-4'>
               <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-                <NotebookPen className='w-5 h-5' />
+                <BotMessageSquare className='w-5 h-5' />
               </button>
               <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
                 <Settings className='w-5 h-5' />

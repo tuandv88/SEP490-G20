@@ -77,6 +77,11 @@ export default function Header() {
                 </Link>
               </li>
               <li>
+                <Link to={AR.PROBLEMS} className='text-lg hover:text-primary hover:font-bold'>
+                  Problems
+                </Link>
+              </li>
+              <li>
                 <Link href='/discuss' className='text-lg hover:text-primary hover:font-bold'>
                   Discuss
                 </Link>

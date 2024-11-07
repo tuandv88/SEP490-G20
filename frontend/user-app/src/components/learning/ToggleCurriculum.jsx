@@ -4,7 +4,7 @@
 import { ChevronDown, ChevronRight, TableOfContents, Tag, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
-const ToggleCurriculum = ({ title, chapters, setSelectedLectureId, isProblemListOpen, toggleProblemList }) => {
+const ToggleCurriculum = ({ title, chapters, setSelectedLectureId, isProblemListOpen, toggleProblemList, navigate }) => {
   const [expandedSections, setExpandedSections] = useState(() => {
     // Lấy trạng thái từ Local Storage khi component mount
     const savedSections = localStorage.getItem('expandedSections')
@@ -20,6 +20,8 @@ const ToggleCurriculum = ({ title, chapters, setSelectedLectureId, isProblemList
     // console.log(lectureId)
     setActiveLectureId(lectureId)
     setSelectedLectureId(lectureId)
+    navigate(`/learning-space/9209cb44-0581-4107-a080-fa210fe9b09c/lecture/${lectureId}`);
+    console.log("Navigate")
     if (toggleProblemList) {
       toggleProblemList(false)
     }

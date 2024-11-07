@@ -5,6 +5,8 @@ import { HomePage, About, NotFound, CourseList } from '../pages'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import LearningSpace from '@/pages/LearningSpace'
 import ErrorPage from '@/pages/ErrorPage'
+// import Problems from '@/pages/Problems'
+import Problem from '@/pages/Problem'
 
 export const AppRouter = () => {
   const router = createBrowserRouter([
@@ -27,6 +29,10 @@ export const AppRouter = () => {
     {
       path: AUTHENTICATION_ROUTERS.LEARNINGSPACE,
       element: <LearningSpace />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.PROBLEMS,
+      element: <Problem />
     },
     { path: AUTHENTICATION_ROUTERS.NOTFOUND, element: <NotFound /> },
     { path: AUTHENTICATION_ROUTERS.ERROR, element: <ErrorPage /> }

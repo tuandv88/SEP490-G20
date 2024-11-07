@@ -8,7 +8,8 @@ export const AUTHENTICATION_ROUTERS = {
   THEME: '/themes',
   COURSELIST: '/courseList',
   COURSEDETAIL: '/courseDetail/:id',
-  LEARNINGSPACE: '/learningSpace/:id'
+  LEARNINGSPACE: '/learning-space/:id/lecture/:lectureId',
+  PROBLEMS: '/problems'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

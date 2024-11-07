@@ -28,7 +28,7 @@ const HeaderCode = ({ onButtonClick }) => {
 
   return (
     <div>
-      <nav className='relative flex h-12 w-full shrink-0 items-center px-5 pr-2.5 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'>
+      <nav className='flex h-12 w-full shrink-0 items-center px-5 pr-2.5 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'>
         <div className='flex w-full justify-between'>
           <div className='flex w-full items-center justify-between'>
             <div className='flex items-center'>

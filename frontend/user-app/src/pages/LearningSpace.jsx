@@ -5,8 +5,8 @@ import Curriculum from '@/components/learning/Curriculum'
 import Description from '@/components/learning/Description'
 import HeaderTab from '@/components/learning/HeaderTab'
 import { LearningAPI } from '@/services/api/learningApi'
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useEffect, useRef, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import ErrorPage from './ErrorPage'
 import NotFound from './NotFound'
 import ChapterLoading from '@/components/loading/ChapterLoading'
@@ -17,6 +17,7 @@ import useClickOutside from '@/components/hooks/useClickOutside'
 import ChatAI from '@/components/chat/ChatAI'
 
 const LearningSpace = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('descriptions')
   const [chapters, setChapters] = useState([])
   const [title, setTitle] = useState('')
@@ -27,12 +28,18 @@ const LearningSpace = () => {
   const [error, setError] = useState(false)
   const [videoBlobUrl, setVideoBlobUrl] = useState(null)
   const [isProblemListOpen, setIsProblemListOpen] = useState(false)
+  const videoTimeRef = useRef(0);
 
   //courseId
-  const { id } = useParams()
+  const { id, lectureId } = useParams();
   const toggleProblemList = () => {
     setIsProblemListOpen(!isProblemListOpen)
   }
+  console.log("Load")
+
+  const handleVideoTimeUpdate = (time) => {
+    videoTimeRef.current = time;
+  };
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
@@ -60,20 +67,20 @@ const LearningSpace = () => {
 
     fetchCourseDetail()
   }, [id])
-
+ 
   // Gọi API lấy lectureDetail khi selectedLectureId thay đổi
   useEffect(() => {
-    if (selectLectureId) {
+    if ( lectureId) {
       const fetchLectureDetail = async () => {
         try {
-          const data = await LearningAPI.getLectureDetails(selectLectureId)
+          const data = await LearningAPI.getLectureDetails( lectureId)
           setLectureDetail(data)
 
           //Gọi API để lấy ra file của lecutre đó.
           const lectureFiles = data?.lectureDetailsDto?.files
           const fileDetails = await Promise.all(
             lectureFiles.map(async (file) => {
-              const data = await LearningAPI.getLectureFiles(selectLectureId, file.fileId)
+              const data = await LearningAPI.getLectureFiles(lectureId, file.fileId)
 
               if (file.fileType === 'VIDEO') {
                 const videoResponse = await fetch(data.presignedUrl)
@@ -97,7 +104,7 @@ const LearningSpace = () => {
       }
       fetchLectureDetail()
     }
-  }, [selectLectureId])
+  }, [lectureId])
 
   if (error) {
     return <ErrorPage />
@@ -114,8 +121,11 @@ const LearningSpace = () => {
       <div>
         <HeaderCode onButtonClick={toggleProblemList} />
       </div>
-      <ResizablePanelGroup direction='horizontal' className='min-h-[200px] rounded-lg border md:min-w-[450px]'>
-        <ResizablePanel defaultSize={30}>
+      <ResizablePanelGroup
+        direction='horizontal'
+        className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
+      >
+        <ResizablePanel defaultSize={40}>
           <div className='scroll-container h-screen'>
             <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} />
             {loading && <ChapterLoading />}
@@ -125,6 +135,8 @@ const LearningSpace = () => {
                 videoSrc={videoBlobUrl}
                 loading={loading}
                 titleProblem={lectureDetail?.lectureDetailsDto?.problem?.title}
+                initialTime={videoTimeRef.current}
+                onTimeUpdate={handleVideoTimeUpdate}
               />
             )}
             {activeTab === 'comments' && !loading && <Comments />}
@@ -132,7 +144,7 @@ const LearningSpace = () => {
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle className='resize-sha w-[3px]' />
-        <ResizablePanel defaultSize={70}>
+        <ResizablePanel defaultSize={60}>
           {/* <QuizScreen></QuizScreen> */}
           <CodeEditor
             templates={lectureDetail?.lectureDetailsDto?.problem?.templates.Java}
@@ -150,9 +162,11 @@ const LearningSpace = () => {
         setSelectedLectureId={setSelectedLectureId}
         isProblemListOpen={isProblemListOpen}
         toggleProblemList={toggleProblemList}
+        navigate={navigate}
       />
     </div>
   )
 }
 
-export default LearningSpace
+export default React.memo(LearningSpace)
+

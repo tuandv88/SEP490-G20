@@ -1,6 +1,7 @@
-﻿using Learning.Application.Models.Problems.Dtos;
+﻿using Learning.Application.Commons;
+using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.TestCases.Dtos;
-using Learning.Domain.Models;
+using Learning.Domain.ValueObjects;
 
 namespace Learning.Application.Extensions;
 public static class ProblemExtensions {
@@ -50,6 +51,42 @@ public static class ProblemExtensions {
             TestCases: problem.TestCases.ToListTestCaseDetailsDto()
             );
         return problemDetailsDto;
+    }
+
+    public static ProblemListDto ToProblemListDto(this Problem problem, Guid? userid) {
+        string status = ProblemListStatus.TODO;
+
+        var problemSubmisstionOfUser = problem.ProblemSubmissions
+            .Where(pl => pl.UserId.Value == userid)
+            .ToList();
+
+        if (problemSubmisstionOfUser.Any()) {
+            if (problemSubmisstionOfUser.Any(submission =>
+                submission.TestResults.All(test => test.IsPass))) {
+                status = ProblemListStatus.SOLVED;
+            } else {
+                status = ProblemListStatus.ATTEMPTED;
+            }
+        }
+
+        float acceptance = -1f;
+
+        int totalSubmissions = problem.ProblemSubmissions.Count;
+        int passedSubmissions = problem.ProblemSubmissions
+            .Count(submission => submission.TestResults.All(test => test.IsPass));
+
+        if (totalSubmissions > 0) {
+            acceptance = (float)passedSubmissions / totalSubmissions;
+        }
+
+        var problemListDto = new ProblemListDto(
+            ProblemsId: problem.Id.Value,
+            Status: status,
+            Title: problem.Title,
+            Difficulty: problem.DifficultyType.ToString(),
+            Acceptance: acceptance
+            );
+        return problemListDto;
     }
 }
 

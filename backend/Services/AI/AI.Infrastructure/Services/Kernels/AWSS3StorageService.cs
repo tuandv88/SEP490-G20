@@ -7,19 +7,19 @@ using Microsoft.KernelMemory;
 using System.Net;
 
 namespace AI.Infrastructure.Services.Kernels;
-public class AWSS3StorageCustom : IDocumentStorage, IDisposable
+public class AWSS3StorageService : IDocumentStorage, IDisposable
 {
     private readonly AmazonS3Client _client;
-    private readonly ILogger<AWSS3StorageCustom> _log;
+    private readonly ILogger<AWSS3StorageService> _log;
     private readonly string _bucketName;
 
-    public AWSS3StorageCustom(
+    public AWSS3StorageService(
         AWSS3Config config,
-        ILogger<AWSS3StorageCustom>? log = null)
+        ILogger<AWSS3StorageService>? log = null)
     {
         config.Validate();
 
-        _log = log ?? DefaultLogger<AWSS3StorageCustom>.Instance;
+        _log = log ?? DefaultLogger<AWSS3StorageService>.Instance;
         _bucketName = config.BucketName;
 
         switch (config.Auth)

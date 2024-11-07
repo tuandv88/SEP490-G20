@@ -9,5 +9,6 @@ public class Message : Entity<MessageId> {
     public string Content { get; set; } = default!;
     public PromptType PromptType { get; set; } = PromptType.AnswerWithFacts;
     public List<Document>? References { get; set; } = new();
+    public List<string>? NonIndexedExternalReferences { get; set; } = new();
 }
 

@@ -11,12 +11,14 @@ internal class PromptUtils {
         string template,
         string factContent,
         string? source = "",
+        string documentId = "",
         string? relevance = "",
         string? recordId = "",
         TagCollection? tags = null,
         Dictionary<string, object>? metadata = null) {
         var result = template
             .Replace("{{$source}}", source, StringComparison.Ordinal)
+            .Replace("{{$documentId}}", documentId, StringComparison.Ordinal)
             .Replace("{{$relevance}}", relevance, StringComparison.Ordinal)
             .Replace("{{$memoryId}}", recordId, StringComparison.Ordinal);
 

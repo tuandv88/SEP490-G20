@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Newtonsoft.Json;
 
 namespace AI.Infrastructure.Data.Configurations;
 public class DocumentConfiguration : IEntityTypeConfiguration<Document> {
@@ -10,10 +11,14 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document> {
             dbId => DocumentId.Of(dbId));
 
         builder.Property(d => d.Tags)
-                  .HasConversion(
-                       v => JsonConvert.SerializeObject(v),
-                       v => JsonConvert.DeserializeObject<Dictionary<string, object>>(v)!
-                  );
+            .HasConversion(
+                v => JsonConvert.SerializeObject(v),
+                v => JsonConvert.DeserializeObject<Dictionary<string, object>>(v ?? "{}")!)
+            .Metadata.SetValueComparer(new ValueComparer<Dictionary<string, object>>(
+                (d1, d2) => d1.Count == d2.Count && !d1.Except(d2).Any(),
+                d => d.Aggregate(0, (hash, kvp) => HashCode.Combine(hash, kvp.Key.GetHashCode(), GetSafeHashCode(kvp.Value))),
+                d => d.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)
+            ));
 
         builder.Property(d => d.FileName)
             .IsRequired()
@@ -41,6 +46,9 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document> {
                     .HasForeignKey("DocumentId")
                     .OnDelete(DeleteBehavior.Cascade)
             );
+    }
+    private static int GetSafeHashCode(object obj) {
+        return obj?.GetHashCode() ?? 0;
     }
 }
 

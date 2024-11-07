@@ -12,7 +12,7 @@ using System.Text;
 using Microsoft.KernelMemory.Search;
 
 namespace AI.Infrastructure.Services.Kernels;
-public sealed class SearchClientCustom : ISearchClient{
+public sealed class SearchClientService : ISearchClient{
     private readonly IMemoryDb _memoryDb;
     private readonly ITextGenerator _textGenerator;
     private readonly IContentModeration? _contentModeration;
@@ -20,7 +20,7 @@ public sealed class SearchClientCustom : ISearchClient{
     private readonly ILogger<SearchClient> _log;
     private readonly string _answerPrompt;
 
-    public SearchClientCustom(
+    public SearchClientService(
         IMemoryDb memoryDb,
         ITextGenerator textGenerator,
         SearchClientConfig? config = null,
@@ -162,6 +162,7 @@ public sealed class SearchClientCustom : ISearchClient{
     }
 
     /// <inheritdoc />
+    /// Trả về các Fact ở Result
     public async Task<MemoryAnswer> AskAsync(
         string index,
         string question,
@@ -236,6 +237,7 @@ public sealed class SearchClientCustom : ISearchClient{
                 template: factTemplate,
                 factContent: partitionText,
                 source: (fileName == "content.url" ? webPageUrl : fileName),
+                documentId: documentId,
                 relevance: relevance.ToString("P1", CultureInfo.CurrentCulture),
                 recordId: memory.Id,
                 tags: memory.Tags,
@@ -297,31 +299,33 @@ public sealed class SearchClientCustom : ISearchClient{
             return noAnswerFound;
         }
 
-        var text = new StringBuilder();
-        var charsGenerated = 0;
-        var watch = new Stopwatch();
-        watch.Restart();
-        await foreach (var x in this.GenerateAnswer(question, facts.ToString(), context, cancellationToken).ConfigureAwait(false)) {
-            text.Append(x);
+        //var text = new StringBuilder();
+        //var charsGenerated = 0;
+        //var watch = new Stopwatch();
+        //watch.Restart();
+        //await foreach (var x in this.GenerateAnswer(question, facts.ToString(), context, cancellationToken).ConfigureAwait(false)) {
+        //    text.Append(x);
 
-            if (this._log.IsEnabled(LogLevel.Trace) && text.Length - charsGenerated >= 30) {
-                charsGenerated = text.Length;
-                this._log.LogTrace("{0} chars generated", charsGenerated);
-            }
-        }
+        //    if (this._log.IsEnabled(LogLevel.Trace) && text.Length - charsGenerated >= 30) {
+        //        charsGenerated = text.Length;
+        //        this._log.LogTrace("{0} chars generated", charsGenerated);
+        //    }
+        //}
 
-        watch.Stop();
+        //watch.Stop();
 
-        answer.Result = text.ToString();
-        this._log.LogSensitive("Answer: {0}", answer.Result);
-        answer.NoResult = ValueIsEquivalentTo(answer.Result, this._config.EmptyAnswer);
-        if (answer.NoResult) {
-            answer.NoResultReason = "No relevant memories found";
-            this._log.LogTrace("Answer generated in {0} msecs. No relevant memories found", watch.ElapsedMilliseconds);
-        } else {
-            this._log.LogTrace("Answer generated in {0} msecs", watch.ElapsedMilliseconds);
-        }
-
+        //answer.Result = text.ToString();
+        //this._log.LogSensitive("Answer: {0}", answer.Result);
+        //answer.NoResult = ValueIsEquivalentTo(answer.Result, this._config.EmptyAnswer);
+        //if (answer.NoResult) {
+        //    answer.NoResultReason = "No relevant memories found";
+        //    this._log.LogTrace("Answer generated in {0} msecs. No relevant memories found", watch.ElapsedMilliseconds);
+        //} else {
+        //    this._log.LogTrace("Answer generated in {0} msecs", watch.ElapsedMilliseconds);
+        //}
+        //custom start
+        answer.Result = facts.ToString();
+        //custom end
         if (this._contentModeration != null && this._config.UseContentModeration) {
             var isSafe = await this._contentModeration.IsSafeAsync(answer.Result, cancellationToken).ConfigureAwait(false);
             if (!isSafe) {
@@ -331,7 +335,7 @@ public sealed class SearchClientCustom : ISearchClient{
                 answer.Result = this._config.ModeratedAnswer;
             }
         }
-
+        
         return answer;
     }
 

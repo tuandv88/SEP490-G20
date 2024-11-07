@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
+using YarpApiGateway.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions {
 });
 
 app.UseCors("CombinedPolicy");
-
+app.UseRejectWebsocketOverHttp2WhileUnsupported();
 // Configure the HTTP request pipeline.
 app.UseRateLimiter();
 

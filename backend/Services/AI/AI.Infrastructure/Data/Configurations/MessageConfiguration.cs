@@ -1,4 +1,7 @@
-﻿namespace AI.Infrastructure.Data.Configurations;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Newtonsoft.Json;
+
+namespace AI.Infrastructure.Data.Configurations;
 public class MessageConfiguration : IEntityTypeConfiguration<Message> {
     public void Configure(EntityTypeBuilder<Message> builder) {
         builder.HasKey(m => m.Id);
@@ -34,5 +37,15 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message> {
                     .HasForeignKey("MessageId")
                     .OnDelete(DeleteBehavior.Cascade)
             );
+
+        builder.Property(m => m.NonIndexedExternalReferences)
+            .HasConversion(
+                v => JsonConvert.SerializeObject(v),
+                v => JsonConvert.DeserializeObject<List<string>>(v ?? "[]")!)
+            .Metadata.SetValueComparer(new ValueComparer<List<string>>(
+                (c1, c2) => c1.SequenceEqual(c2),
+                c => c.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode())),
+                c => c.ToList()
+            ));
     }
 }

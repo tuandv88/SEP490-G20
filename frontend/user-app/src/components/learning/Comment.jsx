@@ -26,8 +26,8 @@ const CommentInput = ({ onSubmit }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className='bg-white p-4 border-t sticky'>
-      <div className='bg-gray-100 rounded-lg p-2'>
+    <form onSubmit={handleSubmit} className='bg-white p-4 border-t'>
+      <div className='bg-gray-100 rounded-lg p-2 '>
         <textarea
           placeholder='Add comment...'
           value={comment}
@@ -150,6 +150,7 @@ export default function Comments() {
   return (
     <div className='mx-auto bg-white rounded-lg shadow-md'>
       <CommentInput onSubmit={addComment} />
+      
       <div className='h-[calc(100vh-120px)] overflow-y-auto'>
         <div className='p-4 border-b'>
           <h2 className='text-xl font-semibold flex items-center'>
@@ -163,7 +164,7 @@ export default function Comments() {
               <Comment key={comment.id} {...comment} />
             ))}
           </div>
-          <div className='text-center'>
+          <div className='text-center mb-[50px]'>
             <button type='submit' className='bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600'>
               Load More
             </button>

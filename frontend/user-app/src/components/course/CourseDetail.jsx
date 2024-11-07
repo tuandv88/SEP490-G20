@@ -38,7 +38,7 @@ export default function CourseDetail() {
   }
 
   const handleLearningCourse = (courseId) => {
-    navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId))
+    navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(':lectureId', '30137826-3f32-4a6e-a366-d943a532dab8'))
   }
 
   useEffect(() => {

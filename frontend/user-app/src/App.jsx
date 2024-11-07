@@ -4,11 +4,9 @@ import { ThemeProvider } from '@/components/theme-provider'
 
 function App() {
   return (
-    <div className='bg-baseBackground h-[100vh] w-[100vw]'>
-      <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
-        <AppRouter />
-      </ThemeProvider>
-    </div>
+    <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
+      <AppRouter />
+    </ThemeProvider>
   )
 }
 

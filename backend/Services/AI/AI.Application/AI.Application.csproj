@@ -7,12 +7,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Folder Include="Extensions\" />
-		<Folder Include="Models\Messages\EventHandlers\" />
-		<Folder Include="Models\Messages\Events\" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
 		<PackageReference Include="Microsoft.KernelMemory.Abstractions" Version="0.90.241021.1" />
 		<PackageReference Include="Microsoft.KernelMemory.Core" Version="0.90.241021.1" />

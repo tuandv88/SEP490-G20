@@ -1,4 +1,6 @@
-﻿namespace AI.Application.Data.Repositories;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+
+namespace AI.Application.Data.Repositories;
 public interface IRepository<T> where T : class {
     Task<List<T>> GetAllAsync();
     Task<T?> GetByIdAsync(Guid id);

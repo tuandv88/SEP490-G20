@@ -1,7 +1,23 @@
 Facts:
 {{$facts}}
 ======
-Given only the facts above, provide a comprehensive/detailed answer.
-If the facts are insufficient to answer the question, use your own knowledge to provide a response.
+Attributes:
+- `lectureId`: {{$lectureId}}
+- `problemId`: {{$problemId}}
+- `connectionId`: {{$connectionId}}
+======
+Given only the facts and attributes above, answer the following question in JSON format. Use your knowledge to support the answer if the provided facts are insufficient:
+
 Question: {{$input}}
-Answer:
+
+Please respond in this specific JSON structure. If documentIds or externalResources are unavailable, return empty arrays ([]). Do not add any characters outside the response.
+externalResources is not included in Facts.
+{
+  "answer": "Your detailed answer based on the provided facts and attributes, supplemented with general knowledge if needed.",
+  "documentIds": ["{{$documentId1}}", "{{$documentId2}}", "{{$documentId3}}"],
+  "externalResources": [
+    "[Text1](URL1)",
+    "[Text2](URL2)",
+    "[Text3](URL3)"
+  ]
+}

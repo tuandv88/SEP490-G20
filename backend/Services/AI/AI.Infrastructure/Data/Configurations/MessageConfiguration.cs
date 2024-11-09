@@ -47,5 +47,18 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message> {
                 c => c.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode())),
                 c => c.ToList()
             ));
+
+        builder.Property(m => m.Context)
+            .HasConversion(
+                v => JsonConvert.SerializeObject(v),
+                v => JsonConvert.DeserializeObject<Dictionary<string, object>>(v ?? "{}")!)
+            .Metadata.SetValueComparer(new ValueComparer<Dictionary<string, object>>(
+                (d1, d2) => d1.Count == d2.Count && !d1.Except(d2).Any(),
+                d => d.Aggregate(0, (hash, kvp) => HashCode.Combine(hash, kvp.Key.GetHashCode(), GetSafeHashCode(kvp.Value))),
+                d => d.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)
+            ));
+    }
+    private static int GetSafeHashCode(object obj) {
+        return obj?.GetHashCode() ?? 0;
     }
 }

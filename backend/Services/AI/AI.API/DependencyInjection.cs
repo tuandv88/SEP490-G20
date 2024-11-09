@@ -4,6 +4,7 @@ using BuildingBlocks.Exceptions.Handler;
 using BuildingBlocks.Extensions;
 using Carter;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using StackExchange.Redis;
 
 namespace AI.API;
@@ -49,6 +50,15 @@ public static class DependencyInjection {
         //ClientCommunicationService
         services.AddScoped<IClientCommunicationService, ClientCommunicationService>();
 
+        //Config max size body
+        //services.Configure<IISServerOptions>(options => {
+        //    options.MaxRequestBodySize = 200 * 1024 * 1024; // 200MB
+        //});
+
+        services.Configure<KestrelServerOptions>(options =>
+        {
+            options.Limits.MaxRequestBodySize = 200 * 1024 * 1024; // 200MB
+        });
         //Exceptions
         services.AddExceptionHandler<CustomExceptionHandler>();
         return services;

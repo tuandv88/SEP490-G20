@@ -1,6 +1,4 @@
 ﻿using AI.Application.Data;
-using AI.Application.Data.Repositories;
-using AI.Application.Interfaces;
 using AI.Infrastructure.Data;
 using AI.Infrastructure.Data.Interceptors;
 using AI.Infrastructure.Data.Repositories.Conversations;
@@ -9,12 +7,12 @@ using AI.Infrastructure.Data.Repositories.Messages;
 using AI.Infrastructure.Data.Repositories.Recommendations;
 using AI.Infrastructure.Extensions;
 using AI.Infrastructure.Services;
+using BuidingBlocks.Storage;
 using BuildingBlocks.Extensions;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.KernelMemory;
 
 namespace AI.Infrastructure;
 public static class DependencyInjection {
@@ -44,6 +42,11 @@ public static class DependencyInjection {
         //UserContext
         services.AddScoped<IUserContextService, UserContextService>();
 
+        //Configuration Service
+        ConfigureService(services, configuration);
+
+        //Add storage
+        services.AddStorage(configuration);
         return services;
     }
     private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration) {
@@ -59,6 +62,16 @@ public static class DependencyInjection {
         //Document Repository
         services.AddScoped<IDocumentRepository, DocumentRepository>();
 
+    }
+    private static void ConfigureService(this IServiceCollection services, IConfiguration configuration) {
+        //ChatService
+        services.AddScoped<IChatService, ConversationalAIService>();
+
+        //MessageService
+        services.AddScoped<IMessageService, MessageService>();
+
+        //DocumentService
+        services.AddScoped<IDocumentService, DocumentService>();
     }
 
 }

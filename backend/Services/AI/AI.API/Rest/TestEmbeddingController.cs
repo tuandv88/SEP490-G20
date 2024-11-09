@@ -132,7 +132,7 @@ namespace AI.API.Rest {
             return Ok(d);
         }
         [HttpPost("/markdown")]
-        public async Task<ActionResult<string>> ImportMarkdownAsync(string markdown) {
+        public async Task<ActionResult<string>> ImportMarkdownAsync([FromBody]string markdown) {
 
             var d = await _kernelMemory.ImportTextAsync(markdown, Guid.NewGuid().ToString());
             return Ok(d);
@@ -156,8 +156,8 @@ namespace AI.API.Rest {
         }
         [HttpGet("/ask")]
         public async Task<IActionResult> AskRag(string question) {
-            var answer = await _kernelMemory.AskAsync(question, minRelevance: 0.4);
-
+            var answer = await _kernelMemory.AskAsync(question);
+            //, minRelevance: 0.4
             return Ok(answer);
         }
         [HttpGet("/search")]

@@ -1,0 +1,22 @@
+Facts:
+{{$facts}}
+======
+Attributes:
+- `lectureId`: {{$lectureId}}: The identifier for the specific lecture within the course.
+- `problemId`: {{$problemId}}: The identifier for a specific problem within the course, used to fetch details or check solutions.
+- `connectionId`: {{$connectionId}}: The unique identifier for the client connection, used for real-time communication or code execution tracking.
+======
+Given only the facts and attributes above, provide a comprehensive and detailed answer. At the end of your response, include the relevant `documentId(s)` in the following format:
+
+=== DOCUMENT_IDS ===
+[DocumentIds: {{$documentId1}}, {{$documentId2}}, {{$documentId3}}]
+
+If external resources are used in the answer, include the relevant resource link(s) in the format below:
+
+=== EXTERNAL_RESOURCES ===
+[ExternalLinks: {{$externalLink1}}, {{$externalLink2}}, {{$externalLink3}}]
+
+If the facts are insufficient to answer the question, use your own knowledge to provide a response.
+
+Question: {{$input}}
+Answer:

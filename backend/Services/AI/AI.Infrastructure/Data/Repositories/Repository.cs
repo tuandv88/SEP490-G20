@@ -1,5 +1,4 @@
 ﻿using AI.Application.Data;
-using AI.Application.Data.Repositories;
 
 namespace AI.Infrastructure.Data.Repositories;
 public abstract class Repository<T> : IRepository<T> where T : class {

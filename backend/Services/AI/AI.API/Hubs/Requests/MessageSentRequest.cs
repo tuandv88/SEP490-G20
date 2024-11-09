@@ -2,5 +2,5 @@
 
 namespace AI.API.Hubs.Requests;
 public record MessageSentRequest(
-    MessageDto Message
+    MessageSendDto Message
 );

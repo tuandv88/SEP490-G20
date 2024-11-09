@@ -46,6 +46,9 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document> {
                     .HasForeignKey("DocumentId")
                     .OnDelete(DeleteBehavior.Cascade)
             );
+        builder.Property(d => d.Index)
+            .IsRequired()
+            .HasMaxLength(50);
     }
     private static int GetSafeHashCode(object obj) {
         return obj?.GetHashCode() ?? 0;

@@ -1,5 +1,4 @@
 ﻿using AI.Application.Data;
-using AI.Application.Data.Repositories;
 
 namespace AI.Infrastructure.Data.Repositories.Messages;
 public class MessageRepository : Repository<Message>, IMessageRepository {
@@ -20,6 +19,15 @@ public class MessageRepository : Repository<Message>, IMessageRepository {
                        .AsEnumerable()
                        .FirstOrDefault(c => c.Id.Value == id);
         return message;
+    }
+
+    public async Task<List<Message>> GetMessageByConversationIdsync(Guid conversationId) {
+        var messages = await _dbContext.Messages.Include(m => m.References)
+                    .AsNoTracking()
+                    .AsAsyncEnumerable()
+                    .Where(m => m.ConversationId.Value == conversationId)
+                    .ToListAsync();
+        return messages;
     }
 }
 

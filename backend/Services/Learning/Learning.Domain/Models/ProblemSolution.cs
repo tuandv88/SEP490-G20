@@ -5,5 +5,6 @@ public class ProblemSolution : Entity<ProblemSolutionId>{
     public string SolutionCode { get; set; } = default!;
     public string Description { get; set; } = default!;
     public LanguageCode LanguageCode { get; set; } = LanguageCode.Java; // loại ngôn ngữ code : java, c#, python,...
+    public bool Priority = false;
 }
 

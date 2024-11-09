@@ -22,54 +22,6 @@ namespace Learning.Infrastructure.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Learning.Domain.Model.Document", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<double>("FileSize")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("Format")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("LessonId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LessonId");
-
-                    b.ToTable("Documents");
-                });
-
             modelBuilder.Entity("Learning.Domain.Models.Chapter", b =>
                 {
                     b.Property<Guid>("Id")
@@ -198,6 +150,65 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.ToTable("Courses");
                 });
 
+            modelBuilder.Entity("Learning.Domain.Models.File", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<double?>("Duration")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("DOCUMENT");
+
+                    b.Property<string>("Format")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("LectureId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LectureId");
+
+                    b.ToTable("Files");
+                });
+
             modelBuilder.Entity("Learning.Domain.Models.Lecture", b =>
                 {
                     b.Property<Guid>("Id")
@@ -227,20 +238,21 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasDefaultValue("Lesson");
 
-                    b.Property<Guid>("LessonId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("OrderIndex")
                         .HasColumnType("integer");
 
                     b.Property<int>("Point")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ProblemId")
+                    b.Property<Guid?>("ProblemId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("QuizId")
+                    b.Property<Guid?>("QuizId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<double>("TimeEstimation")
                         .HasColumnType("double precision");
@@ -252,9 +264,6 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ChapterId");
-
-                    b.HasIndex("LessonId")
-                        .IsUnique();
 
                     b.HasIndex("ProblemId")
                         .IsUnique();
@@ -348,38 +357,20 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.ToTable("LecturesProgress");
                 });
 
-            modelBuilder.Entity("Learning.Domain.Models.Lesson", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Lessons");
-                });
-
             modelBuilder.Entity("Learning.Domain.Models.Problem", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
                     b.Property<float>("CpuExtraTime")
-                        .HasColumnType("real");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("real")
+                        .HasDefaultValue(0.5f);
 
                     b.Property<float>("CpuTimeLimit")
-                        .HasColumnType("real");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("real")
+                        .HasDefaultValue(0.5f);
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -399,7 +390,14 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasDefaultValue("Easy");
 
                     b.Property<bool>("EnableNetwork")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -408,13 +406,19 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("MaxFileSize")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1024);
 
                     b.Property<int>("MaxThread")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(30);
 
-                    b.Property<float>("MemoryLimit")
-                        .HasColumnType("real");
+                    b.Property<int>("MemoryLimit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(64000);
 
                     b.Property<string>("ProblemType")
                         .IsRequired()
@@ -423,7 +427,9 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasDefaultValue("Practice");
 
                     b.Property<int>("StackLimit")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(32000);
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -468,6 +474,11 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
+                    b.Property<bool>("Priority")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<Guid>("ProblemId")
                         .HasColumnType("uuid");
 
@@ -488,6 +499,9 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CompileErrors")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -497,10 +511,11 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<double>("ExecutionTime")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("LanguageCode")
+                    b.Property<string>("LanguageCode")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
+                        .HasColumnType("text")
+                        .HasDefaultValue("Java");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -515,7 +530,6 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("RunTimeErrors")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("SourceCode")
@@ -523,16 +537,20 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasMaxLength(2147483647)
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("SubmissionDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 18, 18, 16, 10, 580, DateTimeKind.Utc).AddTicks(2444));
-
-                    b.Property<string>("TestCasesFailed")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("TestCasesPassed")
+                    b.Property<DateTime>("SubmissionDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValue(new DateTime(2024, 11, 3, 15, 27, 53, 731, DateTimeKind.Utc).AddTicks(5772));
+
+                    b.Property<string>("TestResults")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TokenReference")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -576,7 +594,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<int>("OrderIndex")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ProblemId")
+                    b.Property<Guid?>("ProblemId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("QuestionLevel")
@@ -750,7 +768,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 18, 18, 16, 10, 594, DateTimeKind.Utc).AddTicks(4751));
+                        .HasDefaultValue(new DateTime(2024, 11, 3, 15, 27, 53, 743, DateTimeKind.Utc).AddTicks(775));
 
                     b.Property<int>("TotalQuestions")
                         .HasColumnType("integer");
@@ -781,9 +799,8 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasMaxLength(2147483647)
                         .HasColumnType("text");
 
-                    b.Property<string>("Input")
+                    b.Property<string>("Inputs")
                         .IsRequired()
-                        .HasMaxLength(2147483647)
                         .HasColumnType("text");
 
                     b.Property<bool>("IsHidden")
@@ -800,12 +817,12 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<int>("OrderIndex")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("TestScriptId")
+                    b.Property<Guid>("ProblemId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TestScriptId");
+                    b.HasIndex("ProblemId");
 
                     b.ToTable("TestCases");
                 });
@@ -883,7 +900,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 10, 18, 18, 16, 10, 604, DateTimeKind.Utc).AddTicks(7660));
+                        .HasDefaultValue(new DateTime(2024, 11, 3, 15, 27, 53, 748, DateTimeKind.Utc).AddTicks(2322));
 
                     b.Property<string>("Feedback")
                         .IsRequired()
@@ -917,72 +934,20 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.ToTable("UserCourses");
                 });
 
-            modelBuilder.Entity("Learning.Domain.Models.Video", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<double>("Duration")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<double>("FileSize")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("Format")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("LessonId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LessonId")
-                        .IsUnique();
-
-                    b.ToTable("Videos");
-                });
-
-            modelBuilder.Entity("Learning.Domain.Model.Document", b =>
-                {
-                    b.HasOne("Learning.Domain.Models.Lesson", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Learning.Domain.Models.Chapter", b =>
                 {
                     b.HasOne("Learning.Domain.Models.Course", null)
                         .WithMany("Chapters")
                         .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Learning.Domain.Models.File", b =>
+                {
+                    b.HasOne("Learning.Domain.Models.Lecture", null)
+                        .WithMany("Files")
+                        .HasForeignKey("LectureId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -995,23 +960,13 @@ namespace Learning.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Learning.Domain.Models.Lesson", null)
-                        .WithOne()
-                        .HasForeignKey("Learning.Domain.Models.Lecture", "LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Learning.Domain.Models.Problem", null)
                         .WithOne()
-                        .HasForeignKey("Learning.Domain.Models.Lecture", "ProblemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Learning.Domain.Models.Lecture", "ProblemId");
 
                     b.HasOne("Learning.Domain.Models.Quiz", null)
                         .WithOne()
-                        .HasForeignKey("Learning.Domain.Models.Lecture", "QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Learning.Domain.Models.Lecture", "QuizId");
                 });
 
             modelBuilder.Entity("Learning.Domain.Models.LectureComment", b =>
@@ -1060,9 +1015,7 @@ namespace Learning.Infrastructure.Data.Migrations
                 {
                     b.HasOne("Learning.Domain.Models.Problem", null)
                         .WithOne()
-                        .HasForeignKey("Learning.Domain.Models.Question", "ProblemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Learning.Domain.Models.Question", "ProblemId");
 
                     b.HasOne("Learning.Domain.Models.Quiz", null)
                         .WithMany("Questions")
@@ -1091,9 +1044,9 @@ namespace Learning.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Learning.Domain.Models.TestCase", b =>
                 {
-                    b.HasOne("Learning.Domain.Models.TestScript", null)
+                    b.HasOne("Learning.Domain.Models.Problem", null)
                         .WithMany("TestCases")
-                        .HasForeignKey("TestScriptId")
+                        .HasForeignKey("ProblemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1116,15 +1069,6 @@ namespace Learning.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Learning.Domain.Models.Video", b =>
-                {
-                    b.HasOne("Learning.Domain.Models.Lesson", null)
-                        .WithOne("Video")
-                        .HasForeignKey("Learning.Domain.Models.Video", "LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Learning.Domain.Models.Chapter", b =>
                 {
                     b.Navigation("Lectures");
@@ -1139,17 +1083,11 @@ namespace Learning.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Learning.Domain.Models.Lecture", b =>
                 {
+                    b.Navigation("Files");
+
                     b.Navigation("LectureComments");
 
                     b.Navigation("LectureProgress");
-                });
-
-            modelBuilder.Entity("Learning.Domain.Models.Lesson", b =>
-                {
-                    b.Navigation("Documents");
-
-                    b.Navigation("Video")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Learning.Domain.Models.Problem", b =>
@@ -1157,6 +1095,8 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Navigation("ProblemSolutions");
 
                     b.Navigation("ProblemSubmissions");
+
+                    b.Navigation("TestCases");
 
                     b.Navigation("TestScripts");
                 });
@@ -1171,11 +1111,6 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Navigation("Questions");
 
                     b.Navigation("QuizSubmissions");
-                });
-
-            modelBuilder.Entity("Learning.Domain.Models.TestScript", b =>
-                {
-                    b.Navigation("TestCases");
                 });
 
             modelBuilder.Entity("Learning.Domain.Models.UserCourse", b =>

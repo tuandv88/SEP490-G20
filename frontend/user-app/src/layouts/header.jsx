@@ -3,7 +3,7 @@ import { Bell, /*User*/ Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS as AR } from '@/data/constants'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/Avatar'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import DropdownMenuUser from '@/components/ui/userdropdown'
 import { ModeToggle } from '@/components/mode-toggle'
 
@@ -52,7 +52,7 @@ export default function Header() {
 
   return (
     <header
-      className={`bg-background text-foreground shadow-md py-3 fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isHidden ? 'hidden' : 'top-0'}`}
+      className={`bg-background text-foreground shadow-md fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isHidden ? 'hidden' : 'top-0'}`}
     >
       <div className='container px-4 py-4 mx-auto'>
         <div className='flex items-center justify-between'>
@@ -74,6 +74,11 @@ export default function Header() {
               <li>
                 <Link href='/contests' className='text-lg hover:text-primary hover:font-bold'>
                   Competition
+                </Link>
+              </li>
+              <li>
+                <Link to={AR.PROBLEMS} className='text-lg hover:text-primary hover:font-bold'>
+                  Problems
                 </Link>
               </li>
               <li>

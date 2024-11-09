@@ -1,6 +1,6 @@
 ﻿namespace Learning.Domain.ValueObjects;
 public record ChapterId {
-    private ChapterId(Guid value) => Value = value;
+    public ChapterId(Guid value) => Value = value;
     public Guid Value { get; }
     public static ChapterId Of(Guid value) {
         ArgumentNullException.ThrowIfNull(value);

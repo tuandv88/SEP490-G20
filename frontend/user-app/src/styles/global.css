@@ -1,3 +1,70 @@
 * {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
+
+.split {
+  display: flex;
+  flex-direction: row;
+}
+
+.gutter {
+  background-color: #eee;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+  /* background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg=='); */
+  cursor: col-resize;
+}
+
+.resize-sha:hover {
+	background-color: #0a84ff;
+}
+
+.gutter.gutter-vertical {
+	/* background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII="); */
+	cursor: row-resize;
+}
+
+.scroll-container {
+  @apply overflow-y-scroll; /* Cho phép cuộn dọc */
+  scrollbar-width: none; /* Ẩn thanh cuộn trong Firefox */
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none; /* Ẩn thanh cuộn trong Chrome, Safari và Edge */
+}
+
+.prose :where(code)::after {
+  content: none; /* Hoặc content: ""; */
+}
+
+.prose :where(code)::before {
+  content: none; /* Hoặc content: ""; */
+}
+
+.prose :where(pre):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+  color: var(--tw-prose-pre-code);
+  background: none;
+  overflow-x: auto;
+  font-weight: 400;
+  font-size: 0.875em;
+  line-height: 1.7142857;
+  margin-top: 1.7142857em;
+  margin-bottom: 1.7142857em;
+  border-radius: 0.375rem;
+  padding: 0px;
+}
+
+.prose :where(h2):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+  color: black;
+  font-weight: 700;
+  font-size: 1.5em;  
+  line-height: 1.3333333;
+}
+
+.markdown-des h2 {
+  color: white !important;
+}
+

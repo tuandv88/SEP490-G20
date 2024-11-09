@@ -6,9 +6,7 @@ public static class DependencyInjection {
         services.AddCarter();
 
         //Authentication
-        services.ConfigureAuthentication(configuration);
-        //Caching
-        services.ConfigureCaching(configuration);
+        services.AddConfigureAuthentication(configuration);
         //Exceptions
         services.AddExceptionHandler<CustomExceptionHandler>();
 

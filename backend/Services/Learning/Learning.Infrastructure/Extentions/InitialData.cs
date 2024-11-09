@@ -1,7 +1,7 @@
 ﻿namespace Learning.Infrastructure.Extentions;
 public static class InitialData {
-    public static IEnumerable<Domain.Models.Course> Courses =>
-        new List<Domain.Models.Course>() {
+    public static IEnumerable<Course> Courses =>
+        new List<Course>() {
             //TODO
         };
     public static IEnumerable<Chapter> Chapters =>

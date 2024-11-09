@@ -15,6 +15,10 @@ export default defineConfig({
     historyApiFallback: true
   },
   build: {
+<<<<<<< HEAD
     outDir: 'build' // Đặt tên thư mục output là 'build'
+=======
+    outDir: 'build' 
+>>>>>>> d656cee91989ac401e6d0c58bc64f3c5e41e903e
   }
 })

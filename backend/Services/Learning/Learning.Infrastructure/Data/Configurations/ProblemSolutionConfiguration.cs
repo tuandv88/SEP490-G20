@@ -16,6 +16,7 @@ public class ProblemSolutionConfiguration : IEntityTypeConfiguration<ProblemSolu
             .HasDefaultValue(LanguageCode.Java)
             .HasConversion(
                 s => s.ToString(), dbStatus => (LanguageCode)Enum.Parse(typeof(LanguageCode), dbStatus));
+        builder.Property(pl => pl.Priority).HasDefaultValue(false);
     }
 }
 

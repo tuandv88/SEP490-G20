@@ -1,19 +1,22 @@
-﻿namespace Learning.API.Endpoints.Courses;
+﻿using Learning.Application.Models.Courses.Queries.GetCourses;
 
-//public record GetCourseRequest();
-//public record GetCourseResponse();
-//public class GetCourseEndpoint : ICarterModule {
-//    public void AddRoutes(IEndpointRouteBuilder app) {
-//        app.MapGet("/courses", async (GetCourseRequest request, ISender sender) => {
-//            var command = request.Adapt<CreateSubmissionCommand>();
+namespace Learning.API.Endpoints.Courses;
+public record GetCourseResponse(PaginatedResult<CourseDto> CourseDtos);
+public class GetCourseEndpoint : ICarterModule {
+    public void AddRoutes(IEndpointRouteBuilder app) {
+        app.MapGet("/courses", async ([AsParameters] PaginationRequest request, ISender sender) => {
+            var result = await sender.Send(new GetCoursesQuery(request));
 
-//            var result = await sender.Send(command);
+            var response = result.Adapt<GetCourseResponse>();
 
-//            var response = result.Adapt<GetCourseResponse>();
+            return Results.Ok(response);
 
-//            return Results.Accepted();
-
-//        });
-//    }
-//}
+        })
+        .WithName("GetCourses")
+        .Produces<GetCourseResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithSummary("Get Courses");
+    }
+}
 

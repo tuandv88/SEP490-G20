@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import { Link } from 'react-router-dom'
-import { AUTHENTICATION_ROUTERS } from './../data/constants'
+import { Link, useNavigate } from 'react-router-dom'
+import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import Layout from '@/layouts/layout'
 import { useState } from 'react'
 import { Star, Clock, Users, Trophy, ChevronRight } from 'lucide-react'
@@ -33,6 +33,12 @@ const Avatar = ({ src, alt, className, ...props }) => (
 
 function HomePage() {
   const [email, setEmail] = useState('')
+
+  const navigate = useNavigate()
+
+  const handleViewDetail = (courseId) => {
+    navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', courseId))
+  }
 
   const handleSubscribe = (e) => {
     e.preventDefault()
@@ -91,7 +97,12 @@ function HomePage() {
                         <Star className='w-5 h-5 mr-1 text-yellow-400' />
                         <span className='text-sm'>4.8 (120 đánh giá)</span>
                       </div>
-                      <Button className='text-white bg-green-500 hover:bg-green-600'>Xem chi tiết</Button>
+                      <Button
+                        onClick={() => handleViewDetail('6773706d-dae4-42f8-b58e-5551fa6ebaca')}
+                        className='text-white bg-green-500 hover:bg-green-600'
+                      >
+                        Xem chi tiết
+                      </Button>
                     </div>
                   </Card>
                 ))}

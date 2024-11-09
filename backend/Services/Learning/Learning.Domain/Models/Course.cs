@@ -3,10 +3,8 @@
 namespace Learning.Domain.Models;
 public class Course : Aggregate<CourseId> {
 
-    private readonly List<Chapter> _chapters = new();
-    public IReadOnlyList<Chapter> Chapters => _chapters.AsReadOnly();
-    private readonly List<UserCourse> _userCourse = new();
-    public IReadOnlyList<UserCourse> UserCourses => _userCourse.AsReadOnly();
+    public List<Chapter> Chapters = new();
+    public List<UserCourse> UserCourses = new();
     public string Title { get; set; } = default!;
     public string Description { get; set; } = default!;
     public string Headline { get; set; } = default!; //Tên dưới title
@@ -21,44 +19,49 @@ public class Course : Aggregate<CourseId> {
     public CourseLevel CourseLevel { get; set; } = CourseLevel.Basic;
     public double Price {  get; set; } // giá bán của khóa học
 
-    public static Course Create(CourseId courseId, string title, string description, string headline, double timeEstimation, 
-        string prerequisites, string objectives, string targetAudiences, string imageUrl, int orderIndex, double price) {
-        ArgumentException.ThrowIfNullOrWhiteSpace(title);
-        ArgumentException.ThrowIfNullOrWhiteSpace(headline);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(timeEstimation);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(orderIndex);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
+    public static Course Create(CourseId courseId, string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, 
+        string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, string imageUrl, int orderIndex, CourseLevel courseLevel, double price) {
         var course = new Course() {
             Id = courseId,
             Title = title, 
             Description = description,
             Headline = headline,
+            CourseStatus = courseStatus,
             TimeEstimation = timeEstimation, 
             Prerequisites = prerequisites,
             Objectives = objectives,
             TargetAudiences = targetAudiences,
+            ScheduledPublishDate = scheduledPublishDate,
             ImageUrl = imageUrl,
+            OrderIndex = orderIndex,
+            CourseLevel = courseLevel,
             Price = price
         };
         course.AddDomainEvent(new CourseCreatedEvent(course));
         return course;
     }
 
-    public Chapter AddChapter(string title, string description, double timeEstimation, int orderIndex, bool isActive) {
-        ArgumentException.ThrowIfNullOrWhiteSpace(title);
-        ArgumentException.ThrowIfNullOrWhiteSpace(description);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(timeEstimation);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(orderIndex);
-        var chapter = new Chapter() {
-            CourseId = Id,
-            Title = title,
-            Description = description,
-            TimeEstimation = timeEstimation,
-            OrderIndex = orderIndex,
-            IsActive = isActive
-        };
-        _chapters.Add(chapter);
-        return chapter;
+    public void AddChapter(Chapter chapter) {
+        Chapters.Add(chapter);
+    }
+
+    public void Update(string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, int orderIndex, CourseLevel courseLevel, double price) {
+        Title = title;
+        Description = description;
+        Headline = headline;
+        CourseStatus = courseStatus;
+        TimeEstimation = timeEstimation;
+        Prerequisites = prerequisites;
+        Objectives = objectives;
+        TargetAudiences = targetAudiences;
+        ScheduledPublishDate = scheduledPublishDate;
+        OrderIndex = orderIndex;
+        CourseLevel = courseLevel;
+        Price = price;
+        //TODO add event vào domain
+    }
+    public void UpdateImage(string imageUrl) {
+        ImageUrl = imageUrl;
     }
 
 }

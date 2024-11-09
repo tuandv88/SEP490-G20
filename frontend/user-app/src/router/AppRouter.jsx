@@ -1,7 +1,12 @@
 // src/router/AppRouter.jsx
-import { AUTHENTICATION_ROUTERS } from './../data/constants'
-import { HomePage, About, NotFound, CourseList } from './../pages'
+import CourseDetail from '@/components/course/CourseDetail'
+import { AUTHENTICATION_ROUTERS } from '../data/constants'
+import { HomePage, About, NotFound, CourseList } from '../pages'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import LearningSpace from '@/pages/LearningSpace'
+import ErrorPage from '@/pages/ErrorPage'
+// import Problems from '@/pages/Problems'
+import Problem from '@/pages/Problem'
 
 export const AppRouter = () => {
   const router = createBrowserRouter([
@@ -17,7 +22,20 @@ export const AppRouter = () => {
       path: AUTHENTICATION_ROUTERS.COURSELIST,
       element: <CourseList />
     },
-    { path: AUTHENTICATION_ROUTERS.NOTFOUND, element: <NotFound /> }
+    {
+      path: AUTHENTICATION_ROUTERS.COURSEDETAIL,
+      element: <CourseDetail />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.LEARNINGSPACE,
+      element: <LearningSpace />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.PROBLEMS,
+      element: <Problem />
+    },
+    { path: AUTHENTICATION_ROUTERS.NOTFOUND, element: <NotFound /> },
+    { path: AUTHENTICATION_ROUTERS.ERROR, element: <ErrorPage /> }
   ])
   return <RouterProvider router={router} />
 }

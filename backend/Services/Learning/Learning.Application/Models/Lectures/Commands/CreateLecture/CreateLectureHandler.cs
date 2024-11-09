@@ -1,0 +1,43 @@
+﻿
+using Learning.Application.Data.Repositories;
+using Learning.Application.Models.Lectures.Dtos;
+using Learning.Domain.Enums;
+using Learning.Domain.ValueObjects;
+
+namespace Learning.Application.Models.Lectures.Commands.CreateLecture;
+public class CreateLectureHandler(IChapterRepository chapterRepository, ILectureRepository lectureRepository) : ICommandHandler<CreateLectureCommand, CreateLectureResult> {
+    public async Task<CreateLectureResult> Handle(CreateLectureCommand request, CancellationToken cancellationToken) {
+        var chapter = await chapterRepository.GetByIdAsync(request.ChapterId);
+        if (chapter == null) {
+            throw new NotFoundException("Chapter", request.ChapterId);
+        }
+        var lecture = CreateNewLecture(chapter, request.CreateLectureDto);
+
+        await lectureRepository.AddAsync(lecture);
+        await lectureRepository.SaveChangesAsync(cancellationToken);
+
+        return new CreateLectureResult(lecture.Id.Value);
+    }
+    private Lecture CreateNewLecture(Chapter chapter, CreateLectureDto createLectureDto) {
+        var lectureType = Enum.TryParse<LectureType>(createLectureDto.LectureType, out var status)
+        ? status
+        : throw new ArgumentOutOfRangeException(nameof(createLectureDto.LectureType), $"Value '{createLectureDto.LectureType}' is not valid for LectureType.");
+
+        var lecture = Lecture.Create(
+            lectureId: LectureId.Of(Guid.NewGuid()),
+            chapterId: chapter.Id,
+            title: createLectureDto.Title,
+            summary: createLectureDto.Summary,
+            timeEstimation: createLectureDto.TimeEstimation,
+            lectureType: lectureType,
+            orderIndex: chapter.OrderIndex,
+            point: createLectureDto.Point,
+            isFree: createLectureDto.IsFree
+            );
+        chapter.AddLecture(lecture);
+        return lecture;
+    }
+}
+
+
+

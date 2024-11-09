@@ -1,8 +1,13 @@
-﻿global using Learning.Application.Dtos;
 global using FluentValidation;
 global using Judge0.DotNet.Models.Submissions;
 global using Learning.Domain.Models;
 global using Judge0.DotNet;
 global using BuildingBlocks.CQRS;
-global using Learning.Application.Common;
-global using Learning.Application.Submissions.Commands.CreateSubmission;
+global using Learning.Application.Data;
+global using Microsoft.EntityFrameworkCore;
+global using BuildingBlocks.Pagination;
+global using Learning.Application.Extensions;
+global using BuildingBlocks.Exceptions;
+global using BuidingBlocks.Storage;
+global using Learning.Application.Data.Repositories;
+global using Learning.Application.Interfaces;

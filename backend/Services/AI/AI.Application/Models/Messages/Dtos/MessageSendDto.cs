@@ -2,6 +2,7 @@
 public record MessageSendDto(
     Guid? ConversationId,
     Guid? LectureId,
+    Guid? ProblemId,
     string Content
 );
 

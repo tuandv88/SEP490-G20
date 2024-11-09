@@ -1,5 +1,4 @@
 ﻿using AI.Application.Data;
-using AI.Application.Data.Repositories;
 
 namespace AI.Infrastructure.Data.Repositories.Documents;
 public class DocumentRepository : Repository<Document>, IDocumentRepository {
@@ -20,6 +19,13 @@ public class DocumentRepository : Repository<Document>, IDocumentRepository {
                        .AsEnumerable()
                        .FirstOrDefault(c => c.Id.Value == id);
         return document;
+    }
+
+    public async Task<List<Document>> GetDocuments(params Guid[] documentIds) {
+        return await _dbContext.Documents
+            .AsAsyncEnumerable()
+            .Where(doc => documentIds.Contains(doc.Id.Value))
+            .ToListAsync();
     }
 }
 

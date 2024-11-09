@@ -37,7 +37,7 @@ public class ChatHub(ISender sender, ILogger<ChatHub> logger) : Hub<IChatClient>
     }
 
     public async Task<MessageSentResponse> SendMessage(MessageSentRequest request) {
-        var command = request.Adapt<MessageSentCommand>();
+        var command = new MessageSentCommand(Context.ConnectionId, request.Message);
         var result = await sender.Send(command);
         return result.Adapt<MessageSentResponse>();
     }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AI.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241106185129_InitialCreate")]
+    [Migration("20241109144804_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -29,10 +29,6 @@ namespace AI.Infrastructure.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Context")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -78,6 +74,11 @@ namespace AI.Infrastructure.Data.Migrations
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("Index")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
@@ -106,6 +107,10 @@ namespace AI.Infrastructure.Data.Migrations
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(2147483647)
+                        .HasColumnType("text");
+
+                    b.Property<string>("Context")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("ConversationId")

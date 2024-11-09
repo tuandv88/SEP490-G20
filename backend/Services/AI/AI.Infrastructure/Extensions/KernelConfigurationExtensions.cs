@@ -1,13 +1,11 @@
-﻿using AI.Application.Interfaces;
-using AI.Infrastructure.Plugins;
+﻿using AI.Infrastructure.Plugins;
 using AI.Infrastructure.Services.Kernels;
 using AI.Infrastructure.Services.Kernels.Prompts;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.DocumentStorage;
-using Microsoft.SemanticKernel;
+using Microsoft.KernelMemory.Prompts;
 using static Microsoft.KernelMemory.AWSS3Config;
 
 namespace AI.Infrastructure.Extensions;
@@ -32,7 +30,7 @@ public static class KernelConfigurationExtensions
 
         string awsS3AccessKey = configuration["AWS:AccessKey"]!;
         string awsS3SecretKey = configuration["AWS:SecretKey"]!;
-        string awsS3Endpoint = configuration["AWS:Endpoint"]!;
+        string awsS3Endpoint = configuration["AWS:Url"]!;
         string awsS3Bucket = configuration["AWS:Bucket"]!;
 
         int searchClientMaxMatchesCount = configuration.GetValue<int>("SearchClient:MaxMatchesCount");
@@ -68,7 +66,7 @@ public static class KernelConfigurationExtensions
             Auth = AuthTypes.AccessKey,
         };
 
-        //services.AddSingleton(awsS3Config);
+        services.AddSingleton(awsS3Config);
 
         var qdrantConfig = new QdrantConfig()
         {
@@ -82,6 +80,8 @@ public static class KernelConfigurationExtensions
             FactTemplate = "==== [File:{{$source}};DocumentId:{{$documentId}};Relevance:{{$relevance}}]:\n{{$content}}"
         };
 
+        services.AddSingleton(searchClientConfig);
+
         var kernelMemory = new KernelMemoryBuilder()
             .WithAzureOpenAITextGeneration(chatConfig)
             .WithAzureOpenAITextEmbeddingGeneration(embeddingConfig)
@@ -91,6 +91,8 @@ public static class KernelConfigurationExtensions
             .WithSearchClientConfig(searchClientConfig) 
             .WithCustomPromptProvider<PromptProvider>()
             .Build();
+        
+        services.AddSingleton<IPromptProvider, PromptProvider>();
 
         var kernel = Kernel.CreateBuilder()
             .AddAzureOpenAIChatCompletion(deploymentChatName, endpoint, apiKey)
@@ -124,7 +126,9 @@ public static class KernelConfigurationExtensions
                 var clientService = scopedProvider.GetRequiredService<IClientCommunicationService>();
 
                 var communicationPlugin = new CommunicationPlugin(clientService);
+                var learningPlugin = new LearningPlugin();
                 kernel.ImportPluginFromObject(communicationPlugin);
+                kernel.ImportPluginFromObject(learningPlugin);
             }
 
             return kernel;

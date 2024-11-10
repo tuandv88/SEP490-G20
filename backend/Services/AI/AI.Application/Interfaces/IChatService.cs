@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel;
 
 namespace AI.Application.Interfaces;
 public interface IChatService {
@@ -9,9 +10,9 @@ public class MessageAnswer {
     [JsonProperty("answer")]
     public string Answer { get; set; } = default!;
 
-    [JsonProperty("documentIds")]
-    public List<string> Documents { get; set; } = new();
+    [JsonProperty("documentIds"), Description("List of document IDs from facts that are relevant to the answer")]
+    public List<string> DocumentIds { get; set; } = new();
 
-    [JsonProperty("externalResources")]
+    [JsonProperty("externalResources"), Description("List of external resources in Markdown format [Text](Url) that are relevant to the answer")]
     public List<string> ExternalResources { get; set; } = new();
 }

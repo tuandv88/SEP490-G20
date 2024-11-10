@@ -77,7 +77,7 @@ public static class KernelConfigurationExtensions
         var searchClientConfig = new SearchClientConfig() {
             MaxMatchesCount = searchClientMaxMatchesCount,
             AnswerTokens = searchClientAnswerTokens,
-            FactTemplate = "==== [File:{{$source}};DocumentId:{{$documentId}};Relevance:{{$relevance}}]:\n{{$content}}"
+            FactTemplate = "==== [DocumentId:{{$documentId}};Relevance:{{$relevance}}]:\n{{$content}}"
         };
 
         services.AddSingleton(searchClientConfig);

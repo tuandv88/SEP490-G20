@@ -36,7 +36,11 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
 
     public async Task<Comment?> GetByIdDetailAsync(Guid id)
     {
-        return null;
+        var comment = _dbContext.Comments
+                        .Include(c => c.Votes)  
+                        .AsEnumerable()
+                        .FirstOrDefault(c => c.Id.Value == id);
+        return comment;
     }
 }
 

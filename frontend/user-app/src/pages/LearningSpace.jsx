@@ -70,10 +70,10 @@ const LearningSpace = () => {
  
   // Gọi API lấy lectureDetail khi selectedLectureId thay đổi
   useEffect(() => {
-    if ( lectureId) {
+    if (lectureId) {
       const fetchLectureDetail = async () => {
         try {
-          const data = await LearningAPI.getLectureDetails( lectureId)
+          const data = await LearningAPI.getLectureDetails(lectureId)
           setLectureDetail(data)
 
           //Gọi API để lấy ra file của lecutre đó.

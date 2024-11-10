@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { Link, useNavigate } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
@@ -5,6 +6,7 @@ import Layout from '@/layouts/layout'
 import { useState } from 'react'
 import { Star, Clock, Users, Trophy, ChevronRight } from 'lucide-react'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
+import CourseItem from '@/components/course/CourseItem'
 
 // Giả lập các component UI
 const Button = ({ children, className, ...props }) => (
@@ -36,6 +38,7 @@ function HomePage() {
 
   const navigate = useNavigate()
 
+  // eslint-disable-next-line no-unused-vars
   const handleViewDetail = (courseId) => {
     navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', courseId))
   }
@@ -79,7 +82,7 @@ function HomePage() {
           <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
               <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Khóa học nổi bật</h2>
-              <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 md:gap-8'>
+              {/* <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 md:gap-8'>
                 {[1, 2, 3].map((course) => (
                   <Card key={course} className='flex flex-col'>
                     <img
@@ -106,7 +109,8 @@ function HomePage() {
                     </div>
                   </Card>
                 ))}
-              </div>
+              </div> */}
+              <CourseItem/>
               <div className='mt-8 text-center md:mt-10'>
                 <Button className='text-green-500 border border-green-500 hover:bg-blue-50'>
                   Xem tất cả khóa học

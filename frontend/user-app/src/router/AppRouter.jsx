@@ -7,6 +7,7 @@ import LearningSpace from '@/pages/LearningSpace'
 import ErrorPage from '@/pages/ErrorPage'
 // import Problems from '@/pages/Problems'
 import Problem from '@/pages/Problem'
+import ChatAI from '@/components/chat/ChatAI'
 
 export const AppRouter = () => {
   const router = createBrowserRouter([
@@ -16,7 +17,7 @@ export const AppRouter = () => {
     },
     {
       path: AUTHENTICATION_ROUTERS.ABOUT,
-      element: <About />
+      element: <ChatAI />
     },
     {
       path: AUTHENTICATION_ROUTERS.COURSELIST,

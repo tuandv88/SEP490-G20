@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Extensions;
 using Community.Infrastructure.Data.Interceptors;
+using Community.Infrastructure.Data.Repositories.Bookmarks;
 using Community.Infrastructure.Data.Repositories.Categorys;
 using Community.Infrastructure.Data.Repositories.Comments;
 using Community.Infrastructure.Data.Repositories.Discussions;
@@ -44,6 +45,8 @@ public static class DependencyInjection
         services.AddScoped<IVoteRepository, VoteRepository>();
 
         services.AddScoped<ICommentRepository, CommentRepository>();
+
+        services.AddScoped<IBookmarkRepository, BookmarkReponsitory>();
 
     }
 }

@@ -9,7 +9,6 @@ namespace Community.Application.Extensions
 {
     public static class BookmarkExtensions
     {
-        // Phương thức mở rộng để chuyển đổi từ Bookmark sang BookmarkDto
         public static BookmarkDto ToBookmarkDto(this Bookmark bookmark)
         {
             return new BookmarkDto(

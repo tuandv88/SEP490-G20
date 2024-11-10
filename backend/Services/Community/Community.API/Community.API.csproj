@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Endpoints\Bookmarks\" />
     <Folder Include="Endpoints\Notifications\" />
   </ItemGroup>
 

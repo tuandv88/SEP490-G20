@@ -2,7 +2,8 @@
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.KernelMemory;
 using Newtonsoft.Json;
-
+using System.Text;
+#pragma warning disable SKEXP0010
 namespace AI.Infrastructure.Services;
 public class ConversationalAIService(
     Kernel kernel, SearchClientConfig _config, IConversationRepository conversationRepository, ILogger<ConversationalAIService> logger
@@ -24,20 +25,24 @@ public class ConversationalAIService(
             PresencePenalty = _config.PresencePenalty,
             FrequencyPenalty = _config.FrequencyPenalty,
             StopSequences = _config.StopSequences,
+            ResponseFormat = typeof(MessageAnswer),
         };
         var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
         var chatHistory = await GetRecentChatHistory(conversationId);
 
         //Thêm câu hỏi cho user
         chatHistory.AddUserMessage(prompt);
-        var result = await chatCompletionService.GetChatMessageContentAsync(chatHistory, settings, kernel, token);
-
+        var result = chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory, settings, kernel, token);
+        StringBuilder fullMessage = new();
+        await foreach (var content in result) {
+            fullMessage.Append(content.Content);
+        }
         MessageAnswer messageAnswer = new MessageAnswer();
         try {
-            messageAnswer = JsonConvert.DeserializeObject<MessageAnswer>(result.Content!)!;
+            messageAnswer = JsonConvert.DeserializeObject<MessageAnswer>(fullMessage.ToString())!;
         } catch (Exception ex) {
             logger.LogError(ex.Message);
-            messageAnswer.Answer = result.Content ?? _config.EmptyAnswer;
+            messageAnswer.Answer = fullMessage.ToString() ?? _config.EmptyAnswer;
         }
         return messageAnswer;
     }
@@ -48,7 +53,8 @@ public class ConversationalAIService(
         if(conversation==null) {
             return chats;
         }
-        conversation.Messages.ForEach(m => {
+        conversation.Messages.OrderBy(m => m.CreatedAt)
+            .ToList().ForEach(m => {
             if(m.SenderType == SenderType.User) {
                 chats.AddUserMessage(m.Content);
             } else {

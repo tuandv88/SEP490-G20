@@ -1,8 +1,5 @@
-﻿using Community.Application.Models.Categories.Dtos;
-using Community.Application.Models.Categories.Queries.GetCategoryDetailById;
+﻿using Community.Application.Models.Categories.Queries.GetCategoryDetailById;
 using Microsoft.AspNetCore.Mvc;
-using Mapster;
-using MediatR;
 
 namespace Community.API.Endpoints.Categories;
 

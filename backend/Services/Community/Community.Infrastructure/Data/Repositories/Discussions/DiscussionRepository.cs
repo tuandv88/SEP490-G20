@@ -31,7 +31,15 @@ public class DiscussionRepository : Repository<Discussion>, IDiscussionRepositor
 
     public async Task<Discussion?> GetByIdDetailAsync(Guid id)
     {
-        return null;
+        var discussion = _dbContext.Discussions
+                       .Include(d => d.UserDiscussions)
+                       .Include(d => d.Comments)
+                       .ThenInclude(c => c.Votes)
+                       .Include(d => d.Votes)
+                       .Include(d => d.Bookmarks)
+                       .AsEnumerable()
+                       .FirstOrDefault(c => c.Id.Value == id);
+        return discussion;
     }
 
     public async Task<IQueryable<Discussion>> GetByCategoryIdAsync(Guid id)

@@ -17,7 +17,7 @@ export const AppRouter = () => {
     },
     {
       path: AUTHENTICATION_ROUTERS.ABOUT,
-      element: <ChatAI />
+      element: <LearningSpace />
     },
     {
       path: AUTHENTICATION_ROUTERS.COURSELIST,

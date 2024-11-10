@@ -1,16 +1,28 @@
+/* eslint-disable no-async-promise-executor */
 /* eslint-disable no-unused-vars */
 'use client'
 
-import React, { useState } from 'react'
-import { Send, Plus, X, RotateCcw, History, Square } from 'lucide-react'
+import React, { useEffect, useRef, useState } from 'react'
+import { Send, Plus, X, RotateCcw, History, Square, Bot, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { HubConnectionBuilder } from '@microsoft/signalr'
 
 export default function Component() {
+  const [connection, setConnection] = useState(null)
+  const [codeResponse, setCodeResponse] = useState(null)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [message, setMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -33,7 +45,6 @@ export default function Component() {
       timestamp: '2m ago'
     }
   ])
-  const [input, setInput] = useState('')
 
   const chatHistory = [
     { id: 5, role: 'user', content: 'Chào hỏi và hỗ trợ lập trình', timestamp: '10m ago' },
@@ -44,64 +55,179 @@ export default function Component() {
 
   const filteredHistory = chatHistory.filter((chat) => chat.content.toLowerCase().includes(searchQuery.toLowerCase()))
 
-  const handleSend = () => {
-    if (input.trim()) {
-      const newMessage = { id: messages.length + 1, role: 'user', content: input, timestamp: 'Just now' }
+  const handleSend = async () => {
+    if (message.trim()) {
+      const newMessage = { id: messages.length + 1, role: 'user', content: message, timestamp: 'Just now' }
       setMessages([...messages, newMessage])
-      setInput('')
+      setMessage('')
+      setIsLoading(true)
       // Here you would typically call your AI service to get a response
       // For this example, we'll just add a mock response after a short delay
-      setTimeout(() => {
-        const aiResponse = {
-          id: messages.length + 2,
-          role: 'assistant',
-          content: 'This is a mock response from the AI.',
-          timestamp: 'Just now'
+      if (connection) {
+        const messageRequest = {
+          Message: {
+            ConversationId: '86779f6e-6b71-4f2a-8ad6-4fecce3853f0',
+            LectureId: 'e7b8f8e2-4c3b-4f8b-9f8e-2b4c3b4f8b9f',
+            ProblemId: '89980ac8-3d50-49af-9a65-9cdcda802e11',
+            Content: message
+          }
         }
-        setMessages((prev) => [...prev, aiResponse])
-      }, 1000)
+
+        try {
+          await connection.invoke('SendMessage', messageRequest).then((result) => {
+            console.log('Message sent successfully:', result)
+            const aiResponse = {
+              id: messages.length + 2,
+              role: 'assistant',
+              content: result.MessageAnswer.Content,
+              timestamp: 'Just now'
+            }
+            setMessages((prev) => [...prev, aiResponse])
+            setIsLoading(false)
+          })
+        } catch (error) {
+          console.error('Error sending message: ', error)
+        }
+      }
     }
   }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, isLoading])
+
+  useEffect(() => {
+    const connect = async () => {
+      const newConnection = new HubConnectionBuilder()
+        .withUrl('https://localhost:5000/ai-service/ai-chat')
+        .withAutomaticReconnect()
+        .build()
+
+      newConnection.on('RequestUserCode', async () => {
+        console.log('Server requested code from client.')
+
+        let promise = new Promise(async (resolve, reject) => {
+          try {
+            const codeDto = await requestUserCode()
+            resolve(codeDto)
+          } catch (error) {
+            reject(error)
+          }
+        })
+
+        return promise
+      })
+
+      newConnection.on('ReceiveMessage', (message) => {
+        setMessages((prevMessages) => [...prevMessages, message])
+      })
+
+      newConnection.onclose(() => {
+        console.log('Connection closed. Attempting to reconnect...')
+      })
+
+      newConnection.onreconnecting(() => {
+        console.log('Reconnecting...')
+      })
+
+      newConnection.onreconnected((connectionId) => {
+        console.log(`Reconnected. Connection ID: ${connectionId}`)
+      })
+
+      try {
+        await newConnection.start()
+        console.log('Connected to SignalR server with Connection ID:', newConnection.connectionId)
+        setConnection(newConnection)
+      } catch (error) {
+        console.error('Connection failed: ', error)
+      }
+    }
+
+    connect()
+
+    return () => {
+      if (connection) {
+        connection.stop().then(() => {
+          console.log('Connection stopped.')
+        })
+      }
+    }
+  }, [])
+
+  const requestUserCode = () => {
+    return new Promise((resolve) => {
+      // Giả lập mã code trả về từ client
+      const codeDto = {
+        SolutionCode: 'console.log("Hello World!");',
+        SubmissionResult: 'Success'
+      }
+      resolve(codeDto)
+    })
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  //=========================================
 
   return (
     <div className='flex bg-[#1E1E1E] text-white h-[calc(100vh-6rem)]'>
       {/* Chat History Sidebar */}
-      {isHistoryOpen && (
-        <div className='w-80 bg-[#2D2D2D] border-r border-gray-700'>
-          <div className='p-4 border-b border-gray-700'>
-            <div className='flex justify-between items-center mb-4'>
-              <h2 className='text-lg font-semibold'>All Chats</h2>
-              <Button
-                variant='ghost'
-                size='icon'
-                onClick={() => setIsHistoryOpen(false)}
-                className='hover:bg-gray-700 rounded'
-              >
-                <X size={18} />
-              </Button>
-            </div>
-            <Input
-              type='text'
-              placeholder='Search chats...'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className='w-full bg-[#3D3D3D] text-white placeholder-gray-400'
-            />
+      <div
+        style={{
+          height: 'inherit'
+        }}
+        className={`fixed inset-y-0 left-0 w-80 bg-[#2D2D2D] shadow-lg transform transition-transform duration-300 ease-in-out  ${
+          isHistoryOpen ? 'translate-x-0 z-[3]' : '-translate-x-full'
+        }`}
+      >
+        <div className='p-4 border-b border-gray-700'>
+          <div className='flex justify-between items-center mb-4'>
+            <h2 className='text-lg font-semibold'>All Chats</h2>
+            <Button
+              variant='ghost'
+              size='icon'
+              onClick={() => setIsHistoryOpen(false)}
+              className='hover:bg-gray-700 rounded'
+            >
+              <X size={18} />
+            </Button>
           </div>
-          <ScrollArea className='h-[calc(100vh-120px)]'>
-            {filteredHistory.map((chat) => (
-              <div key={chat.id} className='p-4 hover:bg-[#3D3D3D] cursor-pointer border-b border-gray-700'>
-                <div className='flex items-start gap-3'>
-                  <Square size={16} className='mt-1' />
-                  <div>
-                    <p className='text-sm'>{chat.content}</p>
-                    <span className='text-xs text-gray-400'>{chat.timestamp}</span>
-                  </div>
+          <Input
+            type='text'
+            placeholder='Search chats...'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className='w-full bg-[#3D3D3D] text-white placeholder-gray-400'
+          />
+        </div>
+        <ScrollArea className='h-[calc(100vh-120px)]'>
+          {filteredHistory.map((chat) => (
+            <div key={chat.id} className='p-4 hover:bg-[#3D3D3D] cursor-pointer border-b border-gray-700'>
+              <div className='flex items-start gap-3'>
+                <Square size={16} className='mt-1' />
+                <div>
+                  <p className='text-sm'>{chat.content}</p>
+                  <span className='text-xs text-gray-400'>{chat.timestamp}</span>
                 </div>
               </div>
-            ))}
-          </ScrollArea>
-        </div>
+            </div>
+          ))}
+        </ScrollArea>
+      </div>
+
+      {isHistoryOpen && (
+        <div
+          style={{
+            height: 'inherit'
+          }}
+          className='fixed inset-0 bg-black bg-opacity-50 z-[2]'
+          onClick={() => setIsHistoryOpen(false)}
+        ></div>
       )}
 
       {/* Main Chat Area */}
@@ -160,6 +286,23 @@ export default function Component() {
                 </div>
               </div>
             ))}
+            {isLoading && (
+              <div className='flex justify-start'>
+                <div className='flex items-start space-x-2'>
+                  <Avatar>
+                    <AvatarImage src='/placeholder.svg?height=40&width=40' />
+                    <AvatarFallback>AI</AvatarFallback>
+                  </Avatar>
+                  <div className='flex flex-col'>
+                    <span className='text-sm font-medium mb-1'>ChatAI</span>
+                    <div className='p-2 rounded-lg bg-gray-100'>
+                      <div className='w-6 h-6 border-t-2 border-green-500 rounded-full animate-spin'></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} /> {/* This empty div is used as a reference for scrolling */}
           </div>
         </ScrollArea>
 
@@ -169,11 +312,13 @@ export default function Component() {
             <Input
               type='text'
               placeholder='Type a message...'
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isLoading}
               className='flex-1 bg-[#3D3D3D] text-white placeholder-gray-400'
             />
-            <Button onClick={handleSend} className='bg-blue-600 hover:bg-blue-700'>
+            <Button type='submit' onClick={handleSend} className='bg-blue-600 hover:bg-blue-700' disabled={isLoading}>
               <Send size={20} />
             </Button>
           </div>

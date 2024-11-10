@@ -106,15 +106,15 @@ const LearningSpace = () => {
     }
   }, [lectureId])
 
-  if (error) {
-    return <ErrorPage />
-  }
+  // if (error) {
+  //   return <ErrorPage />
+  // }
 
-  if (!chapters && !loading) {
-    return (
-      <NotFound mess='We cannot find documents in this course. Please check the link or search for other courses.' />
-    )
-  }
+  // if (!chapters && !loading) {
+  //   return (
+  //     <NotFound mess='We cannot find documents in this course. Please check the link or search for other courses.' />
+  //   )
+  // }
 
   return (
     <div>

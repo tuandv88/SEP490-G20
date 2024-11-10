@@ -14,10 +14,11 @@
         public bool IsActive { get; set; } = true;             // Đánh dấu vote đã bị ẩn hay chưa
 
         // Phương thức khởi tạo một vote
-        public static Vote Create(UserId userId, VoteType voteType, DateTime dateVoted, DiscussionId? discussionId = null, CommentId? commentId = null, bool isActive = true)
+        public static Vote Create(VoteId voteId, UserId userId, VoteType voteType, DateTime dateVoted, DiscussionId? discussionId = null, CommentId? commentId = null, bool isActive = true)
         {
             return new Vote
             {
+                Id = voteId,
                 UserId = userId,
                 VoteType = voteType,
                 DateVoted = dateVoted,

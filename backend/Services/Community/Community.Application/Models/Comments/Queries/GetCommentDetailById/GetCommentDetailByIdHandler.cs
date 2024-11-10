@@ -18,11 +18,8 @@ namespace Community.Application.Models.Comments.Queries.GetCommentDetailById
 
             if (comment == null)
             {
-                Console.WriteLine("//.sssss." + comment.Content);
                 return new GetCommentDetailByIdResult(null);
             }
-
-            Console.WriteLine("//....." + comment.Content);
 
             var commentDto = comment?.ToCommentDetailDto();
 

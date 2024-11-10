@@ -14,7 +14,7 @@ public record DiscussionDto(
         List<string> Tags,             // Danh sách tag của thảo luận
         bool Pinned,                   // Trạng thái ghim của thảo luận
         long ViewCount,                // Số lượt xem
-        int VoteCount,                 // Số lượng vote
-        int CommentCount,              // Số lượng bình luận
+        long VoteCount,                 // Số lượng vote
+        long CommentCount,              // Số lượng bình luận
         bool Closed                    // Trạng thái đóng của thảo luận
     );

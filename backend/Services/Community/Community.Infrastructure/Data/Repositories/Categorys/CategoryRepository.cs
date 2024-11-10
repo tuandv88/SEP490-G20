@@ -1,4 +1,5 @@
-﻿namespace Community.Infrastructure.Data.Repositories.Categorys
+﻿
+namespace Community.Infrastructure.Data.Repositories.Categorys
 {
     public class CategoryRepository : Repository<Category>, ICategoryRepository
     {
@@ -28,6 +29,25 @@
         public async Task<Category?> GetByIdDetailAsync(Guid id)
         {
             return null;
+        }
+
+        public async Task<Category?> GetCategoryDetailByIdIsActiveAsync(Guid id)
+        {
+            // Lấy tất cả các bản ghi có IsActive = true từ database
+            var category = _dbContext.Categories
+                                     .Include(c => c.Discussions)
+                                             .ThenInclude(d => d.Comments)
+                                             .ThenInclude(c => c.Votes)
+                                     .Include(c => c.Discussions)
+                                             .ThenInclude(d => d.Votes)
+                                     .Include(c => c.Discussions)
+                                             .ThenInclude(d => d.Bookmarks)
+                                     .Include(c => c.Discussions)
+                                             .ThenInclude(d => d.UserDiscussions)
+                                     .AsEnumerable()  // Chuyển truy vấn sang client-side để xử lý
+                                     .FirstOrDefault(c => c.Id.Value == id && c.IsActive);
+
+            return await Task.FromResult(category);
         }
     }
 }

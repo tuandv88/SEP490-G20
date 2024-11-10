@@ -9,3 +9,5 @@ global using BuildingBlocks.Pagination;
 global using Learning.Application.Extensions;
 global using BuildingBlocks.Exceptions;
 global using BuidingBlocks.Storage;
+global using Learning.Application.Data.Repositories;
+global using Learning.Application.Interfaces;

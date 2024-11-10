@@ -10,7 +10,6 @@ public record UpdateCourseDto(
     string Objectives,
     string TargetAudiences,
     string ScheduledPublishDate,
-    string ImageUrl,
     int OrderIndex,
     string CourseLevel,
     double Price

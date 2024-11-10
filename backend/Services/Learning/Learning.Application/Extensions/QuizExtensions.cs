@@ -5,7 +5,7 @@ public static class QuizExtensions {
     public static QuizDto ToQuizDto(this Quiz quiz) {
         var questions = quiz.IsRandomized
                 ? quiz.Questions.OrderBy(_ => Guid.NewGuid()).ToList()
-                : quiz.Questions;
+                : quiz.Questions.OrderBy(q => q.OrderIndex).ToList();
         return new QuizDto(
         Id: quiz.Id.Value,
         Title: quiz.Title,
@@ -15,7 +15,7 @@ public static class QuizExtensions {
         HasTimeLimit: quiz.HasTimeLimit,
         AttemptLimit: quiz.AttemptLimit,
         HasAttemptLimit: quiz.HasAttemptLimit,
-        Questions: quiz.Questions.ToListQuestionDto());
+        Questions: questions.ToListQuestionDto());
 
     }
 }

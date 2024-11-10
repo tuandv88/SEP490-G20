@@ -20,13 +20,25 @@ public class CreateFileHandler(IFilesService filesService, IFileRepository fileR
         return new CreateFileResult(file.Id.Value);
     }
     private async Task<Domain.Models.File> CreateNewFileAsync(Lecture lecture, CreateFileDto createFileDto) {
-
         if (!Enum.TryParse(typeof(FileType), createFileDto.FileType, true, out var parsedFileType)) {
             throw new ArgumentException("Invalid file type provided.");
         }
-
         var bucket = StorageConstants.BUCKET;
-        var prefix = StorageConstants.VIDEO_PATH;
+        string prefix;
+        switch ((FileType)parsedFileType) {
+            case FileType.VIDEO:
+                prefix = StorageConstants.VIDEO_PATH;
+                break;
+            case FileType.DOCUMENT:
+                prefix = StorageConstants.DOCUMENT_PATH;
+                break;
+            case FileType.IMAGE:
+                prefix = StorageConstants.IMAGE_PATH;
+                break;
+            default:
+                throw new ArgumentException("Invalid file type provided.");
+        }
+
         var fileName = await filesService.UploadFileAsync(createFileDto.File, bucket, prefix);
         var fileUrl = $"{prefix}/{fileName}";
 
@@ -43,6 +55,7 @@ public class CreateFileHandler(IFilesService filesService, IFileRepository fileR
         );
         lecture.AddFile(file);
         return file;
+
     }
 }
 

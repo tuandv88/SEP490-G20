@@ -1,9 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+		<PackageReference Include="Microsoft.KernelMemory.Abstractions" Version="0.90.241021.1" />
+		<PackageReference Include="Microsoft.KernelMemory.Core" Version="0.90.241021.1" />
+		<PackageReference Include="Microsoft.KernelMemory.DocumentStorage.AWSS3" Version="0.90.241021.1" />
+		<PackageReference Include="Microsoft.KernelMemory.SemanticKernelPlugin" Version="0.90.241021.1" />
+		<PackageReference Include="Microsoft.KernelMemory.Service.AspNetCore" Version="0.90.241021.1" />
+		<PackageReference Include="Microsoft.SemanticKernel" Version="1.25.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Messaging\BuildingBlocks.Messaging.csproj" />
+		<ProjectReference Include="..\AI.Domain\AI.Domain.csproj" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Messaging\BuildingBlocks.Messaging.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj" />
+  </ItemGroup>
 
 </Project>

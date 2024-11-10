@@ -1,8 +1,5 @@
-﻿using FluentValidation;
-using Learning.Application.Models.Files.Dtos;
+﻿using Learning.Application.Models.Files.Dtos;
 using Learning.Domain.Enums;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
 
 namespace Learning.Application.Models.Files.Commands.CreateFile;
 public record CreateFileCommand(Guid LectureId, CreateFileDto CreateFileDto) : ICommand<CreateFileResult>;

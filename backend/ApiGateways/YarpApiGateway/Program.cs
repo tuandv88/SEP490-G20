@@ -1,10 +1,20 @@
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
+using Yarp.ReverseProxy.Transforms;
+using YarpApiGateway.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+      .AddTransforms(transforms => {
+          transforms.AddRequestTransform(async context => {
+              context.HttpContext.Request.EnableBuffering();
+              context.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>()!.MaxRequestBodySize = 5L * 1024 * 1024 * 1024; // 5GB
+          });
+      });
 
 builder.Services.AddRateLimiter(rateLimiterOptions => {
     rateLimiterOptions.AddFixedWindowLimiter("fixed", options => {
@@ -24,8 +34,13 @@ builder.Services.AddCors(options => {
 
 
 var app = builder.Build();
-app.UseCors("CombinedPolicy");
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions {
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+});
+
+app.UseCors("CombinedPolicy");
+app.UseRejectWebsocketOverHttp2WhileUnsupported();
 // Configure the HTTP request pipeline.
 app.UseRateLimiter();
 

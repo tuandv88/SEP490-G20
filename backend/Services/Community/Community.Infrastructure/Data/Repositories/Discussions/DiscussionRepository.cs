@@ -20,6 +20,10 @@ public class DiscussionRepository : Repository<Discussion>, IDiscussionRepositor
     public override async Task<Discussion?> GetByIdAsync(Guid id)
     {
         var discussion = _dbContext.Discussions
+                        .Include(d => d.Bookmarks)
+                        .Include(d => d.Comments)
+                        .ThenInclude(c => c.Votes)
+                        .Include(d => d.Votes)
                         .AsEnumerable()
                         .FirstOrDefault(c => c.Id.Value == id);
         return discussion;

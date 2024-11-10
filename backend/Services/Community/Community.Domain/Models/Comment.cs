@@ -13,7 +13,7 @@
         public bool IsActive { get; set; } = true;         // Đánh dấu vote đã bị ẩn hay chưa
 
         // Phương thức khởi tạo một bình luận
-        public static Comment Create(CommentId commentId, DiscussionId discussionId, UserId userId, string content, CommentId? parentCommentId = null, int depth = 0, bool isActive = true)
+        public static Comment Create(CommentId commentId, DiscussionId discussionId, UserId userId, string content, DateTime dateCreated, CommentId? parentCommentId = null, int depth = 0, bool isActive = true)
         {
             return new Comment
             {
@@ -22,7 +22,7 @@
                 UserId = userId,
                 Content = content,
                 ParentCommentId = parentCommentId,
-                DateCreated = DateTime.Now,
+                DateCreated = dateCreated,
                 IsEdited = false,
                 Depth = depth,
                 IsActive = isActive

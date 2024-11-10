@@ -23,6 +23,6 @@ public class UpdateStatusVoteEndpoint : ICarterModule
         .WithName("UpdateStatusVote")
         .Produces(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithSummary("Update the IsActive status of a vote.");
+        .WithSummary("Update IsActive status of a vote.");
     }
 }

@@ -28,6 +28,17 @@ public class VoteRepository : Repository<Vote>, IVoteRepository
     {
         return null;
     }
+
+    public async Task<IQueryable<Vote>> GetVotesByCommentIdAsync(Guid commentId)
+    {
+        var votes = _dbContext.Votes
+            .AsEnumerable()
+            .Where(v => v.CommentId != null && v.CommentId.Value == commentId) 
+            .AsQueryable();
+
+        return await Task.FromResult(votes);
+    }
+
 }
 
 

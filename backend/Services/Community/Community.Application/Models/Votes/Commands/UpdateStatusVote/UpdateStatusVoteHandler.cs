@@ -1,5 +1,4 @@
-﻿
-namespace Community.Application.Models.Votes.Commands.UpdateStatusVote;
+﻿namespace Community.Application.Models.Votes.Commands.UpdateStatusVote;
 
 public class UpdateStatusVoteHandler : ICommandHandler<UpdateStatusVoteCommand, UpdateStatusVoteResult>
 {

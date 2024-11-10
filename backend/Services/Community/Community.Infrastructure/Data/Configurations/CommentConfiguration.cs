@@ -56,6 +56,10 @@ namespace Community.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasDefaultValue(0);                          // Độ sâu mặc định là 0
 
+
+            builder.Property(d => d.IsActive)
+                .HasDefaultValue(true);
+
             // Thiết lập các chỉ mục để tối ưu hóa hiệu năng truy vấn
             builder.HasIndex(c => c.UserId);
             builder.HasIndex(c => c.DiscussionId);

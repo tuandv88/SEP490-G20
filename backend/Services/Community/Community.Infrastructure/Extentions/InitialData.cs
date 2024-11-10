@@ -80,25 +80,25 @@ namespace Community.Infrastructure.Extensions
         public static readonly List<Comment> Comments = new List<Comment>
         {
             new Comment { Id = new CommentId(Guid.NewGuid()), DiscussionId = Discussions[0].Id, UserId = Users[1].Id,
-                Content = "AI will change our lives drastically", DateCreated = DateTime.UtcNow.AddDays(-9), IsEdited = false, Depth = 0 },
+                Content = "AI will change our lives drastically", DateCreated = DateTime.UtcNow.AddDays(-9), IsEdited = false, Depth = 0, IsActive = true  },
             new Comment { Id = new CommentId(Guid.NewGuid()), DiscussionId = Discussions[1].Id, UserId = Users[2].Id,
-                Content = "Focus on skills and networking", DateCreated = DateTime.UtcNow.AddDays(-19), IsEdited = false, Depth = 0 },
+                Content = "Focus on skills and networking", DateCreated = DateTime.UtcNow.AddDays(-19), IsEdited = false, Depth = 0 , IsActive = true },
             new Comment { Id = new CommentId(Guid.NewGuid()), DiscussionId = Discussions[2].Id, UserId = Users[3].Id,
-                Content = "Yoga is great for stress management", DateCreated = DateTime.UtcNow.AddDays(-14), IsEdited = true, Depth = 0 },
+                Content = "Yoga is great for stress management", DateCreated = DateTime.UtcNow.AddDays(-14), IsEdited = true, Depth = 0 , IsActive = true },
             new Comment { Id = new CommentId(Guid.NewGuid()), DiscussionId = Discussions[3].Id, UserId = Users[4].Id,
-                Content = "Consistent practice is key to learning", DateCreated = DateTime.UtcNow.AddDays(-4), IsEdited = false, Depth = 1 },
+                Content = "Consistent practice is key to learning", DateCreated = DateTime.UtcNow.AddDays(-4), IsEdited = false, Depth = 1 , IsActive = true },
             new Comment { Id = new CommentId(Guid.NewGuid()), DiscussionId = Discussions[4].Id, UserId = Users[0].Id,
-                Content = "Saving early is beneficial", DateCreated = DateTime.UtcNow.AddDays(-1), IsEdited = false, Depth = 0 }
+                Content = "Saving early is beneficial", DateCreated = DateTime.UtcNow.AddDays(-1), IsEdited = false, Depth = 0 , IsActive = true }
         };
 
         // Danh sách Vote mẫu
         public static readonly List<Vote> Votes = new List<Vote>
         {
-            new Vote { Id = new VoteId(Guid.NewGuid()), DiscussionId = Discussions[0].Id, UserId = Users[2].Id, VoteType = VoteType.Like, DateVoted = DateTime.UtcNow },
-            new Vote { Id = new VoteId(Guid.NewGuid()), DiscussionId = Discussions[1].Id, UserId = Users[3].Id, VoteType = VoteType.Dislike, DateVoted = DateTime.UtcNow },
-            new Vote { Id = new VoteId(Guid.NewGuid()), CommentId = Comments[0].Id, UserId = Users[0].Id, VoteType = VoteType.Like, DateVoted = DateTime.UtcNow },
+            new Vote { Id = new VoteId(Guid.NewGuid()), DiscussionId = Discussions[0].Id, UserId = Users[2].Id, VoteType = VoteType.Like, DateVoted = DateTime.UtcNow,  IsActive = true  },
+            new Vote { Id = new VoteId(Guid.NewGuid()), DiscussionId = Discussions[1].Id, UserId = Users[3].Id, VoteType = VoteType.Dislike, DateVoted = DateTime.UtcNow , IsActive = true },
+            new Vote { Id = new VoteId(Guid.NewGuid()), CommentId = Comments[0].Id, UserId = Users[0].Id, VoteType = VoteType.Like, DateVoted = DateTime.UtcNow , IsActive = true },
             new Vote { Id = new VoteId(Guid.NewGuid()), CommentId = Comments[1].Id, UserId = Users[1].Id, VoteType = VoteType.Like, DateVoted = DateTime.UtcNow },
-            new Vote { Id = new VoteId(Guid.NewGuid()), CommentId = Comments[2].Id, UserId = Users[4].Id, VoteType = VoteType.Dislike, DateVoted = DateTime.UtcNow }
+            new Vote { Id = new VoteId(Guid.NewGuid()), CommentId = Comments[2].Id, UserId = Users[4].Id, VoteType = VoteType.Dislike, DateVoted = DateTime.UtcNow , IsActive = true }
         };
 
         // Danh sách Bookmark mẫu

@@ -17,7 +17,8 @@ namespace Community.Application.Extensions
                 ParentCommentId: comment.ParentCommentId?.Value,
                 DateCreated: comment.DateCreated,
                 IsEdited: comment.IsEdited,
-                Depth: comment.Depth
+                Depth: comment.Depth,
+                IsActive: comment.IsActive
             );
         }
         public static CommentDetailDto ToCommentDetailDto(this Comment comment)
@@ -31,6 +32,7 @@ namespace Community.Application.Extensions
                 DateCreated: comment.DateCreated,
                 IsEdited: comment.IsEdited,
                 Depth: comment.Depth,
+                IsActive: comment.IsActive,
                 Votes: comment.Votes.Select(vote => vote.ToVoteDto()).ToList()
             );
         }

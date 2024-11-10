@@ -126,6 +126,11 @@ namespace Community.Infrastructure.Data.Migrations
                     b.Property<Guid>("DiscussionId")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<bool>("IsEdited")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -462,6 +467,11 @@ namespace Community.Infrastructure.Data.Migrations
 
                     b.Property<Guid?>("DiscussionId")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");

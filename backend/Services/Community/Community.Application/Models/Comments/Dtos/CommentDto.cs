@@ -9,5 +9,6 @@ public record CommentDto(
     Guid? ParentCommentId,        // ID của bình luận cha (có thể null)
     DateTime DateCreated,         // Thời gian tạo bình luận
     bool IsEdited,                // Đánh dấu nếu bình luận đã chỉnh sửa
-    int Depth                     // Độ sâu của bình luận (lồng nhau)
+    int Depth,                    // Độ sâu của bình luận (lồng nhau)
+    bool IsActive
 );

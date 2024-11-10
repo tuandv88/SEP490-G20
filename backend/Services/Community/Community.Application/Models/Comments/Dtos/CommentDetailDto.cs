@@ -10,5 +10,6 @@ public record CommentDetailDto(
     DateTime DateCreated,         // Thời gian tạo bình luận
     bool IsEdited,                // Đánh dấu nếu bình luận đã chỉnh sửa
     int Depth,                    // Độ sâu của bình luận (lồng nhau)
+    bool IsActive,
     List<VoteDto> Votes           // Danh sách các vote liên quan đến bình luận
 );

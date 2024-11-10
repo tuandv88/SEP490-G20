@@ -22,7 +22,6 @@
     <Folder Include="Models\Categories\Commands\" />
     <Folder Include="Models\Comments\Commands\" />
     <Folder Include="Models\Discussions\Commands\" />
-    <Folder Include="Models\Votes\Commands\" />
   </ItemGroup>
 
 </Project>

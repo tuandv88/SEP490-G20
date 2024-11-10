@@ -11,7 +11,8 @@ namespace Community.Application.Extensions
                 DiscussionId: vote.DiscussionId?.Value,
                 CommentId: vote.CommentId?.Value,
                 VoteType: vote.VoteType,
-                DateVoted: vote.DateVoted
+                DateVoted: vote.DateVoted,
+                IsActive: vote.IsActive
             );
         }
     }

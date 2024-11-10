@@ -10,9 +10,10 @@
         public DateTime DateCreated { get; set; }          // Thời gian tạo bình luận
         public bool IsEdited { get; set; }                 // Đánh dấu nếu bình luận đã chỉnh sửa
         public int Depth { get; set; }                     // Độ sâu của bình luận (lồng nhau)
+        public bool IsActive { get; set; } = true;             // Đánh dấu vote đã bị ẩn hay chưa
 
         // Phương thức khởi tạo một bình luận
-        public static Comment Create(DiscussionId discussionId, UserId userId, string content, CommentId? parentCommentId = null, int depth = 0)
+        public static Comment Create(DiscussionId discussionId, UserId userId, string content, CommentId? parentCommentId = null, int depth = 0, bool isActive = true)
         {
             return new Comment
             {
@@ -22,7 +23,8 @@
                 ParentCommentId = parentCommentId,
                 DateCreated = DateTime.Now,
                 IsEdited = false,
-                Depth = depth
+                Depth = depth,
+                IsActive = isActive
             };
         }
 

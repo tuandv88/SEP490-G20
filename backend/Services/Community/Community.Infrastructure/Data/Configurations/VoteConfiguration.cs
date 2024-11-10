@@ -45,6 +45,10 @@ namespace Community.Infrastructure.Data.Configurations
             builder.Property(v => v.DateVoted)
                 .IsRequired();
 
+
+            builder.Property(d => d.IsActive)
+                .HasDefaultValue(true);
+
             // Thiết lập các chỉ mục
             builder.HasIndex(v => v.UserId);
             builder.HasIndex(v => v.DiscussionId);

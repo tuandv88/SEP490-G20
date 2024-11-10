@@ -58,7 +58,7 @@ public class MessageSentHandler(
         //Lấy ra reference link
         var referenceLink = new List<string>();
         referenceLink.AddRange(answer.ExternalResources);
-        referenceLink.AddRange(await documentService.GetDocumentMarkdownLinks(answer.Documents, facts));
+        referenceLink.AddRange(await documentService.GetDocumentMarkdownLinks(answer.DocumentIds, facts));
 
         return new MessageSentResult(
             new MessageAnswerDto(
@@ -98,7 +98,7 @@ public class MessageSentHandler(
     }
     private async Task<Message> CreateNewMessageFromAI(Conversation conversation, MessageAnswer messageAnswer, 
         PromptType promptType, IDictionary<string, object> context) {
-        var document = await documentRepository.GetDocuments(messageAnswer.Documents.Select(Guid.Parse).ToArray());
+        var document = await documentRepository.GetDocuments(messageAnswer.DocumentIds.Select(Guid.Parse).ToArray());
         var message = new Message() {
             Id = MessageId.Of(Guid.NewGuid()),
             ConversationId = conversation.Id,

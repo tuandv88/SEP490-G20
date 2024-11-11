@@ -7,10 +7,11 @@
         public DateTime DateBookmarked { get; set; }                     // Ngày lưu bài
 
         // Phương thức khởi tạo một bookmark
-        public static Bookmark Create(UserId userId, DiscussionId discussionId)
+        public static Bookmark Create(BookmarkId bookmarkId, UserId userId, DiscussionId discussionId)
         {
             return new Bookmark
             {
+                Id = bookmarkId,
                 UserId = userId,
                 DiscussionId = discussionId,
                 DateBookmarked = DateTime.Now

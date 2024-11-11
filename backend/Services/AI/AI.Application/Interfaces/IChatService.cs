@@ -8,11 +8,14 @@ public interface IChatService {
 
 public class MessageAnswer {
     [JsonProperty("answer")]
-    public string Answer { get; set; } = default!;
+    [Description("The content of the answer provided by AI")]
+    public string Answer { get; set; } = string.Empty;
 
-    [JsonProperty("documentIds"), Description("List of document IDs from facts that are relevant to the answer")]
+    [JsonProperty("documentIds")]
+    [Description("List of document IDs from facts that are relevant to the answer")]
     public List<string> DocumentIds { get; set; } = new();
 
-    [JsonProperty("externalResources"), Description("List of external resources in Markdown format [Text](Url) that are relevant to the answer")]
+    [JsonProperty("externalResources")]
+    [Description("List of external resources in Markdown format [Text](Url) that are relevant to the answer")]
     public List<string> ExternalResources { get; set; } = new();
 }

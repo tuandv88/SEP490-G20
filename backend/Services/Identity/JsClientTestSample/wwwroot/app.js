@@ -4,7 +4,7 @@ var config = {
 	client_id: "icoder.vn",													  // Client ID cấu hình trên IdentityServer
 	response_type: "code",													  // Sử dụng Authorization Code Flow
 	requirePkce: true,														  // Bật PKCE để tăng cường bảo mật
-	authority: "https://localhost:5001",									  // URL của IdentityServer
+	authority: "https://localhost:6001",									  // URL của IdentityServer
 	redirect_uri: "https://localhost:5003/callback.html",					  // Trang callback sau khi đăng nhập thành công
 	post_logout_redirect_uri: "https://localhost:5003/index.html",			  // Trang sau khi đăng xuất
 	scope: "openid profile email moviesApi roles offline_access",			  // Các scope yêu cầu
@@ -35,7 +35,7 @@ function callApi() {
 		if (user) {
 			console.log("User's access token: ", user.access_token);
 			var xhr = new XMLHttpRequest();
-			xhr.open("GET", "https://localhost:6001/api/movies");                   // URL API bảo vệ
+			xhr.open("GET", "https://localhost:6002/api/movies");                   // URL API bảo vệ
 			xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);   // Gửi kèm access token
 			xhr.onload = function () {
 				log("API response: " + xhr.responseText);

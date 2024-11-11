@@ -2,7 +2,6 @@
 using Learning.Application.Data.Repositories;
 using Learning.Application.Interfaces;
 using Learning.Application.Models.Courses.Dtos;
-using Learning.Application.Models.Files.Dtos;
 using Learning.Domain.Enums;
 using Learning.Domain.ValueObjects;
 

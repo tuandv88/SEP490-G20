@@ -4,10 +4,12 @@ export const AUTHENTICATION_ROUTERS = {
   HOME: '/',
   ABOUT: '/about',
   NOTFOUND: '*',
+  ERROR: '/error',
   THEME: '/themes',
   COURSELIST: '/courseList',
-  COURSEDETAIL: '/courseDetail',
-  LEARNINGSPACE: '/learningSpace'
+  COURSEDETAIL: '/courseDetail/:id',
+  LEARNINGSPACE: '/learning-space/:id/lecture/:lectureId',
+  PROBLEMS: '/problems'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

@@ -15,11 +15,6 @@ export default defineConfig({
     historyApiFallback: true
   },
   build: {
-    outDir: 'build' // Đặt tên thư mục output là 'build'
-  },
-  esbuild: {
-    loader: 'jsx', // Cấu hình esbuild để xử lý JSX trong file .js
-    include: /src\/.*\.js$/,
-    exclude: [] // Chỉ định các file .js trong thư mục src có JSX
+    outDir: 'build' 
   }
 })

@@ -1,5 +1,4 @@
-﻿using BuildingBlocks.Pagination;
-using Learning.Application.Models.Courses.Dtos;
+﻿using Learning.Application.Models.Courses.Dtos;
 
 namespace Learning.Application.Models.Courses.Queries.GetCourses;
 public record GetCoursesQuery(PaginationRequest PaginationRequest) : IQuery<GetCoursesResult>;

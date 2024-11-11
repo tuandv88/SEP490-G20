@@ -4,6 +4,7 @@ using Community.Infrastructure.Data.Repositories.Bookmarks;
 using Community.Infrastructure.Data.Repositories.Categorys;
 using Community.Infrastructure.Data.Repositories.Comments;
 using Community.Infrastructure.Data.Repositories.Discussions;
+using Community.Infrastructure.Data.Repositories.UserDiscussions;
 using Community.Infrastructure.Data.Repositories.Votes;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -47,6 +48,8 @@ public static class DependencyInjection
         services.AddScoped<ICommentRepository, CommentRepository>();
 
         services.AddScoped<IBookmarkRepository, BookmarkReponsitory>();
+
+        services.AddScoped<IUserDiscussionRepository, UserDiscussionRepository>();
 
     }
 }

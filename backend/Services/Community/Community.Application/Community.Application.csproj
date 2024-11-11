@@ -20,6 +20,7 @@
   <ItemGroup>
     <Folder Include="Exceptions\" />
     <Folder Include="Models\Discussions\Commands\" />
+    <Folder Include="Models\UserDiscussions\Commands\" />
   </ItemGroup>
 
 </Project>

@@ -9,6 +9,10 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { HubConnectionBuilder } from '@microsoft/signalr'
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import ReactMarkdown from 'react-markdown'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import PreCoppy from '../ui/PreCoppy'
 
 export default function Component() {
   const [connection, setConnection] = useState(null)
@@ -28,21 +32,30 @@ export default function Component() {
       id: 1,
       role: 'user',
       content: 'Write a 100-character meta description for my blog post about digital marketing.',
-      timestamp: '5m ago'
+      timestamp: '5m ago',
+      referenceLink: []
     },
     {
       id: 2,
       role: 'assistant',
       content: 'Master the art of digital marketing with expert strategies for online success. Unlock growth now!',
-      timestamp: '4m ago'
+      timestamp: '4m ago',
+      referenceLink: []
     },
-    { id: 3, role: 'user', content: 'Provide a UX design tip I can share on LinkedIn.', timestamp: '3m ago' },
+    {
+      id: 3,
+      role: 'user',
+      content: 'Provide a UX design tip I can share on LinkedIn.',
+      timestamp: '3m ago',
+      referenceLink: []
+    },
     {
       id: 4,
       role: 'assistant',
       content:
         'UX tip: Prioritize clarity over complexity. Keep interfaces simple and intuitive to enhance user satisfaction and engagement. #UserExperience #UXDesign',
-      timestamp: '2m ago'
+      timestamp: '2m ago',
+      referenceLink: []
     }
   ])
 
@@ -66,7 +79,7 @@ export default function Component() {
       if (connection) {
         const messageRequest = {
           Message: {
-            ConversationId: '86779f6e-6b71-4f2a-8ad6-4fecce3853f0',
+            ConversationId: null,
             LectureId: 'e7b8f8e2-4c3b-4f8b-9f8e-2b4c3b4f8b9f',
             ProblemId: '89980ac8-3d50-49af-9a65-9cdcda802e11',
             Content: message
@@ -80,7 +93,8 @@ export default function Component() {
               id: messages.length + 2,
               role: 'assistant',
               content: result.MessageAnswer.Content,
-              timestamp: 'Just now'
+              timestamp: 'Just now',
+              referenceLink: result.MessageAnswer.ReferenceLinks
             }
             setMessages((prev) => [...prev, aiResponse])
             setIsLoading(false)
@@ -278,10 +292,50 @@ export default function Component() {
                   </Avatar>
                   <div className='flex flex-col'>
                     <span className='text-sm font-medium mb-1'>{message.role === 'user' ? 'You' : 'ChatAI'}</span>
-                    <div className={`p-3 rounded-lg ${message.role === 'user' ? 'bg-blue-600' : 'bg-[#3D3D3D]'}`}>
-                      {message.content}
+                    <div
+                      className={`prose !text-white p-3 rounded-lg ${message.role === 'user' ? 'bg-[#3D3D3D]' : ''} markdown-chat markdown-chat-a max-w-fit`}
+                    >
+                      <ReactMarkdown
+                        components={{
+                          code({ node, inline, className, children, ...props }) {
+                            const match = /language-(\w+)/.exec(className || '')
+                            return !inline && match ? (
+                              <div className='relative'>
+                                <SyntaxHighlighter style={oneDark} language={match[1]} PreTag='div' {...props}>
+                                  {String(children).replace(/\n$/, '')}
+                                </SyntaxHighlighter>
+                                <PreCoppy code={String(children)} />
+                              </div>
+                            ) : (
+                              <code
+                                className='bg-gray-300 inline-block text-black rounded px-1 py-0.3 text-sm font-mono'
+                                style={{ content: 'none' }}
+                                {...props}
+                              >
+                                {children}
+                              </code>
+                            )
+                          }
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                      {message.referenceLink && (
+                        <div className='flex flex-wrap gap-2'>
+                          {message.referenceLink.map((link, index) => (
+                            <div key={index} className='flex items-center gap-2 px-4 bg-gray-300 rounded-full'>
+                              <div className='flex items-center justify-center w-3 h-3 text-xs text-black font-medium rounded-full bg-[#ffe4ca]'>
+                                {index + 1}
+                              </div>
+                              <span className='text-[11px] markdown-chat-a markdown-chat-p'>
+                                <ReactMarkdown>{link}</ReactMarkdown>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <span className='text-xs text-gray-400 mt-1'>{message.timestamp}</span>
+                    {/* <span className='text-xs text-gray-400 mt-1'>{message.timestamp}</span> */}
                   </div>
                 </div>
               </div>

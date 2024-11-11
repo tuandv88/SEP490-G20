@@ -68,3 +68,17 @@
   color: white !important;
 }
 
+.markdown-chat h1,h2,h3,strong {
+  color: white !important;
+}
+
+.markdown-chat-a a {
+  color: rgb(131, 131, 248) !important;
+  text-decoration: none;
+}
+
+.markdown-chat-p p {
+  margin-top: 0.25em !important;
+  margin-bottom: 0.25em !important;
+}
+

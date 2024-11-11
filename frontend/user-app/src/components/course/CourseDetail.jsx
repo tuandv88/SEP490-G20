@@ -38,7 +38,12 @@ export default function CourseDetail() {
   }
 
   const handleLearningCourse = (courseId) => {
-    navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(':lectureId', '30137826-3f32-4a6e-a366-d943a532dab8'))
+    navigate(
+      AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(
+        ':lectureId',
+        'c2e250db-bf56-4dae-8d70-a2d7be39e943'
+      )
+    )
   }
 
   useEffect(() => {

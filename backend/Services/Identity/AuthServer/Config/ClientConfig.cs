@@ -1,59 +1,75 @@
 ﻿using IdentityServer4.Models;
-using IdentityServer4;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace AuthServer.Config
 {
-    public class ClientConfig
+    public static class ClientConfig
     {
-        public static IEnumerable<Client> GetClients =>
+        // Phương thức tĩnh để lấy danh sách các Client từ cấu hình
+        public static IEnumerable<Client> GetClients(IConfiguration configuration)
+        {
+            var clientsSection = configuration.GetSection("IdentityServer:Clients");
+            var clients = new List<Client>();
 
-            new Client[]
+            foreach (var clientConfig in clientsSection.GetChildren())
             {
-                ///////////////////////////////////////////
-                // Console Client Credentials Flow Sample
-                //////////////////////////////////////////
-                new Client
+                var client = new Client
                 {
-                    ClientId = "client",
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-                    ClientSecrets = { new Secret("secret".Sha256()) },
-                    AllowedScopes = { "api1", "api2.read_only" },
+                    ClientId = clientConfig["ClientId"],
 
-                    // Thời gian sống cho access token
-                    AccessTokenLifetime = 60 * 60, // 1 giờ
-                     // Cho phép sử dụng refresh token
-                    AllowOfflineAccess = true,
-                    AbsoluteRefreshTokenLifetime = 30 * 24 * 60 * 60, // 30 ngày (tính bằng giây)
-                    SlidingRefreshTokenLifetime = 15 * 24 * 60 * 60, // 15 ngày (tính bằng giây)
-                    RequirePkce = true // Bảo mật PKCE
-                },
+                    // Đọc AllowedGrantTypes từ cấu hình
+                    AllowedGrantTypes = ParseGrantTypes(clientConfig.GetSection("AllowedGrantTypes").Get<List<string>>()),
 
-                 ///////////////////////////////////////////
-                // MVC Code Flow Code
-                //////////////////////////////////////////
-                new Client
+                    RequirePkce = bool.Parse(clientConfig["RequirePkce"]),
+                    RequireClientSecret = bool.Parse(clientConfig["RequireClientSecret"]),
+                    RequireConsent = bool.Parse(clientConfig["RequireConsent"]),
+                    AllowedCorsOrigins = clientConfig.GetSection("AllowedCorsOrigins").Get<List<string>>(),
+                    RedirectUris = clientConfig.GetSection("RedirectUris").Get<List<string>>(),
+                    PostLogoutRedirectUris = clientConfig.GetSection("PostLogoutRedirectUris").Get<List<string>>(),
+                    AllowedScopes = clientConfig.GetSection("AllowedScopes").Get<List<string>>(),
+                    AccessTokenLifetime = int.Parse(clientConfig["AccessTokenLifetime"]),
+                    AllowOfflineAccess = bool.Parse(clientConfig["AllowOfflineAccess"]),
+                    AbsoluteRefreshTokenLifetime = int.Parse(clientConfig["AbsoluteRefreshTokenLifetime"]),
+
+                    // Đọc RefreshTokenExpiration từ cấu hình
+                    RefreshTokenExpiration = clientConfig["RefreshTokenExpiration"] == "Sliding"
+                        ? TokenExpiration.Sliding : TokenExpiration.Absolute,
+
+                    SlidingRefreshTokenLifetime = int.Parse(clientConfig["SlidingRefreshTokenLifetime"]),
+
+                    // Đọc RefreshTokenUsage từ cấu hình
+                    RefreshTokenUsage = clientConfig["RefreshTokenUsage"] == "ReUse"
+                        ? TokenUsage.ReUse : TokenUsage.OneTimeOnly
+                };
+
+                clients.Add(client);
+            }
+
+            return clients;
+        }
+
+        // Hàm hỗ trợ để parse AllowedGrantTypes từ cấu hình
+        private static ICollection<string> ParseGrantTypes(List<string> grantTypes)
+        {
+            var result = new List<string>();
+
+            foreach (var grantType in grantTypes)
+            {
+                if (grantType.Equals("Code", StringComparison.OrdinalIgnoreCase))
                 {
-                    ClientId = "ICoderVN",
-                    AllowedGrantTypes = GrantTypes.Code,    // Tự tìm đến Account/Login của identityServer đẻ Author
-                    AllowOfflineAccess = true,
-                    RequireClientSecret = false,
-                    AllowedCorsOrigins = { "https://localhost:5004" },
+                    result.Add(GrantType.AuthorizationCode);
+                }
 
-                    // đăng nhập thành công thì redirect lại theo đường dẫn này
-                    RedirectUris = { "https://localhost:5004/callback.html" },
-                    // khi logout nó chạy cổng này và xử lý logout thì nó redirect đến url: 5001 logout của identityServer
-                    PostLogoutRedirectUris = { "https://localhost:5004/index.html" },
+                // Có thể thêm nhiều loại GrantType khác tại đây
+                //else if (grantType.Equals("Implicit", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    result.Add(GrantType.Implicit);
+                //}
+            }
 
-                    // ở client này cho phép chuy cập đến những cái này
-                    AllowedScopes = new List<string>
-                    { 
-                        // ở đây chúng ta cho chuy cập cả thông tin user lần api
-                        IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile,
-                        IdentityServerConstants.StandardScopes.Email
-                    }
-                 }
-
-            };
+            return result;
+        }
     }
+
 }

@@ -314,7 +314,7 @@
             </div>
 
             <!-- Display validation error message -->
-            @if (!ViewData.ModelState.IsValid)
+            @if (!ViewData.ModelState.IsValid && !string.IsNullOrWhiteSpace(Html.ValidationSummary(true).ToString()))
             {
                 <div class="error-message show">
                     <span> @Html.ValidationSummary(true, "", new { @class = "text-danger" })</span>

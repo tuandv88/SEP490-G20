@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.DataProtection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Linq;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
@@ -56,8 +55,7 @@ namespace AuthServer.Controllers
         [HttpGet]
         public IActionResult Register(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
-
+            returnUrl = returnUrl ?? Url.Content("~/");
             ViewData["ReturnUrl"] = returnUrl;
 
             return View();
@@ -67,7 +65,8 @@ namespace AuthServer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/");
+            ViewData["ReturnUrl"] = returnUrl;
 
             if (ModelState.IsValid)
             {
@@ -163,7 +162,8 @@ namespace AuthServer.Controllers
         [HttpGet]
         public async Task<IActionResult> ResendEmailConfirmation(string email, string fullName, string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/");
+            ViewData["ReturnUrl"] = returnUrl;
 
             if (string.IsNullOrEmpty(email))
             {
@@ -307,7 +307,7 @@ namespace AuthServer.Controllers
                 return RedirectToAction("Index", "Profile");
             }
 
-            returnUrl ??= Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/");
 
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -337,7 +337,8 @@ namespace AuthServer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/");
+            ViewData["ReturnUrl"] = returnUrl;
 
             if (!ModelState.IsValid)
             {

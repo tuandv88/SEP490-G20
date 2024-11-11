@@ -33,7 +33,7 @@ namespace AuthServer.Controllers
         [HttpGet]
         public async Task<IActionResult> Personal(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/");
 
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -59,7 +59,8 @@ namespace AuthServer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Personal(PersonalViewModel model, string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/");
+            ViewData["ReturnUrl"] = returnUrl;
 
             if (!ModelState.IsValid)
             {
@@ -145,7 +146,7 @@ namespace AuthServer.Controllers
         [HttpGet]
         public async Task<IActionResult> ChangePassword(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/");
 
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -168,8 +169,8 @@ namespace AuthServer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model, string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
-
+            returnUrl = returnUrl ?? Url.Content("~/");
+            ViewData["ReturnUrl"] = returnUrl;
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)

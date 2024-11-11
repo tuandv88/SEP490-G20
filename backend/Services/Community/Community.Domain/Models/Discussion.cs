@@ -44,16 +44,19 @@
         }
 
         // Phương thức cập nhật thông tin của Discussion
-        public void Update(string title, string description, bool isActive, List<string> tags, bool closed, bool pinned, string? imageUrl)
+        public void Update(UserId userId, CategoryId categoryId, string title, string description, bool isActive, List<string> tags, bool closed, bool pinned, long viewCount)
         {
+            UserId = userId;
+            CategoryId = categoryId;
             Title = title;
             Description = description;
-            IsActive = isActive;
             Tags = tags;
+            IsActive = isActive;
             Closed = closed;
             Pinned = pinned;
+            ViewCount = viewCount;
             DateUpdated = DateTime.Now;
-            ImageUrl = imageUrl;
+
             // Thêm sự kiện cập nhật nếu cần thiết
             // AddDomainEvent(new DiscussionUpdatedEvent(this));
         }

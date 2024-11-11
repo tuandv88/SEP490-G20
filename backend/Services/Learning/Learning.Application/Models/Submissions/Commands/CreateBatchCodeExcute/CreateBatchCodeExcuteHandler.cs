@@ -44,7 +44,7 @@ public class CreateBatchCodeExcuteHandler(ISubmissionService submissionService, 
             submissionsDone = submissions.Submissions.Where(x => tokens.Contains(x.Token) && x.Status!.Id >= 3).ToList();
             if (submissionsDone.Count == tokens.Count()) {
                 break;
-            }
+            } 
 
             attempts++;
             await Task.Delay(DelayMilliseconds, cancellationToken);

@@ -68,9 +68,7 @@
   color: white !important;
 }
 
-.markdown-chat h1,h2,h3,strong {
-  color: white !important;
-}
+
 
 .markdown-chat-a a {
   color: rgb(131, 131, 248) !important;
@@ -82,3 +80,15 @@
   margin-bottom: 0.25em !important;
 }
 
+.custom-markdown strong {
+  color: white;
+  font-weight: 600; 
+}
+
+.markdown-chat-ol-li ol > li {
+  color: white !important;
+}
+
+.textarea-no-scroll {
+  resize: none; 
+}

@@ -179,6 +179,14 @@ export default function Quiz() {
     <div className='max-w-2xl mx-auto p-6 space-y-6'>
       {renderQuestionProgress()}
 
+      <div className='space-y-4'>
+        <span className='text-sm text-gray-500'>{currentQuestionData.label}</span>
+
+        <h2 className='text-xl font-semibold text-gray-900'>{currentQuestionData.question}</h2>
+
+        {renderOptions()}
+      </div>
+
       <div className='flex justify-between pt-4'>
         <Button variant='outline' onClick={handlePrevious} disabled={currentQuestion === 0}>
           Previous
@@ -191,16 +199,43 @@ export default function Quiz() {
         )}
       </div>
 
-      <div className='space-y-4'>
-        <span className='text-sm text-gray-500'>{currentQuestionData.label}</span>
-
-        <h2 className='text-xl font-semibold text-gray-900'>{currentQuestionData.question}</h2>
-
-        {renderOptions()}
-      </div>
-
       {renderQuestionStatus()}
     </div>
   )
 }
 
+// import { useState } from 'react';
+// import { Button } from "@/components/ui/button";
+// import { X } from "lucide-react";
+// import Quiz from './QuizComponent';
+
+// export default function QuizPopup() {
+//   const [isOpen, setIsOpen] = useState(false);
+
+//   const openQuiz = () => setIsOpen(true);
+//   const closeQuiz = () => setIsOpen(false);
+
+//   return (
+//     <div>
+//       <Button onClick={openQuiz}>Open Quiz</Button>
+
+//       {isOpen && (
+//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+//           <div className="bg-white w-full h-full max-w-4xl max-h-[90vh] rounded-lg shadow-lg overflow-auto relative">
+//             <Button
+//               variant="ghost"
+//               size="icon"
+//               className="absolute top-4 right-4"
+//               onClick={closeQuiz}
+//             >
+//               <X className="h-4 w-4" />
+//             </Button>
+//             <div className="p-6">
+//               <Quiz />
+//             </div>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// }

@@ -14,17 +14,20 @@
     "check:all": "yarn check:prettier && yarn check:lint && yarn check:type"
   },
   "dependencies": {
+    "@codingame/monaco-vscode-configuration-service-override": "11.0.1",
+    "@codingame/monaco-vscode-editor-service-override": "11.0.1",
+    "@codingame/monaco-vscode-textmate-service-override": "^11.0.1",
+    "@codingame/monaco-vscode-theme-service-override": "^11.0.1",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@microsoft/signalr": "^8.0.7",
     "@monaco-editor/react": "^4.6.0",
     "@radix-ui/react-avatar": "^1.1.1",
-    "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-navigation-menu": "^1.2.1",
     "@radix-ui/react-progress": "^1.1.0",
-    "@radix-ui/react-radio-group": "^1.2.1",
     "@radix-ui/react-scroll-area": "^1.2.0",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
@@ -41,6 +44,9 @@
     "loaders.css": "^0.1.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.451.0",
+    "monaco-editor": "npm:@codingame/monaco-vscode-editor-api@11.0.1",
+    "monaco-editor-wrapper": "^5.5.3",
+    "monaco-languageclient": "^8.8.3",
     "oidc-client-ts": "^3.1.0",
     "prettier": "^3.3.3",
     "react": "^18.3.1",
@@ -55,8 +61,12 @@
     "styled-components": "^6.1.13",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
-    "zustand": "^5.0.0",
-    "@microsoft/signalr": "^8.0.7"
+    "vscode": "npm:@codingame/monaco-vscode-api@11.0.1",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.1.0",
+    "vscode-ws-jsonrpc": "^3.3.2",
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
@@ -70,8 +80,10 @@
     "eslint-plugin-react-refresh": "^0.4.12",
     "globals": "^15.9.0",
     "husky": "^9.1.6",
+    "import-meta-resolve": "^4.1.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
-    "vite": "^5.4.8"
+    "vite": "^5.4.8",
+    "vite-plugin-static-copy": "^2.0.0"
   }
 }

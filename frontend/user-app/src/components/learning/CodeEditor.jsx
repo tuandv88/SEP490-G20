@@ -2,7 +2,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react'
-import Editor from '@monaco-editor/react'
+// import Editor from '@monaco-editor/react'
 import TestcaseInterface from './TestcaseInterface'
 import PreferenceNav from './PreferenceNav'
 import useStore from '../../data/store'
@@ -10,6 +10,9 @@ import lodash, { isEmpty } from 'lodash'
 import { LearningAPI } from '@/services/api/learningApi'
 import Popup from '../ui/popup'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../ui/resizable'
+import Editor from '@/lib/code-editor/components/Editor'
+import { JAVA_LANGUAGE_CONFIG, JAVA_LANGUAGE_EXT_POINT, JAVA_LANGUAGE_ID } from '@/lib/code-editor/constants'
+
 
 const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
   const [response, setResponse] = useState(null)
@@ -18,7 +21,6 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
   const [testCase, setTestCase] = useState({ 0: { l1: '9 9 9 9', l2: '9 9 9' } })
   const testCases = useStore((state) => state.testCases)
   const [isOpen, setIsOpen] = useState(false)
-
 
   const handleEditorChange = lodash.debounce((value) => {
     setCode(value)
@@ -42,6 +44,7 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
       return
     }
 
+    console.log(code)
     const submissionData = {
       createCodeExecuteDto: {
         languageCode: 'Java',
@@ -68,7 +71,7 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
       setCode(templates)
       handleArrayToDictionary(arrayTestcase)
     }
-    fetchProblem()
+     fetchProblem()
   }, [arrayTestcase, templates])
 
   useEffect(() => {
@@ -82,7 +85,7 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
       <ResizablePanelGroup direction='vertical'>
         <ResizablePanel defaultSize={60}>
           <div className='w-full h-full overflow-auto'>
-            <Editor
+            {/* <Editor
               height='100%'
               defaultLanguage='java'
               value={code}
@@ -99,7 +102,32 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
                 cursorStyle: 'line',
                 rulers: [80],
                 wordWrap: 'on'
+              }} */}
+            <Editor             
+              langConfig={{
+                extPoint: JAVA_LANGUAGE_EXT_POINT,
+                langId: JAVA_LANGUAGE_ID,
+                langConfig: JAVA_LANGUAGE_CONFIG
               }}
+              vsCodeSettingsJson={JSON.stringify({
+                'editor.fontSize': 14,
+                'editor.lineHeight': 20,
+                'editor.fontFamily': 'monospace',
+                'editor.fontWeight': 'normal',
+                'editor.indentSize': 'tabSize',
+                'workbench.colorTheme': 'Default Dark Modern',
+                'editor.guides.bracketPairsHorizontal': 'active',
+                'editor.experimental.asyncTokenization': true
+              })}
+              connectConfig={{
+                fileUri: 'home/mlc/packages/examples/resources/eclipse.jdt.ls/workspace/ICoderVN/src/Solution.java',
+                url: 'wss://lsp.icoder.vn/jdtls',
+                workspaceUri: 'home/mlc/packages/examples/resources/eclipse.jdt.ls/workspace/ICoderVN'
+              }}
+              initValue={templates}
+              //sampleFile='resources/com/example/app/Solution.java'
+              containerId={'editor'}
+              onChange={handleEditorChange}
             />
           </div>
         </ResizablePanel>

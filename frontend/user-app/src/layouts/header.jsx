@@ -6,6 +6,7 @@ import { AUTHENTICATION_ROUTERS as AR } from '@/data/constants'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import DropdownMenuUser from '@/components/ui/userdropdown'
 import { ModeToggle } from '@/components/mode-toggle'
+import AuthService from '@/oidc/AuthService'
 
 export default function Header() {
   const [isLoggedIn /*setIsLoggedIn*/] = useState(false) // Set to true for demonstration
@@ -67,6 +68,11 @@ export default function Header() {
                 </Link>
               </li>
               <li>
+                <Link to={AR.CODE} className='text-lg hover:text-primary hover:font-bold'>
+                  Code
+                </Link>
+              </li>
+              <li>
                 <Link to={AR.COURSELIST} className='text-lg hover:text-primary hover:font-bold'>
                   Course
                 </Link>
@@ -122,7 +128,7 @@ export default function Header() {
               </div>
             ) : (
               <div className='hidden md:block'>
-                <Button variant='outline' className='mr-2'>
+                <Button variant='outline' className='mr-2' onClick={() => AuthService.login()}>
                   Login
                 </Button>
                 <Button>Register</Button>

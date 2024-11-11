@@ -3,7 +3,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { Send, Plus, X, RotateCcw, History, Square, Bot, Loader2 } from 'lucide-react'
+import { Send, Plus, X, RotateCcw, History, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -13,51 +13,19 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import PreCoppy from '../ui/PreCoppy'
+import ChatDefaultScreen from './ChatDefaultScreen'
+import { Textarea } from '../ui/textarea'
 
 export default function Component() {
-  const [connection, setConnection] = useState(null)
-  const [codeResponse, setCodeResponse] = useState(null)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+
+  const [connection, setConnection] = useState(null)
+  const [codeResponse, setCodeResponse] = useState(null)
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef(null)
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      role: 'user',
-      content: 'Write a 100-character meta description for my blog post about digital marketing.',
-      timestamp: '5m ago',
-      referenceLink: []
-    },
-    {
-      id: 2,
-      role: 'assistant',
-      content: 'Master the art of digital marketing with expert strategies for online success. Unlock growth now!',
-      timestamp: '4m ago',
-      referenceLink: []
-    },
-    {
-      id: 3,
-      role: 'user',
-      content: 'Provide a UX design tip I can share on LinkedIn.',
-      timestamp: '3m ago',
-      referenceLink: []
-    },
-    {
-      id: 4,
-      role: 'assistant',
-      content:
-        'UX tip: Prioritize clarity over complexity. Keep interfaces simple and intuitive to enhance user satisfaction and engagement. #UserExperience #UXDesign',
-      timestamp: '2m ago',
-      referenceLink: []
-    }
-  ])
+  const [messages, setMessages] = useState([])
 
   const chatHistory = [
     { id: 5, role: 'user', content: 'Chào hỏi và hỗ trợ lập trình', timestamp: '10m ago' },
@@ -74,12 +42,11 @@ export default function Component() {
       setMessages([...messages, newMessage])
       setMessage('')
       setIsLoading(true)
-      // Here you would typically call your AI service to get a response
-      // For this example, we'll just add a mock response after a short delay
+
       if (connection) {
         const messageRequest = {
           Message: {
-            ConversationId: null,
+            ConversationId: 'e304d87a-1c06-4012-88c6-771c2d76287e',
             LectureId: 'e7b8f8e2-4c3b-4f8b-9f8e-2b4c3b4f8b9f',
             ProblemId: '89980ac8-3d50-49af-9a65-9cdcda802e11',
             Content: message
@@ -105,10 +72,6 @@ export default function Component() {
       }
     }
   }
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages, isLoading])
 
   useEffect(() => {
     const connect = async () => {
@@ -186,8 +149,6 @@ export default function Component() {
     }
   }
 
-  //=========================================
-
   return (
     <div className='flex bg-[#1E1E1E] text-white h-[calc(100vh-6rem)]'>
       {/* Chat History Sidebar */}
@@ -195,8 +156,8 @@ export default function Component() {
         style={{
           height: 'inherit'
         }}
-        className={`fixed inset-y-0 left-0 w-80 bg-[#2D2D2D] shadow-lg transform transition-transform duration-300 ease-in-out  ${
-          isHistoryOpen ? 'translate-x-0 z-[3]' : '-translate-x-full'
+        className={`fixed left-0 w-80 bg-[#2D2D2D] shadow-lg transform transition-transform duration-300 ease-in-out  ${
+          isHistoryOpen ? 'translate-x-0 z-10' : '-translate-x-full z-10'
         }`}
       >
         <div className='p-4 border-b border-gray-700'>
@@ -234,16 +195,6 @@ export default function Component() {
         </ScrollArea>
       </div>
 
-      {isHistoryOpen && (
-        <div
-          style={{
-            height: 'inherit'
-          }}
-          className='fixed inset-0 bg-black bg-opacity-50 z-[2]'
-          onClick={() => setIsHistoryOpen(false)}
-        ></div>
-      )}
-
       {/* Main Chat Area */}
       <div className='flex-1 flex flex-col scroll-container'>
         {/* Header */}
@@ -263,114 +214,113 @@ export default function Component() {
             <Button variant='ghost' size='icon' className='hover:bg-[#3D3D3D] rounded'>
               <Plus size={18} />
             </Button>
-            <Button variant='ghost' size='icon' className='hover:bg-[#3D3D3D] rounded'>
-              <RotateCcw size={18} />
-            </Button>
-            <Button variant='ghost' size='icon' className='hover:bg-[#3D3D3D] rounded'>
-              <X size={18} />
-            </Button>
           </div>
         </div>
 
         {/* Chat Messages Area */}
         <ScrollArea className='flex-1 p-4'>
-          <div className='space-y-4'>
-            {messages.map((message) => (
-              <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`flex items-start space-x-2 ${message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}
-                >
-                  <Avatar>
-                    <AvatarImage
-                      src={
-                        message.role === 'user'
-                          ? '/placeholder.svg?height=40&width=40'
-                          : '/placeholder.svg?height=40&width=40'
-                      }
-                    />
-                    <AvatarFallback>{message.role === 'user' ? 'U' : 'AI'}</AvatarFallback>
-                  </Avatar>
-                  <div className='flex flex-col'>
-                    <span className='text-sm font-medium mb-1'>{message.role === 'user' ? 'You' : 'ChatAI'}</span>
-                    <div
-                      className={`prose !text-white p-3 rounded-lg ${message.role === 'user' ? 'bg-[#3D3D3D]' : ''} markdown-chat markdown-chat-a max-w-fit`}
-                    >
-                      <ReactMarkdown
-                        components={{
-                          code({ node, inline, className, children, ...props }) {
-                            const match = /language-(\w+)/.exec(className || '')
-                            return !inline && match ? (
-                              <div className='relative'>
-                                <SyntaxHighlighter style={oneDark} language={match[1]} PreTag='div' {...props}>
-                                  {String(children).replace(/\n$/, '')}
-                                </SyntaxHighlighter>
-                                <PreCoppy code={String(children)} />
-                              </div>
-                            ) : (
-                              <code
-                                className='bg-gray-300 inline-block text-black rounded px-1 py-0.3 text-sm font-mono'
-                                style={{ content: 'none' }}
-                                {...props}
-                              >
-                                {children}
-                              </code>
-                            )
-                          }
-                        }}
+          {messages.length > 0 ? (
+            <div className='space-y-4'>
+              {messages.map((message) => (
+                <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`flex items-start space-x-2 ${message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}
+                  >
+                    <Avatar>
+                      <AvatarImage
+                        src={
+                          message.role === 'user'
+                            ? ''
+                            : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJLfI1-UONOCM_xB1cr7iD0rDkT3YGINyXhw&s'
+                        }
+                      />
+                      <AvatarFallback>{message.role === 'user' ? '' : 'AI'}</AvatarFallback>
+                    </Avatar>
+                    <div className='flex flex-col'>
+                      <span className='text-sm font-medium mb-1'>{message.role === 'user' ? 'You' : 'ChatAI'}</span>
+                      <div
+                        className={`prose !text-white p-3 rounded-lg ${message.role === 'user' ? 'bg-[#3D3D3D]' : ''} markdown-chat markdown-chat-a markdown-chat-ol-li max-w-fit`}
                       >
-                        {message.content}
-                      </ReactMarkdown>
-                      {message.referenceLink && (
-                        <div className='flex flex-wrap gap-2'>
-                          {message.referenceLink.map((link, index) => (
-                            <div key={index} className='flex items-center gap-2 px-4 bg-gray-300 rounded-full'>
-                              <div className='flex items-center justify-center w-3 h-3 text-xs text-black font-medium rounded-full bg-[#ffe4ca]'>
-                                {index + 1}
+                        <ReactMarkdown
+                          className='custom-markdown list-decimal marker:text-white prose-h3:text-white markdown-chat-p'
+                          components={{
+                            code({ node, inline, className, children, ...props }) {
+                              const match = /language-(\w+)/.exec(className || '')
+                              return !inline && match ? (
+                                <div className='relative'>
+                                  <SyntaxHighlighter style={oneDark} language={match[1]} PreTag='div' {...props}>
+                                    {String(children).replace(/\n$/, '')}
+                                  </SyntaxHighlighter>
+                                  <PreCoppy code={String(children)} />
+                                </div>
+                              ) : (
+                                <code
+                                  className='bg-gray-300 inline-block text-black rounded px-1 py-0.3 text-sm font-mono'
+                                  style={{ content: 'none' }}
+                                  {...props}
+                                >
+                                  {children}
+                                </code>
+                              )
+                            }
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                        {message.referenceLink && (
+                          <div className='flex flex-wrap gap-2'>
+                            {message.referenceLink.map((link, index) => (
+                              <div key={index} className='flex items-center gap-2 px-4 bg-gray-300 rounded-full'>
+                                <div className='flex items-center justify-center w-3 h-3 text-xs text-black font-medium rounded-full bg-[#ffe4ca]'>
+                                  {index + 1}
+                                </div>
+                                <span className='text-[11px] markdown-chat-a markdown-chat-p'>
+                                  <ReactMarkdown>{link}</ReactMarkdown>
+                                </span>
                               </div>
-                              <span className='text-[11px] markdown-chat-a markdown-chat-p'>
-                                <ReactMarkdown>{link}</ReactMarkdown>
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    {/* <span className='text-xs text-gray-400 mt-1'>{message.timestamp}</span> */}
-                  </div>
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className='flex justify-start'>
-                <div className='flex items-start space-x-2'>
-                  <Avatar>
-                    <AvatarImage src='/placeholder.svg?height=40&width=40' />
-                    <AvatarFallback>AI</AvatarFallback>
-                  </Avatar>
-                  <div className='flex flex-col'>
-                    <span className='text-sm font-medium mb-1'>ChatAI</span>
-                    <div className='p-2 rounded-lg bg-gray-100'>
-                      <div className='w-6 h-6 border-t-2 border-green-500 rounded-full animate-spin'></div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {/* <span className='text-xs text-gray-400 mt-1'>{message.timestamp}</span> */}
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} /> {/* This empty div is used as a reference for scrolling */}
-          </div>
+              ))}
+              {isLoading && (
+                <div className='flex justify-start'>
+                  <div className='flex items-start space-x-2'>
+                    <Avatar>
+                      <AvatarImage src='/placeholder.svg?height=40&width=40' />
+                      <AvatarFallback>AI</AvatarFallback>
+                    </Avatar>
+                    <div className='flex flex-col'>
+                      <span className='text-sm font-medium mb-1'>ChatAI</span>
+                      <div className='p-2 rounded-lg bg-gray-100'>
+                        <div className='w-6 h-6 border-t-2 border-green-500 rounded-full animate-spin'></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} /> {/* This empty div is used as a reference for scrolling */}
+            </div>
+          ) : (
+            <ChatDefaultScreen />
+          )}
         </ScrollArea>
 
         {/* Input Area */}
         <div className='border-t border-gray-700 p-4 sticky bottom-0 bg-black'>
           <div className='flex items-center gap-4'>
-            <Input
+            <Textarea
               type='text'
               placeholder='Type a message...'
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
               disabled={isLoading}
-              className='flex-1 bg-[#3D3D3D] text-white placeholder-gray-400'
+              onKeyDown={handleKeyDown}
+              className='flex-1 bg-[#3D3D3D] text-white placeholder-gray-400 textarea-no-scroll'
             />
             <Button type='submit' onClick={handleSend} className='bg-blue-600 hover:bg-blue-700' disabled={isLoading}>
               <Send size={20} />

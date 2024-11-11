@@ -11,7 +11,7 @@ public class MessageSentHandler(
     IDocumentRepository documentRepository,IKernelMemory memory, IDocumentService documentService
     ) : ICommandHandler<MessageSentCommand, MessageSentResult> {
     public async Task<MessageSentResult> Handle(MessageSentCommand request, CancellationToken cancellationToken) {
-        var userId = userContext.User.Id.Value; //Guid.Parse("89980ac8-3d50-49af-9a65-9cdcda802e11"); //userContext.User.Id;
+        var userId = Guid.Parse("89980ac8-3d50-49af-9a65-9cdcda802e11"); //userContext.User.Id;
         if (userId == null) {
             throw new UnauthorizedAccessException();
         }

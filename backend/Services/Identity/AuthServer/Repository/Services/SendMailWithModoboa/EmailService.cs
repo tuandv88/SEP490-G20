@@ -2,7 +2,6 @@
 using MailKit;
 using MailKit.Net.Imap;
 using MailKit.Security;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using MimeKit;
 
 namespace AuthServer.Repository.Services.SendMailWithModoboa

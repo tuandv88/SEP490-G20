@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Extensions;
+using Community.Application.Interfaces;
 using Community.Infrastructure.Data.Interceptors;
 using Community.Infrastructure.Data.Repositories.Bookmarks;
 using Community.Infrastructure.Data.Repositories.Categorys;
@@ -6,6 +7,7 @@ using Community.Infrastructure.Data.Repositories.Comments;
 using Community.Infrastructure.Data.Repositories.Discussions;
 using Community.Infrastructure.Data.Repositories.UserDiscussions;
 using Community.Infrastructure.Data.Repositories.Votes;
+using Community.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -31,7 +33,11 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+
+        //IBase64Converter
+        services.AddScoped<IBase64Converter, Base64Converter>();
 
         return services;
     }

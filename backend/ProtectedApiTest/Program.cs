@@ -56,7 +56,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.Authority = "https://localhost:5001";  // URL của IdentityServer
+        options.Authority = "https://localhost:6001";  // URL của IdentityServer
         options.Audience = "moviesApi";                // Phải khớp với scope `moviesApi` trong cấu hình IdentityServer
         options.RequireHttpsMetadata = true;
     });

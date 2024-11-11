@@ -1,29 +1,27 @@
 ﻿using Community.Application.Extensions;
-using Community.Application.Models.Votes.Queries.GetVoteById;
 
-namespace Community.Application.Models.Votes.Queries.GetVoteById
+namespace Community.Application.Models.Votes.Queries.GetVoteById;
+
+public class GetVoteByIdHandler : IQueryHandler<GetVoteByIdQuery, GetVoteByIdResult>
 {
-    public class GetVoteByIdHandler : IQueryHandler<GetVoteByIdQuery, GetVoteByIdResult>
+    private readonly IVoteRepository _repository;
+
+    public GetVoteByIdHandler(IVoteRepository repository)
     {
-        private readonly IVoteRepository _repository;
+        _repository = repository;
+    }
 
-        public GetVoteByIdHandler(IVoteRepository repository)
+    public async Task<GetVoteByIdResult> Handle(GetVoteByIdQuery query, CancellationToken cancellationToken)
+    {
+        var vote = await _repository.GetByIdAsync(query.Id);
+
+        if (vote == null)
         {
-            _repository = repository;
+            return new GetVoteByIdResult(null);
         }
 
-        public async Task<GetVoteByIdResult> Handle(GetVoteByIdQuery query, CancellationToken cancellationToken)
-        {
-            var vote = await _repository.GetByIdAsync(query.Id);
+        var voteDto = vote?.ToVoteDto();
 
-            if (vote == null)
-            {
-                return new GetVoteByIdResult(null);
-            }
-
-            var voteDto = vote?.ToVoteDto();
-
-            return new GetVoteByIdResult(voteDto);
-        }
+        return new GetVoteByIdResult(voteDto);
     }
 }

@@ -16,7 +16,11 @@ namespace User.Infrastructure.Data.Configurations
                     pointHistoryId => pointHistoryId.Value,
                     dbId => PointHistoryId.Of(dbId));
 
-            builder.Property(ph => ph.UserId).IsRequired();
+            builder.Property(lp => lp.UserId)
+               .HasConversion(
+                   userId => userId.Value,
+                   dbId => UserId.Of(dbId));
+
             builder.Property(ph => ph.Point).IsRequired();
             builder.Property(ph => ph.ChangeType).IsRequired();
             builder.Property(ph => ph.Source).HasMaxLength(500);

@@ -10,3 +10,4 @@ global using BuildingBlocks.Exceptions;
 global using BuidingBlocks.Storage;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
+global using BuildingBlocks.Caching;

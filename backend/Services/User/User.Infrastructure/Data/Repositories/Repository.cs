@@ -1,5 +1,5 @@
 ﻿
-namespace Learning.Infrastructure.Data.Repositories;
+namespace User.Infrastructure.Data.Repositories;
 public abstract class Repository<T> : IRepository<T> where T : class
 {
     private readonly IApplicationDbContext dbContext;

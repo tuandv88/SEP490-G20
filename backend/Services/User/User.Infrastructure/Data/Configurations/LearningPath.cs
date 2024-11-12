@@ -11,7 +11,11 @@
                     learningPathId => learningPathId.Value,
                     dbId => LearningPathId.Of(dbId));
 
-            builder.Property(lp => lp.UserId).IsRequired();
+            builder.Property(lp => lp.UserId)
+               .HasConversion(
+                   userId => userId.Value,
+                   dbId => UserId.Of(dbId));
+
             builder.Property(lp => lp.PathName).IsRequired().HasMaxLength(150);
             builder.Property(lp => lp.StartDate).IsRequired();
             builder.Property(lp => lp.EndDate).IsRequired();

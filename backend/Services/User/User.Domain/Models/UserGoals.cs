@@ -6,13 +6,13 @@ namespace User.Domain.Models
     public class UserGoal : Aggregate<UserGoalId> // Sử dụng ValueObject cho Id
     {
         // Thuộc tính
-        public Guid UserId { get; private set; }
+        public UserId UserId { get; private set; }
         public GoalType GoalType { get; private set; } // Enum từ User.Domain.Enums
         public DateTime TargetDate { get; private set; }
         public GoalStatus Status { get; private set; } // Enum từ User.Domain.Enums
 
         // Phương thức khởi tạo tĩnh (static factory method)
-        public static UserGoal Create(UserGoalId userGoalId, Guid userId, GoalType goalType, DateTime targetDate, GoalStatus status)
+        public static UserGoal Create(UserGoalId userGoalId, UserId userId, GoalType goalType, DateTime targetDate, GoalStatus status)
         {
             if (targetDate <= DateTime.UtcNow)
             {

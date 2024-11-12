@@ -6,15 +6,14 @@ namespace User.Domain.Models
     public class PointHistory : Aggregate<PointHistoryId> 
     {
         // Thuộc tính
-        public Guid UserId { get; private set; }
+        public UserId UserId { get; private set; }
         public long Point { get; private set; }
         public ChangeType ChangeType { get; private set; } // Enum từ User.Domain.Enums
         public string Source { get; private set; } = string.Empty;
         public DateTime DateReceived { get; private set; }
         public DateTime LastUpdated { get; private set; }
 
-        // Phương thức khởi tạo tĩnh (static factory method)
-        public static PointHistory Create(PointHistoryId pointHistoryId, Guid userId, long point, ChangeType changeType, string source, DateTime dateReceived, DateTime lastUpdated)
+        public static PointHistory Create(PointHistoryId pointHistoryId, UserId userId, long point, ChangeType changeType, string source, DateTime dateReceived, DateTime lastUpdated)
         {
             if (point <= 0)
             {

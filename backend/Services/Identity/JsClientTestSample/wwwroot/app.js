@@ -1,7 +1,7 @@
 ﻿
 // Cấu hình OIDC client để kết nối với IdentityServer
 var config = {
-	client_id: "icoder.vn",													  // Client ID cấu hình trên IdentityServer
+	client_id: "local_test",													  // Client ID cấu hình trên IdentityServer
 	response_type: "code",													  // Sử dụng Authorization Code Flow
 	requirePkce: true,														  // Bật PKCE để tăng cường bảo mật
 	authority: "https://localhost:6001",									  // URL của IdentityServer

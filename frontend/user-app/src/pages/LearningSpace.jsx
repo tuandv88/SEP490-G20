@@ -17,7 +17,7 @@ import useClickOutside from '@/components/hooks/useClickOutside'
 import ChatAI from '@/components/chat/ChatAI'
 
 const LearningSpace = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('descriptions')
   const [chapters, setChapters] = useState([])
   const [title, setTitle] = useState('')
@@ -28,18 +28,18 @@ const LearningSpace = () => {
   const [error, setError] = useState(false)
   const [videoBlobUrl, setVideoBlobUrl] = useState(null)
   const [isProblemListOpen, setIsProblemListOpen] = useState(false)
-  const videoTimeRef = useRef(0);
+  const videoTimeRef = useRef(0)
 
   //courseId
-  const { id, lectureId } = useParams();
+  const { id, lectureId } = useParams()
   const toggleProblemList = () => {
     setIsProblemListOpen(!isProblemListOpen)
   }
-  console.log("Load")
+  console.log('Load')
 
   const handleVideoTimeUpdate = (time) => {
-    videoTimeRef.current = time;
-  };
+    videoTimeRef.current = time
+  }
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
@@ -67,13 +67,13 @@ const LearningSpace = () => {
 
     fetchCourseDetail()
   }, [id])
- 
+
   // Gọi API lấy lectureDetail khi selectedLectureId thay đổi
   useEffect(() => {
-    if ( lectureId) {
+    if (lectureId) {
       const fetchLectureDetail = async () => {
         try {
-          const data = await LearningAPI.getLectureDetails( lectureId)
+          const data = await LearningAPI.getLectureDetails(lectureId)
           setLectureDetail(data)
 
           //Gọi API để lấy ra file của lecutre đó.
@@ -106,15 +106,15 @@ const LearningSpace = () => {
     }
   }, [lectureId])
 
-  // if (error) {
-  //   return <ErrorPage />
-  // }
+  if (error) {
+    return <ErrorPage />
+  }
 
-  // if (!chapters && !loading) {
-  //   return (
-  //     <NotFound mess='We cannot find documents in this course. Please check the link or search for other courses.' />
-  //   )
-  // }
+  if (!chapters && !loading) {
+    return (
+      <NotFound mess='We cannot find documents in this course. Please check the link or search for other courses.' />
+    )
+  }
 
   return (
     <div>
@@ -140,7 +140,7 @@ const LearningSpace = () => {
               />
             )}
             {activeTab === 'comments' && !loading && <Comments />}
-            {activeTab === 'chatbot' && !loading && <ChatAI />}
+            {activeTab === 'chatbot' && !loading && <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id} />}
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle className='resize-sha w-[3px]' />
@@ -154,7 +154,12 @@ const LearningSpace = () => {
         </ResizablePanel>
       </ResizablePanelGroup>
 
-      {isProblemListOpen && <div onClick={() => setIsProblemListOpen(!isProblemListOpen)} className='z-40 fixed inset-0 bg-gray-800 opacity-60'></div>}
+      {isProblemListOpen && (
+        <div
+          onClick={() => setIsProblemListOpen(!isProblemListOpen)}
+          className='z-40 fixed inset-0 bg-gray-800 opacity-60'
+        ></div>
+      )}
 
       <ToggleCurriculum
         title={title}
@@ -169,4 +174,3 @@ const LearningSpace = () => {
 }
 
 export default React.memo(LearningSpace)
-

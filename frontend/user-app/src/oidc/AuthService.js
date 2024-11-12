@@ -35,18 +35,6 @@ class AuthService {
     return this.userManager.signinRedirect()
   }
 
-  callApi() {
-    return this.getUser().then(user => {
-      if (user) {
-        console.log("User's access token:", user.access_token)
-        // Gọi API bảo vệ với access token
-        // Đặt các hàm gọi API ở đây nếu cần
-      } else {
-        console.log("User is not logged in")
-      }
-    })
-  }
-
   logout() {
     return this.userManager.signoutRedirect()
   }
@@ -57,6 +45,31 @@ class AuthService {
 
   handleCallback() {
     return this.userManager.signinRedirectCallback()
+  }
+
+  callApi() {
+    return this.getUser().then(user => {
+      if (user) {
+        console.log("User's access token using for API:", user.access_token);
+
+        // Thực hiện gọi API bảo vệ
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://localhost:6002/api/movies"); // URL của API bảo vệ
+        xhr.setRequestHeader("Authorization", "Bearer " + user.access_token); // Gửi access token trong header
+
+        xhr.onload = function () {
+          console.log("API response: ", xhr.responseText);
+        };
+
+        xhr.onerror = function () {
+          console.error("Error while calling API");
+        };
+
+        xhr.send();
+      } else {
+        console.error("User is not logged in");
+      }
+    });
   }
 }
 

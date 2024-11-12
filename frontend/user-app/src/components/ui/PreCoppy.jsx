@@ -16,7 +16,7 @@ const PreCoppy = ({ code }) => {
   return (
     <button
       onClick={handleCopy}
-      className='absolute top-2 right-2 p-2 bg-white rounded-md shadow-sm opacity-60 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+      className='absolute top-3 right-2 p-2 bg-white rounded-md shadow-sm opacity-60 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
       aria-label={isCopied ? 'Copied!' : 'Copy code'}
     >
       {isCopied ? <Check className='h-5 w-5 text-green-500' /> : <Copy className='h-5 w-5 text-gray-500' />}

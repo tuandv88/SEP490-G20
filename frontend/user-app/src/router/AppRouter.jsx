@@ -8,8 +8,7 @@ import ErrorPage from '@/pages/ErrorPage'
 // import Problems from '@/pages/Problems'
 import Problem from '@/pages/Problem'
 import { lazy, Suspense } from 'react'
-import Loading from '@/lib/code-editor/components/Loading'
-import ChatAI from '@/components/chat/ChatAI'
+import Callback from '@/oidc/Callback'
 const Code = lazy(() => import('@/pages/Code'))
 
 export const AppRouter = () => {
@@ -20,7 +19,7 @@ export const AppRouter = () => {
     },
     {
       path: AUTHENTICATION_ROUTERS.ABOUT,
-      element: <LearningSpace />
+      element: <About />
     },
     {
       path: AUTHENTICATION_ROUTERS.COURSELIST,
@@ -39,12 +38,8 @@ export const AppRouter = () => {
       element: <Problem />
     },
     {
-      path: AUTHENTICATION_ROUTERS.CODE,
-      element: (
-        <Suspense fallback={<Loading />}>
-          <Code />
-        </Suspense>
-      )
+      path: AUTHENTICATION_ROUTERS.CALLBACK,
+      element: <Callback />
     },
     { path: AUTHENTICATION_ROUTERS.NOTFOUND, element: <NotFound /> },
     { path: AUTHENTICATION_ROUTERS.ERROR, element: <ErrorPage /> }

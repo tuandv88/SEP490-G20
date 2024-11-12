@@ -10,7 +10,8 @@ export const AUTHENTICATION_ROUTERS = {
   COURSEDETAIL: '/courseDetail/:id',
   LEARNINGSPACE: '/learning-space/:id/lecture/:lectureId',
   PROBLEMS: '/problems',
-  CODE: '/code'
+  CODE: '/code',
+  CALLBACK: '/callback'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}
@@ -20,3 +21,7 @@ export const ROUTES = {
   ...UNAUTHENTICATION_ROUTERS,
   ...BASE_URL
 }
+
+export const SIGNALR_URL = 'https://localhost:5000/ai-service/ai-chat'
+
+

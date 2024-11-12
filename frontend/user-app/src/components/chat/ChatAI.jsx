@@ -3,52 +3,70 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { Send, Plus, X, RotateCcw, History, Square } from 'lucide-react'
+import { Send, Plus, X, History, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { HubConnectionBuilder } from '@microsoft/signalr'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import PreCoppy from '../ui/PreCoppy'
 import ChatDefaultScreen from './ChatDefaultScreen'
 import { Textarea } from '../ui/textarea'
+import { useSignalRConnection } from '../hooks/useSignalRConnection'
+import { ChatAPI } from '@/services/api/chatApi'
+import { SIGNALR_URL } from '@/data/constants'
 
-export default function Component() {
+export default function Component({ lectureId, problemId }) {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-
-  const [connection, setConnection] = useState(null)
   const [codeResponse, setCodeResponse] = useState(null)
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const messagesEndRef = useRef(null)
-  const [messages, setMessages] = useState([])
+  const { connection, messages: initialMessages } = useSignalRConnection(SIGNALR_URL)
+  const [messages, setMessages] = useState(initialMessages || [])
+  const [chatHistory, setChatHistory] = useState([])
+  const [selectedConversationId, setSelectedConversationId] = useState(null)
+  
 
-  const chatHistory = [
-    { id: 5, role: 'user', content: 'Chào hỏi và hỗ trợ lập trình', timestamp: '10m ago' },
-    { id: 6, role: 'user', content: 'Cải thiện xác thực dữ liệu và xử lý lỗi', timestamp: '1d ago' },
-    { id: 7, role: 'user', content: 'Xử lý dữ liệu API để hiển thị chương và bài giảng', timestamp: '3d ago' },
-    { id: 8, role: 'user', content: 'Vấn đề với việc log testCase trong React', timestamp: '4d ago' }
-  ]
 
-  const filteredHistory = chatHistory.filter((chat) => chat.content.toLowerCase().includes(searchQuery.toLowerCase()))
+  useEffect(() => {
+    const fetchConversation = async () => {
+      try {
+        const data = await ChatAPI.getConversation()
+        setChatHistory(data.conversations.data)       
+      } catch (error) {
+        console.error('Error fetching conversation:', error)
+      }
+    }
+    fetchConversation()
+  }, [selectedConversationId])
+
+
+
 
   const handleSend = async () => {
-    if (message.trim()) {
-      const newMessage = { id: messages.length + 1, role: 'user', content: message, timestamp: 'Just now' }
-      setMessages([...messages, newMessage])
+    if (message.trim() ) {
+      const newMessage = { id: messages.length > 0 ? messages[messages.length - 1].id + 1 : 1, senderType: 'User', content: message, timestamp: 'Just now', referenceLinks: [] }
+      if (Array.isArray(messages)) {
+        setMessages([...messages, newMessage])
+      } else {
+        console.error('messages is not an array:', messages)
+        setMessages([newMessage]) // Khởi tạo lại nếu cần
+      }
+      //setMessages([...messages, newMessage])
       setMessage('')
       setIsLoading(true)
 
       if (connection) {
         const messageRequest = {
           Message: {
-            ConversationId: 'e304d87a-1c06-4012-88c6-771c2d76287e',
-            LectureId: 'e7b8f8e2-4c3b-4f8b-9f8e-2b4c3b4f8b9f',
-            ProblemId: '89980ac8-3d50-49af-9a65-9cdcda802e11',
+            ConversationId: selectedConversationId,
+            LectureId: lectureId,
+            ProblemId: problemId,
+            // LectureId: 'e7b8f8e2-4c3b-4f8b-9f8e-2b4c3b4f8b9f',
+            // ProblemId: '89980ac8-3d50-49af-9a65-9cdcda802e11',
             Content: message
           }
         }
@@ -58,13 +76,17 @@ export default function Component() {
             console.log('Message sent successfully:', result)
             const aiResponse = {
               id: messages.length + 2,
-              role: 'assistant',
+              senderType: 'AI',
               content: result.MessageAnswer.Content,
               timestamp: 'Just now',
               referenceLink: result.MessageAnswer.ReferenceLinks
-            }
+            }            
             setMessages((prev) => [...prev, aiResponse])
             setIsLoading(false)
+            if(selectedConversationId === null) {
+              setSelectedConversationId(result.MessageAnswer.ConversationId)
+              setChatHistory((prev) => [...prev, { id: result.MessageAnswer.ConversationId, title: result.MessageAnswer.Content.slice(0, 20)}])
+            }
           })
         } catch (error) {
           console.error('Error sending message: ', error)
@@ -72,81 +94,31 @@ export default function Component() {
       }
     }
   }
-
-  useEffect(() => {
-    const connect = async () => {
-      const newConnection = new HubConnectionBuilder()
-        .withUrl('https://localhost:5000/ai-service/ai-chat')
-        .withAutomaticReconnect()
-        .build()
-
-      newConnection.on('RequestUserCode', async () => {
-        console.log('Server requested code from client.')
-
-        let promise = new Promise(async (resolve, reject) => {
-          try {
-            const codeDto = await requestUserCode()
-            resolve(codeDto)
-          } catch (error) {
-            reject(error)
-          }
-        })
-
-        return promise
-      })
-
-      newConnection.on('ReceiveMessage', (message) => {
-        setMessages((prevMessages) => [...prevMessages, message])
-      })
-
-      newConnection.onclose(() => {
-        console.log('Connection closed. Attempting to reconnect...')
-      })
-
-      newConnection.onreconnecting(() => {
-        console.log('Reconnecting...')
-      })
-
-      newConnection.onreconnected((connectionId) => {
-        console.log(`Reconnected. Connection ID: ${connectionId}`)
-      })
-
-      try {
-        await newConnection.start()
-        console.log('Connected to SignalR server with Connection ID:', newConnection.connectionId)
-        setConnection(newConnection)
-      } catch (error) {
-        console.error('Connection failed: ', error)
-      }
-    }
-
-    connect()
-
-    return () => {
-      if (connection) {
-        connection.stop().then(() => {
-          console.log('Connection stopped.')
-        })
-      }
-    }
-  }, [])
-
-  const requestUserCode = () => {
-    return new Promise((resolve) => {
-      // Giả lập mã code trả về từ client
-      const codeDto = {
-        SolutionCode: 'console.log("Hello World!");',
-        SubmissionResult: 'Success'
-      }
-      resolve(codeDto)
-    })
-  }
-
+ 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSend()
     }
+  }
+
+  const handleChatClick = (conversationId) => {
+    const fetchMessage = async () => {
+      try {
+        const data = await ChatAPI.getMessage(conversationId)
+        setMessages(data.messages.data.reverse())
+        setSelectedConversationId(conversationId)
+        setIsHistoryOpen(false)
+      } catch (error) {
+        console.error('Error fetching message:', error)
+      }
+    }
+    fetchMessage()
+  }
+
+  const handleNewChat = () => {
+    setSelectedConversationId(null)
+    setMessages([])
   }
 
   return (
@@ -172,26 +144,27 @@ export default function Component() {
               <X size={18} />
             </Button>
           </div>
-          <Input
+          {/* <Input
             type='text'
             placeholder='Search chats...'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className='w-full bg-[#3D3D3D] text-white placeholder-gray-400'
-          />
+          /> */}
         </div>
-        <ScrollArea className='h-[calc(100vh-120px)]'>
-          {filteredHistory.map((chat) => (
-            <div key={chat.id} className='p-4 hover:bg-[#3D3D3D] cursor-pointer border-b border-gray-700'>
+        <ScrollArea className='h-[calc(100vh-120px)] mb-4 scroll-container pb-[200px]'>
+          {chatHistory.map((chat) => (
+            <div onClick={() => handleChatClick(chat.id)} key={chat.id} className={`p-4 cursor-pointer border-b border-gray-700 ${selectedConversationId === chat.id ? 'bg-gray-500' : 'hover:bg-[#3D3D3D]'}`}>
               <div className='flex items-start gap-3'>
                 <Square size={16} className='mt-1' />
                 <div>
-                  <p className='text-sm'>{chat.content}</p>
-                  <span className='text-xs text-gray-400'>{chat.timestamp}</span>
+                  <p className='text-sm'>{chat.title}</p>
+                  <span className='text-xs text-gray-400'>Just now</span>
                 </div>
               </div>
             </div>
           ))}
+          <div className='h-5'></div>
         </ScrollArea>
       </div>
 
@@ -211,7 +184,7 @@ export default function Component() {
             >
               <History size={18} />
             </Button>
-            <Button variant='ghost' size='icon' className='hover:bg-[#3D3D3D] rounded'>
+            <Button variant='ghost' size='icon' className='hover:bg-[#3D3D3D] rounded' onClick={handleNewChat}>
               <Plus size={18} />
             </Button>
           </div>
@@ -222,32 +195,32 @@ export default function Component() {
           {messages.length > 0 ? (
             <div className='space-y-4'>
               {messages.map((message) => (
-                <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div key={message.id} className={`flex ${message.senderType === 'User' ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className={`flex items-start space-x-2 ${message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}
+                    className={`flex items-start space-x-2 ${message.senderType === 'User' ? 'flex-row-reverse space-x-reverse' : ''}`}
                   >
                     <Avatar>
                       <AvatarImage
                         src={
-                          message.role === 'user'
+                          message.senderType === 'User'
                             ? ''
                             : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJLfI1-UONOCM_xB1cr7iD0rDkT3YGINyXhw&s'
                         }
                       />
-                      <AvatarFallback>{message.role === 'user' ? '' : 'AI'}</AvatarFallback>
+                      <AvatarFallback>{message.senderType === 'User' ? '' : 'AI'}</AvatarFallback>
                     </Avatar>
                     <div className='flex flex-col'>
-                      <span className='text-sm font-medium mb-1'>{message.role === 'user' ? 'You' : 'ChatAI'}</span>
+                      <span className='text-sm font-medium mb-1'>{message.senderType === 'User' ? '' : 'ChatAI'}</span>
                       <div
-                        className={`prose !text-white p-3 rounded-lg ${message.role === 'user' ? 'bg-[#3D3D3D]' : ''} markdown-chat markdown-chat-a markdown-chat-ol-li max-w-fit`}
+                        className={`prose !text-white p-3 rounded-lg ${message.senderType === 'User' ? 'bg-[#3D3D3D]' : ''} markdown-chat markdown-chat-a markdown-chat-ol-li `}
                       >
                         <ReactMarkdown
-                          className='custom-markdown list-decimal marker:text-white prose-h3:text-white markdown-chat-p'
+                          className='custom-markdown list-decimal marker:text-white prose-h3:text-white prose-h4:text-white markdown-chat-p'
                           components={{
                             code({ node, inline, className, children, ...props }) {
                               const match = /language-(\w+)/.exec(className || '')
                               return !inline && match ? (
-                                <div className='relative'>
+                                <div className='relative max-w-full overflow-x-auto'>
                                   <SyntaxHighlighter style={oneDark} language={match[1]} PreTag='div' {...props}>
                                     {String(children).replace(/\n$/, '')}
                                   </SyntaxHighlighter>
@@ -291,7 +264,7 @@ export default function Component() {
                 <div className='flex justify-start'>
                   <div className='flex items-start space-x-2'>
                     <Avatar>
-                      <AvatarImage src='/placeholder.svg?height=40&width=40' />
+                      <AvatarImage src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJLfI1-UONOCM_xB1cr7iD0rDkT3YGINyXhw&s' />
                       <AvatarFallback>AI</AvatarFallback>
                     </Avatar>
                     <div className='flex flex-col'>
@@ -303,7 +276,7 @@ export default function Component() {
                   </div>
                 </div>
               )}
-              <div ref={messagesEndRef} /> {/* This empty div is used as a reference for scrolling */}
+             
             </div>
           ) : (
             <ChatDefaultScreen />

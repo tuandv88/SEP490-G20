@@ -21,9 +21,11 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
   const [testCase, setTestCase] = useState({ 0: { l1: '9 9 9 9', l2: '9 9 9' } })
   const testCases = useStore((state) => state.testCases)
   const [isOpen, setIsOpen] = useState(false)
-
+  const setCodeRun = useStore((state) => state.setCodeRun)
+  const setCodeResponse = useStore((state) => state.setCodeResponse)
   const handleEditorChange = lodash.debounce((value) => {
     setCode(value)
+    setCodeRun(value)
   }, 1000)
 
   const handleArrayToDictionary = (inputArray) => {
@@ -44,7 +46,6 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
       return
     }
 
-    console.log(code)
     const submissionData = {
       createCodeExecuteDto: {
         languageCode: 'Java',
@@ -57,6 +58,7 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
     try {
       const data = await LearningAPI.excuteCode(problemId, submissionData)
       setResponse(data)
+      setCodeResponse(data)
     } catch (error) {
       console.error('Error submitting code:', error)
       alert('Error occurred while submitting code')
@@ -75,7 +77,7 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
   }, [arrayTestcase, templates])
 
   useEffect(() => {
-    console.log('Updated testCase:', testCase)
+    //console.log('Updated testCase:', testCase)
   }, [testCase])
 
   return (

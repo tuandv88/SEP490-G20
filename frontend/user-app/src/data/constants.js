@@ -9,7 +9,9 @@ export const AUTHENTICATION_ROUTERS = {
   COURSELIST: '/courseList',
   COURSEDETAIL: '/courseDetail/:id',
   LEARNINGSPACE: '/learning-space/:id/lecture/:lectureId',
-  PROBLEMS: '/problems'
+  PROBLEMS: '/problems',
+  CODE: '/code',
+  CALLBACK: '/callback'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}
@@ -19,3 +21,6 @@ export const ROUTES = {
   ...UNAUTHENTICATION_ROUTERS,
   ...BASE_URL
 }
+
+
+

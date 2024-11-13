@@ -1,21 +1,29 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import AuthService from './AuthService'
+import React from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import AuthService from './AuthService';
+
 
 function Callback() {
-  const navigate = useNavigate()
+  console.log("Callback method....");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     AuthService.handleCallback()
       .then(() => {
-        navigate('/')
+        console.log('Verify Auth Code - Get Access_Token & Save Storage..');
+        navigate('/');
       })
       .catch((error) => {
-        console.error('Error handling callback:', error)
-      })
-  }, [navigate])
+        console.error('Error handling callback:', error);
+        console.error('Verify Auth Code Failed.');
+        navigate('/');
+      });
+  }, [navigate]);
 
-  return <div>Loading...</div>
+  // Tạo phần tử React mà không dùng JSX
+  return React.createElement('div', null, 'Loading...');
 }
 
-export default Callback
+export default Callback;

@@ -110,7 +110,7 @@ const TestcaseInterface = ({ response, loading, testCase }) => {
   }
 
   useEffect(() => {
-    console.log('Received result in TestcaseInterface:', response)
+    //console.log('Received result in TestcaseInterface:', response)
     //setData(testCases)
     setStoreTestCases(Object.values(testCases).map((inputs) => ({ inputs }))) // Cập nhật dữ liệu trong store
   }, [response, setStoreTestCases, testCases])

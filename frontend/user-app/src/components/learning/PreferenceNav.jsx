@@ -53,11 +53,10 @@ const LoadingButton = styled.div`
 `
 
 const PreferenceNav = ({ onSubmit, loading }) => {
-  const data = useStore((state) => state.data)
+  const codeRun = useStore((state) => state.codeRun)
 
   const handleFetchData = () => {
-    alert(`Dữ liệu từ Component Test: ${data}`)
-    console.log(data)
+    alert(`Dữ liệu từ Component Test: ${codeRun}`)
   }
 
   return (

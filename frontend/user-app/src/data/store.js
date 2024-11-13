@@ -2,7 +2,13 @@ import { create } from 'zustand'
 
 const useStore = create((set) => ({
   testCases: [],
-  setTestCases: (newTestCases) => set({ testCases: newTestCases })
+  setTestCases: (newTestCases) => set({ testCases: newTestCases }),
+  codeRun: null,
+  setCodeRun: (newCodeRun) => set({ codeRun: newCodeRun }),
+  codeResponse: null,
+  setCodeResponse: (newCodeResponse) => set({ codeResponse: newCodeResponse }),
+  selectedConversationId: null,
+  setSelectedConversationId: (newSelectedConversationId) => set({ selectedConversationId: newSelectedConversationId })
 }))
 
 export default useStore

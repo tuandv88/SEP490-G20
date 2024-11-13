@@ -61,6 +61,11 @@
             // AddDomainEvent(new DiscussionUpdatedEvent(this));
         }
 
+        public void UpdateImage(string imageUrl)
+        {
+            ImageUrl = imageUrl;
+        }
+
         // Tăng số lượt xem
         public void IncrementViewCount()
         {

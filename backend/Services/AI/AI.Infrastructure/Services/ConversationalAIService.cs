@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.KernelMemory;
 using Newtonsoft.Json;
@@ -6,7 +7,8 @@ using System.Text;
 #pragma warning disable SKEXP0010
 namespace AI.Infrastructure.Services;
 public class ConversationalAIService(
-    Kernel kernel, SearchClientConfig _config, IConversationRepository conversationRepository, ILogger<ConversationalAIService> logger
+    Kernel kernel, SearchClientConfig _config, IConversationRepository conversationRepository, ILogger<ConversationalAIService> logger,
+    IConfiguration configuration
     ) : IChatService {
 
     public async Task<MessageAnswer> GenerateAnswer(Guid conversationId, string prompt, IMessageContext? context = default, CancellationToken token = default) {
@@ -48,8 +50,9 @@ public class ConversationalAIService(
     }
 
     private async Task<ChatHistory> GetRecentChatHistory(Guid conversationId) {
+        int pastMessages = configuration.GetValue<int>("Parameters:PastMessages", 10);
         ChatHistory chats = new ChatHistory(); 
-        var conversation = await conversationRepository.GetRecentMessagesAsync(conversationId);
+        var conversation = await conversationRepository.GetRecentMessagesAsync(conversationId, pastMessages);
         if(conversation==null) {
             return chats;
         }

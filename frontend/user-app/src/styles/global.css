@@ -78,6 +78,7 @@
 .markdown-chat-p p {
   margin-top: 0.25em !important;
   margin-bottom: 0.25em !important;
+  color: #B0BEC5 !important;
 }
 
 .custom-markdown strong {
@@ -86,7 +87,7 @@
 }
 
 .markdown-chat-ol-li ol > li {
-  color: white !important;
+  color: #B0BEC5 !important;
 }
 
 .textarea-no-scroll {

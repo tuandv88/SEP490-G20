@@ -22,6 +22,5 @@ export const ROUTES = {
   ...BASE_URL
 }
 
-export const SIGNALR_URL = 'https://localhost:5000/ai-service/ai-chat'
 
 

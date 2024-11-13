@@ -3,9 +3,8 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { Send, Plus, X, History, Square } from 'lucide-react'
+import { Send, Plus, X, History, Square, ArrowUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
@@ -16,19 +15,25 @@ import ChatDefaultScreen from './ChatDefaultScreen'
 import { Textarea } from '../ui/textarea'
 import { useSignalRConnection } from '../hooks/useSignalRConnection'
 import { ChatAPI } from '@/services/api/chatApi'
-import { SIGNALR_URL } from '@/data/constants'
+import useStore from '@/data/store'
 
 export default function Component({ lectureId, problemId }) {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [codeResponse, setCodeResponse] = useState(null)
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { connection, messages: initialMessages } = useSignalRConnection(SIGNALR_URL)
-  const [messages, setMessages] = useState(initialMessages || [])
+  const { connection, messages: initialMessages } = useSignalRConnection(process.env.REACT_APP_SIGNALR_URL)
+  const [messages, setMessages] = useState( [])
   const [chatHistory, setChatHistory] = useState([])
-  const [selectedConversationId, setSelectedConversationId] = useState(null)
-  
+  // const [selectedConversationId, setSelectedConversationId] = useState(null)
+  const selectedConversationId = useStore((state) => state.selectedConversationId)
+  const setSelectedConversationId = useStore((state) => state.setSelectedConversationId)
+
+  const codeRun = useStore((state) => state.codeRun)
+  const codeRunRef = useRef(codeRun);
+
+  useEffect(() => {
+    codeRunRef.current = codeRun;
+  }, [codeRun]);
 
 
   useEffect(() => {
@@ -40,6 +45,18 @@ export default function Component({ lectureId, problemId }) {
         console.error('Error fetching conversation:', error)
       }
     }
+
+    const fetchMessage = async () => {
+      try {
+        const data = await ChatAPI.getMessage(selectedConversationId)
+        setMessages(data.messages.data.reverse())
+        setSelectedConversationId(selectedConversationId)
+      } catch (error) {
+        console.error('Error fetching message:', error)
+      }
+    }
+    
+    fetchMessage()
     fetchConversation()
   }, [selectedConversationId])
 
@@ -47,7 +64,7 @@ export default function Component({ lectureId, problemId }) {
 
 
   const handleSend = async () => {
-    if (message.trim() ) {
+    if (message.trim() !== '') {
       const newMessage = { id: messages.length > 0 ? messages[messages.length - 1].id + 1 : 1, senderType: 'User', content: message, timestamp: 'Just now', referenceLinks: [] }
       if (Array.isArray(messages)) {
         setMessages([...messages, newMessage])
@@ -103,17 +120,9 @@ export default function Component({ lectureId, problemId }) {
   }
 
   const handleChatClick = (conversationId) => {
-    const fetchMessage = async () => {
-      try {
-        const data = await ChatAPI.getMessage(conversationId)
-        setMessages(data.messages.data.reverse())
+
         setSelectedConversationId(conversationId)
-        setIsHistoryOpen(false)
-      } catch (error) {
-        console.error('Error fetching message:', error)
-      }
-    }
-    fetchMessage()
+        setIsHistoryOpen(false)   
   }
 
   const handleNewChat = () => {
@@ -122,20 +131,19 @@ export default function Component({ lectureId, problemId }) {
   }
 
   return (
-    <div className='flex bg-[#1E1E1E] text-white h-[calc(100vh-6rem)]'>
+    <div className='flex bg-[#1b2a32] text-white h-[calc(100vh-3rem)]'>
       {/* Chat History Sidebar */}
       <div
         style={{
           height: 'inherit'
         }}
-        className={`fixed left-0 w-80 bg-[#2D2D2D] shadow-lg transform transition-transform duration-300 ease-in-out  ${
-          isHistoryOpen ? 'translate-x-0 z-10' : '-translate-x-full z-10'
+        className={`fixed right-0 w-80 bg-[#2D2D2D] shadow-lg transform transition-transform duration-300 ease-in-out ${
+          isHistoryOpen ? 'translate-x-0 z-10' : 'translate-x-full z-10'
         }`}
       >
         <div className='p-4 border-b border-gray-700'>
           <div className='flex justify-between items-center mb-4'>
-            <h2 className='text-lg font-semibold'>All Chats</h2>
-            <Button
+          <Button
               variant='ghost'
               size='icon'
               onClick={() => setIsHistoryOpen(false)}
@@ -143,14 +151,8 @@ export default function Component({ lectureId, problemId }) {
             >
               <X size={18} />
             </Button>
+            <h2 className='text-lg font-semibold'>All Chats</h2>           
           </div>
-          {/* <Input
-            type='text'
-            placeholder='Search chats...'
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className='w-full bg-[#3D3D3D] text-white placeholder-gray-400'
-          /> */}
         </div>
         <ScrollArea className='h-[calc(100vh-120px)] mb-4 scroll-container pb-[200px]'>
           {chatHistory.map((chat) => (
@@ -171,11 +173,8 @@ export default function Component({ lectureId, problemId }) {
       {/* Main Chat Area */}
       <div className='flex-1 flex flex-col scroll-container'>
         {/* Header */}
-        <div className='h-14 border-b border-gray-700 flex items-center px-4 justify-between sticky top-0 bg-black z-[1]'>
-          <div className='flex items-center gap-2'>
-            <h1 className='font-semibold'>CHAT</h1>
-          </div>
-          <div className='flex items-center gap-3'>
+        <div className='h-[52px] border-b border-gray-700 flex items-center px-4 justify-between sticky top-0 bg-[#1f2937] z-[1]'>
+        <div className='flex items-center gap-3'>
             <Button
               variant='ghost'
               size='icon'
@@ -188,122 +187,129 @@ export default function Component({ lectureId, problemId }) {
               <Plus size={18} />
             </Button>
           </div>
+          
+          <div className='flex items-center gap-2'>
+            <h1 className='font-semibold'>CHAT</h1>
+          </div>
+          
         </div>
 
         {/* Chat Messages Area */}
         <ScrollArea className='flex-1 p-4'>
           {messages.length > 0 ? (
-            <div className='space-y-4'>
-              {messages.map((message) => (
-                <div key={message.id} className={`flex ${message.senderType === 'User' ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`flex items-start space-x-2 ${message.senderType === 'User' ? 'flex-row-reverse space-x-reverse' : ''}`}
-                  >
-                    <Avatar>
-                      <AvatarImage
-                        src={
-                          message.senderType === 'User'
-                            ? ''
-                            : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJLfI1-UONOCM_xB1cr7iD0rDkT3YGINyXhw&s'
-                        }
-                      />
-                      <AvatarFallback>{message.senderType === 'User' ? '' : 'AI'}</AvatarFallback>
-                    </Avatar>
-                    <div className='flex flex-col'>
-                      <span className='text-sm font-medium mb-1'>{message.senderType === 'User' ? '' : 'ChatAI'}</span>
-                      <div
-                        className={`prose !text-white p-3 rounded-lg ${message.senderType === 'User' ? 'bg-[#3D3D3D]' : ''} markdown-chat markdown-chat-a markdown-chat-ol-li `}
-                      >
-                        <ReactMarkdown
-                          className='custom-markdown list-decimal marker:text-white prose-h3:text-white prose-h4:text-white markdown-chat-p'
-                          components={{
-                            code({ node, inline, className, children, ...props }) {
-                              const match = /language-(\w+)/.exec(className || '')
-                              return !inline && match ? (
-                                <div className='relative max-w-full overflow-x-auto'>
-                                  <SyntaxHighlighter style={oneDark} language={match[1]} PreTag='div' {...props}>
-                                    {String(children).replace(/\n$/, '')}
-                                  </SyntaxHighlighter>
-                                  <PreCoppy code={String(children)} />
-                                </div>
-                              ) : (
-                                <code
-                                  className='bg-gray-300 inline-block text-black rounded px-1 py-0.3 text-sm font-mono'
-                                  style={{ content: 'none' }}
-                                  {...props}
+                        <div className='space-y-4'>
+                        {messages.map((message) => (
+                          <div key={message.id} className={`flex ${message.senderType === 'User' ? 'justify-end' : 'justify-start'}`}>
+                            <div
+                              className={`flex w-full items-start space-x-2 ${message.senderType === 'User' ? 'flex-row-reverse space-x-reverse' : ''}`}
+                            >
+                              {message.senderType !== 'User' && (
+                                <Avatar>
+                                  <AvatarImage
+                                    src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJLfI1-UONOCM_xB1cr7iD0rDkT3YGINyXhw&s'
+                                  />
+                                  <AvatarFallback>AI</AvatarFallback>
+                                </Avatar>
+                              )}
+                              <div className='flex flex-col overflow-x-auto'>
+                                
+                                <div
+                                  className={`prose prose-invert max-w-fit overflow-x-auto !text-white p-3 rounded-lg ${message.senderType === 'User' ? 'bg-[#3D3D3D]' : ''} markdown-chat markdown-chat-a markdown-chat-ol-li `}
                                 >
-                                  {children}
-                                </code>
-                              )
-                            }
-                          }}
-                        >
-                          {message.content}
-                        </ReactMarkdown>
-                        {message.referenceLink && (
-                          <div className='flex flex-wrap gap-2'>
-                            {message.referenceLink.map((link, index) => (
-                              <div key={index} className='flex items-center gap-2 px-4 bg-gray-300 rounded-full'>
-                                <div className='flex items-center justify-center w-3 h-3 text-xs text-black font-medium rounded-full bg-[#ffe4ca]'>
-                                  {index + 1}
+                                  <ReactMarkdown
+                                    className='custom-markdown list-decimal marker:text-white prose-h3:text-[#B0BEC5] prose-h4:text-[#B0BEC5] markdown-chat-p'
+                                    components={{
+                                      code({ node, inline, className, children, ...props }) {
+                                        const match = /language-(\w+)/.exec(className || '')
+                                        return !inline && match ? (
+                                          <div className='relative overflow-x-auto'>
+                                            <SyntaxHighlighter style={oneDark} language={match[1]} PreTag='div' {...props}>
+                                              {String(children).replace(/\n$/, '')}
+                                            </SyntaxHighlighter>
+                                            <PreCoppy code={String(children)} />
+                                          </div>
+                                        ) : (
+                                          <code
+                                            className='bg-gray-300 inline-block text-black rounded px-1 py-0.3 text-sm font-mono'
+                                            style={{ content: 'none' }}
+                                            {...props}
+                                          >
+                                            {children}
+                                          </code>
+                                        )
+                                      }
+                                    }}
+                                  >
+                                    {message.content}
+                                  </ReactMarkdown>
+                                  
+                                  {message.referenceLink && (
+                                    <div className='flex flex-wrap gap-2'>
+                                      {message.referenceLink.map((link, index) => (
+                                        <div key={index} className='flex items-center gap-2 px-4 bg-gray-300 rounded-full'>
+                                          <div className='flex items-center justify-center w-3 h-3 text-xs text-black font-medium rounded-full bg-[#ffe4ca]'>
+                                            {index + 1}
+                                          </div>
+                                          <span className='text-[11px] markdown-chat-a markdown-chat-p'>
+                                            <ReactMarkdown>{link}</ReactMarkdown>
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
-                                <span className='text-[11px] markdown-chat-a markdown-chat-p'>
-                                  <ReactMarkdown>{link}</ReactMarkdown>
-                                </span>
+                                {/* <span className='text-xs text-gray-400 mt-1'>{message.timestamp}</span> */}
                               </div>
-                            ))}
+                            </div>
+                          </div>
+                        ))}
+                        {isLoading && (
+                          <div className='flex justify-start'>
+                            <div className='flex items-start space-x-2'>
+                              <Avatar>
+                                <AvatarImage src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJLfI1-UONOCM_xB1cr7iD0rDkT3YGINyXhw&s' />
+                                <AvatarFallback>AI</AvatarFallback>
+                              </Avatar>
+                              <div className='flex flex-col'>
+                                <span className='text-sm font-medium mb-1'>ChatAI</span>
+                                <div className='p-2 rounded-lg bg-gray-100'>
+                                  <div className='w-6 h-6 border-t-2 border-green-500 rounded-full animate-spin'></div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
-                      {/* <span className='text-xs text-gray-400 mt-1'>{message.timestamp}</span> */}
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className='flex justify-start'>
-                  <div className='flex items-start space-x-2'>
-                    <Avatar>
-                      <AvatarImage src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJLfI1-UONOCM_xB1cr7iD0rDkT3YGINyXhw&s' />
-                      <AvatarFallback>AI</AvatarFallback>
-                    </Avatar>
-                    <div className='flex flex-col'>
-                      <span className='text-sm font-medium mb-1'>ChatAI</span>
-                      <div className='p-2 rounded-lg bg-gray-100'>
-                        <div className='w-6 h-6 border-t-2 border-green-500 rounded-full animate-spin'></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-             
-            </div>
           ) : (
             <ChatDefaultScreen />
           )}
         </ScrollArea>
 
         {/* Input Area */}
-        <div className='border-t border-gray-700 p-4 sticky bottom-0 bg-black'>
-          <div className='flex items-center gap-4'>
-            <Textarea
-              type='text'
-              placeholder='Type a message...'
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              disabled={isLoading}
-              onKeyDown={handleKeyDown}
-              className='flex-1 bg-[#3D3D3D] text-white placeholder-gray-400 textarea-no-scroll'
-            />
-            <Button type='submit' onClick={handleSend} className='bg-blue-600 hover:bg-blue-700' disabled={isLoading}>
-              <Send size={20} />
-            </Button>
-          </div>
-          <div className='mt-2 text-xs text-gray-400 flex items-center gap-2'>
-            <span>Ask followup (Ctrl+Shift+Y)</span>
-            <span className='text-gray-500'>|</span>
-            <span>↑ to select</span>
-          </div>
+        <div className='border-t border-gray-700 p-4 sticky bottom-0 bg-[#1f2937]'>        
+          <div className="flex items-end gap-2">
+        <div className="relative flex-grow">
+          <Textarea 
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isLoading}
+            placeholder="Ask ChatAI..." 
+            className="min-h-[90px] max-h-[200px] bg-gray-300 text-black placeholder:text-zinc-500 resize-none border-none focus-visible:ring-0 mb-2"
+          />
+        </div>
+        <div className="flex items-center gap-2">          
+          <Button
+            type='submit'
+            onClick={handleSend}
+            disabled={isLoading}
+            size="icon"
+            className="bg-white text-black hover:bg-zinc-200 mb-2"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
         </div>
       </div>
     </div>

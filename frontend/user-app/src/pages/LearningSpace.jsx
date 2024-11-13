@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 import CodeEditor from '@/components/learning/CodeEditor'
 import Comments from '@/components/learning/Comment'
-import Curriculum from '@/components/learning/Curriculum'
 import Description from '@/components/learning/Description'
 import HeaderTab from '@/components/learning/HeaderTab'
 import { LearningAPI } from '@/services/api/learningApi'
@@ -13,7 +12,6 @@ import ChapterLoading from '@/components/loading/ChapterLoading'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import HeaderCode from '@/layouts/learningheader'
 import ToggleCurriculum from '@/components/learning/ToggleCurriculum'
-import useClickOutside from '@/components/hooks/useClickOutside'
 import ChatAI from '@/components/chat/ChatAI'
 
 const LearningSpace = () => {
@@ -29,6 +27,7 @@ const LearningSpace = () => {
   const [videoBlobUrl, setVideoBlobUrl] = useState(null)
   const [isProblemListOpen, setIsProblemListOpen] = useState(false)
   const videoTimeRef = useRef(0)
+  const [isThreePanels, setIsThreePanels] = useState(false)
 
   //courseId
   const { id, lectureId } = useParams()
@@ -39,6 +38,10 @@ const LearningSpace = () => {
 
   const handleVideoTimeUpdate = (time) => {
     videoTimeRef.current = time
+  }
+
+  const togglePanelLayout = () => {
+    setIsThreePanels(!isThreePanels)
   }
 
   useEffect(() => {
@@ -68,7 +71,7 @@ const LearningSpace = () => {
     fetchCourseDetail()
   }, [id])
 
-  // Gọi API lấy lectureDetail khi selectedLectureId thay đổi
+  
   useEffect(() => {
     if (lectureId) {
       const fetchLectureDetail = async () => {
@@ -119,13 +122,13 @@ const LearningSpace = () => {
   return (
     <div>
       <div>
-        <HeaderCode onButtonClick={toggleProblemList} />
+        <HeaderCode onButtonClick={toggleProblemList} onChatClick={togglePanelLayout} />
       </div>
       <ResizablePanelGroup
         direction='horizontal'
         className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
       >
-        <ResizablePanel defaultSize={40}>
+        <ResizablePanel id='panel-1' order={1} defaultSize={isThreePanels ? 30 : 40}>
           <div className='scroll-container h-screen'>
             <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} />
             {loading && <ChapterLoading />}
@@ -140,11 +143,10 @@ const LearningSpace = () => {
               />
             )}
             {activeTab === 'comments' && !loading && <Comments />}
-            {activeTab === 'chatbot' && !loading && <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id} />}
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle className='resize-sha w-[3px]' />
-        <ResizablePanel defaultSize={60}>
+        <ResizablePanel id='panel-2' order={2} defaultSize={isThreePanels ? 40 : 60}>
           {/* <QuizScreen></QuizScreen> */}
           <CodeEditor
             templates={lectureDetail?.lectureDetailsDto?.problem?.templates.Java}
@@ -152,6 +154,16 @@ const LearningSpace = () => {
             problemId={lectureDetail?.lectureDetailsDto?.problem?.id}
           />
         </ResizablePanel>
+        {isThreePanels && (
+          <>
+            <ResizableHandle withHandle className='resize-sha w-[3px]' />
+            <ResizablePanel id='panel-3' order={3} defaultSize={30}>
+              <div className='scroll-container h-screen'>
+              <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id}/>
+              </div>
+            </ResizablePanel>
+          </>
+        )}
       </ResizablePanelGroup>
 
       {isProblemListOpen && (

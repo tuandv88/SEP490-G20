@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { HubConnectionBuilder } from '@microsoft/signalr'
 import useStore from '@/data/store'
 
@@ -8,6 +8,12 @@ export const useSignalRConnection = (url) => {
   const codeRun = useStore((state) => state.codeRun)
   const codeResponse = useStore((state) => state.codeResponse)
 
+  const codeRunRef = useRef(codeRun);
+
+  useEffect(() => {
+    codeRunRef.current = codeRun;
+  }, [codeRun]);
+  
   useEffect(() => {
     const connect = async () => {
       const newConnection = new HubConnectionBuilder()
@@ -20,7 +26,7 @@ export const useSignalRConnection = (url) => {
 
         let promise = new Promise(async (resolve, reject) => {
           try {
-            const codeDto = await requestUserCode()
+            const codeDto = await requestUserCode(codeRunRef.current)
             resolve(codeDto)
           } catch (error) {
             reject(error)
@@ -66,11 +72,11 @@ export const useSignalRConnection = (url) => {
     }
   }, [url])
 
-  const requestUserCode = () => {
+  const requestUserCode = (codeRun) => {
     return new Promise((resolve) => {
       const codeDto = {
-        SolutionCode: codeRun.toString(),
-        SubmissionResult: codeResponse.toString()
+        SolutionCode: codeRun,
+        SubmissionResult: 'Success'
       }
       resolve(codeDto)
     })

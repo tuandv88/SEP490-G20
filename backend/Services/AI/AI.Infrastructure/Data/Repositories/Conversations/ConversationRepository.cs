@@ -31,7 +31,7 @@ public class ConversationRepository : Repository<Conversation>, IConversationRep
         return conversations;
     }
 
-    public async Task<Conversation?> GetRecentMessagesAsync(Guid id) {
+    public async Task<Conversation?> GetRecentMessagesAsync(Guid id, int pastMessages) {
         var conversation = _dbContext.Conversations
                        .Include(c => c.Messages)
                        .AsNoTracking()
@@ -42,7 +42,7 @@ public class ConversationRepository : Repository<Conversation>, IConversationRep
             conversation.Messages = conversation.Messages
                 .Where(m => m.ConversationId.Value == id)
                 .OrderByDescending(m => m.CreatedAt)
-                .Take(10)
+                .Take(pastMessages)
                 .ToList();
         }
         return conversation;

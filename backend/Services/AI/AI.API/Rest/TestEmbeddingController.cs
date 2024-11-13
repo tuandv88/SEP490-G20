@@ -21,7 +21,7 @@ namespace AI.API.Rest {
             _kernel = kernel;
             _kernelMemory = kernelMemory;
             //_textEmbeddingGenerationService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-            //_chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+            _chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
         }
 
         //[HttpGet("/embedding")]

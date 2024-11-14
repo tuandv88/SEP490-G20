@@ -14,7 +14,7 @@ const indexRoute = createRoute({
 const courseTableRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/course-table',
-  component: lazy(() => import('@/pages/Course/course'))
+  component: lazy(() => import('@/pages/Course/CourseTable'))
 })
 
 const errorTestRoute = createRoute({
@@ -31,8 +31,8 @@ const loadingTestRoute = createRoute({
 
 const createCourseRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/createCourse',
-  component: lazy(() => import('@/pages/Course/createCourse'))
+  path: '/create-course',
+  component: lazy(() => import('@/pages/Course/CreateCourse'))
 })
 
 const routeTree = rootRoute.addChildren([

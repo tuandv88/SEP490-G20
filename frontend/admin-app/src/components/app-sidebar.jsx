@@ -65,7 +65,7 @@ const data = {
         },
         {
           title: 'Create Course',
-          url: '#'
+          url: '/create-course'
         }
       ]
     },

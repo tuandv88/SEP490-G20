@@ -130,6 +130,7 @@ public static class KernelConfigurationExtensions {
                 var learningPlugin = new LearningPlugin();
                 kernel.ImportPluginFromObject(communicationPlugin);
                 kernel.ImportPluginFromObject(learningPlugin);
+                kernel.ImportPluginFromType<UtilsPlugin>();
             }
 
             return kernel;

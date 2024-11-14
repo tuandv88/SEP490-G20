@@ -171,6 +171,17 @@ namespace AI.API.Rest {
 
             return Ok(answer.ToJson(true));
         }
+        [HttpGet("/searchweb")]
+        public async Task<IActionResult> SearchWeb(string question) {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://google.serper.dev/search");
+            request.Headers.Add("X-API-KEY", "e313f010c0e6082bacba5f7000f103edabc67ecc");
+            var content = new StringContent("{\"q\":\""+ question+"\"}", null, "application/json");
+            request.Content = content;
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return Ok(await response.Content.ReadAsStringAsync());
+        }
         [HttpGet("/ask-rag-prompt")]
         public async Task<IActionResult> AskRagPrompt(string question) {
             var prompt = $@"c

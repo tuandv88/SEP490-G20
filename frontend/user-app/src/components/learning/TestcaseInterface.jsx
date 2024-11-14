@@ -59,6 +59,8 @@ const TestcaseInterface = ({ response, loading, testCase }) => {
   const [activeTestResult, setActiveTestResult] = useState(0)
   const [testCases, setTestCases] = useState(testCase)
   const setStoreTestCases = useStore((state) => state.setTestCases)
+  const activeTabTestcase = useStore((state) => state.activeTabTestcase)
+  const setActiveTabTestcase = useStore((state) => state.setActiveTabTestcase)
 
   useEffect(() => {
     if (testCase) {
@@ -116,23 +118,23 @@ const TestcaseInterface = ({ response, loading, testCase }) => {
   }, [response, setStoreTestCases, testCases])
 
   return (
-    <div className='bg-[#111827] p-4 shadow-md w-full h-full'>
+    <div className='bg-[#111827] p-4 shadow-md w-full h-full '>
       <div className='flex mb-4 border-b border-gray-600'>
         <button
           className={`px-4 py-2 text-sm font-bold ${
-            activeTab === 'Testcase' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-gray-200'
+            activeTabTestcase === 'Testcase' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-gray-200'
           }`}
-          onClick={() => setActiveTab('Testcase')}
+          onClick={() => setActiveTabTestcase('Testcase')}
         >
           Testcase
         </button>
         <button
           className={`px-4 py-2 text-sm font-bold flex items-center ${
-            activeTab === 'Test Result'
+            activeTabTestcase === 'Test Result'
               ? 'text-blue-400 border-b-2 border-blue-400'
               : 'text-gray-400 hover:text-gray-200'
           }`}
-          onClick={() => setActiveTab('Test Result')}
+          onClick={() => setActiveTabTestcase('Test Result')}
         >
           {loading ? (
             <>
@@ -144,7 +146,7 @@ const TestcaseInterface = ({ response, loading, testCase }) => {
           )}
         </button>
       </div>
-      {activeTab === 'Testcase' && (
+      {activeTabTestcase === 'Testcase' && (
         <>
           <div className='p-4 bg-gray-800 rounded-lg'>
             <div className='flex items-center mb-4'>
@@ -203,7 +205,7 @@ const TestcaseInterface = ({ response, loading, testCase }) => {
           </div>
         </>
       )}
-      {activeTab === 'Test Result' && (
+      {activeTabTestcase === 'Test Result' && (
         <div className='bg-gray-800 rounded-md p-4'>
           {loading && <TestResultLoading></TestResultLoading>}
           {!loading && response?.codeExecuteDto?.testResults && response.codeExecuteDto.testResults.length > 0 && (

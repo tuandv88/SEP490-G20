@@ -128,8 +128,8 @@ const LearningSpace = () => {
         direction='horizontal'
         className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
       >
-        <ResizablePanel id='panel-1' order={1} defaultSize={isThreePanels ? 30 : 40}>
-          <div className='scroll-container h-screen'>
+        <ResizablePanel id='panel-1' order={1} defaultSize={30}>
+          <div className='scroll-container h-full'>
             <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} />
             {loading && <ChapterLoading />}
             {activeTab === 'descriptions' && !loading && (
@@ -158,7 +158,7 @@ const LearningSpace = () => {
           <>
             <ResizableHandle withHandle className='resize-sha w-[3px]' />
             <ResizablePanel id='panel-3' order={3} defaultSize={30}>
-              <div className='scroll-container h-screen'>
+              <div className='scroll-container h-full'>
               <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id}/>
               </div>
             </ResizablePanel>

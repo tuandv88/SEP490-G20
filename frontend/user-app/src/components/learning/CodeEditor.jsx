@@ -23,6 +23,9 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
   const [isOpen, setIsOpen] = useState(false)
   const setCodeRun = useStore((state) => state.setCodeRun)
   const setCodeResponse = useStore((state) => state.setCodeResponse)
+  const setActiveTabTestcase = useStore((state) => state.setActiveTabTestcase)
+
+
   const handleEditorChange = lodash.debounce((value) => {
     setCode(value)
     setCodeRun(value)
@@ -53,7 +56,7 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
         testCases: testCases
       }
     }
-
+    setActiveTabTestcase('Test Result')
     setLoading(true)
     try {
       const data = await LearningAPI.excuteCode(problemId, submissionData)

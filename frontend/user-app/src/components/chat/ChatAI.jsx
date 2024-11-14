@@ -17,16 +17,21 @@ import { useSignalRConnection } from '../hooks/useSignalRConnection'
 import { ChatAPI } from '@/services/api/chatApi'
 import useStore from '@/data/store'
 
-export default function Component({ lectureId, problemId }) {
+const ChatAI = ({ lectureId, problemId }) => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [message, setMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { connection, messages: initialMessages } = useSignalRConnection(process.env.REACT_APP_SIGNALR_URL)
+  const { connection, messages: initialMessages } = useSignalRConnection(import.meta.env.VITE_SIGNALR_URL)
   const [messages, setMessages] = useState( [])
   const [chatHistory, setChatHistory] = useState([])
   // const [selectedConversationId, setSelectedConversationId] = useState(null)
   const selectedConversationId = useStore((state) => state.selectedConversationId)
   const setSelectedConversationId = useStore((state) => state.setSelectedConversationId)
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   const codeRun = useStore((state) => state.codeRun)
   const codeRunRef = useRef(codeRun);
@@ -37,10 +42,15 @@ export default function Component({ lectureId, problemId }) {
 
 
   useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+
+  useEffect(() => {
     const fetchConversation = async () => {
       try {
         const data = await ChatAPI.getConversation()
-        setChatHistory(data.conversations.data)       
+        setChatHistory(data.conversations.data)     
       } catch (error) {
         console.error('Error fetching conversation:', error)
       }
@@ -49,18 +59,19 @@ export default function Component({ lectureId, problemId }) {
     const fetchMessage = async () => {
       try {
         const data = await ChatAPI.getMessage(selectedConversationId)
-        setMessages(data.messages.data.reverse())
+        setMessages(data.messages.data.reverse())       
         setSelectedConversationId(selectedConversationId)
       } catch (error) {
         console.error('Error fetching message:', error)
       }
     }
     
-    fetchMessage()
+    
     fetchConversation()
+    if(selectedConversationId !== null) {
+      fetchMessage()
+    }
   }, [selectedConversationId])
-
-
 
 
   const handleSend = async () => {
@@ -131,7 +142,7 @@ export default function Component({ lectureId, problemId }) {
   }
 
   return (
-    <div className='flex bg-[#1b2a32] text-white h-[calc(100vh-3rem)]'>
+    <div className='flex bg-bGprimary text-white h-[calc(100vh-3rem)]'>
       {/* Chat History Sidebar */}
       <div
         style={{
@@ -237,21 +248,37 @@ export default function Component({ lectureId, problemId }) {
                                             {children}
                                           </code>
                                         )
+                                      },
+                                      a({ href, children, ...props }) {
+                                        return (
+                                          <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+                                            {children}
+                                          </a>
+                                        )
                                       }
-                                    }}
+                                    }
+                                  }
                                   >
                                     {message.content}
                                   </ReactMarkdown>
                                   
-                                  {message.referenceLink && (
+                                  {message.referenceLinks && (
                                     <div className='flex flex-wrap gap-2'>
-                                      {message.referenceLink.map((link, index) => (
+                                      {message.referenceLinks.map((link, index) => (
                                         <div key={index} className='flex items-center gap-2 px-4 bg-gray-300 rounded-full'>
                                           <div className='flex items-center justify-center w-3 h-3 text-xs text-black font-medium rounded-full bg-[#ffe4ca]'>
                                             {index + 1}
                                           </div>
                                           <span className='text-[11px] markdown-chat-a markdown-chat-p'>
-                                            <ReactMarkdown>{link}</ReactMarkdown>
+                                            <ReactMarkdown
+                                            components={{
+                                              a: ({ node, ...props }) => (
+                                                <a {...props} target="_blank" rel="noopener noreferrer">
+                                                  {props.children}
+                                                </a>
+                                              ),
+                                            }}
+                                            >{link}</ReactMarkdown>
                                           </span>
                                         </div>
                                       ))}
@@ -279,6 +306,7 @@ export default function Component({ lectureId, problemId }) {
                             </div>
                           </div>
                         )}
+                        <div ref={messagesEndRef} />
                       </div>
           ) : (
             <ChatDefaultScreen />
@@ -315,3 +343,5 @@ export default function Component({ lectureId, problemId }) {
     </div>
   )
 }
+
+export default React.memo(ChatAI)

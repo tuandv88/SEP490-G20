@@ -27,7 +27,7 @@ public class ConversationalAIService(
             PresencePenalty = _config.PresencePenalty,
             FrequencyPenalty = _config.FrequencyPenalty,
             StopSequences = _config.StopSequences,
-            ResponseFormat = typeof(MessageAnswer),
+            //ResponseFormat = typeof(MessageAnswer),
         };
         var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
         var chatHistory = await GetRecentChatHistory(conversationId);

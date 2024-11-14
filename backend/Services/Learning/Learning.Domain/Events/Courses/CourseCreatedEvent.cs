@@ -1,2 +1,2 @@
-﻿namespace Learning.Domain.Events;
+﻿namespace Learning.Domain.Events.Courses;
 public record CourseCreatedEvent(Models.Course Course) : IDomainEvent;

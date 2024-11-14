@@ -59,6 +59,7 @@ const PreferenceNav = ({ onSubmit, loading }) => {
     alert(`Dữ liệu từ Component Test: ${codeRun}`)
   }
 
+
   return (
     <div>
       <div className='flex items-center justify-between p-2 bg-gray-800'>

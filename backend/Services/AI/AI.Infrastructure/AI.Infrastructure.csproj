@@ -23,6 +23,7 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="MassTransit.Kafka" Version="8.3.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

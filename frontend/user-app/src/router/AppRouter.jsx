@@ -7,6 +7,9 @@ import LearningSpace from '@/pages/LearningSpace'
 import ErrorPage from '@/pages/ErrorPage'
 // import Problems from '@/pages/Problems'
 import Problem from '@/pages/Problem'
+import { lazy, Suspense } from 'react'
+import Callback from '@/oidc/Callback'
+const Code = lazy(() => import('@/pages/Code'))
 
 export const AppRouter = () => {
   const router = createBrowserRouter([
@@ -33,6 +36,10 @@ export const AppRouter = () => {
     {
       path: AUTHENTICATION_ROUTERS.PROBLEMS,
       element: <Problem />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.CALLBACK,
+      element: <Callback />
     },
     { path: AUTHENTICATION_ROUTERS.NOTFOUND, element: <NotFound /> },
     { path: AUTHENTICATION_ROUTERS.ERROR, element: <ErrorPage /> }

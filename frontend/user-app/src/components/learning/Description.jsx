@@ -62,7 +62,7 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
       {loading ? (
         <DescriptionLoading />
       ) : (
-        <div className='bg-gray-900 text-gray-300 p-6 mx-auto font-sans'>
+        <div className='bg-bGprimary text-gray-300 p-6 mx-auto font-sans'>
           <div className='relative pb-[56.25%] h-0'>
             <video           
               ref={videoRef}

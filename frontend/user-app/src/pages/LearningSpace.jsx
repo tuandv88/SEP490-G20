@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 import CodeEditor from '@/components/learning/CodeEditor'
 import Comments from '@/components/learning/Comment'
-import Curriculum from '@/components/learning/Curriculum'
 import Description from '@/components/learning/Description'
 import HeaderTab from '@/components/learning/HeaderTab'
 import { LearningAPI } from '@/services/api/learningApi'
@@ -13,11 +12,10 @@ import ChapterLoading from '@/components/loading/ChapterLoading'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import HeaderCode from '@/layouts/learningheader'
 import ToggleCurriculum from '@/components/learning/ToggleCurriculum'
-import useClickOutside from '@/components/hooks/useClickOutside'
 import ChatAI from '@/components/chat/ChatAI'
 
 const LearningSpace = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('descriptions')
   const [chapters, setChapters] = useState([])
   const [title, setTitle] = useState('')
@@ -28,18 +26,23 @@ const LearningSpace = () => {
   const [error, setError] = useState(false)
   const [videoBlobUrl, setVideoBlobUrl] = useState(null)
   const [isProblemListOpen, setIsProblemListOpen] = useState(false)
-  const videoTimeRef = useRef(0);
+  const videoTimeRef = useRef(0)
+  const [isThreePanels, setIsThreePanels] = useState(false)
 
   //courseId
-  const { id, lectureId } = useParams();
+  const { id, lectureId } = useParams()
   const toggleProblemList = () => {
     setIsProblemListOpen(!isProblemListOpen)
   }
-  console.log("Load")
+  console.log('Load')
 
   const handleVideoTimeUpdate = (time) => {
-    videoTimeRef.current = time;
-  };
+    videoTimeRef.current = time
+  }
+
+  const togglePanelLayout = () => {
+    setIsThreePanels(!isThreePanels)
+  }
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
@@ -67,13 +70,13 @@ const LearningSpace = () => {
 
     fetchCourseDetail()
   }, [id])
- 
-  // Gọi API lấy lectureDetail khi selectedLectureId thay đổi
+
+  
   useEffect(() => {
-    if ( lectureId) {
+    if (lectureId) {
       const fetchLectureDetail = async () => {
         try {
-          const data = await LearningAPI.getLectureDetails( lectureId)
+          const data = await LearningAPI.getLectureDetails(lectureId)
           setLectureDetail(data)
 
           //Gọi API để lấy ra file của lecutre đó.
@@ -119,14 +122,14 @@ const LearningSpace = () => {
   return (
     <div>
       <div>
-        <HeaderCode onButtonClick={toggleProblemList} />
+        <HeaderCode onButtonClick={toggleProblemList} onChatClick={togglePanelLayout} />
       </div>
       <ResizablePanelGroup
         direction='horizontal'
         className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
       >
-        <ResizablePanel defaultSize={40}>
-          <div className='scroll-container h-screen'>
+        <ResizablePanel id='panel-1' order={1} defaultSize={30}>
+          <div className='scroll-container h-full'>
             <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} />
             {loading && <ChapterLoading />}
             {activeTab === 'descriptions' && !loading && (
@@ -140,11 +143,10 @@ const LearningSpace = () => {
               />
             )}
             {activeTab === 'comments' && !loading && <Comments />}
-            {activeTab === 'chatbot' && !loading && <ChatAI />}
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle className='resize-sha w-[3px]' />
-        <ResizablePanel defaultSize={60}>
+        <ResizablePanel id='panel-2' order={2} defaultSize={isThreePanels ? 40 : 60}>
           {/* <QuizScreen></QuizScreen> */}
           <CodeEditor
             templates={lectureDetail?.lectureDetailsDto?.problem?.templates.Java}
@@ -152,9 +154,24 @@ const LearningSpace = () => {
             problemId={lectureDetail?.lectureDetailsDto?.problem?.id}
           />
         </ResizablePanel>
+        {isThreePanels && (
+          <>
+            <ResizableHandle withHandle className='resize-sha w-[3px]' />
+            <ResizablePanel id='panel-3' order={3} defaultSize={30}>
+              <div className='scroll-container h-full'>
+              <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id}/>
+              </div>
+            </ResizablePanel>
+          </>
+        )}
       </ResizablePanelGroup>
 
-      {isProblemListOpen && <div className='z-40 fixed inset-0 bg-gray-800 opacity-60'></div>}
+      {isProblemListOpen && (
+        <div
+          onClick={() => setIsProblemListOpen(!isProblemListOpen)}
+          className='z-40 fixed inset-0 bg-gray-800 opacity-60'
+        ></div>
+      )}
 
       <ToggleCurriculum
         title={title}
@@ -169,4 +186,3 @@ const LearningSpace = () => {
 }
 
 export default React.memo(LearningSpace)
-

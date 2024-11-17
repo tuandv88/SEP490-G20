@@ -31,10 +31,11 @@ namespace Community.Infrastructure.Data.Configurations
                 .OnDelete(DeleteBehavior.Cascade);         // Xóa các UserDiscussion khi Discussion bị xóa
 
             // Thiết lập mối quan hệ với Votes
-            builder.HasMany(d => d.Votes)
-                .WithOne(v => v.Discussion)
-                .HasForeignKey(v => v.DiscussionId)
-                .OnDelete(DeleteBehavior.Cascade);
+            // 1 Discussion có nhiều Votes, mỗi Vote liên kết với một Discussion
+            builder.HasMany(c => c.Votes)
+                .WithOne()                                   // Mỗi Vote có một Discussion
+                .HasForeignKey(c => c.DiscussionId)          // Vote tham chiếu đến DiscussionId
+                .OnDelete(DeleteBehavior.Cascade);           // Xóa tất cả Votes khi Discussion bị xóa
 
             // Thiết lập các thuộc tính của Discussion
             builder.Property(d => d.UserId)

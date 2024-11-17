@@ -1,4 +1,5 @@
 ﻿
+
 namespace Community.Infrastructure.Data.Repositories.Discussions;
 public class DiscussionRepository : Repository<Discussion>, IDiscussionRepository
 {
@@ -66,6 +67,17 @@ public class DiscussionRepository : Repository<Discussion>, IDiscussionRepositor
         return await Task.FromResult(discussions);
     }
 
+    public async Task<List<Discussion>?> GetAllDetailIsActiveAsync()
+    {
+        var discussion = _dbContext.Discussions
+                       .AsNoTracking()
+                       .Include(d => d.Comments)
+                       .Include(d => d.Votes)
+                       .AsEnumerable()
+                       .Where(d => d.IsActive)
+                       .ToList();
+        return discussion;
+    }
 }
 
 

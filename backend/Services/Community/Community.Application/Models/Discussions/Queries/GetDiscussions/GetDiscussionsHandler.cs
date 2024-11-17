@@ -14,7 +14,7 @@ public class GetDiscussionsHandler : IQueryHandler<GetDiscussionsQuery, GetDiscu
 
     public async Task<GetDiscussionsResult> Handle(GetDiscussionsQuery query, CancellationToken cancellationToken)
     {
-        var allDiscussions = await _repository.GetAllAsync();
+        var allDiscussions = await _repository.GetAllDetailIsActiveAsync();
 
         var discussionDtos = await allDiscussions.ToDiscussionDtoListAsync(_filesService);
 

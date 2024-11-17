@@ -102,4 +102,25 @@ public class CachedDiscussionRepository : IDiscussionRepository
 
         return allData;
     }
+
+    public async Task<List<Discussion>?> GetAllDetailIsActiveAsync()
+    {
+        var cachedKey = CacheKey.COMMUNITY_DISCUSSIONS_DETAILS;
+
+        var cachedData = await _cacheService.GetAsync<List<Discussion>>(cachedKey);
+
+        if (cachedData == null || !cachedData.Any())
+        {
+            var allData = await _discussionRepository.GetAllDetailIsActiveAsync();
+
+
+            _ = _cacheService.SetAsync(cachedKey, allData);
+
+            return allData;
+        }
+        else
+        {
+            return cachedData;
+        }
+    }
 }

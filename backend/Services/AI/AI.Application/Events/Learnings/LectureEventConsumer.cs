@@ -18,7 +18,7 @@ public class LectureEventConsumer(ILogger<LectureEventConsumer> logger, IKernelM
             _ => throw new ArgumentOutOfRangeException(nameof(lectureEvent.Type), $"Not expected lecture event: {lectureEvent.Type}")
         });
     }
-
+     
     private async Task LectureCreatedHandler(LectureCreated lectureCreated) {
         logger.LogInformation($"[LectureCreatedHandler] Processing LectureCreated event for LectureId: {lectureCreated.LectureId}");
         var @object = new {

@@ -1,12 +1,8 @@
-﻿using Learning.Application.Data.Repositories;
-using Learning.Application.Exceptions;
+﻿using Learning.Application.Exceptions;
 using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.Submissions.Commands.CreateBatchCodeExcute;
 using Learning.Application.Models.Submissions.Dtos.CodeExecution;
 using Learning.Application.Models.TestCases.Dtos;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
-using MediatR;
 namespace Learning.Application.Models.Problems.Commands.CreateProblem;
 public class CreateProblemHandler(ILectureRepository lectureRepository, IProblemRepository problemRepository, ISender sender)
     : ICommandHandler<CreateProblemCommand, CreateProblemResult> {

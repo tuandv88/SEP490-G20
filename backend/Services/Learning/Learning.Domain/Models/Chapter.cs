@@ -1,4 +1,6 @@
 ﻿
+using Learning.Domain.Events.Lectures;
+
 namespace Learning.Domain.Models;
 public class Chapter : Aggregate<ChapterId> {
     public List<Lecture> Lectures = new();
@@ -24,5 +26,34 @@ public class Chapter : Aggregate<ChapterId> {
 
     public void AddLecture(Lecture lecture) {
         Lectures.Add(lecture);
+        lecture.AddDomainEvent(new LectureCreatedEvent(lecture));
     }
+    public void UpdateLecture(LectureId lectureId, string title, string summary, double timeEstimation, LectureType lectureType, int orderIndex, int point, bool isFree) {
+        var lecture = Lectures.FirstOrDefault(l => l.Id == lectureId);
+        if (lecture == null) {
+            throw new NotFoundException("Lecture not found", lectureId.Value);
+        }
+
+        lecture.Title = title;
+        lecture.Summary = summary;
+        lecture.TimeEstimation = timeEstimation;
+        lecture.LectureType = lectureType;
+        lecture.OrderIndex = orderIndex;
+        lecture.Point = point;
+        lecture.IsFree = isFree;
+
+        lecture.AddDomainEvent(new LectureUpdatedEvent(lecture));
+    }
+
+    public void DeleteLecture(LectureId lectureId) {
+        var lecture = Lectures.FirstOrDefault(l => l.Id == lectureId);
+        if (lecture == null) {
+            throw new NotFoundException("Lecture not found", lectureId.Value);
+        }
+
+        Lectures.Remove(lecture);
+
+        lecture.AddDomainEvent(new LectureDeletedEvent(lecture));
+    }
+
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using BuildingBlocks.Messaging.Events;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Learning.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialOutbox : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,6 +38,22 @@ namespace Learning.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Courses", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OutboxMessages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Payload = table.Column<EventBase>(type: "jsonb", nullable: false),
+                    AggregateId = table.Column<string>(type: "text", nullable: false),
+                    AggregateType = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<string>(type: "text", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "Timestamp", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OutboxMessages", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -125,7 +142,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    EnrollmentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 3, 15, 27, 53, 748, DateTimeKind.Utc).AddTicks(2322)),
+                    EnrollmentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 15, 14, 11, 47, 469, DateTimeKind.Utc).AddTicks(7562)),
                     CompletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UserCourseStatus = table.Column<string>(type: "text", nullable: false, defaultValue: "InProgress"),
                     Rating = table.Column<int>(type: "integer", nullable: false, defaultValue: -1),
@@ -180,7 +197,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProblemId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 3, 15, 27, 53, 731, DateTimeKind.Utc).AddTicks(5772)),
+                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 15, 14, 11, 47, 454, DateTimeKind.Utc).AddTicks(7576)),
                     SourceCode = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
                     LanguageCode = table.Column<string>(type: "text", nullable: false, defaultValue: "Java"),
                     ExecutionTime = table.Column<double>(type: "double precision", nullable: false),
@@ -300,7 +317,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     QuizId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 3, 15, 27, 53, 743, DateTimeKind.Utc).AddTicks(775)),
+                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 15, 14, 11, 47, 465, DateTimeKind.Utc).AddTicks(4822)),
                     Score = table.Column<long>(type: "bigint", nullable: false),
                     TotalQuestions = table.Column<int>(type: "integer", nullable: false),
                     CorrectAnswers = table.Column<int>(type: "integer", nullable: false),
@@ -575,6 +592,9 @@ namespace Learning.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "LecturesProgress");
+
+            migrationBuilder.DropTable(
+                name: "OutboxMessages");
 
             migrationBuilder.DropTable(
                 name: "ProblemSolutions");

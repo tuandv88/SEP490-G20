@@ -1,8 +1,4 @@
-﻿
-using Learning.Application.Data.Repositories;
-using Learning.Application.Models.Lectures.Dtos;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
+﻿using Learning.Application.Models.Lectures.Dtos;
 
 namespace Learning.Application.Models.Lectures.Commands.CreateLecture;
 public class CreateLectureHandler(IChapterRepository chapterRepository, ILectureRepository lectureRepository) : ICommandHandler<CreateLectureCommand, CreateLectureResult> {

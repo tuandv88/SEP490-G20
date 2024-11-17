@@ -1,8 +1,4 @@
-﻿using BuidingBlocks.Storage.Interfaces;
-using Learning.Application.Data.Repositories;
-using Learning.Application.Extensions;
-
-namespace Learning.Application.Models.Courses.Queries.GetCourseDetails;
+﻿namespace Learning.Application.Models.Courses.Queries.GetCourseDetails;
 public class GetCourseDetailsHandler(ICourseRepository courseRepository, IFilesService filesService) 
     : IQueryHandler<GetCourseDetailsQuery, GetCourseDetailsResult>
 {

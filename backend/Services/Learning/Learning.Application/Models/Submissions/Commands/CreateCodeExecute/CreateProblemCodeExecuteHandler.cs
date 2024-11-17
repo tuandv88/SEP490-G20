@@ -1,9 +1,6 @@
-﻿using Learning.Application.Data.Repositories;
-using Learning.Application.Models.Submissions.Commands.CreateBatchCodeExcute;
+﻿using Learning.Application.Models.Submissions.Commands.CreateBatchCodeExcute;
 using Learning.Application.Models.Submissions.Dtos.CodeExecution;
 using Learning.Application.Models.TestCases.Dtos;
-using Learning.Domain.ValueObjects;
-using MediatR;
 
 namespace Learning.Application.Models.Submissions.Commands.CreateCodeExecute;
 

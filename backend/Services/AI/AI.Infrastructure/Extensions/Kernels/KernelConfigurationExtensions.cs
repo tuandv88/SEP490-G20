@@ -9,10 +9,12 @@ using Microsoft.KernelMemory.DocumentStorage;
 using Microsoft.KernelMemory.Prompts;
 using static Microsoft.KernelMemory.AWSS3Config;
 
-namespace AI.Infrastructure.Extensions;
-public static class KernelConfigurationExtensions {
+namespace AI.Infrastructure.Extensions.Kernels;
+public static class KernelConfigurationExtensions
+{
 
-    public static IServiceCollection AddKernelConfiguration(this IServiceCollection services, IConfiguration configuration) {
+    public static IServiceCollection AddKernelConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
         string chatApiKey = configuration["AzureOpenAI:ChatApiKey"]!;
         string embeddingApiKey = configuration["AzureOpenAI:EmbeddingApiKey"]!;
 
@@ -34,15 +36,16 @@ public static class KernelConfigurationExtensions {
         string awsS3Endpoint = configuration["AWS:Url"]!;
         string awsS3Bucket = configuration["AWS:Bucket"]!;
 
-        int searchClientMaxMatchesCount = configuration.GetValue<int>("SearchClient:MaxMatchesCount", 10);
-        int searchClientAnswerTokens = configuration.GetValue<int>("SearchClient:AnswerTokens", 1000);
-        int searchClientTemperature = configuration.GetValue<int>("SearchClient:Temperature", 0);
-        int searchClientTopP = configuration.GetValue<int>("SearchClient:TopP", 0);
-        int searchClientPresencePenalty = configuration.GetValue<int>("SearchClient:PresencePenalty", 0);
-        int searchClientFrequencyPenalty = configuration.GetValue<int>("SearchClient:FrequencyPenalty", 0);
+        int searchClientMaxMatchesCount = configuration.GetValue("SearchClient:MaxMatchesCount", 10);
+        int searchClientAnswerTokens = configuration.GetValue("SearchClient:AnswerTokens", 1000);
+        int searchClientTemperature = configuration.GetValue("SearchClient:Temperature", 0);
+        int searchClientTopP = configuration.GetValue("SearchClient:TopP", 0);
+        int searchClientPresencePenalty = configuration.GetValue("SearchClient:PresencePenalty", 0);
+        int searchClientFrequencyPenalty = configuration.GetValue("SearchClient:FrequencyPenalty", 0);
 
 
-        var embeddingConfig = new AzureOpenAIConfig {
+        var embeddingConfig = new AzureOpenAIConfig
+        {
             APIKey = embeddingApiKey,
             Deployment = deploymentEmbeddingName,
             Endpoint = embeddingEndpoint,
@@ -52,7 +55,8 @@ public static class KernelConfigurationExtensions {
             EmbeddingDimensions = embeddingDimensions
         };
 
-        var chatConfig = new AzureOpenAIConfig {
+        var chatConfig = new AzureOpenAIConfig
+        {
             APIKey = chatApiKey,
             Deployment = deploymentChatName,
             Endpoint = chatEndpoint,
@@ -61,7 +65,8 @@ public static class KernelConfigurationExtensions {
             MaxTokenTotal = maxTokenTotalChat,
         };
 
-        var awsS3Config = new AWSS3Config() {
+        var awsS3Config = new AWSS3Config()
+        {
             AccessKey = awsS3AccessKey,
             SecretAccessKey = awsS3SecretKey,
             Endpoint = awsS3Endpoint,
@@ -71,12 +76,14 @@ public static class KernelConfigurationExtensions {
 
         services.AddSingleton(awsS3Config);
 
-        var qdrantConfig = new QdrantConfig() {
+        var qdrantConfig = new QdrantConfig()
+        {
             APIKey = qdrantApiKey,
             Endpoint = qdrantEndpoint
         };
 
-        var searchClientConfig = new SearchClientConfig() {
+        var searchClientConfig = new SearchClientConfig()
+        {
             MaxMatchesCount = searchClientMaxMatchesCount,
             AnswerTokens = searchClientAnswerTokens,
             FactTemplate = "==== [DocumentId:{{$documentId}};Relevance:{{$relevance}}]:\n{{$content}}",
@@ -101,33 +108,40 @@ public static class KernelConfigurationExtensions {
 
         services.AddSingleton<IPromptProvider, PromptProvider>();
 
-        var kernel = Kernel.CreateBuilder()
-            .AddAzureOpenAIChatCompletion(deploymentChatName, chatEndpoint, chatApiKey)
-            .Build();
+        var kernelBuilder = Kernel.CreateBuilder();
+        kernelBuilder.AddAzureOpenAIChatCompletion(deploymentChatName, chatEndpoint, chatApiKey);
+        kernelBuilder.Services.AddSingleton<IFunctionInvocationFilter, FunctionInvocationFilter>();
+
+        var kernel = kernelBuilder.Build();
 
         services.AddKernelSingleton(kernel);
         services.AddSingleton(kernelMemory);
         return services;
     }
 
-    public static IKernelMemoryBuilder WithAWSS3DocumentStorageCustom(this IKernelMemoryBuilder builder, AWSS3Config config) {
+    public static IKernelMemoryBuilder WithAWSS3DocumentStorageCustom(this IKernelMemoryBuilder builder, AWSS3Config config)
+    {
         builder.Services.AddAWSS3AsDocumentStorageCustom(config);
         return builder;
     }
-    public static IServiceCollection AddAWSS3AsDocumentStorageCustom(this IServiceCollection services, AWSS3Config config) {
+    public static IServiceCollection AddAWSS3AsDocumentStorageCustom(this IServiceCollection services, AWSS3Config config)
+    {
         return services
             .AddSingleton(config)
             .AddSingleton<IDocumentStorage, AWSS3StorageService>();
     }
 
-    public static void AddKernelSingleton(this IServiceCollection services, Kernel kernel) {
-        services.AddSingleton(provider => {
-            using (var scope = provider.CreateScope()) {
+    public static void AddKernelSingleton(this IServiceCollection services, Kernel kernel)
+    {
+        services.AddSingleton(provider =>
+        {
+            using (var scope = provider.CreateScope())
+            {
                 var scopedProvider = scope.ServiceProvider;
                 var clientService = scopedProvider.GetRequiredService<IClientCommunicationService>();
-
+                var kernelMemory = scopedProvider.GetRequiredService<IKernelMemory>();
                 var communicationPlugin = new CommunicationPlugin(clientService);
-                var learningPlugin = new LearningPlugin();
+                var learningPlugin = new LearningPlugin(kernelMemory);
                 kernel.ImportPluginFromObject(communicationPlugin);
                 kernel.ImportPluginFromObject(learningPlugin);
                 kernel.ImportPluginFromType<UtilsPlugin>();

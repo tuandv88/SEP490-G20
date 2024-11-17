@@ -1,5 +1,4 @@
-﻿using BuidingBlocks.Storage.Interfaces;
-using Learning.Application.Models.Courses.Dtos;
+﻿using Learning.Application.Models.Courses.Dtos;
 
 namespace Learning.Application.Models.Courses.Queries.GetCourses;
 

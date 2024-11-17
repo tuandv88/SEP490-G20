@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-
-namespace AI.Application.Data.Repositories;
+﻿namespace AI.Application.Data.Repositories;
 public interface IRepository<T> where T : class {
     Task<List<T>> GetAllAsync();
     Task<T?> GetByIdAsync(Guid id);
@@ -8,7 +6,7 @@ public interface IRepository<T> where T : class {
     Task UpdateAsync(T entity);
     Task DeleteAsync(T entity);
     Task DeleteByIdAsync(Guid id);
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default!);
 }
 
 

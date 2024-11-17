@@ -5,6 +5,7 @@ using Learning.Infrastructure.Data.Repositories.Chapters;
 using Learning.Infrastructure.Data.Repositories.Courses;
 using Learning.Infrastructure.Data.Repositories.Files;
 using Learning.Infrastructure.Data.Repositories.Lectures;
+using Learning.Infrastructure.Data.Repositories.OutboxMessages;
 using Learning.Infrastructure.Data.Repositories.Problems;
 using Learning.Infrastructure.Data.Repositories.ProblemSolutions;
 using Learning.Infrastructure.Data.Repositories.ProblemSubmissions;
@@ -15,17 +16,20 @@ using Learning.Infrastructure.Data.Repositories.TestScripts;
 using Learning.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace Learning.Infrastructure;
 public static class DependencyInjection {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration) {
 
-
         var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var dataSource = new NpgsqlDataSourceBuilder(connectionString)
+            .EnableDynamicJson()
+            .Build();
 
         services.AddDbContext<ApplicationDbContext>((sp, options) => {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseNpgsql(connectionString).LogTo(Console.WriteLine, LogLevel.Information); ;
+            options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information); ;
         });
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
@@ -88,5 +92,8 @@ public static class DependencyInjection {
 
         //QuestionRepository
         services.AddScoped<IQuestionRepository, QuestionRepository>();
+
+        //OutboxMessageRepository
+        services.AddScoped<IOutboxMessageRepository, OutboxMessageRepository>();
     }
 }

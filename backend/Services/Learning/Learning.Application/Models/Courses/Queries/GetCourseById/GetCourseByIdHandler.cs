@@ -1,6 +1,4 @@
-﻿using BuidingBlocks.Storage.Interfaces;
-using Learning.Application.Data.Repositories;
-namespace Learning.Application.Models.Courses.Queries.GetCourseById;
+﻿namespace Learning.Application.Models.Courses.Queries.GetCourseById;
 public class GetCourseByIdHandler(ICourseRepository repository, IFilesService filesService)
     : IQueryHandler<GetCourseByIdQuery, GetCourseByIdResult>
 {

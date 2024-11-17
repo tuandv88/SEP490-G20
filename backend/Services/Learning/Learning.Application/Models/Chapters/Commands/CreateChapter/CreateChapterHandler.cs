@@ -1,6 +1,4 @@
-﻿using Learning.Application.Data.Repositories;
-using Learning.Application.Models.Chapters.Dtos;
-using Learning.Domain.ValueObjects;
+﻿using Learning.Application.Models.Chapters.Dtos;
 
 namespace Learning.Application.Models.Chapters.Commands.CreateChapter;
 public class CreateChapterHandler(ICourseRepository courseRepository, IChapterRepository chapterRepository) : ICommandHandler<CreateChapterCommand, CreateChapterResult> {

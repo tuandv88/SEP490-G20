@@ -2,7 +2,6 @@
 
 public record UpdateDiscussionDto(
     Guid Id,
-    Guid UserId,
     Guid CategoryId,
     string Title,
     string Description,

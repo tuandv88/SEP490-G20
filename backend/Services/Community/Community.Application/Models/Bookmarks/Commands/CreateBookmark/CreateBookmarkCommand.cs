@@ -11,9 +11,6 @@ public class CreateBookmarkCommandValidator : AbstractValidator<CreateBookmarkCo
 {
     public CreateBookmarkCommandValidator()
     {
-        RuleFor(x => x.CreateBookmarkDto.UserId)
-            .NotEmpty().WithMessage("UserId must not be empty.");
-
         RuleFor(x => x.CreateBookmarkDto.DiscussionId)
             .NotEmpty().WithMessage("DiscussionId must not be empty.");
     }

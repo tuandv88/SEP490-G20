@@ -35,6 +35,9 @@ public static class DependencyInjection
 
         services.AddHttpContextAccessor();
 
+        //UserContext
+        services.AddScoped<IUserContextService, UserContextService>();
+
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
 
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();

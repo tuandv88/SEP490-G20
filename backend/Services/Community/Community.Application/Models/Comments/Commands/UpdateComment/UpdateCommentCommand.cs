@@ -14,10 +14,6 @@ public class UpdateCommentCommandValidator : AbstractValidator<UpdateCommentComm
             .NotEmpty()
             .WithMessage("Content must not be empty.");
 
-        RuleFor(x => x.UpdateCommentDto.UserId)
-            .NotEmpty()
-            .WithMessage("UserId must not be empty.");
-
         RuleFor(x => x.UpdateCommentDto.DiscussionId)
             .NotEmpty()
             .WithMessage("DiscussionId must not be empty.");

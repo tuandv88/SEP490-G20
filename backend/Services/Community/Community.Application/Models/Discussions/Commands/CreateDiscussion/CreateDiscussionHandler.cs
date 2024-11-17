@@ -11,13 +11,15 @@ public class CreateDiscussionHandler : ICommandHandler<CreateDiscussionCommand, 
     private readonly ICategoryRepository _categoryRepository;
     private readonly IFilesService _filesService;
     private readonly IBase64Converter _base64Converter;
+    private readonly IUserContextService _userContextService;
 
-    public CreateDiscussionHandler(IDiscussionRepository discussionRepository, ICategoryRepository categoryRepository, IFilesService filesService, IBase64Converter base64Converter)
+    public CreateDiscussionHandler(IDiscussionRepository discussionRepository, ICategoryRepository categoryRepository, IFilesService filesService, IBase64Converter base64Converter, IUserContextService userContextService)
     {
         _discussionRepository = discussionRepository;
         _categoryRepository = categoryRepository;
         _filesService = filesService;
         _base64Converter = base64Converter;
+        _userContextService = userContextService;
     }
 
     public async Task<CreateDiscussionResult> Handle(CreateDiscussionCommand request, CancellationToken cancellationToken)
@@ -39,7 +41,26 @@ public class CreateDiscussionHandler : ICommandHandler<CreateDiscussionCommand, 
 
     private async Task<Discussion> CreateNewDiscussion(CreateDiscussionDto createDiscussionDto)
     {
-        var userId = UserId.Of(createDiscussionDto.UserId);
+        // Dữ liệu test UserId
+        var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
+
+        if (!Guid.TryParse(userContextTest, out var currentUserIdTest))
+        {
+            throw new UnauthorizedAccessException("Invalid user ID.");
+        }
+
+        var userId = UserId.Of(currentUserIdTest);
+
+        // Lấy UserId từ UserContextService
+        //var currentUserId = _userContextService.User.Id;
+
+        //if (currentUserId == null)
+        //{
+        //    throw new UnauthorizedAccessException("User is not authenticated.");
+        //}
+
+        //var userId = UserId.Of(currentUserId.Value);
+
         var categoryId = CategoryId.Of(createDiscussionDto.CategoryId);
 
         // Xử lý ảnh nếu có
@@ -53,7 +74,13 @@ public class CreateDiscussionHandler : ICommandHandler<CreateDiscussionCommand, 
             var base64Image = createDiscussionDto.Image.Base64Image;
             var contentType = createDiscussionDto.Image.ContentType;
 
-            var fileName = await _filesService.UploadFileAsync(_base64Converter.ConvertToMemoryStream(base64Image), originFileName, contentType, bucket, prefix);
+            var fileName = await _filesService.UploadFileAsync(
+                _base64Converter.ConvertToMemoryStream(base64Image),
+                originFileName,
+                contentType,
+                bucket,
+                prefix);
+
             imageUrl = $"{prefix}/{fileName}";
         }
 
@@ -68,4 +95,5 @@ public class CreateDiscussionHandler : ICommandHandler<CreateDiscussionCommand, 
             imageUrl: imageUrl
         );
     }
+
 }

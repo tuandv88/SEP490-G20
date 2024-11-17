@@ -13,9 +13,8 @@ public class QuestionRepository : Repository<Question>, IQuestionRepository {
     }
 
     public override async Task<Question?> GetByIdAsync(Guid id) {
-        var question = _dbContext.Questions
-                        .AsEnumerable()
-                        .FirstOrDefault(q => q.Id.Value == id);
+        var question = await _dbContext.Questions
+                        .FirstOrDefaultAsync(q => q.Id.Equals(QuestionId.Of(id)));
         return question;
     }
 }

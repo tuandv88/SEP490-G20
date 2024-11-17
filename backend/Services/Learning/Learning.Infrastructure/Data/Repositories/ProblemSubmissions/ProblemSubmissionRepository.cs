@@ -16,17 +16,15 @@ public class ProblemSubmissionRepository : Repository<ProblemSubmission>, IProbl
 
 
     public async override Task<ProblemSubmission?> GetByIdAsync(Guid id) {
-        var problemSubmission =  _dbContext.ProblemSubmissions
-                                    .AsEnumerable()
-                                    .FirstOrDefault(p => p.Id.Value == id);
+        var problemSubmission = await  _dbContext.ProblemSubmissions
+                                    .FirstOrDefaultAsync(p => p.Id.Equals(ProblemSolutionId.Of(id)));
         return problemSubmission;
     }
 
-    public async Task<List<ProblemSubmission>> GetProblemSubmissionsByProblemAsync(params Guid[] problems) {
-        var problemSubmissions = _dbContext.ProblemSubmissions
-                                .AsEnumerable()
-                                .Where(ps => problems.Contains(ps.ProblemId.Value))
-                                .ToList();
+    public async Task<List<ProblemSubmission>> GetProblemSubmissionsByProblemAsync(params ProblemId[] problems) {
+        var problemSubmissions = await _dbContext.ProblemSubmissions
+                                .Where(ps => problems.Contains(ps.ProblemId))
+                                .ToListAsync();
         return problemSubmissions;
     }
 }

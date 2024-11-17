@@ -6,6 +6,10 @@ public class CachedChapterRepository(IChapterRepository repository, ICacheServic
         DeleteCached(string.Format(CacheKey.COURSES_DETAILS, entity.CourseId.Value));
     }
 
+    public async Task<int> CountByCourseAsync(Guid courseId) {
+         return await repository.CountByCourseAsync(courseId);
+    }
+
     public async Task DeleteAsync(Chapter entity) {
         await repository.DeleteAsync(entity);
         DeleteCached(string.Format(CacheKey.COURSES_DETAILS, entity.CourseId.Value));

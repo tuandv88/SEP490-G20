@@ -56,6 +56,10 @@ public class CachedCourseRepository(ICourseRepository repository, ICacheService 
         return allData;
     }
 
+    public async Task<Course?> GetCourseByChapterIdAsync(Guid chapterId) {
+        return await repository.GetCourseByChapterIdAsync(chapterId);
+    }
+
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken) {
         int n = await repository.SaveChangesAsync(cancellationToken);
         return n;

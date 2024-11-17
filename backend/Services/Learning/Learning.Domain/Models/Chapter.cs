@@ -58,4 +58,9 @@ public class Chapter : Aggregate<ChapterId> {
         return lecture;
     }
 
+    public void UpdateOrderIndexLecture(Lecture lecture, int orderIndex) {
+        lecture.OrderIndex = orderIndex;
+        lecture.AddDomainEvent(new LectureUpdatedEvent(lecture));
+    }
+
 }

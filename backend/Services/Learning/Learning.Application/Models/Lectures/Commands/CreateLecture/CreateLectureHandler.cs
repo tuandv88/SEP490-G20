@@ -7,14 +7,14 @@ public class CreateLectureHandler(IChapterRepository chapterRepository, ILecture
         if (chapter == null) {
             throw new NotFoundException("Chapter", request.ChapterId);
         }
-        var lecture = CreateNewLecture(chapter, request.CreateLectureDto);
+        var lecture = await CreateNewLecture(chapter, request.CreateLectureDto);
 
         await lectureRepository.AddAsync(lecture);
         await lectureRepository.SaveChangesAsync(cancellationToken);
 
         return new CreateLectureResult(lecture.Id.Value);
     }
-    private Lecture CreateNewLecture(Chapter chapter, CreateLectureDto createLectureDto) {
+    private async Task<Lecture> CreateNewLecture(Chapter chapter, CreateLectureDto createLectureDto) {
         var lectureType = Enum.TryParse<LectureType>(createLectureDto.LectureType, out var status)
         ? status
         : throw new ArgumentOutOfRangeException(nameof(createLectureDto.LectureType), $"Value '{createLectureDto.LectureType}' is not valid for LectureType.");
@@ -26,7 +26,7 @@ public class CreateLectureHandler(IChapterRepository chapterRepository, ILecture
             summary: createLectureDto.Summary,
             timeEstimation: createLectureDto.TimeEstimation,
             lectureType: lectureType,
-            orderIndex: chapter.OrderIndex,
+            orderIndex: (await lectureRepository.CountByChapterAsync(chapter.Id.Value)) + 1,
             point: createLectureDto.Point,
             isFree: createLectureDto.IsFree
             );

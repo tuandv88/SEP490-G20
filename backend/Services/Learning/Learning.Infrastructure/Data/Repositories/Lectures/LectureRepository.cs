@@ -5,6 +5,10 @@ public class LectureRepository : Repository<Lecture>, ILectureRepository {
         _dbContext = dbContext ?? throw new ArgumentNullException();
     }
 
+    public async Task<int> CountByChapterAsync(Guid chapterId) {
+        return await _dbContext.Lectures.CountAsync(c => c.ChapterId.Equals(ChapterId.Of(chapterId)));
+    }
+
     public override async Task DeleteByIdAsync(Guid id) {
         var lecture = await GetByIdAsync(id);
         if (lecture != null) {
@@ -13,18 +17,17 @@ public class LectureRepository : Repository<Lecture>, ILectureRepository {
     }
 
     public override async Task<Lecture?> GetByIdAsync(Guid id) {
-        var lecture = _dbContext.Lectures
-                        .AsEnumerable()
-                        .FirstOrDefault(l => l.Id.Value == id);
+        var lecture = await _dbContext.Lectures
+                        .FirstOrDefaultAsync(l => l.Id.Equals(LectureId.Of(id)));
         return lecture;
     }
 
     public async Task<Lecture?> GetLectureByIdDetail(Guid Id) {
-        var lecture = _dbContext.Lectures
+        var lecture = await _dbContext.Lectures
                         .Include(l => l.Files)
                         .AsNoTracking()
-                        .AsEnumerable()
-                        .FirstOrDefault(l => l.Id.Value == Id);
+                        .FirstOrDefaultAsync(l => l.Id.Equals(LectureId.Of(Id)));
+
         return lecture;
     }
 }

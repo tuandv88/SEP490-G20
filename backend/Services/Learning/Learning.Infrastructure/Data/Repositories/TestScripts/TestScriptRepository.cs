@@ -15,9 +15,8 @@ public class TestScriptRepository : Repository<TestScript>, ITestScriptRepositor
     }
 
     public override async Task<TestScript?> GetByIdAsync(Guid id) {
-        var testScript = _dbContext.TestScripts
-                         .AsEnumerable()
-                         .FirstOrDefault(c => c.Id.Value == id);
+        var testScript = await _dbContext.TestScripts
+                         .FirstOrDefaultAsync(c => c.Id.Equals(TestScriptId.Of(id)));
         return testScript;
     }
 }

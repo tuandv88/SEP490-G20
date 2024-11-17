@@ -29,6 +29,7 @@ public class CachedDiscussionRepository : IDiscussionRepository
         await _discussionRepository.AddAsync(entity);
         // Xóa cached
         DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS);
+        DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS);
     }
 
     public async Task UpdateAsync(Discussion entity)
@@ -36,6 +37,7 @@ public class CachedDiscussionRepository : IDiscussionRepository
         await _discussionRepository.UpdateAsync(entity);
         // Xóa cached
         DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS);
+        DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS);
         DeleteCached(string.Format(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS, entity.Id.Value));
     }
 
@@ -44,6 +46,7 @@ public class CachedDiscussionRepository : IDiscussionRepository
         await _discussionRepository.DeleteAsync(entity);
         // Xóa cached
         DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS);
+        DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS);
         DeleteCached(string.Format(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS, entity.Id.Value));
     }
 
@@ -52,6 +55,7 @@ public class CachedDiscussionRepository : IDiscussionRepository
         await _discussionRepository.DeleteByIdAsync(id);
         // Xóa cached
         DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS);
+        DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS);
         DeleteCached(string.Format(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS, id));
     }
 
@@ -77,8 +81,17 @@ public class CachedDiscussionRepository : IDiscussionRepository
 
     public async Task<Discussion?> GetByIdAsync(Guid id)
     {
-        var discussion = await _discussionRepository.GetByIdAsync(id);
-        return discussion;
+        var cachedKey = string.Format(CacheKey.COMMUNITY_DISCUSSION_DETAILS, id);
+
+        var allData = await _cacheService.GetAsync<Discussion>(cachedKey);
+
+        if (allData == null)
+        {
+            allData = await _discussionRepository.GetByIdAsync(id);
+
+            _ = _cacheService.SetAsync(cachedKey, allData);
+        }
+        return allData;
     }
 
     public async Task<Discussion?> GetByIdDetailAsync(Guid id)
@@ -103,7 +116,7 @@ public class CachedDiscussionRepository : IDiscussionRepository
         return allData;
     }
 
-    public async Task<List<Discussion>?> GetAllDetailIsActiveAsync()
+    public async Task<List<Discussion>?> GetAllDetailIAsync()
     {
         var cachedKey = CacheKey.COMMUNITY_DISCUSSIONS_DETAILS;
 
@@ -111,7 +124,7 @@ public class CachedDiscussionRepository : IDiscussionRepository
 
         if (cachedData == null || !cachedData.Any())
         {
-            var allData = await _discussionRepository.GetAllDetailIsActiveAsync();
+            var allData = await _discussionRepository.GetAllDetailIAsync();
 
 
             _ = _cacheService.SetAsync(cachedKey, allData);

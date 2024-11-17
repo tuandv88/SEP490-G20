@@ -16,7 +16,7 @@ public class GetDiscussionsPagingHandler : IQueryHandler<GetDiscussionsPagingQue
 
     public async Task<GetDiscussionsPagingResult> Handle(GetDiscussionsPagingQuery query, CancellationToken cancellationToken)
     {
-        var allData = await _repository.GetAllAsync();
+        var allData = await _repository.GetAllDetailIAsync();
 
         // Lấy thông tin phân trang
         var pageIndex = query.PaginationRequest.PageIndex;

@@ -28,7 +28,7 @@ public class Chapter : Aggregate<ChapterId> {
         Lectures.Add(lecture);
         lecture.AddDomainEvent(new LectureCreatedEvent(lecture));
     }
-    public void UpdateLecture(LectureId lectureId, string title, string summary, double timeEstimation, LectureType lectureType, int orderIndex, int point, bool isFree) {
+    public Lecture UpdateLecture(LectureId lectureId, string title, string summary, double timeEstimation, LectureType lectureType, int orderIndex, int point, bool isFree) {
         var lecture = Lectures.FirstOrDefault(l => l.Id == lectureId);
         if (lecture == null) {
             throw new NotFoundException("Lecture not found", lectureId.Value);
@@ -43,9 +43,10 @@ public class Chapter : Aggregate<ChapterId> {
         lecture.IsFree = isFree;
 
         lecture.AddDomainEvent(new LectureUpdatedEvent(lecture));
+        return lecture;
     }
 
-    public void DeleteLecture(LectureId lectureId) {
+    public Lecture DeleteLecture(LectureId lectureId) {
         var lecture = Lectures.FirstOrDefault(l => l.Id == lectureId);
         if (lecture == null) {
             throw new NotFoundException("Lecture not found", lectureId.Value);
@@ -54,6 +55,7 @@ public class Chapter : Aggregate<ChapterId> {
         Lectures.Remove(lecture);
 
         lecture.AddDomainEvent(new LectureDeletedEvent(lecture));
+        return lecture;
     }
 
 }

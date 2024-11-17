@@ -1,8 +1,14 @@
-﻿namespace Learning.Infrastructure.Data.Repositories.Courses;
+﻿
+namespace Learning.Infrastructure.Data.Repositories.Courses;
 public class CourseRepository : Repository<Course>, ICourseRepository {
     private readonly IApplicationDbContext _dbContext;
     public CourseRepository(IApplicationDbContext dbContext) : base(dbContext) {
         _dbContext = dbContext ?? throw new ArgumentNullException();
+    }
+
+    public async Task<int> CountByLevelAsync(CourseLevel courseLevel) {
+        var number = await _dbContext.Courses.CountAsync(c => c.CourseLevel == courseLevel);
+        return number;
     }
 
     public override async Task DeleteByIdAsync(Guid id) {

@@ -10,7 +10,6 @@ public record CreateCourseDto(
     string TargetAudiences,
     string ScheduledPublishDate,
     ImageDto Image,
-    int OrderIndex,
     string CourseLevel,
     double Price
 );

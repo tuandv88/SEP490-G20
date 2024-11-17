@@ -1,5 +1,4 @@
 ﻿using Learning.Application.Models.Courses.Dtos;
-using Learning.Domain.Enums;
 
 namespace Learning.Application.Models.Courses.Commands.CreateCourse;
 
@@ -46,9 +45,6 @@ public class CreateCourseCommandValidator : AbstractValidator<CreateCourseComman
 
         RuleFor(x => x.CreateCourseDto.Image)
             .NotNull().WithMessage("ImageUrl must not be null.");
-
-        RuleFor(x => x.CreateCourseDto.OrderIndex)
-            .GreaterThan(0).WithMessage("OrderIndex must be greater than to zero.");
 
         RuleFor(x => x.CreateCourseDto.CourseLevel)
            .NotNull().WithMessage("CourseLevel must not be null.")

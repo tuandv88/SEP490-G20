@@ -1,6 +1,5 @@
 ﻿using Learning.Application.Models.Chapters.Commands.CreateChapter;
 using Learning.Application.Models.Lectures.Dtos;
-using Learning.Domain.Enums;
 
 namespace Learning.Application.Models.Lectures.Commands.CreateLecture;
 public record CreateLectureCommand : ICommand<CreateLectureResult> {

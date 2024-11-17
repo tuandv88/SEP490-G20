@@ -1,5 +1,5 @@
 ﻿namespace Learning.Application.Models.Lectures.Dtos;
-public record CreateLectureDto(
+public record UpdateLectureDto(
     string Title,
     string Summary,
     double TimeEstimation,
@@ -8,4 +8,3 @@ public record CreateLectureDto(
     int Point,
     bool IsFree = false
 );
-

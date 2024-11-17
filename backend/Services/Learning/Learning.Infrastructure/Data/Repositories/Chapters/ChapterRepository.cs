@@ -19,5 +19,13 @@ public class ChapterRepository : Repository<Chapter>, IChapterRepository {
                         .FirstOrDefault(c => c.Id.Value == id);
         return chapter;
     }
+
+    public async Task<Chapter?> GetByIdDetailAsync(Guid id) {
+        var chapter = _dbContext.Chapters
+                        .Include(c => c.Lectures)
+                        .AsEnumerable()
+                        .FirstOrDefault(c => c.Id.Value == id);
+        return chapter;
+    }
 }
 

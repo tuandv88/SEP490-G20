@@ -27,6 +27,10 @@ public class CachedChapterRepository(IChapterRepository repository, ICacheServic
         return await repository.GetByIdAsync(id);
     }
 
+    public async Task<Chapter?> GetByIdDetailAsync(Guid id) {
+        return await repository.GetByIdDetailAsync(id);
+    }
+
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken) {
         return await repository.SaveChangesAsync(cancellationToken);
     }

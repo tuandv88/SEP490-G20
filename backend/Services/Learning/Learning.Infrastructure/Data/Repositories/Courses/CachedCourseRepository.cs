@@ -1,11 +1,14 @@
-﻿using Learning.Domain.Abstractions;
-
+﻿
 namespace Learning.Infrastructure.Data.Repositories.Courses;
 public class CachedCourseRepository(ICourseRepository repository, ICacheService cacheService) : ICourseRepository {
     public async Task AddAsync(Course entity) {
         await repository.AddAsync(entity);
         //Xóa cached
         DeleteCached(CacheKey.COURSES);
+    }
+
+    public async Task<int> CountByLevelAsync(CourseLevel courseLevel) {
+        return await repository.CountByLevelAsync(courseLevel);
     }
 
     public async Task DeleteAsync(Course entity) {

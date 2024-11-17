@@ -55,7 +55,7 @@ public class CreateCourseHandler(ICourseRepository repository, IFilesService fil
             targetAudiences: createCourseDto.TargetAudiences,
             scheduledPublishDate: scheduledPublishDate,
             imageUrl: fileUrl,
-            orderIndex: createCourseDto.OrderIndex,
+            orderIndex: (await repository.CountByLevelAsync(courseLevel)) + 1,
             courseLevel: courseLevel,
             price: createCourseDto.Price
         );

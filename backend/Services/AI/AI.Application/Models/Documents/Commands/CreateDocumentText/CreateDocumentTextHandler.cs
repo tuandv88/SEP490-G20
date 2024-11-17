@@ -1,6 +1,4 @@
-﻿
-using AI.Application.Common.Constants;
-using AI.Domain.ValueObjects;
+﻿using AI.Domain.ValueObjects;
 using Microsoft.KernelMemory;
 
 namespace AI.Application.Models.Documents.Commands.CreateDocumentText;

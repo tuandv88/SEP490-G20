@@ -1,10 +1,4 @@
-﻿using BuidingBlocks.Storage.Interfaces;
-using Learning.Application.Data.Repositories;
-using Learning.Application.Interfaces;
-using Learning.Application.Models.Courses.Dtos;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
-
+﻿using Learning.Application.Models.Courses.Dtos;
 namespace Learning.Application.Models.Courses.Commands.CreateCourse;
 public class CreateCourseHandler(ICourseRepository repository, IFilesService filesService, IBase64Converter base64Converter) : ICommandHandler<CreateCourseCommand, CreateCourseResult>
 {

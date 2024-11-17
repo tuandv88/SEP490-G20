@@ -22,5 +22,12 @@ public class Document : Entity<DocumentId> {
         //TODO event
         return document;
     }
+    public void Update(string fileName, string mimeType, long fileSize, Dictionary<string, object> tags, string index) {
+        FileName = fileName;
+        MimeType = mimeType;
+        FileSize = fileSize;
+        Tags = tags;
+        Index = index;
+    }
 }
 

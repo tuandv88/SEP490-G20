@@ -1,6 +1,5 @@
 ﻿namespace Learning.Application.Models.Courses.Dtos;
 public record UpdateCourseDto(
-    Guid Id,
     string Title,
     string Description,
     string Headline,

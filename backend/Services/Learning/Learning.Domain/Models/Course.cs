@@ -1,4 +1,4 @@
-﻿using Learning.Domain.Events;
+﻿using Learning.Domain.Events.Chapters;
 using Learning.Domain.Events.Courses;
 
 namespace Learning.Domain.Models;
@@ -42,11 +42,6 @@ public class Course : Aggregate<CourseId> {
         return course;
     }
 
-    public void AddChapter(Chapter chapter) {
-        Chapters.Add(chapter);
-
-    }
-
     public void Update(string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, int orderIndex, CourseLevel courseLevel, double price) {
         Title = title;
         Description = description;
@@ -60,10 +55,42 @@ public class Course : Aggregate<CourseId> {
         OrderIndex = orderIndex;
         CourseLevel = courseLevel;
         Price = price;
-        //TODO add event vào domain
+
+        AddDomainEvent(new CourseCreatedEvent(this));
     }
     public void UpdateImage(string imageUrl) {
         ImageUrl = imageUrl;
+    }
+    public void AddChapter(Chapter chapter) {
+        Chapters.Add(chapter);
+        chapter.AddDomainEvent(new ChapterCreatedEvent(chapter));
+
+    }
+    public Chapter UpdateChapter(ChapterId chapterId, string title, string description, double timeEstimation, int orderIndex, bool isActive) {
+        var chapter = Chapters.FirstOrDefault(c => c.Id == chapterId);
+        if (chapter == null) {
+            throw new NotFoundException("Chapter not found", chapterId.Value);
+        }
+        chapter.Title = title;
+        chapter.Description = description;
+        chapter.TimeEstimation = timeEstimation;
+        chapter.OrderIndex = orderIndex;
+        chapter.IsActive = isActive;
+
+        chapter.AddDomainEvent(new ChapterUpdatedEvent(chapter));
+        return chapter;
+    }
+
+    public Guid DeleteChapter(ChapterId chapterId) {
+        var chapter = Chapters.FirstOrDefault(c => c.Id == chapterId);
+        if (chapter == null) {
+            throw new Exception("Chapter not found");
+        }
+
+        Chapters.Remove(chapter);
+
+        chapter.AddDomainEvent(new ChapterDeletedEvent(chapter));
+        return chapter.Id.Value;
     }
 
 }

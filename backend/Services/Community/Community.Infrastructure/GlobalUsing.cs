@@ -9,3 +9,4 @@ global using Community.Domain.Models;
 global using Community.Application.Data.Repositories;
 global using Community.Domain.ValueObjects;
 global using Community.Domain.Abstractions;
+global using BuildingBlocks.Caching; 

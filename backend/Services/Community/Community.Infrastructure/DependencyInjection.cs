@@ -27,6 +27,9 @@ public static class DependencyInjection
         //Configuration Repository
         ConfigureRepository(services, configuration);
 
+        //IBase64Converter
+        services.AddScoped<IBase64Converter, Base64Converter>();
+
         //Caching
         services.AddConfigureCaching(configuration);
 
@@ -36,18 +39,16 @@ public static class DependencyInjection
 
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
-        //IBase64Converter
-        services.AddScoped<IBase64Converter, Base64Converter>();
 
         return services;
     }
     private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ICategoryRepository, CategoryRepository>();
-        //services.Decorate<ICategoryRepository, CategoryRepository>();
+        services.Decorate<ICategoryRepository, CachedCategoryRepository>();
 
         services.AddScoped<IDiscussionRepository, DiscussionRepository>();
-        //services.Decorate<ICategoryRepository, CategoryRepository>();
+        services.Decorate<IDiscussionRepository, CachedDiscussionRepository>();
 
         services.AddScoped<IVoteRepository, VoteRepository>();
 

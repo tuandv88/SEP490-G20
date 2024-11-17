@@ -2,7 +2,6 @@
 public record DiscussionId
 {
     public Guid Value { get; }
-    public DiscussionId() { }
     public DiscussionId(Guid value) => Value = value;
     public static DiscussionId Of(Guid value)
     {

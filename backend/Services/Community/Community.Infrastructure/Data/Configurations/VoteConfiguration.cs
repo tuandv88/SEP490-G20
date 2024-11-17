@@ -11,28 +11,17 @@ namespace Community.Infrastructure.Data.Configurations
         {
             // Định nghĩa khóa chính
             builder.HasKey(v => v.Id);
+
             builder.Property(v => v.Id)
                 .HasConversion(
                     voteId => voteId.Value,
                     dbId => VoteId.Of(dbId));
 
-            // Thiết lập mối quan hệ với Discussion (nhiều-1)
-            builder.HasOne(v => v.Discussion)
-                .WithMany(d => d.Votes)
-                .HasForeignKey(v => v.DiscussionId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Thiết lập mối quan hệ với Comment (nhiều-1)
-            builder.HasOne(v => v.Comment)
-                .WithMany(c => c.Votes)
-                .HasForeignKey(v => v.CommentId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             // Thiết lập UserId với Value Converter
             builder.Property(v => v.UserId)
                 .HasConversion(
-                    userId => userId.Value,               // Chuyển UserId thành Guid
-                    dbUserId => new UserId(dbUserId))     // Chuyển Guid thành UserId
+                    userId => userId.Value,
+                    dbUserId => new UserId(dbUserId))
                 .IsRequired();
 
             // Cấu hình VoteType (enum)
@@ -45,8 +34,7 @@ namespace Community.Infrastructure.Data.Configurations
             builder.Property(v => v.DateVoted)
                 .IsRequired();
 
-
-            builder.Property(d => d.IsActive)
+            builder.Property(v => v.IsActive)
                 .HasDefaultValue(true);
 
             // Thiết lập các chỉ mục

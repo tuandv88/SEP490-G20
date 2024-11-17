@@ -27,7 +27,6 @@ public class UpdateLectureHandler(IChapterRepository chapterRepository, ILecture
             summary: lectureDto.Summary,
             timeEstimation: lectureDto.TimeEstimation,
             lectureType: lectureType,
-            orderIndex: chapter.OrderIndex,
             point: lectureDto.Point,
             isFree: lectureDto.IsFree
         );

@@ -4,11 +4,12 @@ public class DeleteLectureHandler(IChapterRepository chapterRepository, ILecture
     public async Task<Unit> Handle(DeleteLectureCommand request, CancellationToken cancellationToken) {
         var chapter = await chapterRepository.GetByIdDetailAsync(request.ChapterId);
         if (chapter == null) {
-            throw new NotFoundException("Chapter", request.ChapterId);
+            throw new NotFoundException(nameof(Chapter), request.ChapterId);
         }
-        var lecture =  DeleteLecture(chapter, request.LectureId);
+        var lecture = chapter.DeleteLecture(LectureId.Of(request.LectureId));
+        chapter.ReorderLectures();
 
-        if(lecture.ProblemId != null) {
+        if (lecture.ProblemId != null) {
             await problemRepository.DeleteByIdAsync(lecture.ProblemId.Value);
         }
         if(lecture.QuizId != null) {
@@ -20,11 +21,6 @@ public class DeleteLectureHandler(IChapterRepository chapterRepository, ILecture
 
         return Unit.Value;
 
-    }
-
-    private Lecture DeleteLecture(Chapter chapter, Guid lectureId) {
-       var lecture =  chapter.DeleteLecture(LectureId.Of(lectureId));
-        return lecture;
     }
 }
 

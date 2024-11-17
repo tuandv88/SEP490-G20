@@ -21,7 +21,6 @@ public class UpdateChapterHandler(ICourseRepository courseRepository, IChapterRe
             title: updateChapterDto.Title,
             description: updateChapterDto.Description,
             timeEstimation: updateChapterDto.TimeEstimation,
-            orderIndex: updateChapterDto.OrderIndex,
             isActive: updateChapterDto.IsActive);
         return chapter;
     }

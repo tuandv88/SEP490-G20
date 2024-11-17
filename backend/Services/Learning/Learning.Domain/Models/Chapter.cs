@@ -28,7 +28,7 @@ public class Chapter : Aggregate<ChapterId> {
         Lectures.Add(lecture);
         lecture.AddDomainEvent(new LectureCreatedEvent(lecture));
     }
-    public Lecture UpdateLecture(LectureId lectureId, string title, string summary, double timeEstimation, LectureType lectureType, int orderIndex, int point, bool isFree) {
+    public Lecture UpdateLecture(LectureId lectureId, string title, string summary, double timeEstimation, LectureType lectureType, int point, bool isFree) {
         var lecture = Lectures.FirstOrDefault(l => l.Id == lectureId);
         if (lecture == null) {
             throw new NotFoundException("Lecture not found", lectureId.Value);
@@ -38,7 +38,6 @@ public class Chapter : Aggregate<ChapterId> {
         lecture.Summary = summary;
         lecture.TimeEstimation = timeEstimation;
         lecture.LectureType = lectureType;
-        lecture.OrderIndex = orderIndex;
         lecture.Point = point;
         lecture.IsFree = isFree;
 
@@ -51,7 +50,6 @@ public class Chapter : Aggregate<ChapterId> {
         if (lecture == null) {
             throw new NotFoundException("Lecture not found", lectureId.Value);
         }
-
         Lectures.Remove(lecture);
 
         lecture.AddDomainEvent(new LectureDeletedEvent(lecture));
@@ -62,5 +60,10 @@ public class Chapter : Aggregate<ChapterId> {
         lecture.OrderIndex = orderIndex;
         lecture.AddDomainEvent(new LectureUpdatedEvent(lecture));
     }
-
+    public void ReorderLectures() {
+        var orderedLectures = Lectures.OrderBy(l => l.OrderIndex).ToList();
+        for (int i = 0; i < orderedLectures.Count; i++) {
+            UpdateOrderIndexLecture(orderedLectures[i], i + 1);
+        }
+    }
 }

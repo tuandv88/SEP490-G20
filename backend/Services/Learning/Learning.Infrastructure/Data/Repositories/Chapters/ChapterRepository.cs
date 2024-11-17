@@ -26,7 +26,7 @@ public class ChapterRepository : Repository<Chapter>, IChapterRepository {
     public async Task<Chapter?> GetByIdDetailAsync(Guid id) {
         var chapter = await _dbContext.Chapters
             .Include(c => c.Lectures)
-            .FirstOrDefaultAsync(c => c.Id.Equals(CourseId.Of(id)));
+            .FirstOrDefaultAsync(c => c.Id.Equals(ChapterId.Of(id)));
         return chapter;
     }
 }

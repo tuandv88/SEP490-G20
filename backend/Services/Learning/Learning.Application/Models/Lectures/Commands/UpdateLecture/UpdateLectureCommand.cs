@@ -17,9 +17,6 @@ public class UpdateLectureCommandValidator : AbstractValidator<UpdateLectureComm
         RuleFor(x => x.Lecture.TimeEstimation)
             .GreaterThan(0).WithMessage("Time estimation must be greater than zero.");
 
-        RuleFor(x => x.Lecture.OrderIndex)
-            .GreaterThan(0).WithMessage("Order index must be greater than to zero.");
-
         RuleFor(x => x.Lecture.Point)
             .GreaterThanOrEqualTo(0).WithMessage("Point must be greater than or equal to zero.");
 

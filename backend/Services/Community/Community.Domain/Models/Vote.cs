@@ -5,7 +5,6 @@
         public DiscussionId? DiscussionId { get; set; }         // ID của thảo luận được vote (nếu là vote cho thảo luận)
         public CommentId? CommentId { get; set; }               // ID của bình luận được vote (nếu là vote cho bình luận)
         public UserId UserId { get; set; } = default!;          // ID của người vote
-
         public VoteType VoteType { get; set; } = VoteType.Like; // Kiểu vote: like, dislike
         public DateTime DateVoted { get; set; }                 // Thời gian vote
         public bool IsActive { get; set; } = true;              // Đánh dấu vote đã bị ẩn hay chưa

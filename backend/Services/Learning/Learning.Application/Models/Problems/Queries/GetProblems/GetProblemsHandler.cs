@@ -14,6 +14,7 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IProblemSu
 
         var totalCount = allDataProblem.Count();
         var problems = allDataProblem.OrderBy(c => c.CreatedAt)
+                            .Where(p => p.ProblemType == ProblemType.Challenge)
                             .Skip(pageSize * (pageIndex - 1))
                             .Take(pageSize)
                             .ToList();

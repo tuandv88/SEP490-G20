@@ -1,7 +1,5 @@
 ﻿using BuidingBlocks.Storage.Interfaces;
-using Learning.Application.Models.Chapters.Dtos;
 using Learning.Application.Models.Courses.Dtos;
-using System.Linq;
 
 namespace Learning.Application.Extensions;
 public static class CourseExtensions {
@@ -36,7 +34,9 @@ public static class CourseExtensions {
     public static CourseDetailsDto ToCourseDetailsDto(this Course course, string imageUrl) {
         var courseDetail = new CourseDetailsDto(
             CourseDto: course.ToCourseDto(imageUrl),
-            ChapterDetailsDtos: course.Chapters.Select(c => c.ToChapterDetailDto()).ToList()
+            ChapterDetailsDtos: course.Chapters
+            .OrderBy(c => c.OrderIndex)
+            .Select(c => c.ToChapterDetailDto()).ToList()
             );
         return courseDetail;
     }

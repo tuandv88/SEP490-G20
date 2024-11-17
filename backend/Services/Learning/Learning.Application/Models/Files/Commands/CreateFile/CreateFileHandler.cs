@@ -1,8 +1,4 @@
-﻿using BuidingBlocks.Storage.Interfaces;
-using Learning.Application.Data.Repositories;
-using Learning.Application.Models.Files.Dtos;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
+﻿using Learning.Application.Models.Files.Dtos;
 
 namespace Learning.Application.Models.Files.Commands.CreateFile;
 public class CreateFileHandler(IFilesService filesService, IFileRepository fileRepository, ILectureRepository lectureRepository) : ICommandHandler<CreateFileCommand, CreateFileResult> {

@@ -2,7 +2,7 @@
 using Learning.Domain.Enums;
 
 namespace Learning.Application.Models.Courses.Commands.UpdateCourse;
-public record UpdateCourseCommand(UpdateCourseDto UpdateCourseDto) : ICommand<UpdateCourseResult>;
+public record UpdateCourseCommand(Guid CourseId, UpdateCourseDto UpdateCourseDto) : ICommand<UpdateCourseResult>;
 public record UpdateCourseResult(bool IsSuccess);
 
 public class UpdateCourseCommandValidator : AbstractValidator<UpdateCourseCommand>

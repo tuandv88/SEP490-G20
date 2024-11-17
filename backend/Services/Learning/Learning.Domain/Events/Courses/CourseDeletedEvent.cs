@@ -1,4 +1,5 @@
-﻿namespace Learning.Domain.Events.Courses;
-public record CourseDeletedEvent() : IDomainEvent;
+﻿using Learning.Domain.Models;
 
+namespace Learning.Domain.Events.Courses;
+public record CourseDeletedEvent(Course Course) : IDomainEvent;
 

@@ -19,7 +19,7 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IProblemSu
                             .Take(pageSize)
                             .ToList();
 
-        var listProlemId = problems.Select(p => p.Id.Value).ToArray();
+        var listProlemId = problems.Select(p => p.Id).ToArray();
 
         //Lấy ra các problem solution của problem
         var problemSubmissions = await problemSubmissionRepository.GetProblemSubmissionsByProblemAsync(listProlemId);

@@ -16,8 +16,7 @@ public class FileRepository : Repository<Domain.Models.File>, IFileRepository {
 
     public override async Task<Domain.Models.File?> GetByIdAsync(Guid id) {
         var file = _dbContext.Files
-                        .AsEnumerable()
-                        .FirstOrDefault(c => c.Id.Value == id);
+                        .FirstOrDefault(c => c.Id.Equals(FileId.Of(id)));
         return file;
     }
 }

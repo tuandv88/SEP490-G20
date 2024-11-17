@@ -19,8 +19,5 @@ public class CreateChapterCommandValidator : AbstractValidator<CreateChapterComm
 
         RuleFor(x => x.CreateChapterDto.TimeEstimation)
             .GreaterThan(0).WithMessage("Time estimation must be greater than zero.");
-
-        RuleFor(x => x.CreateChapterDto.OrderIndex)
-            .GreaterThan(0).WithMessage("Order index must be greater than to zero.");
     }
 }

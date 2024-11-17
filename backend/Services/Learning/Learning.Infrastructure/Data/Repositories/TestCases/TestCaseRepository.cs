@@ -16,8 +16,7 @@ public class TestCaseRepository : Repository<TestCase>, ITestCaseRepository {
 
     public override async Task<TestCase?> GetByIdAsync(Guid id) {
         var testCase = _dbContext.TestCases
-                        .AsEnumerable()
-                        .FirstOrDefault(c => c.Id.Value == id);
+                        .FirstOrDefault(c => c.Id.Equals(TestCaseId.Of(id)));
         return testCase;
     }
 }

@@ -17,7 +17,9 @@ public static class ChapterExtensions {
     public static ChapterDetailDto ToChapterDetailDto(this Chapter chapter) {
         return new ChapterDetailDto(
             ChapterDto: chapter.ToChapterDto(),
-            LectureDtos: chapter.Lectures.Select(l => l.ToLectureDto()).ToList()
+            LectureDtos: chapter.Lectures
+            .OrderBy(l => l.OrderIndex)
+            .Select(l => l.ToLectureDto()).ToList()
             );
     }
 }

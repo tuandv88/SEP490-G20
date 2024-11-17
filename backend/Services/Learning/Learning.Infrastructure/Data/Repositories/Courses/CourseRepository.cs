@@ -19,19 +19,26 @@ public class CourseRepository : Repository<Course>, ICourseRepository {
     }
 
     public override async Task<Course?> GetByIdAsync(Guid id) {
-        var course = _dbContext.Courses
-                        .AsEnumerable()
-                        .FirstOrDefault(c => c.Id.Value == id);
+        var course = await _dbContext.Courses
+                        .FirstOrDefaultAsync(c => c.Id.Equals(CourseId.Of(id)));
         return course;
     }
 
     public async Task<Course?> GetByIdDetailAsync(Guid id) {
-        var course = _dbContext.Courses
+        var course = await _dbContext.Courses
             .Include(c => c.Chapters)
             .ThenInclude(c => c.Lectures)
             .AsNoTracking()
-            .AsEnumerable()
-            .FirstOrDefault(c => c.Id.Value == id);
+            .FirstOrDefaultAsync(c => c.Id.Equals(CourseId.Of(id)));
+        return course;
+    }
+
+
+    public async Task<Course?> GetCourseByChapterIdAsync(Guid chapterId) {
+        var course = await _dbContext.Courses
+            .Include(c => c.Chapters)
+            .Include(c => c.Id)
+            .FirstOrDefaultAsync(c => c.Chapters.Any(ch => ch.Id.Equals(ChapterId.Of(chapterId))));
         return course;
     }
 }

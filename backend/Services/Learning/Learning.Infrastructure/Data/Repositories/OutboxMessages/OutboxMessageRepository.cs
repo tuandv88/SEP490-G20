@@ -13,9 +13,8 @@ public class OutboxMessageRepository : Repository<OutboxMessage>, IOutboxMessage
     }
 
     public override async Task<OutboxMessage?> GetByIdAsync(Guid id) {
-        var outbox = _dbContext.OutboxMessages
-                       .AsEnumerable()
-                       .FirstOrDefault(l => l.Id.Value == id);
+        var outbox = await _dbContext.OutboxMessages
+                       .FirstOrDefaultAsync(l => l.Id.Equals(OutboxMessageId.Of(id)));
         return outbox;
     }
 }

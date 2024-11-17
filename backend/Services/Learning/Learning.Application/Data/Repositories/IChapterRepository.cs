@@ -1,5 +1,6 @@
 ﻿namespace Learning.Application.Data.Repositories;
 public interface IChapterRepository : IRepository<Chapter>{
-    public Task<Chapter?> GetByIdDetailAsync(Guid id);
+    Task<Chapter?> GetByIdDetailAsync(Guid id);
+    Task<int> CountByCourseAsync(Guid courseId);
 }
 

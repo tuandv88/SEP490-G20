@@ -100,5 +100,9 @@ public class Course : Aggregate<CourseId> {
         return chapter.Id.Value;
     }
 
+    public void UpdateOrderIndexChapter(Chapter chapter, int orderIndex) {
+        chapter.OrderIndex = orderIndex;
+        chapter.AddDomainEvent(new ChapterUpdatedEvent(chapter));
+    }
 }
 

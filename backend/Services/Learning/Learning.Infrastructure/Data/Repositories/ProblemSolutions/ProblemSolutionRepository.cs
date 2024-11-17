@@ -15,9 +15,8 @@ public class ProblemSolutionRepository : Repository<ProblemSolution>, IProblemSo
     }
 
     public override async Task<ProblemSolution?> GetByIdAsync(Guid id) {
-        var problemSolution = _dbContext.ProblemSolutions
-                            .AsEnumerable()
-                            .FirstOrDefault(p => p.Id.Value == id);
+        var problemSolution =await _dbContext.ProblemSolutions
+                            .FirstOrDefaultAsync(p => p.Id.Equals(ProblemSolutionId.Of(id)));
         return problemSolution;
     }
 }

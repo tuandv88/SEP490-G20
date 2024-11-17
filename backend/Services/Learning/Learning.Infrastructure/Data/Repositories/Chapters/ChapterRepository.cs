@@ -6,6 +6,10 @@ public class ChapterRepository : Repository<Chapter>, IChapterRepository {
         _dbContext = dbContext ?? throw new ArgumentNullException();
     }
 
+    public async Task<int> CountByCourseAsync(Guid courseId) {
+        return await _dbContext.Chapters.CountAsync(c => c.CourseId.Equals(CourseId.Of(courseId)));
+    }
+
     public override async Task DeleteByIdAsync(Guid id) {
         var chapter = await GetByIdAsync(id);
         if (chapter != null) {
@@ -14,17 +18,15 @@ public class ChapterRepository : Repository<Chapter>, IChapterRepository {
     }
 
     public override async Task<Chapter?> GetByIdAsync(Guid id) {
-        var chapter = _dbContext.Chapters
-                        .AsEnumerable()
-                        .FirstOrDefault(c => c.Id.Value == id);
+        var chapter = await _dbContext.Chapters
+                        .FirstOrDefaultAsync(c => c.Id.Equals(ChapterId.Of(id)));
         return chapter;
     }
 
     public async Task<Chapter?> GetByIdDetailAsync(Guid id) {
-        var chapter = _dbContext.Chapters
-                        .Include(c => c.Lectures)
-                        .AsEnumerable()
-                        .FirstOrDefault(c => c.Id.Value == id);
+        var chapter = await _dbContext.Chapters
+            .Include(c => c.Lectures)
+            .FirstOrDefaultAsync(c => c.Id.Equals(CourseId.Of(id)));
         return chapter;
     }
 }

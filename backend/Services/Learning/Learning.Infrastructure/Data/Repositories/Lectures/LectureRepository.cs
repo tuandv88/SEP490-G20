@@ -9,6 +9,10 @@ public class LectureRepository : Repository<Lecture>, ILectureRepository {
         return await _dbContext.Lectures.CountAsync(c => c.ChapterId.Equals(ChapterId.Of(chapterId)));
     }
 
+    public async Task DeleteAsync(params Lecture[] lectures) {
+        _dbContext.Lectures.RemoveRange(lectures);
+    }
+
     public override async Task DeleteByIdAsync(Guid id) {
         var lecture = await GetByIdAsync(id);
         if (lecture != null) {

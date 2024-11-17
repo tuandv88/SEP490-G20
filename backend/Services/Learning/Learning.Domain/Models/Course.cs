@@ -87,7 +87,7 @@ public class Course : Aggregate<CourseId> {
         return chapter;
     }
 
-    public Guid DeleteChapter(ChapterId chapterId) {
+    public Chapter DeleteChapter(ChapterId chapterId) {
         var chapter = Chapters.FirstOrDefault(c => c.Id == chapterId);
         if (chapter == null) {
             throw new Exception("Chapter not found");
@@ -96,7 +96,7 @@ public class Course : Aggregate<CourseId> {
         Chapters.Remove(chapter);
 
         chapter.AddDomainEvent(new ChapterDeletedEvent(chapter));
-        return chapter.Id.Value;
+        return chapter;
     }
 
     public void UpdateOrderIndexChapter(Chapter chapter, int orderIndex) {

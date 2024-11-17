@@ -55,6 +55,15 @@ public class Chapter : Aggregate<ChapterId> {
         lecture.AddDomainEvent(new LectureDeletedEvent(lecture));
         return lecture;
     }
+    public List<Lecture> DeleteLectures() {
+        var deletedLectures = new List<Lecture>();
+        Lectures.ForEach(lecture => {
+            deletedLectures.Add(lecture);
+            lecture.AddDomainEvent(new LectureDeletedEvent(lecture));
+        });
+        Lectures.Clear();
+        return deletedLectures;
+    }
 
     public void UpdateOrderIndexLecture(Lecture lecture, int orderIndex) {
         lecture.OrderIndex = orderIndex;

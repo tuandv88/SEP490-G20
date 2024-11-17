@@ -10,9 +10,11 @@ public class DeleteLectureHandler(IChapterRepository chapterRepository, ILecture
         chapter.ReorderLectures();
 
         if (lecture.ProblemId != null) {
+            //Cần gọi hàm thêm event nếu cần
             await problemRepository.DeleteByIdAsync(lecture.ProblemId.Value);
         }
         if(lecture.QuizId != null) {
+            //Cần gọi hàm thêm event nếu cần
             await quizRepository.DeleteByIdAsync(lecture.QuizId.Value);
         }
 

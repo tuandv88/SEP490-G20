@@ -1,7 +1,4 @@
-﻿using BuidingBlocks.Storage.Interfaces;
-using Learning.Application.Data.Repositories;
-
-namespace Learning.Application.Models.Files.Queries.GetFileById;
+﻿namespace Learning.Application.Models.Files.Queries.GetFileById;
 
 public class GetFileByIdHandler(IFileRepository fileRepository, ILectureRepository lectureRepository, IFilesService filesService) 
     : IQueryHandler<GetFileByIdQuery, GetFileByIdResult> {

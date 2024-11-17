@@ -33,6 +33,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext {
     public DbSet<ProblemSubmission> ProblemSubmissions => Set<ProblemSubmission>();
 
     public DbSet<Domain.Models.File> Files => Set<Domain.Models.File>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     public async new Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class {
         await Set<T>().AddAsync(entity, cancellationToken);

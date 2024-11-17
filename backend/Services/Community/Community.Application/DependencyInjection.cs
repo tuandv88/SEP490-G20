@@ -15,7 +15,7 @@ namespace Community.Application
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());                 // Đăng ký các validator từ assembly hiện tại
 
             // Cấu hình RabbitMQ
-            services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());           // Thêm message broker với RabbitMQ để giao tiếp giữa các service
+            //services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());           // Thêm message broker với RabbitMQ để giao tiếp giữa các service
 
             //Storage 
             services.AddStorage(configuration);

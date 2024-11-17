@@ -1,8 +1,4 @@
 ﻿
-using BuidingBlocks.Storage.Interfaces;
-using BuidingBlocks.Storage.Services;
-using Learning.Application.Data.Repositories;
-using Learning.Application.Interfaces;
 using Learning.Application.Models.Courses.Dtos;
 
 namespace Learning.Application.Models.Courses.Commands.UpdateCourseImage;

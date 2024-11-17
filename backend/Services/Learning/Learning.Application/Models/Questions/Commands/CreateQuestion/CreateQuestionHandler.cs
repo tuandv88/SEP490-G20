@@ -1,9 +1,6 @@
-﻿using Learning.Application.Data.Repositories;
+﻿
 using Learning.Application.Models.Problems.Commands.CreateProblem;
 using Learning.Application.Models.Questions.Dtos;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
-using MediatR;
 
 namespace Learning.Application.Models.Questions.Commands.CreateQuestion;
 public class CreateQuestionHandler(IQuestionRepository questionRepository, IQuizRepository quizRepository, ISender sender) : ICommandHandler<CreateQuestionCommand, CreateQuestionResult>

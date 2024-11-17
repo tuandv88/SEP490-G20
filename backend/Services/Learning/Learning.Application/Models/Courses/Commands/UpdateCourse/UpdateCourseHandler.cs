@@ -1,6 +1,4 @@
-﻿using Learning.Application.Data.Repositories;
-using Learning.Application.Models.Courses.Dtos;
-using Learning.Domain.Enums;
+﻿using Learning.Application.Models.Courses.Dtos;
 
 namespace Learning.Application.Models.Courses.Commands.UpdateCourse;
 
@@ -9,11 +7,11 @@ public class UpdateCourseHandler(ICourseRepository repository) : ICommandHandler
     public async Task<UpdateCourseResult> Handle(UpdateCourseCommand request, CancellationToken cancellationToken)
     {
 
-        var course = await repository.GetByIdAsync(request.UpdateCourseDto.Id);
+        var course = await repository.GetByIdAsync(request.CourseId);
 
         if (course == null)
         {
-            throw new NotFoundException("Course", request.UpdateCourseDto.Id);
+            throw new NotFoundException("Course", request.CourseId);
 
         }
         UpdateCourseWithNewValues(course, request.UpdateCourseDto);

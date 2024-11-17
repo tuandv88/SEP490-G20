@@ -14,6 +14,11 @@ public class CachedLectureRepository(ILectureRepository lectureRepository, IChap
         await RemoveCachedCourseDetails(entity);
     }
 
+    public async Task DeleteAsync(params Lecture[] lectures) {
+        await lectureRepository.DeleteAsync(lectures);
+        await RemoveCachedCourseDetails(lectures.FirstOrDefault());
+    }
+
     public async Task DeleteByIdAsync(Guid id) {
         await lectureRepository.DeleteByIdAsync(id);
         var lecture = await GetByIdAsync(id);

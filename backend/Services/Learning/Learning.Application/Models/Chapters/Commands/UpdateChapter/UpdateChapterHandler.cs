@@ -14,14 +14,13 @@ public class UpdateChapterHandler(ICourseRepository courseRepository, IChapterRe
 
         return new UpdateChapterResult(true);
     }
-
+     
     private Chapter UpdateChapter(Course course, Guid chapterId, UpdateChapterDto updateChapterDto) {
         var chapter = course.UpdateChapter(
             chapterId: ChapterId.Of(chapterId),
             title: updateChapterDto.Title,
             description: updateChapterDto.Description,
             timeEstimation: updateChapterDto.TimeEstimation,
-            orderIndex: updateChapterDto.OrderIndex,
             isActive: updateChapterDto.IsActive);
         return chapter;
     }

@@ -73,7 +73,7 @@ public class Course : Aggregate<CourseId> {
         chapter.AddDomainEvent(new ChapterCreatedEvent(chapter));
 
     }
-    public Chapter UpdateChapter(ChapterId chapterId, string title, string description, double timeEstimation, int orderIndex, bool isActive) {
+    public Chapter UpdateChapter(ChapterId chapterId, string title, string description, double timeEstimation, bool isActive) {
         var chapter = Chapters.FirstOrDefault(c => c.Id == chapterId);
         if (chapter == null) {
             throw new NotFoundException("Chapter not found", chapterId.Value);
@@ -81,14 +81,13 @@ public class Course : Aggregate<CourseId> {
         chapter.Title = title;
         chapter.Description = description;
         chapter.TimeEstimation = timeEstimation;
-        chapter.OrderIndex = orderIndex;
         chapter.IsActive = isActive;
 
         chapter.AddDomainEvent(new ChapterUpdatedEvent(chapter));
         return chapter;
     }
 
-    public Guid DeleteChapter(ChapterId chapterId) {
+    public Chapter DeleteChapter(ChapterId chapterId) {
         var chapter = Chapters.FirstOrDefault(c => c.Id == chapterId);
         if (chapter == null) {
             throw new Exception("Chapter not found");
@@ -97,7 +96,7 @@ public class Course : Aggregate<CourseId> {
         Chapters.Remove(chapter);
 
         chapter.AddDomainEvent(new ChapterDeletedEvent(chapter));
-        return chapter.Id.Value;
+        return chapter;
     }
 
     public void UpdateOrderIndexChapter(Chapter chapter, int orderIndex) {

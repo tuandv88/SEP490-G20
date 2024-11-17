@@ -50,6 +50,7 @@ public class CreateVoteHandler : ICommandHandler<CreateVoteCommand, CreateVoteRe
         //{
         //    throw new UnauthorizedAccessException("User is not authenticated.");
         //}
+         
 
         //var userId = UserId.Of(currentUserId.Value);
 

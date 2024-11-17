@@ -2,7 +2,6 @@
 public record CommentId
 {
     public Guid Value { get; }
-    public CommentId() { }
     public CommentId(Guid value) => Value = value;
     public static CommentId Of(Guid value)
     {

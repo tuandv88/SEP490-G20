@@ -21,7 +21,7 @@ public class GetCategoryDetailByIdHandler : IQueryHandler<GetCategoryDetailByIdQ
 
         if (categoryData == null)
         {
-            throw new NotFoundException("Category not found");
+            throw new NotFoundException("Category not found Or IsActive: False");
         }
 
         // Lọc các Discussion của Category theo tags và OrderBy

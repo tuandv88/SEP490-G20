@@ -30,12 +30,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    //using var scope = app.Services.CreateScope();
+    //var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    if (dbContext.Database.EnsureCreated()) {
-        dbContext.Database.Migrate();
-    }
+    //if (dbContext.Database.EnsureCreated()) {
+    //    dbContext.Database.Migrate();
+    //}
 }
 
 app.MapControllers();

@@ -1,23 +1,28 @@
 ﻿using AuthServer.Config;
 using AuthServer.Data;
 using AuthServer.Models;
-using AuthServer.Repository.Services;
+using AuthServer.Repository.Services.Profile;
 using AuthServer.Repository.Services.SendMailWithModoboa;
+using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 // Add DbContext 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 // Add AspNetCore Identity 
 builder.Services.AddIdentity<Users, Roles>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -50,6 +55,17 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 
+// Đường dẫn tới file lưu khóa RSA
+var rsaKeyPath = Path.Combine(Directory.GetCurrentDirectory(), "Keys/rsa_key.pem");
+
+// Tạo hoặc tải RSA Key từ tệp (định dạng PEM)
+var rsaKey = RsaKeyHelper.GenerateOrLoadRsaKey(rsaKeyPath);
+
+// Tạo SigningCredentials từ RSA Key và sử dụng thuật toán ký RsaSha256
+var signingCredentials = new SigningCredentials(rsaKey, SecurityAlgorithms.RsaSha256);
+
+var migrationsAssembly = typeof(Program).Assembly.GetName().Name;
+
 // Add IdentityServer4.AspNetCoreIdentity
 builder.Services.AddIdentityServer(options =>
 {
@@ -58,13 +74,21 @@ builder.Services.AddIdentityServer(options =>
     options.Events.RaiseFailureEvents = true;
     options.Events.RaiseSuccessEvents = true;
 
-}).AddDeveloperSigningCredential()
-  .AddAspNetIdentity<Users>()
-  .AddInMemoryClients(ClientConfig.GetClients)
-  .AddInMemoryApiResources(ApiResourcesConfig.GetApiResources)
-  .AddInMemoryApiScopes(ApiScopesConfig.GetApiScopes)
-  .AddInMemoryIdentityResources(IdentityResourcesConfig.GetIdentityResources)
-  .AddProfileService<ProfileService>();
+}).AddSigningCredential(signingCredentials)                                      // AddSigningCredential yêu cầu một SigningCredentials
+  .AddAspNetIdentity<Users>()                                                    // Sử dụng Identity cho quản lý người dùng
+  .AddProfileService<CustomProfileService>()                                     // ProfileService quản lí claims của người dùng
+  .AddConfigurationStore(options =>                                              // Quản lý Client, Resource, ApiScope, IdentityResource của IdentityServer một cách động.
+  {
+      options.ConfigureDbContext = b => b.UseNpgsql(connectionString,            // Sử dụng UseNpgsql cho PostgreSQL
+          npgsql => npgsql.MigrationsAssembly(migrationsAssembly));
+  })
+.AddOperationalStore(options =>                                                  // Cấu hình lưu trữ cho dữ liệu vận hành của IdentityServer như Auth Code và refresh token.
+{
+    options.ConfigureDbContext = b => b.UseNpgsql(connectionString,              // Sử dụng UseNpgsql cho PostgreSQL
+        npgsql => npgsql.MigrationsAssembly(migrationsAssembly));
+    options.EnableTokenCleanup = builder.Configuration["TokenCleanupOptions:EnableTokenCleanup"] == "true";             // Bật xóa token tự động
+    options.TokenCleanupInterval = int.Parse(builder.Configuration["TokenCleanupOptions:TokenCleanupInterval"]); ;      // Thời gian dọn dẹp token (giây)
+});
 
 // Cấu hình Google Authentication
 builder.Services.AddAuthentication(options =>
@@ -88,11 +112,9 @@ builder.Services.AddAuthentication(options =>
     googleOptions.CallbackPath = "/signin-google"; // Đảm bảo đường dẫn callback chính xác
 });
 
-
 // Cấu hình SendMail - Nuget: FluentMail
 builder.Services.AddFluentEmail(builder.Configuration);
 builder.Services.AddTransient<IEmailService, EmailService>();
-
 
 var app = builder.Build();
 
@@ -101,10 +123,20 @@ if (args.Contains("/seeddata"))
 {
     using (var scope = app.Services.CreateScope())
     {
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        SeedDataSample.Initialize(context);
+        // Lấy tất cả các DbContext cần thiết
+        var appDbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var configDbContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+        var persistedGrantDbContext = scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>();
+
+        // Lấy IConfiguration từ scope để truyền vào phương thức Initialize
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+        // Thực hiện seeding dữ liệu
+        SeedDataSample.Initialize(appDbContext, configDbContext, persistedGrantDbContext, configuration);
     }
 }
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -122,6 +154,8 @@ app.UseIdentityServer();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",

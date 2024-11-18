@@ -1,4 +1,5 @@
 ﻿using Learning.Domain.Events;
+using Learning.Domain.Events.Courses;
 
 namespace Learning.Domain.Models;
 public class Course : Aggregate<CourseId> {
@@ -43,6 +44,7 @@ public class Course : Aggregate<CourseId> {
 
     public void AddChapter(Chapter chapter) {
         Chapters.Add(chapter);
+
     }
 
     public void Update(string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, int orderIndex, CourseLevel courseLevel, double price) {

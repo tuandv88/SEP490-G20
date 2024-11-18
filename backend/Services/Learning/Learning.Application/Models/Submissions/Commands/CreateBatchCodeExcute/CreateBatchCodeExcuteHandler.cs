@@ -40,11 +40,11 @@ public class CreateBatchCodeExcuteHandler(ISubmissionService submissionService, 
 
         //Check liên tục chờ kết quả
         while (attempts < MaxAttempts) {
-            var submissions = await submissionService.GetBatchAsync(tokens);
+            var submissions = await submissionService.GetBatchAsync(tokens, true);
             submissionsDone = submissions.Submissions.Where(x => tokens.Contains(x.Token) && x.Status!.Id >= 3).ToList();
             if (submissionsDone.Count == tokens.Count()) {
                 break;
-            }
+            } 
 
             attempts++;
             await Task.Delay(DelayMilliseconds, cancellationToken);

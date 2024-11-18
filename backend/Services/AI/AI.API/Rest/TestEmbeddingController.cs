@@ -21,7 +21,7 @@ namespace AI.API.Rest {
             _kernel = kernel;
             _kernelMemory = kernelMemory;
             //_textEmbeddingGenerationService = kernel.GetRequiredService<ITextEmbeddingGenerationService>();
-            //_chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+            _chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
         }
 
         //[HttpGet("/embedding")]
@@ -132,7 +132,7 @@ namespace AI.API.Rest {
             return Ok(d);
         }
         [HttpPost("/markdown")]
-        public async Task<ActionResult<string>> ImportMarkdownAsync(string markdown) {
+        public async Task<ActionResult<string>> ImportMarkdownAsync([FromBody]string markdown) {
 
             var d = await _kernelMemory.ImportTextAsync(markdown, Guid.NewGuid().ToString());
             return Ok(d);
@@ -156,8 +156,8 @@ namespace AI.API.Rest {
         }
         [HttpGet("/ask")]
         public async Task<IActionResult> AskRag(string question) {
-            var answer = await _kernelMemory.AskAsync(question, minRelevance: 0.4);
-
+            var answer = await _kernelMemory.AskAsync(question);
+            //, minRelevance: 0.4
             return Ok(answer);
         }
         [HttpGet("/search")]
@@ -170,6 +170,17 @@ namespace AI.API.Rest {
             var answer = await _kernelMemory.SearchAsync(question, minRelevance: 0.4);
 
             return Ok(answer.ToJson(true));
+        }
+        [HttpGet("/searchweb")]
+        public async Task<IActionResult> SearchWeb(string question) {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://google.serper.dev/search");
+            request.Headers.Add("X-API-KEY", "e313f010c0e6082bacba5f7000f103edabc67ecc");
+            var content = new StringContent("{\"q\":\""+ question+"\"}", null, "application/json");
+            request.Content = content;
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return Ok(await response.Content.ReadAsStringAsync());
         }
         [HttpGet("/ask-rag-prompt")]
         public async Task<IActionResult> AskRagPrompt(string question) {

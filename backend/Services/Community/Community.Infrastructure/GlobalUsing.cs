@@ -1,0 +1,11 @@
+﻿global using System.Reflection;
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Microsoft.Extensions.DependencyInjection;
+global using Community.Application.Data;
+global using Community.Infrastructure.Data;
+global using Community.Domain.Models;
+global using Community.Application.Data.Repositories;
+global using Community.Domain.ValueObjects;
+global using Community.Domain.Abstractions;

@@ -6,6 +6,7 @@ import { AUTHENTICATION_ROUTERS as AR } from '@/data/constants'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import DropdownMenuUser from '@/components/ui/userdropdown'
 import { ModeToggle } from '@/components/mode-toggle'
+import AuthService from '@/oidc/AuthService'
 
 export default function Header() {
   const [isLoggedIn /*setIsLoggedIn*/] = useState(false) // Set to true for demonstration
@@ -13,6 +14,7 @@ export default function Header() {
   const [isHidden, setIsHidden] = useState(false)
   const [lastScrollTop, setLastScrollTop] = useState(0)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [user, setUser] = useState(null);
 
   const dropdownRef = useRef(null)
 
@@ -50,6 +52,14 @@ export default function Header() {
   }, [])
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
 
+
+  useEffect(() => {
+    AuthService.getUser().then((user) => {
+      setUser(user);
+      console.log(user.profile);
+    });
+  }, []);
+
   return (
     <header
       className={`bg-background text-foreground shadow-md fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isHidden ? 'hidden' : 'top-0'}`}
@@ -66,6 +76,11 @@ export default function Header() {
                   HomePage
                 </Link>
               </li>
+              {/* <li>
+                <Link to={AR.CODE} className='text-lg hover:text-primary hover:font-bold'>
+                  Code
+                </Link>
+              </li> */}
               <li>
                 <Link to={AR.COURSELIST} className='text-lg hover:text-primary hover:font-bold'>
                   Course
@@ -122,10 +137,11 @@ export default function Header() {
               </div>
             ) : (
               <div className='hidden md:block'>
-                <Button variant='outline' className='mr-2'>
+                { user ? (<Button variant='outline' className='mr-2' onClick={() => AuthService.logout()}>
+                  Logout
+                </Button>) : (<Button variant='outline' className='mr-2' onClick={() => AuthService.login()}>
                   Login
-                </Button>
-                <Button>Register</Button>
+                </Button>) }                            
               </div>
             )}
             {/* Add the ModeToggle button here */}
@@ -173,7 +189,7 @@ export default function Header() {
                   </li>
                   <li>
                     <Button className='w-full'>Register</Button>
-                  </li>
+                  </li>                                  
                 </>
               )}
             </ul>

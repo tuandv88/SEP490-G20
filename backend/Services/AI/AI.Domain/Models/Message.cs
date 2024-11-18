@@ -10,5 +10,6 @@ public class Message : Entity<MessageId> {
     public PromptType PromptType { get; set; } = PromptType.AnswerWithFacts;
     public List<Document>? References { get; set; } = new();
     public List<string>? NonIndexedExternalReferences { get; set; } = new();
+    public Dictionary<string, object> Context { get; set; } = new Dictionary<string, object>();
 }
 

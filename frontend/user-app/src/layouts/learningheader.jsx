@@ -17,10 +17,10 @@ import {
 } from 'lucide-react'
 import React, { useState } from 'react'
 
-const HeaderCode = ({ onButtonClick }) => {
+const HeaderCode = ({ onButtonClick, onChatClick }) => {
   const [isRunning, setIsRunning] = useState(false)
   const [time, setTime] = useState('00:00:00')
-  const [isProblemListOpen, setIsProblemListOpen] = useState(false)
+
 
   const toggleTimer = () => {
     setIsRunning(!isRunning)
@@ -63,21 +63,8 @@ const HeaderCode = ({ onButtonClick }) => {
                 </button>
               </div>
             </div>
-            {/* <div className='flex items-center space-x-2'>
-              <button className='flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600'>
-                <Play className='w-4 h-4 mr-2 text-gray-600 dark:text-gray-300' />
-                <span className='text-sm font-medium'>Run</span>
-              </button>
-              <button className='flex items-center px-3 py-1.5 bg-green-100 dark:bg-green-700 rounded-md hover:bg-green-200 dark:hover:bg-green-600 text-green-700 dark:text-green-100'>
-                <CloudUpload className='w-4 h-4 mr-2' />
-                <span className='text-sm font-medium'>Submit</span>
-              </button>
-              <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-                <AlarmClock className='w-5 h-5' />
-              </button>
-            </div> */}
             <div className='flex items-center space-x-2 mr-4'>
-              <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
+              <button onClick={onChatClick} className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
                 <BotMessageSquare className='w-5 h-5' />
               </button>
               <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>

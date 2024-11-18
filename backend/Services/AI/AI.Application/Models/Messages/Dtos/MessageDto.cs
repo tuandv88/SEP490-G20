@@ -1,8 +1,8 @@
 ﻿namespace AI.Application.Models.Messages.Dtos;
 public record MessageDto(
-    Guid? ConversationId,
-    Guid? LectureId,
-    string? SenderType,
+    Guid Id,
+    Guid ConversationId,
+    string SenderType,
     string Content,
-    Dictionary<string, string>? ReferenceLink
+    List<string> ReferenceLinks
 );

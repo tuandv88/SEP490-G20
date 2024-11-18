@@ -1,24 +1,33 @@
+using Microsoft.OpenApi.Models;
+using Serilog;
+using BuildingBlocks.Logging;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//Logging
+builder.Host.UseSerilog(SeriLogger.Configure);
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//Docs API
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+    options.EnableAnnotations();
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Discussion API", Version = "v1" });
+});
+
+//Add Service to DI Extension
+builder.Services
+    .AddApplicationServices(builder.Configuration)
+    .AddInfrastructureServices(builder.Configuration)
+    .AddApiServices(builder.Configuration);
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+// DI - UseApiServices
+app.UseApiServices();
 
 app.Run();

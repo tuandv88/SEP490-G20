@@ -1,0 +1,15 @@
+﻿global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using BuildingBlocks.Pagination;
+global using BuildingBlocks.CQRS;
+global using BuildingBlocks.Exceptions;
+global using BuildingBlocks.Messaging.MassTransit;
+global using BuildingBlocks.Behaviors;
+global using BuidingBlocks.Storage;
+global using BuidingBlocks.Storage.Interfaces;
+global using System.Reflection;
+global using FluentValidation;
+global using Community.Domain.Models;
+global using Community.Application.Data.Repositories;
+global using Community.Domain.Enums;

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Services\Kernels\Prompts\answer-with-facts.txt" />
+    <None Remove="Services\Kernels\Prompts\suggestion.txt" />
     <None Remove="Services\Kernels\Prompts\summarize.txt" />
   </ItemGroup>
 
@@ -15,12 +16,14 @@
     <EmbeddedResource Include="Services\Kernels\Prompts\answer-with-facts.txt">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Services\Kernels\Prompts\suggestion.txt" />
     <EmbeddedResource Include="Services\Kernels\Prompts\summarize.txt">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="MassTransit.Kafka" Version="8.3.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,6 +32,7 @@
 		<PackageReference Include="Scrutor" Version="5.0.1" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\BuildingBlocks\BuidingBlocks.Storage\BuidingBlocks.Storage.csproj" />
 	  <ProjectReference Include="..\AI.Application\AI.Application.csproj" />
 	</ItemGroup>
 </Project>

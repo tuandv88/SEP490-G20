@@ -7,19 +7,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Folder Include="Extensions\" />
-		<Folder Include="Models\Messages\EventHandlers\" />
-		<Folder Include="Models\Messages\Events\" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
-		<PackageReference Include="Microsoft.KernelMemory.Abstractions" Version="0.90.241021.1" />
-		<PackageReference Include="Microsoft.KernelMemory.Core" Version="0.90.241021.1" />
-		<PackageReference Include="Microsoft.KernelMemory.DocumentStorage.AWSS3" Version="0.90.241021.1" />
-		<PackageReference Include="Microsoft.KernelMemory.SemanticKernelPlugin" Version="0.90.241021.1" />
-		<PackageReference Include="Microsoft.KernelMemory.Service.AspNetCore" Version="0.90.241021.1" />
-		<PackageReference Include="Microsoft.SemanticKernel" Version="1.25.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+		<PackageReference Include="Microsoft.KernelMemory.Abstractions" Version="0.92.241112.1" />
+		<PackageReference Include="Microsoft.KernelMemory.Core" Version="0.92.241112.1" />
+		<PackageReference Include="Microsoft.KernelMemory.DocumentStorage.AWSS3" Version="0.92.241112.1" />
+		<PackageReference Include="Microsoft.KernelMemory.SemanticKernelPlugin" Version="0.92.241112.1" />
+		<PackageReference Include="Microsoft.KernelMemory.Service.AspNetCore" Version="0.92.241112.1" />
+		<PackageReference Include="Microsoft.SemanticKernel" Version="1.29.0" />
 	</ItemGroup>
 
 	<ItemGroup>

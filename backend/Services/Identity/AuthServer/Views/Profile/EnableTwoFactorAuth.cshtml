@@ -614,7 +614,7 @@
                 <div class="qr-container text-center mb-4" id="qrcode"></div>
 
                 <!-- Thông báo lỗi -->
-                @if (!ViewData.ModelState.IsValid)
+                @if (!ViewData.ModelState.IsValid && !string.IsNullOrWhiteSpace(Html.ValidationSummary(true).ToString()))
                 {
                     <div class="alert alert-danger">
                         @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))

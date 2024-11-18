@@ -35,7 +35,6 @@ function CourseList() {
   //   setCurrentPage(1) // Reset to first page when filters change
   // }, [searchTerm, selectedLevel, selectedCategory, courses])
 
-
   const navigate = useNavigate()
 
   const handleViewDetail = (courseId) => {

@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie List</title>
+    <!-- Thêm thư viện oidc-client để quản lý OIDC authentication -->
+    <script src="https://cdn.jsdelivr.net/npm/oidc-client@1.11.5/dist/oidc-client.min.js"></script>
+    <style>
+        /* Định dạng bảng hiển thị danh sách phim */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Ẩn danh sách phim mặc định, chỉ hiển thị khi người dùng đã đăng nhập */
+        #movie-list {
+            display: none;
+        }
+    </style>
+    <script>
+        // Cấu hình OIDC client để kết nối với IdentityServer
+        var config = {
+            authority: "https://localhost:5001",                        // IdentityServer URL
+            client_id: "movies_client",                                 // Client ID configured on IdentityServer
+            redirect_uri: "https://localhost:5003/js-client/index.html",// Callback URL after successful login
+            post_logout_redirect_uri: "https://localhost:5003/js-client/index.html", // URL after logout
+            response_type: "code",                                      // Response type: Authorization Code Flow
+            scope: "openid profile email",                              // Data scope to get from IdentityServer
+            client_secret: "secret",                                    // Client secret(plain-text)
+            requirePkce: true,                                          // Configure PKCE request
+            automaticSilentRenew: true,                                 // Automatically renew token when token is about to expire
+            loadUserInfo: true                                          // Get more user information from UserInfo endpoint
+        };
+
+        // Tạo một UserManager với cấu hình trên để quản lý quá trình xác thực và token
+        var userManager = new Oidc.UserManager(config);
+
+        // Xử lý callback sau khi IdentityServer trả về mã (code) sau khi đăng nhập
+        if (window.location.search.includes("code")) {
+            userManager.signinRedirectCallback().then(function (user) {
+                console.log("Login successful:", user); // Log lại thông tin người dùng sau khi đăng nhập thành công
+                updateUI(user);  // Cập nhật giao diện sau khi đăng nhập thành công
+                window.history.replaceState({}, document.title, window.location.pathname); // Xóa mã 'code' khỏi URL
+            }).catch(function (err) {
+                console.error("Login callback error:", err);
+            });
+        } else {
+            // Kiểm tra trạng thái đăng nhập hiện tại của người dùng
+            userManager.getUser().then(function (user) {
+                updateUI(user);  // Cập nhật giao diện nếu người dùng đã đăng nhập hoặc chưa
+            }).catch(function (err) {
+                console.error("Error checking user status:", err);
+            });
+        }
+
+        // Hàm cập nhật giao diện dựa trên trạng thái đăng nhập của người dùng
+        function updateUI(user) {
+            if (user && !user.expired) {
+                // Người dùng đã đăng nhập
+                document.getElementById('movie-list').style.display = 'block';
+                document.getElementById('login-button').style.display = 'none';
+                document.getElementById('logout-button').style.display = 'block';
+
+                // Hiển thị danh sách phim
+                displayMovies();
+            } else {
+                // Người dùng chưa đăng nhập hoặc token đã hết hạn
+                document.getElementById('login-button').style.display = 'block';
+                document.getElementById('movie-list').style.display = 'none';
+                document.getElementById('logout-button').style.display = 'none';
+            }
+        }
+
+        // Hàm xử lý khi người dùng nhấn nút đăng nhập
+        function login() {
+            userManager.signinRedirect();  // Chuyển hướng người dùng đến trang đăng nhập của IdentityServer
+        }
+
+        // Hàm xử lý khi người dùng nhấn nút đăng xuất
+        function logout() {
+            userManager.signoutRedirect();  // Chuyển hướng người dùng đến trang đăng xuất của IdentityServer
+        }
+
+        // Hàm hiển thị bảng danh sách phim
+        function displayMovies() {
+            const table = document.getElementById('movie-table'); // Lấy phần tử bảng từ DOM
+            movies.forEach(movie => {
+                // Tạo hàng mới cho mỗi phim
+                const row = table.insertRow();
+                const titleCell = row.insertCell(0);  // Ô tiêu đề
+                const genreCell = row.insertCell(1);  // Ô thể loại
+                const yearCell = row.insertCell(2);   // Ô năm phát hành
+
+                // Gán nội dung cho từng ô
+                titleCell.textContent = movie.title;
+                genreCell.textContent = movie.genre;
+                yearCell.textContent = movie.year;
+            });
+        }
+
+        // Dữ liệu phim giả lập (có thể thay thế bằng dữ liệu thực từ một API)
+        const movies = [
+            { title: "The Shawshank Redemption", genre: "Drama", year: 1994 },
+            { title: "The Godfather", genre: "Crime", year: 1972 },
+            { title: "The Dark Knight", genre: "Action", year: 2008 },
+            { title: "Pulp Fiction", genre: "Crime", year: 1994 },
+            { title: "Fight Club", genre: "Drama", year: 1999 }
+        ];
+    </script>
+</head>
+<body>
+    <h1>Movie List</h1>
+
+    <!-- Nút đăng nhập: chỉ hiển thị nếu người dùng chưa đăng nhập -->
+    <button id="login-button" onclick="login()">Login</button>
+
+    <!-- Nút đăng xuất: chỉ hiển thị nếu người dùng đã đăng nhập -->
+    <button id="logout-button" onclick="logout()" style="display: none;">Logout</button>
+
+    <!-- Danh sách phim: chỉ hiển thị nếu người dùng đã đăng nhập -->
+    <div id="movie-list">
+        <table id="movie-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Genre</th>
+                    <th>Year</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Các dòng phim sẽ được thêm vào đây bằng JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

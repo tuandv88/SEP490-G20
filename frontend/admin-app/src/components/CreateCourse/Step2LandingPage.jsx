@@ -56,18 +56,38 @@ export default function CourseLandingPage({ onSubmit, initialData }) {
             )}
           />
           <FormField
-            control={methods.control}
-            name='imageCourse'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='text-base'>Course Image</FormLabel>
-                <FormControl>
-                  <Input type='file' accept='image/*' onChange={(e) => field.onChange(e.target.files[0])} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          control={methods.control}
+          name='image'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className='text-base'>Course Image</FormLabel>
+              <FormControl>
+                <Input
+                  type='file'
+                  accept='image/*'
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      const base64Image = reader.result.split(',')[1]; // Remove the prefix
+                      const contentType = file.type;
+                      const fileName = file.name;
+                      field.onChange({
+                        fileName,
+                        base64Image,
+                        contentType
+                      });
+                    };
+                    if (file) {
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
           <FormField
             control={methods.control}
             name='courseLevel'
@@ -100,7 +120,7 @@ export default function CourseLandingPage({ onSubmit, initialData }) {
                 <FormControl>
                   <Input
                     type='number'
-                    step='0.01'
+                    step='0.5'
                     {...field}
                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
                   />

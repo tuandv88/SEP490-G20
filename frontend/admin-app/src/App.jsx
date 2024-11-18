@@ -5,13 +5,20 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { router } from '@/routers/router'
 import ErrorBoundary from '@/components/error-boundary'
 import { LoadingSpinner } from '@/components/loading'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+// Create a QueryClient instance
+const queryClient = new QueryClient()
+
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
-        <Suspense fallback={<LoadingSpinner variant='minimal' />}>
-          <RouterProvider router={router} />
-        </Suspense>
+      <ThemeProvider defaultTheme='light' storageKey='vite-ui-theme'>
+        <QueryClientProvider client={queryClient}>
+          <Suspense fallback={<LoadingSpinner variant='minimal' />}>
+            <RouterProvider router={router} />
+          </Suspense>
+        </QueryClientProvider>
       </ThemeProvider>
     </ErrorBoundary>
   )

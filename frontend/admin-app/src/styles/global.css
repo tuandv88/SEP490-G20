@@ -1,21 +1,17 @@
-/* .overflow-y-auto {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+.custom-list li {
+    color: black;
+    /* Màu chữ đỏ */
+    list-style: disc;
+    /* Hiển thị dấu bullet */
 }
 
-.overflow-y-auto::-webkit-scrollbar {
-    width: 6px;
+.custom-list li::marker {
+    color: black;
+    /* Màu của dấu bullet */
 }
 
-.overflow-y-auto::-webkit-scrollbar-track {
-    background: transparent;
-}
 
-.overflow-y-auto::-webkit-scrollbar-thumb {
-    background-color: rgba(155, 155, 155, 0.5);
-    border-radius: 20px;
-    border: transparent;
-} */
+
 
 * {
     scroll-behavior: smooth;

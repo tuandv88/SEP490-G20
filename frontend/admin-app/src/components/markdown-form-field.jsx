@@ -9,7 +9,7 @@ const MarkdownFormField = ({ control, name, label, placeholder }) => {
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel class name='text-base' htmlFor={name}>
+          <FormLabel className='text-base' htmlFor={name}>
             {label}
           </FormLabel>
           <FormControl>

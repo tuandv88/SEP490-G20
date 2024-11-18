@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState , useEffect} from 'react'
 import PropTypes from 'prop-types'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
@@ -11,12 +11,18 @@ import { Table } from '@/components/ui/table'
 import useCourseTable from '@/hooks/useCourseTable'
 
 function CourseTable() {
-  const { table } = useCourseTable()
+  const [pageIndex, setPageIndex] = useState(1); // Start at 0
+  const pageSize = 10;
+  const { table, isLoading, error } = useCourseTable(pageIndex, pageSize)
   const navigate = useNavigate()
 
   const handleNewCourse = () => {
     navigate({ to: '/create-course' })
   }
+
+
+  if (isLoading) return <div>Loading...</div>
+  if (error) return <div>Error loading courses</div>
   return (
     <div className='w-full h-full'>
       <div className='flex items-center justify-between mb-4'>
@@ -32,7 +38,12 @@ function CourseTable() {
           <CourseTableBody table={table} />
         </Table>
       </div>
-      <CourseTablePagination table={table} />
+      <CourseTablePagination
+        table={table}
+        pageIndex={pageIndex}
+        setPageIndex={setPageIndex}
+        pageSize={pageSize}
+      />
     </div>
   )
 }

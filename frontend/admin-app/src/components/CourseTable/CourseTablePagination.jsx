@@ -3,6 +3,9 @@ import PropTypes from 'prop-types'
 import { Button } from '@/components/ui/button'
 
 export default function CourseTablePagination({ table }) {
+  console.log('Page Count:', table.getPageCount());
+  console.log('Current Page Index:', table.getState().pagination.pageIndex);
+
   return (
     <div className='flex items-center justify-between py-4 space-x-2'>
       <div className='flex-1 text-sm text-muted-foreground'>
@@ -39,6 +42,7 @@ export default function CourseTablePagination({ table }) {
               {table.getState().pagination.pageIndex + 2}
             </Button>
           )}
+
           {table.getPageCount() > 3 && table.getState().pagination.pageIndex < table.getPageCount() - 2 && (
             <>
               {table.getState().pagination.pageIndex < table.getPageCount() - 3 && <span>...</span>}
@@ -54,8 +58,8 @@ export default function CourseTablePagination({ table }) {
       </div>
     </div>
   )
-}
 
+}
 CourseTablePagination.propTypes = {
   table: PropTypes.object.isRequired
 }

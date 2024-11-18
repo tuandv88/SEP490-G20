@@ -12,6 +12,8 @@ export default function CourseTableBody({ table }) {
             {row.getVisibleCells().map((cell) => (
               <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
             ))}
+
+
           </TableRow>
         ))
       ) : (

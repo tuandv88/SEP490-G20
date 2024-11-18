@@ -6,7 +6,7 @@ import {
   getSortedRowModel,
   getFilteredRowModel
 } from '@tanstack/react-table'
-import { fakeCourses } from '@/utils/fakeCourses'
+import useCourseQueries from './useCourseQueries';
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -20,11 +20,15 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
 
-export default function useCourseTable() {
+export default function useCourseTable(pageIndex, pageSize) {
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
   const [rowSelection, setRowSelection] = useState({})
+
+  const { data: courses, isLoading, error } = useCourseQueries(pageIndex, pageSize);
+
+  console.log('Courses Data:', courses);
 
   const columns = [
     {
@@ -52,7 +56,7 @@ export default function useCourseTable() {
       cell: ({ row }) => <div className='pl-4 capitalize'>{row.getValue('title')}</div>
     },
     {
-      accessorKey: 'timeEstimate',
+      accessorKey: 'timeEstimation', // Update this to match the API response
       header: ({ column }) => (
         <div className='text-left'>
           <Button variant='ghost' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')} className='pl-0'>
@@ -61,8 +65,11 @@ export default function useCourseTable() {
           </Button>
         </div>
       ),
-      cell: ({ row }) => <div className='text-left'>{row.getValue('timeEstimate')} hours</div>
+      cell: ({ row }) => <div className='text-left'>{row.getValue('timeEstimation')} hours</div> // Update here as well
     },
+
+
+
     {
       accessorKey: 'scheduledPublishDate',
       header: ({ column }) => (
@@ -73,7 +80,14 @@ export default function useCourseTable() {
           </Button>
         </div>
       ),
-      cell: ({ row }) => <div className='text-left'>{row.getValue('scheduledPublishDate').toLocaleDateString()}</div>
+      cell: ({ row }) => {
+        const date = row.getValue('scheduledPublishDate');
+        return (
+          <div className='text-left'>
+            {date ? new Date(date).toLocaleDateString() : 'N/A'}
+          </div>
+        );
+      }
     },
     {
       accessorKey: 'courseStatus',
@@ -162,7 +176,7 @@ export default function useCourseTable() {
   ]
 
   const table = useReactTable({
-    data: fakeCourses,
+    data: courses || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -180,5 +194,5 @@ export default function useCourseTable() {
     }
   })
 
-  return { table }
+  return { table, isLoading, error }
 }

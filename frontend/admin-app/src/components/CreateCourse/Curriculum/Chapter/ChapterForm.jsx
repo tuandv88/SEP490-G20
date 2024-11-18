@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import MarkdownFormField from '@/components/markdown-form-field'
 
 const formSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
+  title: z.string().min(1, 'Title is required').max(50, 'Title must not exceed 50 characters'),
   description: z.string().min(1, 'Description is required'),
   timeEstimation: z
     .number()

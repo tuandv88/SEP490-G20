@@ -11,6 +11,7 @@ const formSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100, 'Title must not exceed 100 characters'),
   headline: z.string().min(1, 'Headline is required').max(200, 'Headline must not exceed 200 characters'),
   prerequisites: z.string().min(1, 'Prerequisites are required'),
+  description: z.string().min(1, 'Description is required'),
   objectives: z.string().min(1, 'Course objectives are required'),
   targetAudiences: z.string().min(1, 'Target audiences are required'),
   timeEstimation: z
@@ -64,6 +65,12 @@ export default function Step1Form({ onSubmit, initialData }) {
                 <FormMessage />
               </FormItem>
             )}
+          />
+          <MarkdownFormField
+            control={methods.control}
+            name='description'
+            label='Description'
+            placeholder='Enter course description...'
           />
           <MarkdownFormField
             control={methods.control}

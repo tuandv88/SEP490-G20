@@ -4,49 +4,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import remarkGfm from 'remark-gfm'
 import PreCoppy from '../ui/PreCoppy'
 import { BookOpenCheck, Frown } from 'lucide-react'
 import DescriptionLoading from '../loading/DescriptionLoading'
 
-const Description = ({ description, videoSrc, loading, titleProblem, initialTime, onTimeUpdate }) => {
-
-  const videoRef = useRef(null);
-  const [videoTime, setVideoTime] = useState(0); // Lưu thời gian video khi dừng
-  const [isPaused, setIsPaused] = useState(false); // Trạng thái video có tạm dừng hay không
-
-
-  // Khôi phục thời gian khi component mount
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = initialTime;
-    }
-  }, [initialTime, videoSrc]);
-
-  // Lưu thời gian hiện tại khi component unmount
-  useEffect(() => {
-    const handlePause = () => {
-      if (videoRef.current) {
-        onTimeUpdate(videoRef.current.currentTime);
-      }
-    };
-
-    const videoElement = videoRef.current;
-    if (videoElement) {
-      videoElement.addEventListener('pause', handlePause);
-    }
-
-    return () => {
-      if (videoElement) {
-        videoElement.removeEventListener('pause', handlePause);
-        onTimeUpdate(videoElement.currentTime); // Lưu thời gian khi unmount
-      }
-    };
-  }, [onTimeUpdate]);
-
-  
-
-
+const NormalLecture = ({ description, videoSrc, loading, titleProblem }) => {
 
   return (
     <div>
@@ -57,7 +19,6 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
           {videoSrc && (
             <div className='relative pb-[56.25%] h-0'>
               <video           
-              ref={videoRef}
               className='absolute top-0 left-0 w-full h-full'
               controls
               src={videoSrc}
@@ -108,4 +69,4 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
   )
 }
 
-export default React.memo(Description)
+export default React.memo(NormalLecture)

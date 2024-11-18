@@ -318,7 +318,7 @@ const ChatAI = ({ lectureId, problemId }) => {
           <div className="flex items-end gap-2">
         <div className="relative flex-grow">
           <Textarea 
-            value={message}
+            //value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isLoading}

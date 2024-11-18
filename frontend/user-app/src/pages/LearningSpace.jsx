@@ -13,10 +13,15 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import HeaderCode from '@/layouts/learningheader'
 import ToggleCurriculum from '@/components/learning/ToggleCurriculum'
 import ChatAI from '@/components/chat/ChatAI'
+import Quiz from '@/components/learning/Quiz'
+import Quiz1 from '@/components/learning/Quiz1'
+import QuizScreen from '@/components/learning/QuizScreen'
+import Curriculum from '@/components/learning/Curriculum'
+import NormalLecture from '@/components/lecture/NormalLecture'
 
 const LearningSpace = () => {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('descriptions')
+  const [activeTab, setActiveTab] = useState('default')
   const [chapters, setChapters] = useState([])
   const [title, setTitle] = useState('')
   const [selectLectureId, setSelectedLectureId] = useState(null)
@@ -28,6 +33,7 @@ const LearningSpace = () => {
   const [isProblemListOpen, setIsProblemListOpen] = useState(false)
   const videoTimeRef = useRef(0)
   const [isThreePanels, setIsThreePanels] = useState(false)
+  const [firstLectureId, setFirstLectureId] = useState(null)
 
   //courseId
   const { id, lectureId } = useParams()
@@ -50,8 +56,11 @@ const LearningSpace = () => {
       setError(false)
       try {
         const data = await LearningAPI.getCourseDetails(id)
+        //console.log(data)
         setChapters(data?.courseDetailsDto?.chapterDetailsDtos)
         setTitle(data?.courseDetailsDto?.courseDto?.title)
+        // setFirstLectureId(data?.courseDetailsDto.chapterDetailsDtos[4].lectureDtos[0].id)
+        // console.log(firstLectureId)
       } catch (error) {
         console.error('Error fetching course detail:', error)
         if (error.response) {
@@ -76,6 +85,7 @@ const LearningSpace = () => {
     if (lectureId) {
       const fetchLectureDetail = async () => {
         try {
+          //console.log(firstLectureId)
           const data = await LearningAPI.getLectureDetails(lectureId)
           setLectureDetail(data)
 
@@ -113,7 +123,9 @@ const LearningSpace = () => {
     return <ErrorPage />
   }
 
-  if (!chapters && !loading) {
+
+
+  if (!chapters || chapters.length === 0 && !loading) {
     return (
       <NotFound mess='We cannot find documents in this course. Please check the link or search for other courses.' />
     )
@@ -124,15 +136,16 @@ const LearningSpace = () => {
       <div>
         <HeaderCode onButtonClick={toggleProblemList} onChatClick={togglePanelLayout} />
       </div>
-      <ResizablePanelGroup
-        direction='horizontal'
+      {lectureDetail?.lectureDetailsDto?.problem && (
+        <ResizablePanelGroup
+          direction='horizontal'
         className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
       >
-        <ResizablePanel id='panel-1' order={1} defaultSize={30}>
+        <ResizablePanel id='panel-1' order={1} defaultSize={40}>
           <div className='scroll-container h-full'>
-            <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} />
+            <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={false} />
             {loading && <ChapterLoading />}
-            {activeTab === 'descriptions' && !loading && (
+            {(activeTab === 'descriptions' || activeTab === 'default' || activeTab === 'curriculum') && !loading && (
               <Description
                 description={lectureDetail?.lectureDetailsDto?.problem?.description}
                 videoSrc={videoBlobUrl}
@@ -163,8 +176,55 @@ const LearningSpace = () => {
               </div>
             </ResizablePanel>
           </>
-        )}
-      </ResizablePanelGroup>
+          )}
+        </ResizablePanelGroup>
+      )}
+
+      {/* With case Lecture is normal lecture */}
+      {!lectureDetail?.lectureDetailsDto?.problem && !lectureDetail?.lectureDetailsDto?.quiz && (
+        <ResizablePanelGroup
+          direction='horizontal'
+        className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
+      >
+        <ResizablePanel id='panel-1' order={1} defaultSize={25}>
+          <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={true} />
+            {loading && <ChapterLoading />}
+            {(activeTab === 'curriculum' || activeTab === 'default') && !loading && (
+              <Curriculum chapters={chapters} setSelectedLectureId={setSelectedLectureId} title={title} />  
+            )}
+            {activeTab === 'comments' && !loading && <Comments />}                  
+        </ResizablePanel>
+        <ResizableHandle withHandle className='resize-sha w-[3px]' />
+        <ResizablePanel id='panel-2' order={2} defaultSize={isThreePanels ? 50 : 75}>        
+        <div className='scroll-container h-full'>            
+            {/* {loading && <ChapterLoading />} */}
+
+              <NormalLecture
+                description={lectureDetail?.lectureDetailsDto?.summary}
+                videoSrc={videoBlobUrl}
+                loading={loading}
+                titleProblem={lectureDetail?.lectureDetailsDto?.title}
+              />           
+          </div>
+        </ResizablePanel>
+        {isThreePanels && (
+          <>
+            <ResizableHandle withHandle className='resize-sha w-[3px]' />
+            <ResizablePanel id='panel-3' order={3} defaultSize={25}>
+              <div className='scroll-container h-full'>
+              <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id}/>
+              </div>
+            </ResizablePanel>
+          </>
+          )}
+        </ResizablePanelGroup>
+      )}
+
+      {lectureDetail?.lectureDetailsDto?.quiz && (
+        <div className='h-[94vh] w-full bg-bGprimary scroll-container'>
+          <Quiz1 quiz={lectureDetail?.lectureDetailsDto?.quiz}/>
+        </div>
+      )}
 
       {isProblemListOpen && (
         <div

@@ -15,6 +15,7 @@ public interface IApplicationDbContext {
     DbSet<QuizSubmission> QuizSubmissions { get; }
     DbSet<ProblemSubmission> ProblemSubmissions { get; }
     DbSet<Domain.Models.File> Files { get; }
+    DbSet<OutboxMessage> OutboxMessages { get; }
     DbSet<TEntity> Set<TEntity>() where TEntity : class;
 
     Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class;

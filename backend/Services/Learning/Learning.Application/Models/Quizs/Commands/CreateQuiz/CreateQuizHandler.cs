@@ -1,7 +1,4 @@
-﻿using Learning.Application.Data.Repositories;
-using Learning.Application.Models.Quizs.Dtos;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
+﻿using Learning.Application.Models.Quizs.Dtos;
 
 namespace Learning.Application.Models.Quizs.Commands.CreateQuiz;
 public class CreateQuizHandler(IQuizRepository quizRepository, ILectureRepository lectureRepository) : ICommandHandler<CreateQuizComand, CreateQuizResult> {

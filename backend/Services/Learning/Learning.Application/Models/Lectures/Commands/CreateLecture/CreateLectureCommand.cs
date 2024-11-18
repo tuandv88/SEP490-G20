@@ -1,6 +1,4 @@
-﻿using Learning.Application.Models.Chapters.Commands.CreateChapter;
-using Learning.Application.Models.Lectures.Dtos;
-using Learning.Domain.Enums;
+﻿using Learning.Application.Models.Lectures.Dtos;
 
 namespace Learning.Application.Models.Lectures.Commands.CreateLecture;
 public record CreateLectureCommand : ICommand<CreateLectureResult> {
@@ -20,9 +18,6 @@ public class CreateLectureCommandValidator : AbstractValidator<CreateLectureComm
 
         RuleFor(x => x.CreateLectureDto.TimeEstimation)
             .GreaterThan(0).WithMessage("Time estimation must be greater than zero.");
-
-        RuleFor(x => x.CreateLectureDto.OrderIndex)
-            .GreaterThan(0).WithMessage("Order index must be greater than to zero.");
 
         RuleFor(x => x.CreateLectureDto.Point)
             .GreaterThanOrEqualTo(0).WithMessage("Point must be greater than or equal to zero.");

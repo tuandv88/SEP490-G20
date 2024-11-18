@@ -15,19 +15,17 @@ public class QuizRepository : Repository<Quiz>, IQuizRepository {
     }
 
     public override async Task<Quiz?> GetByIdAsync(Guid id) {
-        var quiz = _dbContext.Quizs
-                        .AsEnumerable()
-                        .FirstOrDefault(q => q.Id.Value == id);
+        var quiz =await _dbContext.Quizs
+                        .FirstOrDefaultAsync(q => q.Id.Equals(QuizId.Of(id)));
         return quiz;
     }
 
     public async Task<Quiz?> GetByIdDetailAsync(Guid Id) {
-        var quiz = _dbContext.Quizs
+        var quiz = await _dbContext.Quizs
                         .Include(q => q.Questions)
                         .ThenInclude(q => q.QuestionOptions)
                         .AsNoTracking()
-                        .AsEnumerable()
-                        .FirstOrDefault(q => q.Id.Value == Id);
+                        .FirstOrDefaultAsync(q => q.Id.Equals(QuizId.Of(Id)));
         return quiz;
     }
 }

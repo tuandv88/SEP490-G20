@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.Context;
+using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
@@ -171,6 +172,17 @@ namespace AI.API.Rest {
 
             return Ok(answer.ToJson(true));
         }
+        [HttpGet("/searchweb")]
+        public async Task<IActionResult> SearchWeb(string question) {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://google.serper.dev/search");
+            request.Headers.Add("X-API-KEY", "e313f010c0e6082bacba5f7000f103edabc67ecc");
+            var content = new StringContent("{\"q\":\""+ question+"\"}", null, "application/json");
+            request.Content = content;
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return Ok(await response.Content.ReadAsStringAsync());
+        }
         [HttpGet("/ask-rag-prompt")]
         public async Task<IActionResult> AskRagPrompt(string question) {
             var prompt = $@"c
@@ -197,7 +209,14 @@ namespace AI.API.Rest {
             dynamic a = new { result, result.Content };
             return Ok(result);
         }
+        [HttpGet("/find")]
+        public async Task<IActionResult> Find(string documentId) {
+            MemoryFilter f = new MemoryFilter();
+            f.ByDocument(documentId);
+            var answer = await _kernelMemory.SearchAsync("", filter: f);
 
+            return Ok(answer.ToJson(true));
+        }
     }
 }
 #pragma warning disable SKEXP0001

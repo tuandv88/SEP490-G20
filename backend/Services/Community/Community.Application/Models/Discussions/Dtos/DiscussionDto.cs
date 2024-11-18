@@ -16,5 +16,6 @@ public record DiscussionDto(
         long ViewCount,                // Số lượt xem
         long VoteCount,                 // Số lượng vote
         long CommentCount,              // Số lượng bình luận
-        bool Closed                    // Trạng thái đóng của thảo luận
+        bool Closed,                    // Trạng thái đóng của thảo luận
+        bool IsActive
     );

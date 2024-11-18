@@ -2,7 +2,6 @@
 public record BookmarkId
 {
     public Guid Value { get; }
-    public BookmarkId() { }
     public BookmarkId(Guid value) => Value = value;
     public static BookmarkId Of(Guid value)
     {

@@ -34,7 +34,8 @@ public static class DiscussionExtensions
             VoteCount: (long)discussion.Votes.Count,
             CommentCount: discussion.Comments.Count,
             Pinned: discussion.Pinned,
-            Closed: discussion.Closed
+            Closed: discussion.Closed,
+            IsActive: discussion.IsActive
         );
     }
 

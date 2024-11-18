@@ -1,7 +1,6 @@
 ﻿namespace Community.Domain.ValueObjects;
 public record VoteId
 {
-    public VoteId() { }
     public VoteId(Guid value) => Value = value;
     public Guid Value { get; }
     public static VoteId Of(Guid value)

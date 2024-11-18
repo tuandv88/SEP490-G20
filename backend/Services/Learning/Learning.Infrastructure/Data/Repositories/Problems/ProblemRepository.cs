@@ -14,20 +14,18 @@ public class ProblemRepository : Repository<Problem>, IProblemRepository {
     }
 
     public override async Task<Problem?> GetByIdAsync(Guid id) {
-        var problem = _dbContext.Problems
-                        .AsEnumerable()
-                        .FirstOrDefault(c => c.Id.Value == id);
+        var problem =await _dbContext.Problems
+                        .FirstOrDefaultAsync(c => c.Id.Equals(ProblemId.Of(id)));
         return problem;
     }
 
     public async Task<Problem?> GetByIdDetailAsync(Guid id) {
-        var problem = _dbContext.Problems
+        var problem = await _dbContext.Problems
                         .Include(p => p.TestScripts)
                         .Include(p => p.ProblemSolutions)
                         .Include(p => p.TestCases)
                         .AsNoTracking()
-                        .AsEnumerable()
-                        .FirstOrDefault(p => p.Id.Value == id);
+                        .FirstOrDefaultAsync(p => p.Id.Equals(ProblemId.Of(id)));
         return problem;
     }
 

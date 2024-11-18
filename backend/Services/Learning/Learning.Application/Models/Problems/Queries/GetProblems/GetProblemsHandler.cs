@@ -14,11 +14,12 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IProblemSu
 
         var totalCount = allDataProblem.Count();
         var problems = allDataProblem.OrderBy(c => c.CreatedAt)
+                            .Where(p => p.ProblemType == ProblemType.Challenge)
                             .Skip(pageSize * (pageIndex - 1))
                             .Take(pageSize)
                             .ToList();
 
-        var listProlemId = problems.Select(p => p.Id.Value).ToArray();
+        var listProlemId = problems.Select(p => p.Id).ToArray();
 
         //Lấy ra các problem solution của problem
         var problemSubmissions = await problemSubmissionRepository.GetProblemSubmissionsByProblemAsync(listProlemId);

@@ -5,7 +5,8 @@ using AI.Infrastructure.Data.Repositories.Conversations;
 using AI.Infrastructure.Data.Repositories.Documents;
 using AI.Infrastructure.Data.Repositories.Messages;
 using AI.Infrastructure.Data.Repositories.Recommendations;
-using AI.Infrastructure.Extensions;
+using AI.Infrastructure.Extensions.Kafkas;
+using AI.Infrastructure.Extensions.Kernels;
 using AI.Infrastructure.Services;
 using BuidingBlocks.Storage;
 using BuildingBlocks.Extensions;
@@ -47,6 +48,9 @@ public static class DependencyInjection {
 
         //Add storage
         services.AddStorage(configuration);
+
+        //Add Messagebroker
+        services.AddMassTransitWithKafka(configuration);
         return services;
     }
     private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration) {

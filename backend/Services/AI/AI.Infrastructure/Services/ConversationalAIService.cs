@@ -27,7 +27,7 @@ public class ConversationalAIService(
             PresencePenalty = _config.PresencePenalty,
             FrequencyPenalty = _config.FrequencyPenalty,
             StopSequences = _config.StopSequences,
-            ResponseFormat = typeof(MessageAnswer),
+            //ResponseFormat = typeof(MessageAnswer),
         };
         var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
         var chatHistory = await GetRecentChatHistory(conversationId);
@@ -50,7 +50,7 @@ public class ConversationalAIService(
     }
 
     private async Task<ChatHistory> GetRecentChatHistory(Guid conversationId) {
-        int pastMessages = configuration.GetValue<int>("Parameters:PastMessages", 10);
+        int pastMessages = configuration.GetValue("Parameters:PastMessages", 10);
         ChatHistory chats = new ChatHistory(); 
         var conversation = await conversationRepository.GetRecentMessagesAsync(conversationId, pastMessages);
         if(conversation==null) {

@@ -2,7 +2,6 @@
 public record NotificationHistoryId
 {
     public NotificationHistoryId(Guid value) => Value = value;
-    public NotificationHistoryId() { }
     public Guid Value { get; }
     public static NotificationHistoryId Of(Guid value)
     {

@@ -1,4 +1,5 @@
-﻿namespace Community.Infrastructure.Data.Repositories.Votes;
+﻿
+namespace Community.Infrastructure.Data.Repositories.Votes;
 public class VoteRepository : Repository<Vote>, IVoteRepository
 {
     private readonly IApplicationDbContext _dbContext;
@@ -14,6 +15,24 @@ public class VoteRepository : Repository<Vote>, IVoteRepository
         {
             _dbContext.Votes.Remove(vote);
         }
+    }
+
+    public async Task<List<Vote>?> GetAllVotesByIdCommentAsync(Guid id)
+    {
+        var votes = _dbContext.Votes
+                        .AsEnumerable()
+                        .Where(c => c?.CommentId?.Value == id)
+                        .ToList();
+        return votes;
+    }
+
+    public async Task<List<Vote>?> GetAllVotesByIdDiscussionAsync(Guid id)
+    {
+        var votes = _dbContext.Votes
+                        .AsEnumerable()
+                        .Where(c => c?.DiscussionId?.Value == id)
+                        .ToList();
+        return votes;
     }
 
     public override async Task<Vote?> GetByIdAsync(Guid id)
@@ -38,7 +57,6 @@ public class VoteRepository : Repository<Vote>, IVoteRepository
 
         return await Task.FromResult(votes);
     }
-
 }
 
 

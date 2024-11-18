@@ -6,6 +6,10 @@ public class CachedChapterRepository(IChapterRepository repository, ICacheServic
         DeleteCached(string.Format(CacheKey.COURSES_DETAILS, entity.CourseId.Value));
     }
 
+    public async Task<int> CountByCourseAsync(Guid courseId) {
+         return await repository.CountByCourseAsync(courseId);
+    }
+
     public async Task DeleteAsync(Chapter entity) {
         await repository.DeleteAsync(entity);
         DeleteCached(string.Format(CacheKey.COURSES_DETAILS, entity.CourseId.Value));
@@ -25,6 +29,10 @@ public class CachedChapterRepository(IChapterRepository repository, ICacheServic
 
     public async Task<Chapter?> GetByIdAsync(Guid id) {
         return await repository.GetByIdAsync(id);
+    }
+
+    public async Task<Chapter?> GetByIdDetailAsync(Guid id) {
+        return await repository.GetByIdDetailAsync(id);
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken) {

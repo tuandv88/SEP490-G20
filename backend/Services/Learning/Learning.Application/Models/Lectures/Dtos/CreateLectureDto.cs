@@ -4,8 +4,7 @@ public record CreateLectureDto(
     string Summary,
     double TimeEstimation,
     string LectureType,
-    int OrderIndex,
     int Point,
     bool IsFree = false
-    );
+);
 

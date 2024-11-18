@@ -535,19 +535,15 @@ namespace Community.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Community.Domain.Models.Vote", b =>
                 {
-                    b.HasOne("Community.Domain.Models.Comment", "Comment")
+                    b.HasOne("Community.Domain.Models.Comment", null)
                         .WithMany("Votes")
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Community.Domain.Models.Discussion", "Discussion")
+                    b.HasOne("Community.Domain.Models.Discussion", null)
                         .WithMany("Votes")
                         .HasForeignKey("DiscussionId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Comment");
-
-                    b.Navigation("Discussion");
                 });
 
             modelBuilder.Entity("Community.Domain.Models.Category", b =>

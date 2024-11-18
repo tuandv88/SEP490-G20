@@ -1,29 +1,27 @@
-import "./styles/index.css";
-import Layout from "./components/layout";
-import { Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "@/components/theme-provider";
-import routers from "./routers/router";
+import './styles/index.css'
+import { Suspense } from 'react'
+import { RouterProvider } from '@tanstack/react-router'
+import { ThemeProvider } from '@/components/theme-provider'
+import { router } from '@/routers/router'
+import ErrorBoundary from '@/components/error-boundary'
+import { LoadingSpinner } from '@/components/loading'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+// Create a QueryClient instance
+const queryClient = new QueryClient()
+
 function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <BrowserRouter>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Layout>
-            <Routes>
-              {routers.map((route, index) => (
-                <Route
-                  key={index}
-                  path={route.path}
-                  element={<route.component />}
-                />
-              ))}
-            </Routes>
-          </Layout>
-        </Suspense>
-      </BrowserRouter>
-    </ThemeProvider>
-  );
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme='light' storageKey='vite-ui-theme'>
+        <QueryClientProvider client={queryClient}>
+          <Suspense fallback={<LoadingSpinner variant='minimal' />}>
+            <RouterProvider router={router} />
+          </Suspense>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
+  )
 }
 
-export default App;
+export default App

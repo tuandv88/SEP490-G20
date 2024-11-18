@@ -6,8 +6,7 @@ public record ChapterCreated(
     Guid CourseId,
     string Title,
     string Description,
-    double TimeEstimation,
-    int OrderIndex
+    double TimeEstimation
 ) : ChapterEventBase(Id, OccurredAt, ChapterId) {
     public override string Type => nameof(ChapterCreated);
 }

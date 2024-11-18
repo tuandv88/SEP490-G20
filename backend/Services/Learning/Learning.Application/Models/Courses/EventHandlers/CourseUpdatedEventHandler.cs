@@ -1,8 +1,10 @@
 ﻿namespace Learning.Application.Models.Courses.EventHandlers;
 public class CourseUpdatedEventHandler(IOutboxMessageRepository repository) : INotificationHandler<CourseUpdatedEvent> {
     public async Task Handle(CourseUpdatedEvent notification, CancellationToken cancellationToken) {
-        var outboxMessage = CreateNewOutboxMessage(notification);
-        await repository.AddAsync(outboxMessage);
+        if (notification.Course.CourseStatus == CourseStatus.Published) {
+            var outboxMessage = CreateNewOutboxMessage(notification);
+            await repository.AddAsync(outboxMessage);
+        }
     }
 
     private OutboxMessage CreateNewOutboxMessage(CourseUpdatedEvent @event) {
@@ -18,7 +20,6 @@ public class CourseUpdatedEventHandler(IOutboxMessageRepository repository) : IN
                     @event.Course.Prerequisites,
                     @event.Course.Objectives,
                     @event.Course.TargetAudiences,
-                    @event.Course.OrderIndex,
                     @event.Course.CourseLevel.ToString(),
                     @event.Course.Price),
                 @event.Course.Id.Value.ToString(),

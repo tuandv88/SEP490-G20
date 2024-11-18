@@ -28,7 +28,6 @@ public class LectureEventConsumer(ILogger<LectureEventConsumer> logger, IKernelM
             lectureCreated.Summary,
             lectureCreated.TimeEstimation,
             lectureCreated.LectureType,
-            lectureCreated.OrderIndex,
             lectureCreated.Point
         };
         var json = JsonConvert.SerializeObject(@object);
@@ -45,7 +44,6 @@ public class LectureEventConsumer(ILogger<LectureEventConsumer> logger, IKernelM
             lectureUpdated.Summary,
             lectureUpdated.TimeEstimation,
             lectureUpdated.LectureType,
-            lectureUpdated.OrderIndex,
             lectureUpdated.Point
         };
         var json = JsonConvert.SerializeObject(@object);

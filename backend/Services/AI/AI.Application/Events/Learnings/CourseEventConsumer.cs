@@ -30,7 +30,6 @@ public class CourseEventConsumer(ILogger<CourseEventConsumer> logger, IKernelMem
             courseCreated.Prerequisites,
             courseCreated.Objectives,
             courseCreated.TargetAudiences,
-            courseCreated.OrderIndex,
             courseCreated.CourseLevel,
             courseCreated.Price
         };
@@ -50,7 +49,6 @@ public class CourseEventConsumer(ILogger<CourseEventConsumer> logger, IKernelMem
             courseUpdated.Prerequisites,
             courseUpdated.Objectives,
             courseUpdated.TargetAudiences,
-            courseUpdated.OrderIndex,
             courseUpdated.CourseLevel,
             courseUpdated.Price
         };

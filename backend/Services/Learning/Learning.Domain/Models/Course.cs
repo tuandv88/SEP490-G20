@@ -42,18 +42,15 @@ public class Course : Aggregate<CourseId> {
         return course;
     }
 
-    public void Update(string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, int orderIndex, CourseLevel courseLevel, double price) {
+    public void Update(string title, string description, string headline, double timeEstimation, string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, double price) {
         Title = title;
         Description = description;
         Headline = headline;
-        CourseStatus = courseStatus;
         TimeEstimation = timeEstimation;
         Prerequisites = prerequisites;
         Objectives = objectives;
         TargetAudiences = targetAudiences;
         ScheduledPublishDate = scheduledPublishDate;
-        OrderIndex = orderIndex;
-        CourseLevel = courseLevel;
         Price = price;
 
         AddDomainEvent(new CourseUpdatedEvent(this));
@@ -64,10 +61,17 @@ public class Course : Aggregate<CourseId> {
 
     public void UpdateOrderIndex(int orderIndex) {
         OrderIndex = orderIndex;
-        AddDomainEvent(new CourseUpdatedEvent(this));
     }
 
-
+    public void UpdateStatus(CourseStatus status) {
+        CourseStatus = status;
+        AddDomainEvent(new CourseUpdatedEvent(this));
+    }
+    public void UpdateCourseLevel(CourseLevel courseLevel, int orderIndex) {
+        CourseLevel = courseLevel;
+        OrderIndex = orderIndex;
+        AddDomainEvent(new CourseUpdatedEvent(this));
+    }
     public void AddChapter(Chapter chapter) {
         Chapters.Add(chapter);
         chapter.AddDomainEvent(new ChapterCreatedEvent(chapter));
@@ -101,7 +105,6 @@ public class Course : Aggregate<CourseId> {
 
     public void UpdateOrderIndexChapter(Chapter chapter, int orderIndex) {
         chapter.OrderIndex = orderIndex;
-        chapter.AddDomainEvent(new ChapterUpdatedEvent(chapter));
     }
 }
 

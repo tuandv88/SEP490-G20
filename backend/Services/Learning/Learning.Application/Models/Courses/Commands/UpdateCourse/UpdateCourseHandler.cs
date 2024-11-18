@@ -22,14 +22,6 @@ public class UpdateCourseHandler(ICourseRepository repository) : ICommandHandler
     }
     private void UpdateCourseWithNewValues(Course course, UpdateCourseDto updateCourseDto)
     {
-        var courseStatus = Enum.TryParse<CourseStatus>(updateCourseDto.CourseStatus, out var status)
-        ? status
-        : throw new ArgumentOutOfRangeException(nameof(updateCourseDto.CourseStatus), $"Value '{updateCourseDto.CourseStatus}' is not valid for CourseStatus.");
-
-        var courseLevel = Enum.TryParse<CourseLevel>(updateCourseDto.CourseLevel, out var level)
-        ? level
-        : throw new ArgumentOutOfRangeException(nameof(updateCourseDto.CourseLevel), $"Value '{updateCourseDto.CourseLevel}' is not valid for CourseLevel.");
-
         DateTime? scheduledPublishDate = null;
         if (!string.IsNullOrWhiteSpace(updateCourseDto.ScheduledPublishDate))
         {
@@ -46,14 +38,11 @@ public class UpdateCourseHandler(ICourseRepository repository) : ICommandHandler
             title: updateCourseDto.Title,
             description: updateCourseDto.Description,
             headline: updateCourseDto.Headline,
-            courseStatus: courseStatus,
             timeEstimation: updateCourseDto.TimeEstimation,
             prerequisites: updateCourseDto.Prerequisites,
             objectives: updateCourseDto.Objectives,
             targetAudiences: updateCourseDto.TargetAudiences,
             scheduledPublishDate: scheduledPublishDate,
-            orderIndex: updateCourseDto.OrderIndex,
-            courseLevel: courseLevel,
             price: updateCourseDto.Price
         );
     }

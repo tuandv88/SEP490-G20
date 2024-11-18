@@ -10,7 +10,6 @@ public record CourseCreated(
     string Prerequisites,
     string Objectives,
     string TargetAudiences,
-    int OrderIndex,
     string CourseLevel,
     double Price
 ) : CourseEventBase(Id, OccurredAt, CourseId) {

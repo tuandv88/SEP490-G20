@@ -67,7 +67,6 @@ public class Chapter : Aggregate<ChapterId> {
 
     public void UpdateOrderIndexLecture(Lecture lecture, int orderIndex) {
         lecture.OrderIndex = orderIndex;
-        lecture.AddDomainEvent(new LectureUpdatedEvent(lecture));
     }
     public void ReorderLectures() {
         var orderedLectures = Lectures.OrderBy(l => l.OrderIndex).ToList();

@@ -1,11 +1,15 @@
 ﻿using BuildingBlocks.Messaging.Events.Learnings.Chapters;
+using Learning.Application.Data.Repositories;
 using Learning.Domain.Events.Chapters;
 
 namespace Learning.Application.Models.Chapters.EventHandlers;
-public class ChapterUpdatedEventHandler(IOutboxMessageRepository repository) : INotificationHandler<ChapterUpdatedEvent> {
+public class ChapterUpdatedEventHandler(IOutboxMessageRepository repository, ICourseRepository courseRepository) : INotificationHandler<ChapterUpdatedEvent> {
     public async Task Handle(ChapterUpdatedEvent notification, CancellationToken cancellationToken) {
-        var outboxMessage = CreateNewOutboxMessage(notification);
-        await repository.AddAsync(outboxMessage);
+        var course = await courseRepository.GetCourseByChapterIdAsync(notification.Chapter.CourseId.Value);
+        if (course != null && course.CourseStatus == CourseStatus.Published) {
+            var outboxMessage = CreateNewOutboxMessage(notification);
+            await repository.AddAsync(outboxMessage);
+        }
     }
 
     private OutboxMessage CreateNewOutboxMessage(ChapterUpdatedEvent @event) {
@@ -17,8 +21,7 @@ public class ChapterUpdatedEventHandler(IOutboxMessageRepository repository) : I
                     @event.Chapter.CourseId.Value,
                     @event.Chapter.Title,
                     @event.Chapter.Description,
-                    @event.Chapter.TimeEstimation,
-                    @event.Chapter.OrderIndex),
+                    @event.Chapter.TimeEstimation),
                 @event.Chapter.Id.Value.ToString(),
                 LearningSyncEventType.Chapter
             );

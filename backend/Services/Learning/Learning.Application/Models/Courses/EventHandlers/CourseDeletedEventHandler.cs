@@ -2,8 +2,10 @@
 namespace Learning.Application.Models.Courses.EventHandlers;
 public class CourseDeletedEventHandler(IOutboxMessageRepository repository) : INotificationHandler<CourseDeletedEvent> {
     public async Task Handle(CourseDeletedEvent notification, CancellationToken cancellationToken) {
-        var outboxMessage = CreateNewOutboxMessage(notification);
-        await repository.AddAsync(outboxMessage);
+        if (notification.Course.CourseStatus == CourseStatus.Published) {
+            var outboxMessage = CreateNewOutboxMessage(notification);
+            await repository.AddAsync(outboxMessage);
+        }
     }
     private OutboxMessage CreateNewOutboxMessage(CourseDeletedEvent @event) {
         var outboxMessage = new OutboxMessage(

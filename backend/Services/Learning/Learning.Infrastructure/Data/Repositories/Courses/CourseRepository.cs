@@ -1,4 +1,5 @@
 ﻿
+
 namespace Learning.Infrastructure.Data.Repositories.Courses;
 public class CourseRepository : Repository<Course>, ICourseRepository {
     private readonly IApplicationDbContext _dbContext;
@@ -16,6 +17,14 @@ public class CourseRepository : Repository<Course>, ICourseRepository {
         if (course != null) {
             _dbContext.Courses.Remove(course);
         }
+    }
+
+    public async Task<List<Course>> GetByCourseLevelAsync(CourseLevel courseLevel) {
+        var courses = await _dbContext.Courses
+            .Where(c => c.CourseLevel == courseLevel)
+            .OrderBy(c => c.OrderIndex)
+            .ToListAsync();
+        return courses;
     }
 
     public override async Task<Course?> GetByIdAsync(Guid id) {
@@ -37,9 +46,12 @@ public class CourseRepository : Repository<Course>, ICourseRepository {
     public async Task<Course?> GetCourseByChapterIdAsync(Guid chapterId) {
         var course = await _dbContext.Courses
             .Include(c => c.Chapters)
-            .Include(c => c.Id)
             .FirstOrDefaultAsync(c => c.Chapters.Any(ch => ch.Id.Equals(ChapterId.Of(chapterId))));
         return course;
+    }
+
+    public void Update(params Course[] courses) {
+        _dbContext.Courses.UpdateRange(courses);
     }
 }
 

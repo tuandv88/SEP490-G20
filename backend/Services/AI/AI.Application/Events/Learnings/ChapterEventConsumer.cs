@@ -27,8 +27,7 @@ public class ChapterEventConsumer(ILogger<ChapterEventConsumer> logger, IKernelM
             chapterCreated.CourseId,
             chapterCreated.Title,
             chapterCreated.Description,
-            chapterCreated.TimeEstimation,
-            chapterCreated.OrderIndex
+            chapterCreated.TimeEstimation
         };
         var json = JsonConvert.SerializeObject(@object);
         var documentId = await ImportChapter(json, chapterCreated.ChapterId, chapterCreated.CourseId.ToString());
@@ -42,8 +41,7 @@ public class ChapterEventConsumer(ILogger<ChapterEventConsumer> logger, IKernelM
             chapterUpdated.CourseId,
             chapterUpdated.Title,
             chapterUpdated.Description,
-            chapterUpdated.TimeEstimation,
-            chapterUpdated.OrderIndex
+            chapterUpdated.TimeEstimation
         };
         var json = JsonConvert.SerializeObject(@object);
         var documentId = await ImportChapter(json, chapterUpdated.ChapterId, chapterUpdated.CourseId.ToString());

@@ -38,6 +38,10 @@ public class CachedCourseRepository(ICourseRepository repository, ICacheService 
         return allData;
     }
 
+    public async Task<List<Course>> GetByCourseLevelAsync(CourseLevel courseLevel) {
+        return await repository.GetByCourseLevelAsync(courseLevel);
+    }
+
     public async Task<Course?> GetByIdAsync(Guid id) {
         var allData = await GetAllAsync();
         var course = allData.Where(c => c.Id.Value == id).FirstOrDefault();

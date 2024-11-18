@@ -8,7 +8,6 @@ public record LectureUpdated(
     string Summary,
     double TimeEstimation,
     string LectureType,
-    int OrderIndex,
     int Point
 ) : LectureEventBase(Id, OccurredAt, LectureId) {
     public override string Type => nameof(LectureUpdated);

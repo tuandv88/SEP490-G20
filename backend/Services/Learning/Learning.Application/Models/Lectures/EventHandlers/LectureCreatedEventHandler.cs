@@ -2,10 +2,13 @@
 using Learning.Domain.Events.Lectures;
 
 namespace Learning.Application.Models.Lectures.EventHandlers;
-public class LectureCreatedEventHandler(IOutboxMessageRepository repository) : INotificationHandler<LectureCreatedEvent> {
+public class LectureCreatedEventHandler(IOutboxMessageRepository repository, ICourseRepository courseRepository) : INotificationHandler<LectureCreatedEvent> {
     public async Task Handle(LectureCreatedEvent notification, CancellationToken cancellationToken) {
-        var outboxMessage = CreateNewOutboxMessage(notification);
-        await repository.AddAsync(outboxMessage);
+        var course = await courseRepository.GetCourseByChapterIdAsync(notification.Lecture.ChapterId.Value);
+        if(course != null && course.CourseStatus == CourseStatus.Published) {
+            var outboxMessage = CreateNewOutboxMessage(notification);
+            await repository.AddAsync(outboxMessage);
+        }
     }
 
     private OutboxMessage CreateNewOutboxMessage(LectureCreatedEvent @event) {
@@ -19,7 +22,6 @@ public class LectureCreatedEventHandler(IOutboxMessageRepository repository) : I
                  @event.Lecture.Summary,
                  @event.Lecture.TimeEstimation,
                  @event.Lecture.LectureType.ToString(),
-                 @event.Lecture.OrderIndex,
                  @event.Lecture.Point),
             @event.Lecture.Id.Value.ToString(),
             LearningSyncEventType.Lecture

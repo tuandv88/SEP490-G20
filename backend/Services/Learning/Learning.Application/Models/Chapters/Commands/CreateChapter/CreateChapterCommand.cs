@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Chapters.Commands.CreateChapter;
 
-[Authorize(Roles = $"{RoleType.Administrator}")]
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateChapterCommand : ICommand<CreateChapterResult> {
     public required Guid CourseId;
     public required CreateChapterDto CreateChapterDto;

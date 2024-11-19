@@ -9,7 +9,7 @@ public class GetCoursesHandler(ICourseRepository repository, IFilesService files
     {
 
         var userRole = userContext.User?.Role;
-        var isAdmin = userRole == RoleType.Administrator;
+        var isAdmin = userRole == PoliciesType.Administrator;
 
         var allData = await repository.GetAllAsync();
         //Phân trang

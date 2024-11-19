@@ -2,5 +2,5 @@
 
 namespace Learning.Application.Models.Lectures.Commands.DeleteLecture;
 
-[Authorize(Roles = $"{RoleType.Administrator}")]
+[Authorize($"{PoliciesType.Administrator}")]
 public record DeleteLectureCommand(Guid ChapterId, Guid LectureId): ICommand;

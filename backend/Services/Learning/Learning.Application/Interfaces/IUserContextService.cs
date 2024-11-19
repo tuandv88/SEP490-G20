@@ -8,6 +8,6 @@ public interface IUserContext {
     string Email { get; }
     string FirstName { get; }
     string LastName { get; }
-    string Role {  get; }
+    string Role { get; }
 }
 

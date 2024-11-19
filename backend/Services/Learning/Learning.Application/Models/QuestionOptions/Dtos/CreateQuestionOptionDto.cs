@@ -2,5 +2,5 @@
 public record CreateQuestionOptionDto(
     string Content,
     bool IsCorrect,
-    int OrderIndex    
+    int OrderIndex
 );

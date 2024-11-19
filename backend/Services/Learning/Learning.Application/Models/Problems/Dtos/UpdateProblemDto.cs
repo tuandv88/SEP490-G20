@@ -15,7 +15,7 @@ public record UpdateProblemDto(
     int MaxThread,
     int MaxFileSize,
     bool IsActive,
-    List<UpdateTestScriptDto> Tescripts,
+    List<UpdateTestScriptDto> Testcripts,
     List<UpdateTestCaseDto> TestCases
 );
 

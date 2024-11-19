@@ -8,6 +8,7 @@ using Learning.Infrastructure.Data.Repositories.Lectures;
 using Learning.Infrastructure.Data.Repositories.Problems;
 using Learning.Infrastructure.Data.Repositories.ProblemSolutions;
 using Learning.Infrastructure.Data.Repositories.ProblemSubmissions;
+using Learning.Infrastructure.Data.Repositories.QuestionOptions;
 using Learning.Infrastructure.Data.Repositories.Questions;
 using Learning.Infrastructure.Data.Repositories.Quizs;
 using Learning.Infrastructure.Data.Repositories.TestCases;
@@ -46,18 +47,14 @@ public static class DependencyInjection {
         //Caching
         services.AddConfigureCaching(configuration);
 
-        //Configuration Repository
-        ConfigureRepository(services, configuration);
+        //IBase64Converter
+        services.AddScoped<IBase64Converter, Base64Converter>();
 
         //Configuration Service
         services.AddScoped<ISourceCombiner, SourceCombiner>();
 
-        //IBase64Converter
-        services.AddScoped<IBase64Converter, Base64Converter>();
-
-        //UserContext
-        services.AddScoped<IUserContextService, UserContextService>();
-
+        //Configuration Repository
+        ConfigureRepository(services, configuration);
         return services;
     }
     private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration) {
@@ -96,5 +93,8 @@ public static class DependencyInjection {
 
         //QuestionRepository
         services.AddScoped<IQuestionRepository, QuestionRepository>();
+
+        //QuestionOptionRepository
+        services.AddScoped<IQuestionOptionRepository, QuestionOptionRepository>();
     }
 }

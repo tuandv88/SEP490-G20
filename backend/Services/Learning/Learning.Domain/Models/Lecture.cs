@@ -34,12 +34,7 @@ public class Lecture : Aggregate<LectureId> {
         Files.Add(file);
     }
 
-    public void DeleteFile(FileId fileId) {
-        var file = Files.FirstOrDefault(f => f.Id == fileId);
-        if (file == null) {
-            throw new Exception("File not found");
-        }
-
+    public void DeleteFile(File file) {
         Files.Remove(file);
     }
 

@@ -1,4 +1,5 @@
 ﻿using Learning.Application.Models.Chapters.Commands.CreateChapter;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Learning.API.Endpoints.Chapters;
 
@@ -9,7 +10,7 @@ public class CreateChapterEndpoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
 
-        app.MapPost("/courses/{CourseId}/chapters", async (Guid CourseId, CreateChapterRequest request, ISender sender) =>
+        app.MapPost("/courses/{CourseId}/chapters", async ([FromRoute]Guid CourseId, CreateChapterRequest request, ISender sender) =>
         {
             var command = new CreateChapterCommand() { CourseId = CourseId, CreateChapterDto = request.CreateChapterDto };
 

@@ -24,7 +24,6 @@ public class QuizRepository : Repository<Quiz>, IQuizRepository {
         var quiz = await _dbContext.Quizs
                         .Include(q => q.Questions)
                         .ThenInclude(q => q.QuestionOptions)
-                        .AsNoTracking()
                         .FirstOrDefaultAsync(q => q.Id.Equals(QuizId.Of(Id)));
         return quiz;
     }

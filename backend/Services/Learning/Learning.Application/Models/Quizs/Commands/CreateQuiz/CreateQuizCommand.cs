@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Quizs.Commands.CreateQuiz;
 
-[Authorize(Roles = $"{RoleType.Administrator}")]
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateQuizCommand : ICommand<CreateQuizResult> {
     public Guid? LectureId;
     public required CreateQuizDto CreateQuizDto;

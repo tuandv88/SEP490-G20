@@ -2,6 +2,6 @@
 
 namespace Learning.Application.Models.Chapters.Commands.DeleteChapter;
 
-[Authorize(Roles = $"{RoleType.Administrator}")]
+[Authorize($"{PoliciesType.Administrator}")]
 public record DeleteChapterCommand(Guid CourseId, Guid ChapterId) : ICommand;
 

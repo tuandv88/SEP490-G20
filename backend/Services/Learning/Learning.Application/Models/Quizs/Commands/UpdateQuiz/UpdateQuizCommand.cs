@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Quizs.Commands.UpdateQuiz;
 
-[Authorize(Roles = $"{RoleType.Administrator}")]
+[Authorize($"{PoliciesType.Administrator}")]
 public record UpdateQuizCommand(Guid QuizId, UpdateQuizDto Quiz) : ICommand<UpdateQuizResult>;
 public record UpdateQuizResult(bool IsSuccess);
 

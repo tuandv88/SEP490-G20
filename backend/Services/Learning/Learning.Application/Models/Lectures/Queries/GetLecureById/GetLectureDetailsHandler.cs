@@ -15,7 +15,7 @@ public class GetLectureDetailsHandler(ILectureRepository lectureRepository, IQui
         var course = await courseRepository.GetCourseByChapterIdAsync(lecture.ChapterId.Value);
 
         var userRole = userContext.User?.Role;
-        var isAdmin = userRole == RoleType.Administrator;
+        var isAdmin = userRole == PoliciesType.Administrator;
         var isCoursePublished = course!.CourseStatus == CourseStatus.Published;
         if (!isCoursePublished && !isAdmin) {
             throw new UnauthorizedAccessException("Only admins can view unpublished courses.");

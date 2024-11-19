@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Courses.Commands.CreateCourse;
-[Authorize(Roles = $"{RoleType.Administrator}")]
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateCourseCommand(CreateCourseDto CreateCourseDto) : ICommand<CreateCourseResult>;
 public record CreateCourseResult(Guid Id);
 public class CreateCourseCommandValidator : AbstractValidator<CreateCourseCommand>

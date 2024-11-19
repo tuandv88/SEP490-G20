@@ -8,6 +8,6 @@ public record UpdateTestScriptDto(
     string TestCode,
     string Description,
     string LanguageCode,
-    List<UpdateProblemSolutionDto> ProlemSolutions
+    List<UpdateProblemSolutionDto> Solutions
 );
 

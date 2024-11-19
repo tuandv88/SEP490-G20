@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Problems.Commands.CreateProblem;
 
-[Authorize(Roles = $"{RoleType.Administrator}")]
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateProblemCommand : ICommand<CreateProblemResult> {
     public Guid? LectureId;
     public required CreateProblemDto CreateProblemDto;

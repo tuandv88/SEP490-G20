@@ -1,8 +1,7 @@
 ﻿using Learning.Application.Interfaces;
-using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
-namespace Learning.Infrastructure.Services;
+namespace Learning.API.Services;
 public class UserContextService : IUserContextService {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -57,3 +56,4 @@ public class UserContextService : IUserContextService {
         public string Role { get; set; } = default!;
     }
 }
+

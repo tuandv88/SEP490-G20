@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Lectures.Commands.CreateLecture;
 
-[Authorize(Roles = $"{RoleType.Administrator}")]
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateLectureCommand : ICommand<CreateLectureResult> {
     public required Guid ChapterId;
     public required CreateLectureDto CreateLectureDto;

@@ -8,7 +8,7 @@ namespace BuildingBlocks.Behaviors;
 public class AuthorizationBehaviour<TRequest, TResponse>(IHttpContextAccessor _httpContextAccessor)
     : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken) {
-        
+
 
         var authorizeAttributes = request.GetType().GetCustomAttributes<AuthorizeAttribute>();
 
@@ -39,4 +39,3 @@ public class AuthorizationBehaviour<TRequest, TResponse>(IHttpContextAccessor _h
         return await next();
     }
 }
-

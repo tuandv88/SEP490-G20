@@ -11,7 +11,7 @@ public class GetCourseByIdHandler(ICourseRepository repository, IFilesService fi
             throw new NotFoundException("Course", request.Id);
         }
 
-        var isAdmin = userRole == RoleType.Administrator;
+        var isAdmin = userRole == PoliciesType.Administrator;
         var isPublished = course.CourseStatus == CourseStatus.Published;
 
         if (!isAdmin && !isPublished) {

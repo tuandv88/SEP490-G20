@@ -12,12 +12,13 @@ public static class DependencyInjection {
         //MediatR
         services.AddMediatR(config => {
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            config.AddOpenBehavior(typeof(AuthorizationBehaviour<,>));
+            config.AddOpenBehavior(typeof(Commons.AuthorizationBehaviour<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         //Storage
         services.AddStorage(configuration);
+
         return services;
     }
 }

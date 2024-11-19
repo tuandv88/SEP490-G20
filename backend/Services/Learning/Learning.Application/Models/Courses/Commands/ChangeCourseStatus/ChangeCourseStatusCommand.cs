@@ -2,7 +2,7 @@
 
 namespace Learning.Application.Models.Courses.Commands.ChangeCourseStatus;
 
-[Authorize(Roles = $"{RoleType.Administrator}")]
+[Authorize($"{PoliciesType.Administrator}")]
 public record ChangeCourseStatusCommand(Guid CourseId, string CourseStatus): ICommand<ChangeCourseStatusResult>;
 public record ChangeCourseStatusResult(bool IsSuccess, string Message);
 

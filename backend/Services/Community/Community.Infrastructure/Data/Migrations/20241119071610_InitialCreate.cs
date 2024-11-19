@@ -30,38 +30,15 @@ namespace Community.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "NotificationHistories",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    NotificationTypeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Message = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    DateSent = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DateRead = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsRead = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    SentVia = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedBy = table.Column<string>(type: "text", nullable: true),
-                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_NotificationHistories", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "NotificationTypes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     CanSendEmail = table.Column<bool>(type: "boolean", nullable: false),
                     CanSendWebsite = table.Column<bool>(type: "boolean", nullable: false),
-                    Priority = table.Column<int>(type: "integer", nullable: false, defaultValue: 3),
+                    Priority = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -70,27 +47,6 @@ namespace Community.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_NotificationTypes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserNotificationSettings",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    NotificationTypeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsNotificationEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    IsEmailEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    IsWebsiteEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    NotificationFrequency = table.Column<string>(type: "text", nullable: false, defaultValue: "Daily"),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedBy = table.Column<string>(type: "text", nullable: true),
-                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserNotificationSettings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -122,6 +78,62 @@ namespace Community.Infrastructure.Data.Migrations
                         name: "FK_Discussions_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "NotificationHistories",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    NotificationTypeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Message = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    DateSent = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DateRead = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsRead = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    SentVia = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NotificationHistories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_NotificationHistories_NotificationTypes_NotificationTypeId",
+                        column: x => x.NotificationTypeId,
+                        principalTable: "NotificationTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserNotificationSettings",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    NotificationTypeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsNotificationEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    IsEmailEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    IsWebsiteEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    NotificationFrequency = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserNotificationSettings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserNotificationSettings_NotificationTypes_NotificationType~",
+                        column: x => x.NotificationTypeId,
+                        principalTable: "NotificationTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -301,6 +313,11 @@ namespace Community.Infrastructure.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_NotificationHistories_DateSent",
+                table: "NotificationHistories",
+                column: "DateSent");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_NotificationHistories_NotificationTypeId",
                 table: "NotificationHistories",
                 column: "NotificationTypeId");
@@ -313,13 +330,7 @@ namespace Community.Infrastructure.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_NotificationTypes_Name",
                 table: "NotificationTypes",
-                column: "Name",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_NotificationTypes_Priority",
-                table: "NotificationTypes",
-                column: "Priority");
+                column: "Name");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserDiscussions_DiscussionId",
@@ -342,24 +353,14 @@ namespace Community.Infrastructure.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserNotificationSettings_IsNotificationEnabled",
-                table: "UserNotificationSettings",
-                column: "IsNotificationEnabled");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserNotificationSettings_NotificationFrequency",
-                table: "UserNotificationSettings",
-                column: "NotificationFrequency");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserNotificationSettings_NotificationTypeId",
                 table: "UserNotificationSettings",
                 column: "NotificationTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserNotificationSettings_UserId",
+                name: "IX_UserNotificationSettings_UserId_NotificationTypeId",
                 table: "UserNotificationSettings",
-                column: "UserId");
+                columns: new[] { "UserId", "NotificationTypeId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Votes_CommentId",
@@ -387,9 +388,6 @@ namespace Community.Infrastructure.Data.Migrations
                 name: "NotificationHistories");
 
             migrationBuilder.DropTable(
-                name: "NotificationTypes");
-
-            migrationBuilder.DropTable(
                 name: "UserDiscussions");
 
             migrationBuilder.DropTable(
@@ -397,6 +395,9 @@ namespace Community.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Votes");
+
+            migrationBuilder.DropTable(
+                name: "NotificationTypes");
 
             migrationBuilder.DropTable(
                 name: "Comments");

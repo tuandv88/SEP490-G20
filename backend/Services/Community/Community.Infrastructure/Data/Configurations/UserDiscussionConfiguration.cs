@@ -25,7 +25,7 @@ namespace Community.Infrastructure.Data.Configurations
             // Ánh xạ DiscussionId với Value Converter
             builder.Property(ud => ud.DiscussionId)
                 .HasConversion(
-                    discussionId => discussionId.Value,              // Chuyển DiscussionId thành Guid
+                    discussionId => discussionId.Value,                 // Chuyển DiscussionId thành Guid
                     dbDiscussionId => new DiscussionId(dbDiscussionId)) // Chuyển Guid thành DiscussionId
                 .IsRequired();
 

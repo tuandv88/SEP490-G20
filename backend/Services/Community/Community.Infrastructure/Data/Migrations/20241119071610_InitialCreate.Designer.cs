@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Community.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241117092527_InitialCreate")]
+    [Migration("20241119071610_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -275,24 +275,24 @@ namespace Community.Infrastructure.Data.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<Guid>("NotificationTypeId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("SentVia")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("SentVia")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DateSent");
 
                     b.HasIndex("NotificationTypeId");
 
@@ -319,6 +319,7 @@ namespace Community.Infrastructure.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
@@ -334,16 +335,11 @@ namespace Community.Infrastructure.Data.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<int>("Priority")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(3);
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Priority");
+                    b.HasIndex("Name");
 
                     b.ToTable("NotificationTypes");
                 });
@@ -426,11 +422,8 @@ namespace Community.Infrastructure.Data.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
-                    b.Property<string>("NotificationFrequency")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("Daily");
+                    b.Property<int>("NotificationFrequency")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("NotificationTypeId")
                         .HasColumnType("uuid");
@@ -440,13 +433,9 @@ namespace Community.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IsNotificationEnabled");
-
-                    b.HasIndex("NotificationFrequency");
-
                     b.HasIndex("NotificationTypeId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "NotificationTypeId");
 
                     b.ToTable("UserNotificationSettings");
                 });
@@ -527,11 +516,29 @@ namespace Community.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Community.Domain.Models.NotificationHistory", b =>
+                {
+                    b.HasOne("Community.Domain.Models.NotificationType", null)
+                        .WithMany("NotificationHistorys")
+                        .HasForeignKey("NotificationTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Community.Domain.Models.UserDiscussion", b =>
                 {
                     b.HasOne("Community.Domain.Models.Discussion", null)
                         .WithMany("UserDiscussions")
                         .HasForeignKey("DiscussionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Community.Domain.Models.UserNotificationSetting", b =>
+                {
+                    b.HasOne("Community.Domain.Models.NotificationType", null)
+                        .WithMany("UserNotificationSettings")
+                        .HasForeignKey("NotificationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -568,6 +575,13 @@ namespace Community.Infrastructure.Data.Migrations
                     b.Navigation("UserDiscussions");
 
                     b.Navigation("Votes");
+                });
+
+            modelBuilder.Entity("Community.Domain.Models.NotificationType", b =>
+                {
+                    b.Navigation("NotificationHistorys");
+
+                    b.Navigation("UserNotificationSettings");
                 });
 #pragma warning restore 612, 618
         }

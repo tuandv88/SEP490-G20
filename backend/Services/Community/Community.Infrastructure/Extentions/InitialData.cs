@@ -10,7 +10,7 @@ namespace Community.Infrastructure.Extensions
         // Danh sách User mẫu
         public static readonly List<User> Users = new List<User>
         {
-            new User(new Guid("a1b2c3d4-e5f6-7890-1234-56789abcdef0"), "John Doe"),
+            new User(new Guid("c3d4e5f6-a7b8-9012-3456-789abcdef010"), "John Doe"),
             new User(new Guid("b2c3d4e5-f6a7-8901-2345-6789abcdef01"), "Jane Smith"),
             new User(new Guid("c3d4e5f6-a7b8-9012-3456-789abcdef012"), "Michael Brown"),
             new User(new Guid("d4e5f6a7-b8c9-0123-4567-89abcdef0123"), "Emily Johnson"),

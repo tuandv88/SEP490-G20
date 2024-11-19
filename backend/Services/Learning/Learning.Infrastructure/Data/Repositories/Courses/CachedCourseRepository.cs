@@ -69,6 +69,17 @@ public class CachedCourseRepository(ICourseRepository repository, ICacheService 
         return n;
     }
 
+    public void Update(params Course[] courses) {
+        repository.Update(courses);
+
+        //Xóa cached 
+        DeleteCached(CacheKey.COURSES);
+        foreach (var course in courses) {
+            DeleteCached(string.Format(CacheKey.COURSES_DETAILS, course.Id));
+        }
+    }
+
+
     public async Task UpdateAsync(Course entity) {
         await repository.UpdateAsync(entity);
         //Xóa cached

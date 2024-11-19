@@ -4,11 +4,14 @@ namespace Learning.API.Endpoints.Chapters;
 
 public record CreateChapterRequest(CreateChapterDto CreateChapterDto);
 public record CreateChapterResponse(Guid Id);
-public class CreateChapterEndpoint : ICarterModule {
-    public void AddRoutes(IEndpointRouteBuilder app) {
+public class CreateChapterEndpoint : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
+    {
 
-        app.MapPost("/courses/{CourseId}/chapters", async (Guid CourseId, CreateChapterRequest request, ISender sender) => {
-            var command = new CreateChapterCommand() { CourseId = CourseId, CreateChapterDto = request.CreateChapterDto};
+        app.MapPost("/courses/{CourseId}/chapters", async (Guid CourseId, CreateChapterRequest request, ISender sender) =>
+        {
+            var command = new CreateChapterCommand() { CourseId = CourseId, CreateChapterDto = request.CreateChapterDto };
 
             var result = await sender.Send(command);
 

@@ -1,4 +1,8 @@
-﻿namespace Learning.Application.Models.Courses.Commands.ChangeCourseStatus;
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace Learning.Application.Models.Courses.Commands.ChangeCourseStatus;
+
+[Authorize(Roles = $"{RoleType.Administrator}")]
 public record ChangeCourseStatusCommand(Guid CourseId, string CourseStatus): ICommand<ChangeCourseStatusResult>;
 public record ChangeCourseStatusResult(bool IsSuccess, string Message);
 

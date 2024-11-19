@@ -1,6 +1,9 @@
 ﻿using Learning.Application.Models.Lectures.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Lectures.Commands.CreateLecture;
+
+[Authorize(Roles = $"{RoleType.Administrator}")]
 public record CreateLectureCommand : ICommand<CreateLectureResult> {
     public required Guid ChapterId;
     public required CreateLectureDto CreateLectureDto;

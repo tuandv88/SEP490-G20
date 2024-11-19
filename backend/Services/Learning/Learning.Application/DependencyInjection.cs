@@ -1,5 +1,4 @@
 ﻿using BuildingBlocks.Behaviors;
-using BuildingBlocks.Messaging.MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -13,12 +12,10 @@ public static class DependencyInjection {
         //MediatR
         services.AddMediatR(config => {
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            config.AddOpenBehavior(typeof(AuthorizationBehaviour<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        //RabbitMQ
-        //services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());
-
         //Storage
         services.AddStorage(configuration);
         return services;

@@ -1,6 +1,9 @@
 ﻿using Learning.Application.Models.Chapters.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Chapters.Commands.UpdateChapter;
+
+[Authorize(Roles = $"{RoleType.Administrator}")]
 public record UpdateChapterCommand(Guid ChapterId, Guid CourseId, UpdateChapterDto UpdateChapterDto) : ICommand<UpdateChapterResult>;
 public record UpdateChapterResult(bool IsSuccess);
 

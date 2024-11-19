@@ -1,6 +1,8 @@
 ﻿using Learning.Application.Models.Courses.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Courses.Commands.UpdateCourse;
+[Authorize(Roles = $"{RoleType.Administrator}")]
 public record UpdateCourseCommand(Guid CourseId, UpdateCourseDto UpdateCourseDto) : ICommand<UpdateCourseResult>;
 public record UpdateCourseResult(bool IsSuccess);
 

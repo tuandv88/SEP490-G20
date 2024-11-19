@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 
 namespace Learning.API.Endpoints.Lectures;
-public class DeleteLectureEndpoint : ICarterModule {
-    public void AddRoutes(IEndpointRouteBuilder app) {
-        app.MapDelete("/chapters/{ChapterId}/lectures/{LectureId}", async ([FromRoute] Guid ChapterId, [FromRoute] Guid LectureId, ISender sender) => {
+public class DeleteLectureEndpoint : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
+    {
+        app.MapDelete("/chapters/{ChapterId}/lectures/{LectureId}", async ([FromRoute] Guid ChapterId, [FromRoute] Guid LectureId, ISender sender) =>
+        {
 
             await sender.Send(new DeleteLectureCommand(ChapterId, LectureId));
 

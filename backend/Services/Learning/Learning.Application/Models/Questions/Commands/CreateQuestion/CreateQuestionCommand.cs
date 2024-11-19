@@ -1,9 +1,10 @@
 ﻿using Learning.Application.Models.Problems.Commands.CreateProblem;
-using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.Questions.Dtos;
-using Learning.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Questions.Commands.CreateQuestion;
+
+[Authorize(Roles = $"{RoleType.Administrator}")]
 public record CreateQuestionCommand : ICommand<CreateQuestionResult>
 {
     public required Guid QuizId;

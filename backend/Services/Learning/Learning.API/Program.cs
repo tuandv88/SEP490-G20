@@ -19,7 +19,7 @@ builder.Host.UseSerilog(SeriLogger.Configure)
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options => {
             options.EnableAnnotations();
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Course API", Version = "v1" });
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Learning API", Version = "v1" });
         });
     });
 

@@ -27,4 +27,8 @@
     <ProjectReference Include="..\Learning.Infrastructure\Learning.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Middlewares\" />
+  </ItemGroup>
+
 </Project>

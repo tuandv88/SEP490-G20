@@ -6,8 +6,8 @@ public record GetCourseDetailsResponse(CourseDetailsDto CourseDetailsDto);
 public class GetCourseDetailsEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
         app.MapGet("/courses/{Id}/details", async (Guid Id, ISender sender) => {
-            var result = await sender.Send(new GetCourseDetailsQuery(Id));
 
+            var result = await sender.Send(new GetCourseDetailsQuery(Id));
             var response = result.Adapt<GetCourseDetailsResponse>();
 
             return Results.Ok(response);

@@ -17,6 +17,7 @@ public class ChangeCourseLevelHandler(ICourseRepository repository) : ICommandHa
         //Cập nhật lại course level và đẩy orderIndex lên cao nhất
         course.UpdateCourseLevel(newLevel, (await repository.CountByLevelAsync(newLevel))+1);
         await repository.UpdateAsync(course);
+        await repository.SaveChangesAsync();
 
         //Cập nhật lại các course cùng phân cấp course level của course trước khi thay đổi
         var oldCoursesByLevel = await repository.GetByCourseLevelAsync(oldLevel);

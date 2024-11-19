@@ -14,18 +14,35 @@ public class DocumentRepository : Repository<Document>, IDocumentRepository {
         }
     }
 
+    public async Task DeleteDocumentsByTagAsync(string tagName, string tagValue) {
+        var documents = await _dbContext.Documents
+                            .Where(d => d.Tags.ContainsKey(tagName) && (string)d.Tags[tagName] == tagValue)
+                            .ToListAsync();
+        if (documents.Any()) {
+            _dbContext.Documents.RemoveRange(documents);
+        }
+    }
+
     public async override Task<Document?> GetByIdAsync(Guid id) {
-        var document = _dbContext.Documents
-                       .AsEnumerable()
-                       .FirstOrDefault(c => c.Id.Value == id);
+        var document = await _dbContext.Documents
+                       .FirstOrDefaultAsync(c => c.Id.Equals(DocumentId.Of(id)));
         return document;
     }
 
-    public async Task<List<Document>> GetDocuments(params Guid[] documentIds) {
-        return await _dbContext.Documents
-            .AsAsyncEnumerable()
-            .Where(doc => documentIds.Contains(doc.Id.Value))
+    public async Task<List<Guid>> GetDocumentIdsByTagAsync(string tagName, string tagValue) {
+        var documents = await _dbContext.Documents
+            .Where(d => d.Tags.ContainsKey(tagName) && d.Tags[tagName] == tagValue)
+            .Select(d => d.Id.Value)
             .ToListAsync();
+        return documents;
+    }
+
+
+    public async Task<List<Document>?> GetDocumentsAsync(params DocumentId[] documentIds) {
+        var documents = await _dbContext.Documents
+            .Where(doc => documentIds.Contains(doc.Id))
+            .ToListAsync();
+        return documents;
     }
 }
 

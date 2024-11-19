@@ -15,17 +15,15 @@ public class MessageRepository : Repository<Message>, IMessageRepository {
     }
 
     public async override Task<Message?> GetByIdAsync(Guid id) {
-        var message = _dbContext.Messages
-                       .AsEnumerable()
-                       .FirstOrDefault(c => c.Id.Value == id);
+        var message = await _dbContext.Messages
+                       .FirstOrDefaultAsync(c => c.Id.Equals(MessageId.Of(id)));
         return message;
     }
 
     public async Task<List<Message>> GetMessageByConversationIdsync(Guid conversationId) {
         var messages = await _dbContext.Messages.Include(m => m.References)
                     .AsNoTracking()
-                    .AsAsyncEnumerable()
-                    .Where(m => m.ConversationId.Value == conversationId)
+                    .Where(m => m.ConversationId.Equals(ConversationId.Of(conversationId)))
                     .ToListAsync();
         return messages;
     }

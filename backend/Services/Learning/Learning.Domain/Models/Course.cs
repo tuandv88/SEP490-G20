@@ -1,5 +1,4 @@
-﻿using Learning.Domain.Events.Chapters;
-using Learning.Domain.Events.Courses;
+﻿using Learning.Domain.Events;
 
 namespace Learning.Domain.Models;
 public class Course : Aggregate<CourseId> {
@@ -38,7 +37,6 @@ public class Course : Aggregate<CourseId> {
             CourseLevel = courseLevel,
             Price = price
         };
-        course.AddDomainEvent(new CourseCreatedEvent(course));
         return course;
     }
 
@@ -52,8 +50,6 @@ public class Course : Aggregate<CourseId> {
         TargetAudiences = targetAudiences;
         ScheduledPublishDate = scheduledPublishDate;
         Price = price;
-
-        AddDomainEvent(new CourseUpdatedEvent(this));
     }
     public void UpdateImage(string imageUrl) {
         ImageUrl = imageUrl;
@@ -65,17 +61,15 @@ public class Course : Aggregate<CourseId> {
 
     public void UpdateStatus(CourseStatus status) {
         CourseStatus = status;
-        AddDomainEvent(new CourseUpdatedEvent(this));
+        //THÊM Event ở đây để publish khóa học 
+        AddDomainEvent(new CourseUpdatedStatusEvent(this));
     }
     public void UpdateCourseLevel(CourseLevel courseLevel, int orderIndex) {
         CourseLevel = courseLevel;
         OrderIndex = orderIndex;
-        AddDomainEvent(new CourseUpdatedEvent(this));
     }
     public void AddChapter(Chapter chapter) {
         Chapters.Add(chapter);
-        chapter.AddDomainEvent(new ChapterCreatedEvent(chapter));
-
     }
     public Chapter UpdateChapter(ChapterId chapterId, string title, string description, double timeEstimation, bool isActive) {
         var chapter = Chapters.FirstOrDefault(c => c.Id == chapterId);
@@ -86,8 +80,6 @@ public class Course : Aggregate<CourseId> {
         chapter.Description = description;
         chapter.TimeEstimation = timeEstimation;
         chapter.IsActive = isActive;
-
-        chapter.AddDomainEvent(new ChapterUpdatedEvent(chapter));
         return chapter;
     }
 
@@ -98,8 +90,6 @@ public class Course : Aggregate<CourseId> {
         }
 
         Chapters.Remove(chapter);
-
-        chapter.AddDomainEvent(new ChapterDeletedEvent(chapter));
         return chapter;
     }
 

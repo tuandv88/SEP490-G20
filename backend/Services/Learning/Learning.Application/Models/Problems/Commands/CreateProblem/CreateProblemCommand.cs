@@ -2,10 +2,11 @@
 using Learning.Application.Models.ProblemSolutions.Dtos;
 using Learning.Application.Models.TestCases.Dtos;
 using Learning.Application.Models.TestScripts.Dtos;
-using Learning.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Problems.Commands.CreateProblem;
 
+[Authorize(Roles = $"{RoleType.Administrator}")]
 public record CreateProblemCommand : ICommand<CreateProblemResult> {
     public Guid? LectureId;
     public required CreateProblemDto CreateProblemDto;

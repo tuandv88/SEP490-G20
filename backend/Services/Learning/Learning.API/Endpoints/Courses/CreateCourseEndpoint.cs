@@ -3,10 +3,13 @@
 namespace Learning.API.Endpoints.Courses;
 public record CreateCourseRequest(CreateCourseDto CreateCourseDto);
 public record CreateCourseResponse(Guid Id);
-public class CreateCourseEndpoint : ICarterModule {
-    public void AddRoutes(IEndpointRouteBuilder app) {
+public class CreateCourseEndpoint : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
+    {
 
-        app.MapPost("/courses", async (CreateCourseRequest request, ISender sender) => {
+        app.MapPost("/courses", async (CreateCourseRequest request, ISender sender) =>
+        {
             var command = request.Adapt<CreateCourseCommand>();
 
             var result = await sender.Send(command);

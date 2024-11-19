@@ -1,7 +1,4 @@
-﻿
-using Learning.Domain.Events.Lectures;
-
-namespace Learning.Domain.Models;
+﻿namespace Learning.Domain.Models;
 public class Lecture : Aggregate<LectureId> {
     public ChapterId ChapterId { get; set; } = default!;
     public ProblemId? ProblemId { get; set; } = default!; // Unique
@@ -35,7 +32,6 @@ public class Lecture : Aggregate<LectureId> {
 
     public void AddFile(File file) {
         Files.Add(file);
-        AddDomainEvent(new FileAddedToLectureEvent(file));
     }
 
     public void DeleteFile(FileId fileId) {
@@ -45,7 +41,6 @@ public class Lecture : Aggregate<LectureId> {
         }
 
         Files.Remove(file);
-        AddDomainEvent(new FileDeletedInLectureEvent(file));
     }
 
 }

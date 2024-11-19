@@ -29,5 +29,8 @@ public class Question : Aggregate<QuestionId> {
     public void AddQuestionOption(List<QuestionOption> questionOptions) {
         QuestionOptions.AddRange(questionOptions);
     }
+    public void RemoveQuestionOption(QuestionOption questionOption) {
+        QuestionOptions.Remove(questionOption);
+    }
 }
 

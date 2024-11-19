@@ -24,7 +24,6 @@ public class ProblemRepository : Repository<Problem>, IProblemRepository {
                         .Include(p => p.TestScripts)
                         .Include(p => p.ProblemSolutions)
                         .Include(p => p.TestCases)
-                        .AsNoTracking()
                         .FirstOrDefaultAsync(p => p.Id.Equals(ProblemId.Of(id)));
         return problem;
     }

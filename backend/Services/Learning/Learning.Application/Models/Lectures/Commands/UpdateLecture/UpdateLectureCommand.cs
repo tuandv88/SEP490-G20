@@ -1,6 +1,9 @@
 ﻿using Learning.Application.Models.Lectures.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Lectures.Commands.UpdateLecture;
+
+[Authorize($"{PoliciesType.Administrator}")]
 public record UpdateLectureCommand(Guid ChapterId, Guid LectureId, UpdateLectureDto Lecture) : ICommand<UpdateLectureResult>;
 public record UpdateLectureResult(bool IsSuccess);
 

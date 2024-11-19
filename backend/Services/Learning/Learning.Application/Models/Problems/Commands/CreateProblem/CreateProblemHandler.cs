@@ -104,8 +104,8 @@ public class CreateProblemHandler(ILectureRepository lectureRepository, IProblem
             problemSolutions.AddRange(mapToProblemSolution);
         }
 
-        problem.AddProblemSolution(problemSolutions);
-        problem.AddTestScript(testScripts);
+        problem.AddProblemSolution(problemSolutions.ToArray());
+        problem.AddTestScript(testScripts.ToArray());
 
         var testCases = createProblemDto.TestCases.Select(t => new TestCase() {
             Id = TestCaseId.Of(Guid.NewGuid()),
@@ -115,7 +115,7 @@ public class CreateProblemHandler(ILectureRepository lectureRepository, IProblem
             IsHidden = t.IsHidden,
             OrderIndex = t.OrderIndex
         }).ToList();
-        problem.AddTestCase(testCases);
+        problem.AddTestCase(testCases.ToArray());
 
         return problem;
     }

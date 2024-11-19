@@ -1,6 +1,4 @@
-﻿
-using Learning.Application.Models.Problems.Dtos;
-using Learning.Application.Models.Problems.Queries.GetProblemById;
+﻿using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.Problems.Queries.GetProblemDetails;
 
 namespace Learning.API.Endpoints.Problems;

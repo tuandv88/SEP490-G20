@@ -1,4 +1,6 @@
-﻿namespace Learning.Domain.Models;
+﻿using Learning.Domain.ValueObjects;
+
+namespace Learning.Domain.Models;
 public class Quiz : Aggregate<QuizId> {
     public List<Question> Questions = new();
     public List<QuizSubmission> QuizSubmissions = new();
@@ -28,8 +30,25 @@ public class Quiz : Aggregate<QuizId> {
         };
         return quiz;
     }
+
+    public void Update(bool isActive, bool isRandomized, string title, string description, int passingMark, double timeLimit, bool hasTimeLimit, int attemptLimit, bool hasAttemptLimit, QuizType quizType) {
+        IsActive = isActive;
+        IsRandomized = isRandomized;
+        Title = title;
+        Description = description;
+        PassingMark = passingMark;
+        TimeLimit = timeLimit;
+        HasTimeLimit = hasTimeLimit;
+        AttemptLimit = attemptLimit;
+        HasAttemptLimit = hasAttemptLimit;
+        QuizType = quizType;
+    }
     public void AddQuestion(Question question) {
         Questions.Add(question);
+    }
+
+    public void RemoveQuestion(Question question) {
+        Questions.Remove(question);
     }
 }
 

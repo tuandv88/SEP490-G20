@@ -38,6 +38,10 @@ public class CachedCourseRepository(ICourseRepository repository, ICacheService 
         return allData;
     }
 
+    public async Task<List<Course>> GetByCourseLevelAsync(CourseLevel courseLevel) {
+        return await repository.GetByCourseLevelAsync(courseLevel);
+    }
+
     public async Task<Course?> GetByIdAsync(Guid id) {
         var allData = await GetAllAsync();
         var course = allData.Where(c => c.Id.Value == id).FirstOrDefault();
@@ -64,6 +68,17 @@ public class CachedCourseRepository(ICourseRepository repository, ICacheService 
         int n = await repository.SaveChangesAsync(cancellationToken);
         return n;
     }
+
+    public void Update(params Course[] courses) {
+        repository.Update(courses);
+
+        //Xóa cached 
+        DeleteCached(CacheKey.COURSES);
+        foreach (var course in courses) {
+            DeleteCached(string.Format(CacheKey.COURSES_DETAILS, course.Id));
+        }
+    }
+
 
     public async Task UpdateAsync(Course entity) {
         await repository.UpdateAsync(entity);

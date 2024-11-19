@@ -1,7 +1,8 @@
 ﻿using Learning.Application.Models.Courses.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Courses.Commands.CreateCourse;
-
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateCourseCommand(CreateCourseDto CreateCourseDto) : ICommand<CreateCourseResult>;
 public record CreateCourseResult(Guid Id);
 public class CreateCourseCommandValidator : AbstractValidator<CreateCourseCommand>
@@ -19,11 +20,6 @@ public class CreateCourseCommandValidator : AbstractValidator<CreateCourseComman
         RuleFor(x => x.CreateCourseDto.Headline)
             .NotNull().WithMessage("Headline must not be null.")
             .NotEmpty().WithMessage("Headline must not be empty.");
-
-        RuleFor(x => x.CreateCourseDto.CourseStatus)
-            .NotNull().WithMessage("CourseStatus must not be null.")
-            .NotEmpty().WithMessage("CourseStatus must not be empty.")
-            .Must(BeValidCourseStatus).WithMessage("CourseStatus must be a valid value (Draft, Published, Scheduled, Archived).");
 
         RuleFor(x => x.CreateCourseDto.TimeEstimation)
             .GreaterThan(0).WithMessage("TimeEstimation must be greater than zero.");
@@ -53,10 +49,6 @@ public class CreateCourseCommandValidator : AbstractValidator<CreateCourseComman
 
         RuleFor(x => x.CreateCourseDto.Price)
             .GreaterThanOrEqualTo(0).WithMessage("Price must be greater than or equal zero.");
-    }
-    private bool BeValidCourseStatus(string courseStatus)
-    {
-        return Enum.TryParse(typeof(CourseStatus), courseStatus, out _);
     }
     private bool BeValidDateTimeOrNull(string scheduledPublishDate)
     {

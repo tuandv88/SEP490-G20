@@ -1,7 +1,5 @@
-﻿using Learning.Application.Commons;
-using Learning.Application.Models.Problems.Dtos;
+﻿using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.TestCases.Dtos;
-using Learning.Domain.ValueObjects;
 
 namespace Learning.Application.Extensions;
 public static class ProblemExtensions {

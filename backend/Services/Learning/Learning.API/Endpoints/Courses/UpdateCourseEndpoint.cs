@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace Learning.API.Endpoints.Courses;
 public record UpdateCourseRequest(UpdateCourseDto UpdateCourseDto);
 public record UpdateCourseResponse(bool IsSuccess);
-public class UpdateCourseEndpoint : ICarterModule {
-    public void AddRoutes(IEndpointRouteBuilder app) {
+public class UpdateCourseEndpoint : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
+    {
 
-        app.MapPut("/courses/{CourseId}", async ([FromRoute] Guid CourseId, UpdateCourseRequest request, ISender sender) => {
+        app.MapPut("/courses/{CourseId}", async ([FromRoute] Guid CourseId, UpdateCourseRequest request, ISender sender) =>
+        {
             var result = await sender.Send(new UpdateCourseCommand(CourseId, request.UpdateCourseDto));
 
             var response = result.Adapt<UpdateCourseResponse>();

@@ -101,7 +101,10 @@ public class MessageSentHandler(
     }
     private async Task<Message> CreateNewMessageFromAI(Conversation conversation, MessageAnswer messageAnswer, 
         PromptType promptType, IDictionary<string, object> context) {
-        var document = await documentRepository.GetDocuments(messageAnswer.DocumentIds.Select(Guid.Parse).ToArray());
+        var document = await documentRepository.GetDocumentsAsync(
+            messageAnswer.DocumentIds.Select(
+                s => DocumentId.Of(Guid.Parse(s))
+                ).ToArray());
         var message = new Message() {
             Id = MessageId.Of(Guid.NewGuid()),
             ConversationId = conversation.Id,

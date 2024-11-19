@@ -1,9 +1,10 @@
 ﻿using Learning.Application.Models.Problems.Commands.CreateProblem;
-using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.Questions.Dtos;
-using Learning.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Questions.Commands.CreateQuestion;
+
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateQuestionCommand : ICommand<CreateQuestionResult>
 {
     public required Guid QuizId;
@@ -33,9 +34,6 @@ public class CreateQuestionCommandValidator : AbstractValidator<CreateQuestionCo
 
         RuleFor(x => x.CreateQuestionDto.Mark)
             .GreaterThan(0).WithMessage("Mark must be greater than 0.");
-
-        RuleFor(x => x.CreateQuestionDto.OrderIndex)
-            .GreaterThanOrEqualTo(0).WithMessage("OrderIndex must be 0 or greater.");
 
         RuleFor(x => x.CreateQuestionDto.Problem)
             .NotNull()

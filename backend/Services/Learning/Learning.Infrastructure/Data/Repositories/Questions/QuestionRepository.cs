@@ -5,6 +5,10 @@ public class QuestionRepository : Repository<Question>, IQuestionRepository {
         _dbContext = dbContext;
     }
 
+    public async Task<int> CountByQuizAsync(QuizId quizId) {
+        return await _dbContext.Questions.CountAsync(c => c.QuizId.Equals(quizId));
+    }
+
     public override async Task DeleteByIdAsync(Guid id) {
         var question = await GetByIdAsync(id);
         if (question != null) {

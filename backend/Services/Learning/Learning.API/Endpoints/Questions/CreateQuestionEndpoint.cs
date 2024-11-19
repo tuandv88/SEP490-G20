@@ -1,5 +1,6 @@
 ﻿using Learning.Application.Models.Questions.Commands.CreateQuestion;
 using Learning.Application.Models.Questions.Dtos;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Learning.API.Endpoints.Questions;
 
@@ -8,7 +9,7 @@ public record CreateQuestionResponse(Guid Id);
 public class CreateQuestionEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
 
-        app.MapPost("/quizs/{QuizId}/questions", async (Guid QuizId, CreateQuestionRequest request, ISender sender) => {
+        app.MapPost("/quizs/{QuizId}/questions", async ([FromRoute]Guid QuizId, CreateQuestionRequest request, ISender sender) => {
             var command = new CreateQuestionCommand() { QuizId = QuizId, CreateQuestionDto = request.CreateQuestionDto };
 
             var result = await sender.Send(command);

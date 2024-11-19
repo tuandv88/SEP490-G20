@@ -14,10 +14,6 @@ public class CreateCourseHandler(ICourseRepository repository, IFilesService fil
 
     private async Task<Course> CreateNewCourse(CreateCourseDto createCourseDto)
     {
-        var courseStatus = Enum.TryParse<CourseStatus>(createCourseDto.CourseStatus, out var status)
-            ? status
-            : throw new ArgumentOutOfRangeException(nameof(createCourseDto.CourseStatus), $"Value '{createCourseDto.CourseStatus}' is not valid for CourseStatus.");
-
         var courseLevel = Enum.TryParse<CourseLevel>(createCourseDto.CourseLevel, out var level)
             ? level
             : throw new ArgumentOutOfRangeException(nameof(createCourseDto.CourseLevel), $"Value '{createCourseDto.CourseLevel}' is not valid for CourseLevel.");
@@ -48,7 +44,7 @@ public class CreateCourseHandler(ICourseRepository repository, IFilesService fil
             title: createCourseDto.Title,
             description: createCourseDto.Description,
             headline: createCourseDto.Headline,
-            courseStatus: courseStatus,
+            courseStatus: CourseStatus.Draft,
             timeEstimation: createCourseDto.TimeEstimation,
             prerequisites: createCourseDto.Prerequisites,
             objectives: createCourseDto.Objectives,

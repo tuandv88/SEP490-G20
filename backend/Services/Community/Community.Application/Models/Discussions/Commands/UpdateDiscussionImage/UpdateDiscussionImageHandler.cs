@@ -27,8 +27,11 @@ public class UpdateDiscussionImageHandler: ICommandHandler<UpdateDiscussionImage
         var imageUrl = await UploadDiscussionImage(request.ImageDto);
         var oldImageUrl = discussion.ImageUrl;
 
+
+
         //Update image
         discussion.UpdateImage(imageUrl);
+        discussion.DateUpdated = DateTime.Now;
 
         await _discussionRepository.UpdateAsync(discussion);
         await _discussionRepository.SaveChangesAsync(cancellationToken);

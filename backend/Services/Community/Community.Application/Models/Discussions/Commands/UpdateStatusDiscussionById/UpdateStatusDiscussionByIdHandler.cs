@@ -22,6 +22,7 @@ public class UpdateStatusDiscussionByIdHandler : ICommandHandler<UpdateStatusDis
 
         // Chuyển đổi trạng thái IsActive
         discussion.IsActive = !discussion.IsActive;
+        discussion.DateUpdated = DateTime.Now;
 
         await _repository.UpdateAsync(discussion);
         await _repository.SaveChangesAsync(cancellationToken);

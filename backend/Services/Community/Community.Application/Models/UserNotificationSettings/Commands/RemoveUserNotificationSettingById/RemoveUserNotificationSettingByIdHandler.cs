@@ -1,6 +1,4 @@
-﻿using Community.Application.Models.NotificationTypes.Commands.RemoveNotificationTypeById;
-
-namespace Community.Application.Models.UserNotificationSettings.Commands.RemoveUserNotificationSettingById;
+﻿namespace Community.Application.Models.UserNotificationSettings.Commands.RemoveUserNotificationSettingById;
 
 public class RemoveUserNotificationSettingByIdHandler : ICommandHandler<RemoveUserNotificationSettingByIdCommand, RemoveUserNotificationSettingByIdResult>
 {

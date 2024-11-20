@@ -206,6 +206,11 @@ namespace Community.Infrastructure.Data.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
+                    b.Property<bool>("NotificationsEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<bool>("Pinned")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")

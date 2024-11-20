@@ -66,6 +66,7 @@ namespace Community.Infrastructure.Data.Migrations
                     DateUpdated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Closed = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     Pinned = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    NotificationsEnabled = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

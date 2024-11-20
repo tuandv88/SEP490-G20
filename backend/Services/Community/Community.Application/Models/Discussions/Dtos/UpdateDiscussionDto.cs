@@ -9,5 +9,6 @@ public record UpdateDiscussionDto(
     List<string> Tags,
     bool Closed,
     bool Pinned,
-    long ViewCount
+    long ViewCount,
+    bool EnableNotification
 );

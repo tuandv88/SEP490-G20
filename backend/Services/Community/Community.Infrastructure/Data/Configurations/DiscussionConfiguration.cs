@@ -87,6 +87,9 @@ namespace Community.Infrastructure.Data.Configurations
             builder.Property(d => d.Pinned)
                 .HasDefaultValue(false);
 
+            builder.Property(d => d.NotificationsEnabled)
+                .HasDefaultValue(true);
+
             // Tùy chọn thiết lập các chỉ mục để cải thiện hiệu năng tìm kiếm
             builder.HasIndex(d => d.UserId);
             builder.HasIndex(d => d.CategoryId);

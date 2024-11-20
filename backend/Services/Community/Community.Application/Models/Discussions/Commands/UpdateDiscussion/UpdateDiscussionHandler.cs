@@ -76,7 +76,8 @@ public class UpdateDiscussionHandler : ICommandHandler<UpdateDiscussionCommand, 
             tags: updateDiscussionDto.Tags,
             closed: updateDiscussionDto.Closed,
             pinned: updateDiscussionDto.Pinned,
-            viewCount: updateDiscussionDto.ViewCount
+            viewCount: updateDiscussionDto.ViewCount,
+            notificationsEnabled: updateDiscussionDto.EnableNotification
         );
     }
 }

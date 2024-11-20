@@ -32,12 +32,16 @@ namespace User.Infrastructure
             services.ConfigureCaching(configuration);
 
             services.AddScoped<IPointHistoryRepository, PointHistoryRepository>();
+            //services.AddScoped<IPointHistoryRepository, CachedPointHistoryRepository>();
 
             services.AddScoped<ILearningPathRepository, LearningPathRepository>();
+//services.AddScoped<ILearningPathRepository, CachedLearningPathRepository>();
 
             services.AddScoped<IPathStepsRepository, PathStepsRepository>();
+            //services.AddScoped<IPathStepsRepository, CachedPathStepRepository>();
 
             services.AddScoped<IUserGoalRepository, UserGoalRepository>();
+           // services.AddScoped<IUserGoalRepository, CachedUserGoalRepository>();
 
             return services;
         }

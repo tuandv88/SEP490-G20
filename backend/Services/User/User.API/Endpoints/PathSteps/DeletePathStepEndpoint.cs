@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using User.Application.Models.PathSteps.Queries.DeletePathStep;
 using User.Application.Models.PathSteps.Dtos;
+using User.Application.Models.PathSteps.Commands.DeletePathStep;
 
 namespace User.API.Endpoints.PathSteps
 {

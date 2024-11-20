@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using User.Application.Data.Repositories;  // Repository Interface
 using User.Application.Models.UserGoals.Dtos; // UserGoalDto
 using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions; // CQRS Interfaces
+using BuildingBlocks.Exceptions;
 
-namespace User.Application.Models.UserGoals.Commands.GetUserGoal
+namespace User.Application.Models.UserGoals.Queries.GetUserGoal
 {
     public class GetUserGoalsByUserIdHandler : IQueryHandler<GetUserGoalsByUserIdQuery, GetUserGoalsByUserIdQueryResult>
     {

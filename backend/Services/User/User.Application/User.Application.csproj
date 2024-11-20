@@ -19,4 +19,8 @@
     <ProjectReference Include="..\User.Domain\User.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\PointHistories\Commands\" />
+  </ItemGroup>
+
 </Project>

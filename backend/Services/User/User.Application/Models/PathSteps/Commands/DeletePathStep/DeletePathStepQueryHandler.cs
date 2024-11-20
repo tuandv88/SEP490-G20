@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using User.Application.Data.Repositories; // Repository Interface
 using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions; // Các exception cho CQRS
+using BuildingBlocks.Exceptions;
 
-namespace User.Application.Models.PathSteps.Queries.DeletePathStep
+namespace User.Application.Models.PathSteps.Commands.DeletePathStep
 {
     public class DeletePathStepQueryHandler : IQueryHandler<DeletePathStepQuery, bool>
     {

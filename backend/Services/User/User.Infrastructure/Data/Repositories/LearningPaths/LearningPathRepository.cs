@@ -45,12 +45,6 @@ namespace User.Infrastructure.Data.Repositories.LearningPaths
                 .Include(lp => lp.PathSteps) // Eager Load các PathSteps cho mỗi LearningPath
                 .ToListAsync();
 
-            // Kiểm tra nếu danh sách rỗng
-            if (!learningPaths.Any())
-            {
-                throw new KeyNotFoundException($"Không tìm thấy LearningPath nào cho UserId '{userId}'.");
-            }
-
             return learningPaths;
         }
 
@@ -61,11 +55,6 @@ namespace User.Infrastructure.Data.Repositories.LearningPaths
 
             var learningPath = await _dbContext.LearningPaths
                 .FirstOrDefaultAsync(lp => lp.Id == learningPathIdObject); // So sánh với LearningPathId dưới dạng ValueObject
-
-            if (learningPath == null)
-            {
-                throw new KeyNotFoundException($"LearningPath với LearningPathId '{learningPathId}' không được tìm thấy.");
-            }
 
             return learningPath;
         }

@@ -42,19 +42,16 @@ namespace User.Infrastructure.Data.Repositories.PathSteps
                 .Where(lp => lp.LearningPathId.Equals(new LearningPathId(LearningPathId)))
                 .ToListAsync();  // Lấy tất cả các PathStep phù hợp và chuyển đổi thành danh sách
 
-            if (pathSteps == null || pathSteps.Count == 0)
-            {
-                throw new KeyNotFoundException($"Không tìm thấy PathSteps với LearningPathId '{LearningPathId}'.");
-            }
-
             return pathSteps;  // Trả về danh sách các PathStep
         }
 
         public async Task<PathStep> GetByPathStepIdAsync(Guid pathStepId)
         {
             // Chuyển đổi Guid thành PathStepId trước khi thực hiện truy vấn
+           
             var pathStepIdObject = PathStepId.Of(pathStepId);
 
+            // Truy vấn để lấy PathStep bằng PathStepId đã chuyển đổi
             var pathStep = await _dbContext.PathSteps
                 .FirstOrDefaultAsync(ps => ps.Id == pathStepIdObject); // So sánh với PathStepId dưới dạng ValueObject
 

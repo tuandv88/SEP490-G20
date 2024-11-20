@@ -2,37 +2,29 @@
 using MediatR;
 using User.Application.Models.LearningPaths.Dtos;
 
-namespace User.Application.Models.LearningPaths.Commands.CreateLearningPath
+namespace User.Application.Models.LearningPaths.Commands.UpdateLearningPath
 {
-    public record CreateLearningPathResult(Guid Id);
+    public record UpdateLearningPathCommand(UpdateLearningPathDto LearningPathDto) : IRequest<bool>;
 
-    public class CreateLearningPathCommand : IRequest<CreateLearningPathResult>
+    public class UpdateLearningPathCommandValidator : AbstractValidator<UpdateLearningPathCommand>
     {
-        public required Guid UserId { get; set; }
-        public required LearningPathDto LearningPathDto { get; set; }
-    }
-    public class CreateLearningPathCommandValidator : AbstractValidator<CreateLearningPathCommand>
-    {
-        public CreateLearningPathCommandValidator()
+        public UpdateLearningPathCommandValidator()
         {
-            // Kiểm tra PathName không được null và không được rỗng
+            // Kiểm tra các trường trong DTO
             RuleFor(x => x.LearningPathDto.PathName)
                 .NotNull()
                 .NotEmpty().WithMessage("Path Name is required.");
 
-            // Kiểm tra StartDate không được null
             RuleFor(x => x.LearningPathDto.StartDate)
                 .NotNull()
                 .WithMessage("Start Date is required.");
 
-            // Kiểm tra EndDate không được null và EndDate phải lớn hơn StartDate
             RuleFor(x => x.LearningPathDto.EndDate)
                 .NotNull()
                 .WithMessage("End Date is required.")
                 .GreaterThan(x => x.LearningPathDto.StartDate)
                 .WithMessage("End Date must be greater than Start Date.");
 
-            // Kiểm tra Status có giá trị hợp lệ trong enum LearningPathStatus
             RuleFor(x => x.LearningPathDto.Status)
                 .IsInEnum()
                 .WithMessage("Invalid Status value.");

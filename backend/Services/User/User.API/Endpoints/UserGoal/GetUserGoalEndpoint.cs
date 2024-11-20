@@ -4,7 +4,7 @@ using MediatR;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using User.Application.Models.PathSteps.Queries.GetLeaningPathById;
-using User.Application.Models.UserGoals.Commands.GetUserGoal;
+using User.Application.Models.UserGoals.Queries.GetUserGoal;
 
 namespace User.API.Endpoints.UserGoal;
 

@@ -1,16 +1,11 @@
-﻿using BuildingBlocks.CQRS;
-using FluentValidation;
+﻿using FluentValidation;
+using MediatR;
+using User.Application.Models.PathSteps.Commands.CreatePathStep;
 using User.Application.Models.PathSteps.Dtos;
 
-namespace User.Application.Models.PathSteps.Commands.CreatePathStep
+namespace User.Application.Models.PathSteps.Commands.UpdatePathStep
 {
-    public record CreatePathStepCommand : ICommand<CreatePathStepResult>
-    {
-        public required Guid UserId { get; set; }
-        public required PathStepDto PathStepDto { get; set; }
-    }
-
-    public record CreatePathStepResult(Guid Id);
+    public record UpdatePathStepCommand(UpdatePathStepDto PathStepDto) : IRequest<bool>;
 
     public class CreatePathStepCommandValidator : AbstractValidator<CreatePathStepCommand>
     {
@@ -45,5 +40,4 @@ namespace User.Application.Models.PathSteps.Commands.CreatePathStep
                 .WithMessage("CompletionDate must be less than or equal to ExpectedCompletionDate.");
         }
     }
-
 }

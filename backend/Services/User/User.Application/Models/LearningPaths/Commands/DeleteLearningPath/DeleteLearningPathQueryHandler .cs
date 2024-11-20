@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using User.Application.Data.Repositories; // Repository Interface
 using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions; // Các exception cho CQRS
+using BuildingBlocks.Exceptions;
 
-namespace User.Application.Models.LearningPaths.Queries.DeleteLearningPath
+namespace User.Application.Models.LearningPaths.Commands.DeleteLearningPath
 {
     public class DeleteLearningPathQueryHandler : IQueryHandler<DeleteLearningPathQuery, bool>
     {
@@ -33,12 +33,14 @@ namespace User.Application.Models.LearningPaths.Queries.DeleteLearningPath
             // Lấy các PathStep có LearningPathId tương ứng
             var pathSteps = await _pathStepRepository.GetByLearningPathIDAsync(request.LearningPathId);
 
-            // Xóa tất cả các PathStep liên quan
-            foreach (var pathStep in pathSteps)
+            if (pathSteps != null && pathSteps.Any())
             {
-                await _pathStepRepository.DeleteAsync(pathStep);
+                // Xóa tất cả các PathStep liên quan
+                foreach (var pathStep in pathSteps)
+                {
+                    await _pathStepRepository.DeleteAsync(pathStep);
+                }
             }
-
             // Xóa LearningPath
             await _learningPathRepository.DeleteAsync(learningPath);
 

@@ -1,5 +1,5 @@
 ﻿using User.API.Endpoints.LearningPath;
-using User.Application.Models.LearningPaths.Commands.CreateLearningPath;
+using User.Application.Models.LearningPaths.Commands.CreateLeaningPath;
 using User.Application.Models.LearningPaths.Dtos;
 
 namespace User.API.Endpoints.LearningPath

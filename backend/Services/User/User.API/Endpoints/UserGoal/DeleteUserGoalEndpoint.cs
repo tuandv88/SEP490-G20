@@ -1,9 +1,9 @@
-﻿using User.Application.Models.UserGoals.Queries.DeleteUserGoal;
-using Carter;
+﻿using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using BuildingBlocks.Exceptions;
+using User.Application.Models.UserGoals.Commands.DeleteUserGoal;
 
 namespace User.API.Endpoints.UserGoal
 {

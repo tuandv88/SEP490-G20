@@ -3,7 +3,7 @@ using User.Application.Data.Repositories;
 using User.Application.Models.LearningPaths.Dtos;
 using User.Domain.ValueObjects;
 
-namespace User.Application.Models.LearningPaths.Commands.CreateLearningPath
+namespace User.Application.Models.LearningPaths.Commands.CreateLeaningPath
 {
     public class CreateLearningPathHandler : IRequestHandler<CreateLearningPathCommand, CreateLearningPathResult>
     {

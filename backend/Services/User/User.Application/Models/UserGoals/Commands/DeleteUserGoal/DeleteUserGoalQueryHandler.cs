@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using User.Application.Data.Repositories; // Repository Interface
 using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions; // Các exception cho CQRS
+using BuildingBlocks.Exceptions;
 
-namespace User.Application.Models.UserGoals.Queries.DeleteUserGoal
+namespace User.Application.Models.UserGoals.Commands.DeleteUserGoal
 {
     public class DeleteUserGoalQueryHandler : IQueryHandler<DeleteUserGoalQuery, bool>
     {

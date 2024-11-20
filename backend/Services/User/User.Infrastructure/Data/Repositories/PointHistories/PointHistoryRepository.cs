@@ -25,5 +25,19 @@ namespace User.Infrastructure.Data.Repositories.PointHistories
 
             _dbContext.PointHistories.Remove(pointHistory);
         }
+        public async Task<List<PointHistory>> GetPointHistoryByUserIdAsync(Guid userId)
+        {
+            // Chuyển đổi Guid thành UserId ValueObject
+            var userIdObject = new UserId(userId);
+
+            // Truy vấn để lấy danh sách PointHistory theo UserId
+            var pointHistories = await _dbContext.PointHistories
+                .Where(ph => ph.UserId.Equals(userIdObject)) // So sánh trực tiếp với Guid của UserId
+                .OrderByDescending(ph => ph.DateReceived) // Sắp xếp theo ngày nhận điểm, mới nhất trước
+                .ToListAsync();
+
+            return pointHistories;
+        }
+
     }
 }

@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using User.Application.Models.LearningPaths.Queries.DeleteLearningPath;
 using Microsoft.AspNetCore.Http;
+using User.Application.Models.LearningPaths.Commands.DeleteLearningPath;
 
 namespace User.API.Endpoints.LearningPath
 {

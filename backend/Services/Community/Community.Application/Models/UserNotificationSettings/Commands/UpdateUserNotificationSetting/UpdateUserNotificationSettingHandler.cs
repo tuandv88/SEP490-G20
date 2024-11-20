@@ -1,5 +1,4 @@
 ﻿using Community.Application.Models.UserNotificationSettings.Commands.UpdateUserNotificationSetting;
-using Community.Domain.Models;
 using Community.Domain.ValueObjects;
 
 public class UpdateUserNotificationSettingHandler : ICommandHandler<UpdateUserNotificationSettingCommand, UpdateUserNotificationSettingResult>

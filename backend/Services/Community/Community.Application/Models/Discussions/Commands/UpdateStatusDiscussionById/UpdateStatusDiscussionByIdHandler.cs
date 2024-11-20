@@ -1,6 +1,4 @@
-﻿using Community.Application.Models.Comments.Commands.UpdateStatusComment;
-
-namespace Community.Application.Models.Discussions.Commands.UpdateStatusDiscussionById;
+﻿namespace Community.Application.Models.Discussions.Commands.UpdateStatusDiscussionById;
 
 public class UpdateStatusDiscussionByIdHandler : ICommandHandler<UpdateStatusDiscussionByIdCommand, UpdateStatusDiscussionByIdResult>
 {

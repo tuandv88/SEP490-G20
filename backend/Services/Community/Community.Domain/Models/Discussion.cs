@@ -65,25 +65,5 @@
         {
             ImageUrl = imageUrl;
         }
-
-        // Tăng số lượt xem
-        public void IncrementViewCount()
-        {
-            ViewCount++;
-        }
-
-        // Đóng hoặc mở thảo luận
-        public void ToggleClosed()
-        {
-            Closed = !Closed;
-            DateUpdated = DateTime.Now;
-        }
-
-        // Ghim hoặc bỏ ghim thảo luận
-        public void TogglePinned()
-        {
-            Pinned = !Pinned;
-            DateUpdated = DateTime.Now;
-        }
     }
 }

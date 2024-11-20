@@ -10,10 +10,11 @@
         public NotificationFrequency NotificationFrequency { get; set; } = NotificationFrequency.Daily; // Tần suất nhận thông báo
 
         // Phương thức khởi tạo một UserNotificationSetting
-        public static UserNotificationSetting Create(UserId userId, NotificationTypeId notificationTypeId, bool isNotificationEnabled, bool isEmailEnabled, bool isWebsiteEnabled, NotificationFrequency notificationFrequency)
+        public static UserNotificationSetting Create(UserNotificationSettingId userNotificationSettingId, UserId userId, NotificationTypeId notificationTypeId, bool isNotificationEnabled, bool isEmailEnabled, bool isWebsiteEnabled, NotificationFrequency notificationFrequency)
         {
             return new UserNotificationSetting
             {
+                Id = userNotificationSettingId,
                 UserId = userId,
                 NotificationTypeId = notificationTypeId,
                 IsNotificationEnabled = isNotificationEnabled,

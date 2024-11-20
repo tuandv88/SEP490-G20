@@ -1,5 +1,4 @@
 ﻿using Community.Application.Models.Comments.Dtos;
-using Community.Domain.Models;
 using Community.Domain.ValueObjects;
 
 namespace Community.Application.Models.Comments.Commands.CreateComment;

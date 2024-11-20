@@ -12,10 +12,11 @@
         public Status Status { get; set; } = Status.Sent!;                       // Trạng thái gửi: Đã gửi, Thất bại, Chờ, Đã nhận
 
         // Phương thức khởi tạo một NotificationHistory
-        public static NotificationHistory Create(UserId userId, NotificationTypeId notificationTypeId, string message, SentVia sentVia, Status status)
+        public static NotificationHistory Create(NotificationHistoryId notificationHistoryId, UserId userId, NotificationTypeId notificationTypeId, string message, SentVia sentVia, Status status)
         {
             return new NotificationHistory
             {
+                Id = notificationHistoryId,
                 UserId = userId,
                 NotificationTypeId = notificationTypeId,
                 Message = message,

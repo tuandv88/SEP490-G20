@@ -25,8 +25,9 @@
         }
 
         // Phương thức cập nhật cài đặt thông báo
-        public void UpdateSettings(bool isNotificationEnabled, bool isEmailEnabled, bool isWebsiteEnabled, NotificationFrequency notificationFrequency)
+        public void UpdateSettings(NotificationTypeId notificationTypeId, bool isNotificationEnabled, bool isEmailEnabled, bool isWebsiteEnabled, NotificationFrequency notificationFrequency)
         {
+            NotificationTypeId = notificationTypeId;
             IsNotificationEnabled = isNotificationEnabled;
             IsEmailEnabled = isEmailEnabled;
             IsWebsiteEnabled = isWebsiteEnabled;

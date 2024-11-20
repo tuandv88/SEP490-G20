@@ -27,6 +27,23 @@
             };
         }
 
+        // Cập nhật thông báo với dữ liệu mới
+        public void Update(
+            NotificationTypeId notificationTypeId,
+            string message,
+            DateTime? dateRead,
+            bool isRead,
+            SentVia sentVia,
+            Status status)
+        {
+            NotificationTypeId = notificationTypeId;
+            Message = message;
+            DateRead = dateRead;
+            IsRead = isRead;
+            SentVia = sentVia;
+            Status = status;
+        }
+
         // Phương thức đánh dấu thông báo là đã đọc
         public void MarkAsRead()
         {

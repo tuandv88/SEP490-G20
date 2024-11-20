@@ -23,5 +23,15 @@
                 Priority = priority
             };
         }
+
+        // Phương thức cập nhật NotificationType
+        public void Update(string name, string description, bool canSendEmail, bool canSendWebsite, int priority)
+        {
+            Name = name;
+            Description = description;
+            CanSendEmail = canSendEmail;
+            CanSendWebsite = canSendWebsite;
+            Priority = priority;
+        }
     }
 }

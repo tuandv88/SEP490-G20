@@ -1,6 +1,7 @@
 ﻿namespace Community.Application.Models.UserNotificationSettings.Dtos
 {
     public record UserNotificationSettingDto(
+        Guid Id,
         Guid UserId,                             // ID người dùng
         Guid NotificationTypeId,                 // ID loại thông báo
         bool IsNotificationEnabled,              // Kích hoạt thông báo hay không

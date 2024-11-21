@@ -1,7 +1,6 @@
-﻿using Learning.Domain.ValueObjects;
-
-namespace Learning.Application.Models.Submissions.Dtos.CodeExecution;
+﻿namespace Learning.Application.Models.Submissions.Dtos;
 public record CodeExecuteDto(
+    string Token,
     string? RunTimeErrors,
     string? CompileErrors,
     double ExecutionTime,

@@ -2,7 +2,7 @@
 using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.ProblemSolutions.Dtos;
 using Learning.Application.Models.Submissions.Commands.CreateBatchCodeExcute;
-using Learning.Application.Models.Submissions.Dtos.CodeExecution;
+using Learning.Application.Models.Submissions.Dtos;
 using Learning.Application.Models.TestCases.Dtos;
 
 namespace Learning.Application.Models.Problems.Commands.UpdateProblem;
@@ -10,7 +10,7 @@ public class UpdateProblemHandler(IProblemRepository repository, ITestScriptRepo
     IProblemSolutionRepository problemSolutionRepository, ITestCaseRepository testCaseRepository, ISender sender
     ) : ICommandHandler<UpdateProblemCommand, UpdateProblemResult> {
     public async Task<UpdateProblemResult> Handle(UpdateProblemCommand request, CancellationToken cancellationToken) {
-        var problem =await repository.GetByIdDetailAsync(request.ProblemId);
+        var problem = await repository.GetByIdDetailAsync(request.ProblemId);
         if (problem == null) {
             throw new NotFoundException(nameof(Problem), request.ProblemId);
         }
@@ -36,7 +36,10 @@ public class UpdateProblemHandler(IProblemRepository repository, ITestScriptRepo
                     TestCases: testCases,
                     SolutionCodes: testScript.Solutions.Select(x => x.SolutionCode).ToList(),
                     TestCode: testScript.TestCode
-                )
+                ),
+                new ResourceLimits(updateProblemDto.CpuTimeLimit, updateProblemDto.CpuExtraTime, updateProblemDto.MemoryLimit,
+                    updateProblemDto.EnableNetwork, updateProblemDto.StackLimit, updateProblemDto.MaxThread, updateProblemDto.MaxFileSize
+                    )
             ));
 
             foreach (var codeExecuteDto in batchCodeExecuteResult.CodeExecuteDtos) {
@@ -159,13 +162,13 @@ public class UpdateProblemHandler(IProblemRepository repository, ITestScriptRepo
                 var existingTestCase = existingTestCases.FirstOrDefault(tc => tc.Id.Value == dto.Id.Value);
                 if (existingTestCase != null) {
 
-                    var testCase = problem.UpdateTestCase(existingTestCase.Id, dto.Inputs, dto.ExpectedOutput, 
+                    var testCase = problem.UpdateTestCase(existingTestCase.Id, dto.Inputs, dto.ExpectedOutput,
                                                         dto.IsHidden, dto.OrderIndex);
                     await testCaseRepository.UpdateAsync(testCase);
                 }
             } else {
                 // Create new TestCase
-                var testCase = TestCase.Create(TestCaseId.Of(Guid.NewGuid()), problem.Id, dto.Inputs, dto.ExpectedOutput, 
+                var testCase = TestCase.Create(TestCaseId.Of(Guid.NewGuid()), problem.Id, dto.Inputs, dto.ExpectedOutput,
                                                 dto.IsHidden, dto.OrderIndex);
                 problem.AddTestCase(testCase);
                 await testCaseRepository.AddAsync(testCase);

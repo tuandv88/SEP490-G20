@@ -1,7 +1,8 @@
 ﻿using Learning.Application.Models.Problems.Commands.DeleteProblem;
 
 namespace Learning.Application.Models.Questions.Commands.DeleteQuestion;
-public class DeleteQuestionHandler(IQuizRepository quizRepository, IQuestionRepository questionRepository, ISender sender) : ICommandHandler<DeleteQuestionCommand, Unit> {
+public class DeleteQuestionHandler(IQuizRepository quizRepository, IQuestionRepository questionRepository,
+    IProblemRepository problemRepository, ISender sender) : ICommandHandler<DeleteQuestionCommand, Unit> {
     public async Task<Unit> Handle(DeleteQuestionCommand request, CancellationToken cancellationToken) {
         var quiz = await quizRepository.GetByIdDetailAsync(request.QuizId);
         if (quiz == null) {
@@ -13,7 +14,7 @@ public class DeleteQuestionHandler(IQuizRepository quizRepository, IQuestionRepo
         }
 
         if (question.ProblemId != null) {
-            await sender.Send(new DeleteProblemCommand(question.ProblemId.Value));
+            await problemRepository.DeleteByIdAsync(question.ProblemId.Value);
             question.ProblemId = null;
         }
         quiz.RemoveQuestion(question);

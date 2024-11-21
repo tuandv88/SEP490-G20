@@ -2,7 +2,7 @@
 
 namespace Learning.Application.Extensions;
 public static class QuizExtensions {
-    public static QuizDto ToQuizDto(this Quiz quiz) {
+    public static QuizDto ToQuizDto(this Quiz quiz,int attemptCount) {
         var questions = quiz.IsRandomized
                 ? quiz.Questions.OrderBy(_ => Guid.NewGuid()).ToList()
                 : quiz.Questions.OrderBy(q => q.OrderIndex).ToList();
@@ -14,8 +14,8 @@ public static class QuizExtensions {
         TimeLimit: quiz.TimeLimit,
         HasTimeLimit: quiz.HasTimeLimit,
         AttemptLimit: quiz.AttemptLimit,
-        HasAttemptLimit: quiz.HasAttemptLimit,
-        Questions: questions.ToListQuestionDto());
+        AttemptCount: attemptCount,
+        HasAttemptLimit: quiz.HasAttemptLimit);
 
     }
     public static QuizFullDto ToFullQuizDto(this Quiz quiz) {
@@ -34,6 +34,13 @@ public static class QuizExtensions {
         Questions: quiz.Questions.ToListFullQuestionDto());
 
     }
-
+    public static QuizDetailDto ToQuizDetailDto(this Quiz quiz) {
+        var questions = quiz.IsRandomized
+                ? quiz.Questions.OrderBy(_ => Guid.NewGuid()).ToList()
+                : quiz.Questions.OrderBy(q => q.OrderIndex).ToList();
+        return new QuizDetailDto(
+        QuizId: quiz.Id.Value,
+        Questions: questions.ToListQuestionDto());
+    }
 }
 

@@ -48,9 +48,6 @@ public static class DependencyInjection {
         //Configuration Repository
         ConfigureRepository(services, configuration);
 
-        //UserContext
-        services.AddScoped<IUserContextService, UserContextService>();
-
         //Configuration Service
         ConfigureService(services, configuration);
 

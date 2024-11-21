@@ -3,7 +3,9 @@ using Learning.Application.Models.Quizs.Dtos;
 
 namespace Learning.Application.Models.Lectures.Queries.GetLecureById;
 public class GetLectureDetailsHandler(ILectureRepository lectureRepository, IQuizRepository quizRepository, 
-    IProblemRepository problemRepository, IUserContextService userContext, ICourseRepository courseRepository) : IQueryHandler<GetLectureDetailQuery, GetLectureDetailsResult> {
+    IProblemRepository problemRepository, IUserContextService userContext, ICourseRepository courseRepository,
+    IQuizSubmissionRepository quizSubmissionRepository
+    ) : IQueryHandler<GetLectureDetailQuery, GetLectureDetailsResult> {
     public async Task<GetLectureDetailsResult> Handle(GetLectureDetailQuery request, CancellationToken cancellationToken) {
         var lecture = await lectureRepository.GetLectureByIdDetail(request.LectureId);
 
@@ -26,9 +28,11 @@ public class GetLectureDetailsHandler(ILectureRepository lectureRepository, IQui
         QuizDto? quizDto = null;
         ProblemDto? problemDto = null;
         if (lecture.QuizId != null) {
-            var quiz = await quizRepository.GetByIdDetailAsync(lecture.QuizId.Value);
-            if(quiz != null) {
-                quizDto = quiz.ToQuizDto();
+            var quiz = await quizRepository.GetByIdAsync(lecture.QuizId.Value);
+            if (quiz != null) {
+                var userId = userContext.User?.Id;
+                var attemptCount = userId != null && userId!= Guid.Empty? await quizSubmissionRepository.CountByQuizAndUser(quiz.Id.Value, userId.Value) : 0;
+                quizDto = quiz.ToQuizDto(attemptCount);
             }
         }
         if(lecture.ProblemId != null) {

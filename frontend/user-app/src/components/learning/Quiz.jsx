@@ -42,10 +42,12 @@ const questions = [
   }
 ]
 
-export default function Quiz() {
+export default function Quiz({ quiz }) {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedOptions, setSelectedOptions] = useState({})
   const [answeredQuestions, setAnsweredQuestions] = useState([])
+
+  console.log(quiz)
 
   useEffect(() => {
     const answered = questions

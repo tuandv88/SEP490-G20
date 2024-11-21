@@ -7,6 +7,7 @@ import UpcomingContestsList from '@/components/Dashboard/components-upcoming-con
 import AlgorithmStatsList from '@/components/Dashboard/components-algorithm-stats-list'
 import { PageContainer } from '@/components/page-container'
 
+
 // Existing data (unchanged)
 
 const popularCourses = [
@@ -73,6 +74,8 @@ const topEnrolledCourses = [
 const breadcrumbs = [{ label: 'Dashboard', href: '/' }]
 
 export default function AdminDashboard() {
+  
+
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
       <DashboardLayout>

@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function TestPanel({ testCode, setTestCode }) {
   return (
-    <div className='flex flex-col w-full min-w-0'>
+    <div className='flex flex-col w-full h-full '>
       <div className='flex items-center px-4 py-2 border-b bg-background shrink-0'>
         <div className='flex items-center gap-2'>
           <TestTube2 className='w-5 h-5' />

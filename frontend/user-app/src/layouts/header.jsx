@@ -56,7 +56,7 @@ export default function Header() {
   useEffect(() => {
     AuthService.getUser().then((user) => {
       setUser(user);
-      console.log(user.profile);
+      // console.log(user.profile);
     });
   }, []);
 

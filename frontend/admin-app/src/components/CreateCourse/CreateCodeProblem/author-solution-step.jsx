@@ -3,11 +3,14 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import Split from 'react-split'
-import { RotateCcw } from 'lucide-react'
+import { ChevronDown, ChevronUp, RotateCcw } from 'lucide-react'
 import CodeEditorPanel from './CodeEditorPanel'
 import TestPanel from './TestPanel'
 import TestCaseResultPanel from './TestCaseResultPanel'
 import { FileDialogs } from './FileDialogs'
+import TestCaseGenerator from './code-section'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
+import CodeEditor from '@/pages/CourseTest/CodeEditor'
 
 export default function AuthorSolutionStep({
   form,
@@ -19,8 +22,8 @@ export default function AuthorSolutionStep({
   runCode,
   onSubmit
 }) {
-  const [files, setFiles] = useState([{ name: 'main.java', content: solutionCode }])
-  const [activeFile, setActiveFile] = useState('main.java')
+  const [files, setFiles] = useState([{ name: 'Solution.java', content: solutionCode }])
+  const [activeFile, setActiveFile] = useState('Solution.java')
   const [activeTestCase, setActiveTestCase] = useState('case-1')
   const [activeTab, setActiveTab] = useState('testcase')
   const [isNewFileDialogOpen, setIsNewFileDialogOpen] = useState(false)
@@ -28,6 +31,7 @@ export default function AuthorSolutionStep({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [newFileName, setNewFileName] = useState('')
   const [fileToManage, setFileToManage] = useState(null)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const [testCases, setTestCases] = useState([
     {
@@ -40,11 +44,15 @@ export default function AuthorSolutionStep({
     }
   ])
 
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded)
+  }
+
   const handleAddFile = () => {
     if (newFileName.trim()) {
       setFiles((prev) => [...prev, { name: newFileName, content: '' }])
       setActiveFile(newFileName)
-      setNewFileName('')
+      setNewFileName('Solution.java')
       setIsNewFileDialogOpen(false)
     }
   }
@@ -55,7 +63,7 @@ export default function AuthorSolutionStep({
       setActiveFile(newFileName)
       setNewFileName('')
       setFileToManage(null)
-      setIsRenameDialogOpen(false)
+     
     }
   }
 
@@ -65,7 +73,7 @@ export default function AuthorSolutionStep({
       setFiles(newFiles)
       setActiveFile(newFiles[0].name)
       setFileToManage(null)
-      setIsDeleteDialogOpen(false)
+      
     }
   }
 
@@ -75,7 +83,10 @@ export default function AuthorSolutionStep({
   }
 
   return (
-    <div className='flex flex-col h-[calc(100vh-4rem)] overflow-hidden'>
+    //h-[calc(100vh-4rem)]
+    <div className='flex flex-col '>
+      
+
       {/* Header */}
       <div className='flex items-center justify-end gap-2 p-2 border-b bg-background shrink-0'>
         <Button
@@ -98,12 +109,12 @@ export default function AuthorSolutionStep({
       </div>
 
       {/* Main Content */}
-      <div className='flex flex-col flex-grow overflow-hidden'>
-        {/* Top Panel - Editors */}
-        <div className='flex-grow overflow-hidden'>
+      <div className='flex flex-col  flex-grow '>
+        
+        <div className='flex-grow overflow-hidden min-h-[500px]'>
           <Split
             sizes={[50, 50]}
-            minSize={[300, 300]}
+            // minSize={[300, 300]}
             maxSize={[Infinity, Infinity]}
             gutterSize={4}
             className='flex w-full h-full'
@@ -115,12 +126,13 @@ export default function AuthorSolutionStep({
               return gutter
             }}
           >
-            {/* Solution Panel */}
+           
             <CodeEditorPanel
               title='Solution'
               files={files}
               activeFile={activeFile}
               setActiveFile={setActiveFile}
+              // handleAddFile={handleAddFile}
               setIsNewFileDialogOpen={setIsNewFileDialogOpen}
               setFileToManage={setFileToManage}
               setIsRenameDialogOpen={setIsRenameDialogOpen}
@@ -128,13 +140,14 @@ export default function AuthorSolutionStep({
               handleSolutionCodeChange={handleSolutionCodeChange}
             />
 
-            {/* Test Panel */}
+            
             <TestPanel testCode={testCode} setTestCode={setTestCode} />
           </Split>
+          
         </div>
 
-        {/* Bottom Panel - Test Cases & Results */}
-        <div className='h-64 overflow-y-auto border-t border-zinc-800'>
+       
+        <div className='h-64 overflow-y-auto border-t border-zinc-800 mb-20'>
           <TestCaseResultPanel
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -145,6 +158,50 @@ export default function AuthorSolutionStep({
           />
         </div>
       </div>
+
+      
+
+      <ResizablePanelGroup direction='vertical' className='min-h-[1000px] rounded-lg border h-full'>
+        <ResizablePanel defaultSize={60}>
+          <ResizablePanelGroup direction='horizontal'>
+            <ResizablePanel defaultSize={50}>
+              <div className='flex h-full items-center justify-center'>
+                <CodeEditorPanel
+                  title='Solution'
+                  files={files}
+                  activeFile={activeFile}
+                  setActiveFile={setActiveFile}
+                  // handleAddFile={handleAddFile}
+                  setIsNewFileDialogOpen={setIsNewFileDialogOpen}
+                  setFileToManage={setFileToManage}
+                  setIsRenameDialogOpen={setIsRenameDialogOpen}
+                  setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+                  handleSolutionCodeChange={handleSolutionCodeChange}
+                />
+              </div>
+            </ResizablePanel>
+            <ResizableHandle />
+            <ResizablePanel defaultSize={50}>
+              <div className='flex h-full items-center justify-center'>
+                <TestPanel testCode={testCode} setTestCode={setTestCode} />
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel defaultSize={40} className='bg-zinc-800'>
+          <div>
+              <TestCaseResultPanel
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                testCases={testCases}
+                activeTestCase={activeTestCase}
+                setActiveTestCase={setActiveTestCase}
+                testResult={testResult}
+              />
+            </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
       <FileDialogs
         isNewFileDialogOpen={isNewFileDialogOpen}

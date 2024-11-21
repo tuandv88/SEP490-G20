@@ -4,12 +4,12 @@ import CustomMarkdownEditor from './custom-markdown-editor'
 
 const MarkdownFormField = ({ control, name, label, placeholder }) => {
   return (
-    <FormField
+    <FormField     
       control={control}
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className='text-base' htmlFor={name}>
+          <FormLabel className='text-base font-semibold' htmlFor={name}>
             {label}
           </FormLabel>
           <FormControl>

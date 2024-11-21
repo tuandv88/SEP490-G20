@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useState } from 'react';
 import Header from './Header';
 import BottomTabs from './BottomTabs';
@@ -5,7 +6,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useToast } from '@/hooks/use-toast'
 import FormTabs from './FormTabs';
 import { createProblem } from '@/services/api/problemApi'
-export default function Primary({ navigationUrl, navigationTitle, lectureId, problemType }) {
+const CreateProblem = ({ navigationUrl, navigationTitle, lectureId, problemType }) => {
 
 
   const [activeTab, setActiveTab] = useState('basic');
@@ -58,26 +59,8 @@ export default function Primary({ navigationUrl, navigationTitle, lectureId, pro
     } catch (error) {
       console.error('Error creating problem:', error)
     }
-
-   
+  
   };
-
-   // Hàm xử lý submit tùy chỉnh
-  //  const handleCustomSubmit = (event) => {
-  //   event.preventDefault(); // Ngăn chặn hành vi mặc định của form
-
-  //   // Lấy dữ liệu từ form
-  //   const formData = form.getValues();
-
-  //   toast({
-  //     title: "Form submitted successfully!",
-  //     description: <pre className="mt-2 w-full rounded-md bg-slate-950 p-4">
-  //       <code className="text-white">{JSON.stringify(formData, null, 2)}</code>
-  //     </pre>,
-  //   });
-
-  //   // Thực hiện các hành động khác nếu cần
-  // };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -97,3 +80,5 @@ export default function Primary({ navigationUrl, navigationTitle, lectureId, pro
     </div>
   );
 }
+
+export default React.memo(CreateProblem);

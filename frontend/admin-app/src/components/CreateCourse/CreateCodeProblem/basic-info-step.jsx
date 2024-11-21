@@ -120,7 +120,7 @@ export default function BasicInfoStep({ form }) {
                   step='0.1'
                   placeholder='Enter CPU Time Limit'
                   {...field}
-                  value={field.value || 10}
+                  value={field.value || 2}
                 />
               </FormControl>
               <FormMessage />

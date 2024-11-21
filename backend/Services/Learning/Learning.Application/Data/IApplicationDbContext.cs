@@ -1,6 +1,4 @@
-﻿using MassTransit.EntityFrameworkCoreIntegration;
-
-namespace Learning.Application.Data;
+﻿namespace Learning.Application.Data;
 public interface IApplicationDbContext {
     DbSet<Course> Courses { get; }
     DbSet<Chapter> Chapters { get; }

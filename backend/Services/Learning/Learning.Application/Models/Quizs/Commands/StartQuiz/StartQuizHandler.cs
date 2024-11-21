@@ -1,8 +1,9 @@
-﻿using Hangfire;
+﻿using Learning.Domain.Events;
+using MassTransit;
 
 namespace Learning.Application.Models.Quizs.Commands.StartQuiz;
 public class StartQuizHandler(IQuizSubmissionRepository quizSubmissionRepository, IQuizRepository quizRepository, 
-     IUserContextService userContext) : ICommandHandler<StartQuizCommand, StartQuizResult> {
+     IUserContextService userContext, IMessageScheduler scheduler) : ICommandHandler<StartQuizCommand, StartQuizResult> {
     public async Task<StartQuizResult> Handle(StartQuizCommand request, CancellationToken cancellationToken) {
         var userId = userContext.User.Id;
         var quiz = await quizRepository.GetByIdAsync(request.QuizId);
@@ -40,7 +41,7 @@ public class StartQuizHandler(IQuizSubmissionRepository quizSubmissionRepository
 
         if (quiz.HasTimeLimit) {
            // sau giới hạn thời gian tự động nộp bài quiz
-           ScheduleTimeLimit(quizSubmission.Id, TimeSpan.FromMinutes(quiz.TimeLimit));
+           await ScheduleTimeLimit(quizSubmission.Id, DateTime.Now.AddMinutes(quiz.TimeLimit));
         }
         await quizSubmissionRepository.AddAsync(quizSubmission);
         await quizSubmissionRepository.SaveChangesAsync(cancellationToken);
@@ -48,10 +49,8 @@ public class StartQuizHandler(IQuizSubmissionRepository quizSubmissionRepository
         return new StartQuizResult(quizSubmission.Id.Value);
     }
 
-    private void ScheduleTimeLimit(QuizSubmissionId quizSubmissionId, TimeSpan time) {
-        var jobId = BackgroundJob.Schedule<IQuizSubmissionStateService>(
-                (stateService) => stateService.ChangeStatus(quizSubmissionId, QuizSubmissionStatus.Success),
-                time);
+    private async Task ScheduleTimeLimit(QuizSubmissionId quizSubmissionId, DateTime time) {
+        await scheduler.SchedulePublish(time, new QuizSubmissionTimeoutEvent(quizSubmissionId.Value));
     }
 }
 

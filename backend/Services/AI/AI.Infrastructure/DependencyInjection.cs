@@ -16,7 +16,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using System.Reflection;
 
 namespace AI.Infrastructure;
 public static class DependencyInjection {
@@ -32,7 +31,7 @@ public static class DependencyInjection {
             options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information); ;
         });
         //Add Messagebroker
-        services.AddMassTransitWithRabbitMQ(configuration, typeof(CoursePublishedEventHandler).Assembly);
+        services.AddMassTransitWithRabbitMQ(configuration, typeof(IApplicationDbContext).Assembly);
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();

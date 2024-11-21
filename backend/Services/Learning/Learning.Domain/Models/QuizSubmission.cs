@@ -1,23 +1,34 @@
-﻿using Learning.Domain.Events;
-
-namespace Learning.Domain.Models;
-public class QuizSubmission : Aggregate<QuizSubmissionId>{
+﻿namespace Learning.Domain.Models;
+public class QuizSubmission : Aggregate<QuizSubmissionId> {
     public UserId UserId { get; set; } = default!;
     public QuizId QuizId { get; set; } = default!;
-    public DateTime StartTime { get; set; } = DateTime.UtcNow; 
+    public DateTime StartTime { get; set; } = DateTime.UtcNow;
     public DateTime SubmissionDate { get; set; } = DateTime.UtcNow;
     public long Score { get; set; }
-    public int TotalQuestions {  get; set; }
+    public long TotalScore { get; set; }
+    public int TotalQuestions { get; set; }
     public int CorrectAnswers { get; set; }
-    public int IncorrectAnswers {  get; set; }
     public long Duration => (long)(SubmissionDate - StartTime).TotalSeconds;
     public List<QuestionAnswer>? Answers { get; set; } = default!;
     public QuizSubmissionStatus Status = QuizSubmissionStatus.InProgress;
 
     public void UpdateStatus(QuizSubmissionStatus status) {
         Status = status;
-        AddDomainEvent(new QuizSubmissionUpdateStatusEvent(this));
+        switch (status) {
+            case QuizSubmissionStatus.Processing:
+                // tạo event xử lí submission này (đây là trang thái đã nộp và chờ xử lí ra kết quả)
+                //AddDomainEvent(new QuizSubmissionProcessingEvent(Id.Value));
+                break;
+        }
     }
+    public void UpdateSubmitResult(long score,long totalScore, int totalQuestions, int correctAnswers, List<QuestionAnswer>? answers) {
+        Score = score;
+        TotalScore = TotalScore;
+        TotalQuestions = totalQuestions;
+        CorrectAnswers = correctAnswers;
+        Answers = answers;
+    }
+
     public void UpdateAnswers(QuestionAnswer answer) {
         if (Answers == null) {
             Answers = new List<QuestionAnswer>();

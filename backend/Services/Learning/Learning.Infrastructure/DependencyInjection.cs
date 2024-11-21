@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.Extensions;
 using Learning.Application.Interfaces;
+using Learning.Application.Models.Quizs.EventHandler;
 using Learning.Infrastructure.Data.Interceptors;
 using Learning.Infrastructure.Data.Repositories.Chapters;
 using Learning.Infrastructure.Data.Repositories.Courses;
@@ -18,7 +19,6 @@ using Learning.Infrastructure.Extentions;
 using Learning.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
 
 namespace Learning.Infrastructure;
 public static class DependencyInjection {
@@ -34,7 +34,7 @@ public static class DependencyInjection {
 
             options.LogTo(Console.WriteLine, LogLevel.Information);
         });
-        services.AddMassTransitWithRabbitMQ(configuration, Assembly.GetExecutingAssembly());
+        services.AddMassTransitWithRabbitMQ(configuration, typeof(IApplicationDbContext).Assembly);
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
@@ -57,7 +57,7 @@ public static class DependencyInjection {
         //Configuration Service
         services.AddScoped<ISourceCombiner, SourceCombiner>();
 
-        services.AddScoped<IQuizSubmissionStateService, QuizSubmissionStateService>();
+        services.AddScoped<IManagementStateService, ManagementStateService>();
 
         //Configuration Repository
         ConfigureRepository(services, configuration);

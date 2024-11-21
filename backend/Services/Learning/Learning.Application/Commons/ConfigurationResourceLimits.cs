@@ -14,7 +14,7 @@ public static class ConfigurationResourceLimits {
 
     // Stack Limits (in KB)
     public const int MinStackLimit = 30 * 1024;
-    public const int MaxStackLimit = 500 * 1024;
+    public const int MaxStackLimit = 128 * 1024;
 
     // Thread Limits
     public const int MinThreads = 20;

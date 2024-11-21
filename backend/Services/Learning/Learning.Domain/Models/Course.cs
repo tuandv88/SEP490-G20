@@ -20,7 +20,7 @@ public class Course : Aggregate<CourseId> {
     public double Price {  get; set; } // giá bán của khóa học
     
     public static Course Create(CourseId courseId, string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, 
-        string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, string imageUrl, int orderIndex, CourseLevel courseLevel, double price) {
+        string prerequisites, string objectives, string targetAudiences, string imageUrl, int orderIndex, CourseLevel courseLevel, double price) {
         var course = new Course() {
             Id = courseId,
             Title = title, 
@@ -31,7 +31,6 @@ public class Course : Aggregate<CourseId> {
             Prerequisites = prerequisites,
             Objectives = objectives,
             TargetAudiences = targetAudiences,
-            ScheduledPublishDate = scheduledPublishDate,
             ImageUrl = imageUrl,
             OrderIndex = orderIndex,
             CourseLevel = courseLevel,
@@ -60,9 +59,15 @@ public class Course : Aggregate<CourseId> {
     }
 
     public void UpdateStatus(CourseStatus status) {
+        if(CourseStatus == CourseStatus.Scheduled && status != CourseStatus.Scheduled) {
+            //Hủy lập lịch nếu khóa đó đã được lập lịch
+            AddDomainEvent(new CourseCancelScheduleEvent(this));
+        }
         CourseStatus = status;
-        //THÊM Event ở đây để publish khóa học 
         AddDomainEvent(new CourseUpdatedStatusEvent(this));
+    }
+    public void UpdateSchedule(DateTime dateTime) {
+        ScheduledPublishDate = dateTime;
     }
     public void UpdateCourseLevel(CourseLevel courseLevel, int orderIndex) {
         CourseLevel = courseLevel;

@@ -1,6 +1,7 @@
 ﻿namespace Learning.Domain.ValueObjects;
 public record QuestionAnswer {
     public string Id { get; set; }
+    public string QuestionType {  get; set; }
     public string? Content { get; set; }
     public List<Choice>? Choices { get; set; }
     public List<string>? UserAnswers { get; set; } //là các ID ở trong choices
@@ -25,7 +26,6 @@ public record ProblemAnswer {
     public long MemoryUsage { get; set; }
     public List<TestResult>? TestResults { get; set; }
     public SubmissionStatus? Status { get; set; }
-    public List<Dictionary<string, string>> TestCases { get; set; }
 }
 
 public record CodeAnswer {

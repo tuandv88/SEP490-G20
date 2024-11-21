@@ -8,6 +8,9 @@ public static class MassTransitConfigurationExtensions {
             x.SetKebabCaseEndpointNameFormatter();
             if (assembly != null)
                 x.AddConsumers(assembly);
+            //Thêm hangfire
+            x.AddPublishMessageScheduler();
+            x.AddHangfireConsumers();
 
             x.AddEntityFrameworkOutbox<ApplicationDbContext>(o => {
                 //o.QueryDelay = TimeSpan.FromSeconds(5);
@@ -18,7 +21,11 @@ public static class MassTransitConfigurationExtensions {
                 o.DuplicateDetectionWindow = TimeSpan.FromSeconds(30);
                 o.DisableInboxCleanupService(); // không xóa những message gửi tới tránh duplicate dữ liệu
             });
+
+            
             x.UsingRabbitMq((context, configurator) => {
+                configurator.UsePublishMessageScheduler();
+
                 configurator.Host(new Uri(configuration["MessageBroker:Host"]!), host => {
                     host.Username(configuration["MessageBroker:UserName"]!);
                     host.Password(configuration["MessageBroker:Password"]!);

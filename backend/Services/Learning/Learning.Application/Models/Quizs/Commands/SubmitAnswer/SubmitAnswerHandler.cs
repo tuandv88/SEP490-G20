@@ -29,9 +29,9 @@ public class SubmitAnswerHandler(IQuizSubmissionRepository repository, IUserCont
         }
 
         // Tạo câu trả lời
-        QuestionAnswer answer = question.ProblemId == null
-            ? CreateAnswerWithoutProblem(question, request)
-            : CreateAnswerWithProblem(question, request);
+        QuestionAnswer answer = question.QuestionType == QuestionType.CodeSnippet
+            ? CreateAnswerWithProblem(question, request)
+            : CreateAnswerWithoutProblem(question, request);
 
         quizSubmission.UpdateAnswers(answer);
 
@@ -42,6 +42,14 @@ public class SubmitAnswerHandler(IQuizSubmissionRepository repository, IUserCont
     }
 
     private QuestionAnswer CreateAnswerWithoutProblem(Question question, SubmitAnswerCommand request) {
+
+        var questionType = question.QuestionType;
+        var userAnswers = request.Question.QuestionAnswerId?.Select(q => q.ToString()).ToList() ?? new List<string>();
+
+        if ((questionType == QuestionType.MultipleChoice || questionType == QuestionType.TrueFalse) && userAnswers.Count > 1) {
+            throw new InvalidOperationException("For MultipleChoice and TrueFalse questions, only one answer is allowed.");
+        }
+
         return new QuestionAnswer {
             Id = question.Id.Value.ToString(),
             Content = question.Content,
@@ -51,9 +59,10 @@ public class SubmitAnswerHandler(IQuizSubmissionRepository repository, IUserCont
                 IsCorrect = q.IsCorrect,
                 OrderIndex = q.OrderIndex
             }).ToList(),
-            UserAnswers = request.Question.QuestionAnswerId?.Select(q => q.ToString()).ToList() ?? new List<string>()
+            UserAnswers = userAnswers
         };
     }
+
 
     private QuestionAnswer CreateAnswerWithProblem(Question question, SubmitAnswerCommand request) {
         var problem = request.Question.Problem;

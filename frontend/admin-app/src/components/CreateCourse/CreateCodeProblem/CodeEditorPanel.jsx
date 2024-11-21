@@ -14,10 +14,11 @@ export default function CodeEditorPanel({
   setFileToManage,
   setIsRenameDialogOpen,
   setIsDeleteDialogOpen,
-  handleSolutionCodeChange
+  handleSolutionCodeChange,
+  handleAddFile
 }) {
   return (
-    <div className='flex flex-col w-full min-w-0'>
+    <div className='flex flex-col w-full h-full'>
       <div className='flex items-center px-4 py-2 border-b bg-background shrink-0'>
         <div className='flex items-center gap-2'>
           <Code className='w-5 h-5' />
@@ -35,10 +36,8 @@ export default function CodeEditorPanel({
               >
                 {file.name}
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant='ghost' size='icon' className='w-5 h-5 ml-1 hover:bg-muted-foreground/20'>
-                      <MoreVertical className='w-3 h-3' />
-                    </Button>
+                  <DropdownMenuTrigger asChild>                   
+                      <MoreVertical className='w-4 h-4 ml-2' />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align='end'>
                     <DropdownMenuItem

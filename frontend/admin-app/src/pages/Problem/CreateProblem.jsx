@@ -24,6 +24,8 @@ export default function CreateProblem() {
     }
   })
 
+  alert('CreateProblem')
+
   const handleStepChange = (direction) => {
     if (direction === 'next' && currentStep === 'basic-info') {
       form.trigger(['title', 'description'])
@@ -59,7 +61,9 @@ export default function CreateProblem() {
 
   return (
     <div className='flex flex-col min-h-screen bg-background text-foreground'>
-      <div className='p-1'>
+
+
+       <div className='p-1'>
         <Link to='/curriculum'>
           <Button variant='ghost'>
             <ArrowLeft className='w-2 h-2 mr-1' /> Back to Curriculum
@@ -71,7 +75,7 @@ export default function CreateProblem() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
             {currentStep === 'basic-info' && (
-              <BasicInfoStep form={form} variables={variables} setVariables={setVariables} />
+              <><BasicInfoStep form={form} variables={variables} setVariables={setVariables} /></>
             )}
             {currentStep === 'author-solution' && (
               <AuthorSolutionStep

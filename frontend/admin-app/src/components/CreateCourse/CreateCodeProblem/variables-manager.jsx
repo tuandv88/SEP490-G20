@@ -9,9 +9,9 @@ export default function VariablesManager({ variables, setVariables }) {
     setVariables([...variables, { name: '', value: '' }])
   }
 
-  const updateVariable = (index, field, value) => {
+  const updateVariable = (index, value) => {
     const newVariables = [...variables]
-    newVariables[index][field] = value
+    newVariables[index].name = value
     setVariables(newVariables)
   }
 
@@ -28,12 +28,7 @@ export default function VariablesManager({ variables, setVariables }) {
           <Input
             placeholder='Variable name'
             value={variable.name}
-            onChange={(e) => updateVariable(index, 'name', e.target.value)}
-          />
-          <Input
-            placeholder='Variable value'
-            value={variable.value}
-            onChange={(e) => updateVariable(index, 'value', e.target.value)}
+            onChange={(e) => updateVariable(index, e.target.value)}
           />
           <Button onClick={() => removeVariable(index)} variant='destructive' size='icon'>
             <Trash2 className='w-4 h-4' />

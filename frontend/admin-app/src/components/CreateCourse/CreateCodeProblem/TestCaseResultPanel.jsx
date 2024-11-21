@@ -12,7 +12,7 @@ export default function TestCaseResultPanel({
   testResult
 }) {
   return (
-    <div className='flex flex-col min-w-0 border-t bg-zinc-900 border-zinc-800'>
+    <div className='flex flex-col min-w-0 border-t bg-zinc-900 border-zinc-800 w-full'>
       <Tabs value={activeTab} onValueChange={setActiveTab} className='flex flex-col flex-1'>
         <div className='flex items-center px-2 py-1 border-b border-zinc-800'>
           <TabsList className='h-8 p-1 bg-zinc-800'>
@@ -32,7 +32,7 @@ export default function TestCaseResultPanel({
           </TabsList>
         </div>
 
-        <div className='flex-1 p-4 overflow-auto'>
+        <div className='flex-1 p-4 overflow-auto mb-10'>
           {activeTab === 'testcase' && (
             <div className='space-y-4'>
               <div className='flex gap-2'>

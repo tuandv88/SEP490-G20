@@ -1,12 +1,10 @@
-﻿using Learning.Application.Models.Submissions.Dtos.CodeExecution;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
-using Newtonsoft.Json;
+﻿using Learning.Application.Models.Submissions.Dtos;
 
 namespace Learning.Application.Extensions;
 public static class SubmissionExtensions {
     public static List<CodeExecuteDto> ToCodeExecuteDto(this List<SubmissionResponse> Submissions, string LanguageCode) {
         return Submissions.Select(s => new CodeExecuteDto(
+                Token: s.Token,
                 RunTimeErrors: s.Stderr,
                 CompileErrors: s.CompileOutput,
                 ExecutionTime: double.TryParse(s.Time, out var time) ? time : 0.0, 

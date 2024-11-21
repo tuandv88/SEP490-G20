@@ -11,6 +11,7 @@ using Learning.Infrastructure.Data.Repositories.ProblemSubmissions;
 using Learning.Infrastructure.Data.Repositories.QuestionOptions;
 using Learning.Infrastructure.Data.Repositories.Questions;
 using Learning.Infrastructure.Data.Repositories.Quizs;
+using Learning.Infrastructure.Data.Repositories.QuizSubmissions;
 using Learning.Infrastructure.Data.Repositories.TestCases;
 using Learning.Infrastructure.Data.Repositories.TestScripts;
 using Learning.Infrastructure.Extentions;
@@ -44,6 +45,9 @@ public static class DependencyInjection {
         //trong context đã tạo một ApplicationDbContext rồi, phải lấy ra chứ không add scoped mới 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
+        //Thêm hangfire vào 
+        services.AddHangfireWithPostgreSQL(configuration);
+
         //Caching
         services.AddConfigureCaching(configuration);
 
@@ -53,8 +57,11 @@ public static class DependencyInjection {
         //Configuration Service
         services.AddScoped<ISourceCombiner, SourceCombiner>();
 
+        services.AddScoped<IQuizSubmissionStateService, QuizSubmissionStateService>();
+
         //Configuration Repository
         ConfigureRepository(services, configuration);
+
         return services;
     }
     private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration) {
@@ -96,5 +103,8 @@ public static class DependencyInjection {
 
         //QuestionOptionRepository
         services.AddScoped<IQuestionOptionRepository, QuestionOptionRepository>();
+
+        //IQuizSubmissionRepositoru
+        services.AddScoped<IQuizSubmissionRepository, QuizSubmissionRepository>();
     }
 }

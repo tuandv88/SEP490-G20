@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+	  <PackageReference Include="Hangfire.AspNetCore" Version="1.8.15" />
 	  <PackageReference Include="Judge0.DotNet" Version="1.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
   </ItemGroup>
@@ -39,6 +40,7 @@
   <ItemGroup>
     <Folder Include="Models\Chapters\EventHandlers\" />
     <Folder Include="Models\Lectures\EventHandlers\" />
+    <Folder Include="Models\Quizs\EventHandler\" />
   </ItemGroup>
 
 </Project>

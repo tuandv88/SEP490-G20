@@ -1,9 +1,9 @@
 ﻿using Learning.Application.Models.Submissions.Commands.CreateBatchCodeExcute;
-using Learning.Application.Models.Submissions.Dtos.CodeExecution;
+using Learning.Application.Models.Submissions.Dtos;
 
 namespace Learning.API.Endpoints.Submissions;
 
-public record CreateBatchSubmissionRequest(BatchCodeExecuteDto BatchCodeExecuteDto);
+public record CreateBatchSubmissionRequest(BatchCodeExecuteDto BatchCodeExecuteDto, ResourceLimits ResourceLimits);
 public record CreateBatchSubmissionResponse(List<CodeExecuteDto> CodeExecuteDtos);
 
 public class CreateBatchSubmissionEndpoint : ICarterModule {

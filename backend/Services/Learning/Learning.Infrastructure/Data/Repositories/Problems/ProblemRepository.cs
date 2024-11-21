@@ -1,4 +1,5 @@
 ﻿
+
 namespace Learning.Infrastructure.Data.Repositories.Problems;
 public class ProblemRepository : Repository<Problem>, IProblemRepository {
     private IApplicationDbContext _dbContext;
@@ -13,12 +14,16 @@ public class ProblemRepository : Repository<Problem>, IProblemRepository {
         }
     }
 
+    public async Task<IQueryable<Problem>> GetAllAsQueryableAsync() {
+        var problems = _dbContext.Problems.AsQueryable();
+        return problems;
+    }
+
     public override async Task<Problem?> GetByIdAsync(Guid id) {
         var problem =await _dbContext.Problems
                         .FirstOrDefaultAsync(c => c.Id.Equals(ProblemId.Of(id)));
         return problem;
     }
-
     public async Task<Problem?> GetByIdDetailAsync(Guid id) {
         var problem = await _dbContext.Problems
                         .Include(p => p.TestScripts)

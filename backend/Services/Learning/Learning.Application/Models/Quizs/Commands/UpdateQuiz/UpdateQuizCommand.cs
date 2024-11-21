@@ -22,12 +22,15 @@ public class UpdateQuizCommandValidator : AbstractValidator<UpdateQuizCommand> {
             .WithMessage("QuizType must be one of the following: PRACTICE, ASSESSMENT, FINAL.");
 
         RuleFor(x => x.Quiz.PassingMark)
-            .NotNull().WithMessage("PassingMark is required.");
+        .NotNull().WithMessage("PassingMark is required.")
+        .GreaterThan(0).WithMessage("PassingMark must be a positive value.");
 
         RuleFor(x => x.Quiz.TimeLimit)
-            .NotNull().WithMessage("TimeLimit is required.");
+            .NotNull().WithMessage("TimeLimit is required.")
+            .GreaterThan(0).WithMessage("TimeLimit must be a positive value.");
 
         RuleFor(x => x.Quiz.AttemptLimit)
-            .NotNull().WithMessage("AttemptLimit is required.");
+            .NotNull().WithMessage("AttemptLimit is required.")
+            .GreaterThan(0).WithMessage("AttemptLimit must be a positive value.");
     }
 }

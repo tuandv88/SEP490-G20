@@ -1,8 +1,6 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
-using System.Security.Claims;
 
 namespace Learning.Application.Commons;
 public class AuthorizationBehaviour<TRequest, TResponse>(IHttpContextAccessor _httpContextAccessor, IIdentityService identityService)
@@ -21,7 +19,9 @@ public class AuthorizationBehaviour<TRequest, TResponse>(IHttpContextAccessor _h
             var authorizeAttributesWithPolicies = authorizeAttributes.Where(a => !string.IsNullOrWhiteSpace(a.Policy));
             if (authorizeAttributesWithPolicies.Any()) {
                 var policies = authorizeAttributesWithPolicies.Select(a => a.Policy!.Split(',')).SelectMany(policy => policy).ToArray();
-                identityService.AuthorizePolicyAsync(policies);
+                if (policies.Any() && !identityService.AuthorizePolicyAsync(policies)) {
+                    throw new UnauthorizedAccessException("User does not meet policy requirements.");
+                }
             }
         }
         return await next();

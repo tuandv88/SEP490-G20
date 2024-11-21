@@ -1,7 +1,7 @@
 ﻿using Learning.Application.Exceptions;
 using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.Submissions.Commands.CreateBatchCodeExcute;
-using Learning.Application.Models.Submissions.Dtos.CodeExecution;
+using Learning.Application.Models.Submissions.Dtos;
 using Learning.Application.Models.TestCases.Dtos;
 namespace Learning.Application.Models.Problems.Commands.CreateProblem;
 public class CreateProblemHandler(ILectureRepository lectureRepository, IProblemRepository problemRepository, ISender sender)
@@ -39,7 +39,16 @@ public class CreateProblemHandler(ILectureRepository lectureRepository, IProblem
                     TestCases: testCases,
                     SolutionCodes: testScript.Solutions.Select(x => x.SolutionCode).ToList(),
                     TestCode: testScript.TestCode
-                )
+                ),
+                new ResourceLimits(
+                    createProblemDto.CpuTimeLimit,
+                    createProblemDto.CpuExtraTime,
+                    createProblemDto.MemoryLimit,
+                    createProblemDto.EnableNetwork,
+                    createProblemDto.StackLimit,
+                    createProblemDto.MaxThread,
+                    createProblemDto.MaxFileSize
+                    )
             ));
 
             foreach (var codeExecuteDto in batchCodeExecuteResult.CodeExecuteDtos) {

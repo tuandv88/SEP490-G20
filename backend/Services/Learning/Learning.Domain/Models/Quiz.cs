@@ -1,6 +1,4 @@
-﻿using Learning.Domain.ValueObjects;
-
-namespace Learning.Domain.Models;
+﻿namespace Learning.Domain.Models;
 public class Quiz : Aggregate<QuizId> {
     public List<Question> Questions = new();
     public List<QuizSubmission> QuizSubmissions = new();
@@ -9,7 +7,7 @@ public class Quiz : Aggregate<QuizId> {
     public string Title { get; set; } = default!;
     public string Description { get; set; } = default!;
     public int PassingMark { get; set; } = default!;
-    public double TimeLimit { get; set; } = default!; // giới hạn thời gian làm bài
+    public double TimeLimit { get; set; } = default!; // giới hạn thời gian làm bài -- thời gian là phút
     public bool HasTimeLimit { get; set; } = false; // xác định xem có giới hạn thời gian làm bài không 
     public int AttemptLimit { get; set; } = 1;
     public bool HasAttemptLimit { get; set; } = false;
@@ -50,5 +48,10 @@ public class Quiz : Aggregate<QuizId> {
     public void RemoveQuestion(Question question) {
         Questions.Remove(question);
     }
+
+    public void ChangeActive() {
+        IsActive = IsActive ? false : true;
+    }
+
 }
 

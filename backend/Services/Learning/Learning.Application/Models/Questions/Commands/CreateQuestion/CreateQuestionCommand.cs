@@ -5,19 +5,15 @@ using Microsoft.AspNetCore.Authorization;
 namespace Learning.Application.Models.Questions.Commands.CreateQuestion;
 
 [Authorize($"{PoliciesType.Administrator}")]
-public record CreateQuestionCommand : ICommand<CreateQuestionResult>
-{
+public record CreateQuestionCommand : ICommand<CreateQuestionResult> {
     public required Guid QuizId;
     public required CreateQuestionDto CreateQuestionDto;
 }
 public record CreateQuestionResult(Guid Id);
 
-
-public class CreateQuestionCommandValidator : AbstractValidator<CreateQuestionCommand>
-{
+public class CreateQuestionCommandValidator : AbstractValidator<CreateQuestionCommand> {
     private readonly CreateProblemCommandValidator _problemValidator;
-    public CreateQuestionCommandValidator()
-    {
+    public CreateQuestionCommandValidator() {
         _problemValidator = new CreateProblemCommandValidator();
         RuleFor(x => x.CreateQuestionDto.Content)
             .NotEmpty().WithMessage("Content is required.");

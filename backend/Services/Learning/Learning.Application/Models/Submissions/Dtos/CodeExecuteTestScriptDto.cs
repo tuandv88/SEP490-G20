@@ -1,4 +1,4 @@
-﻿namespace Learning.Application.Models.Submissions.Dtos.CodeExecution;
+﻿namespace Learning.Application.Models.Submissions.Dtos;
 public record CodeExecuteTestScriptDto(
     string FileName,
     string TestCode,

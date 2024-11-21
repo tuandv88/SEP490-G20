@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Learning.API.Endpoints.Quizs;
 
 public record UpdateQuizRequest(UpdateQuizDto Quiz);
-public record UpdateQuizReponse(bool IsSuccess);
+public record UpdateQuizResponse(bool IsSuccess);
 public class UpdateQuizEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
 
@@ -14,12 +14,12 @@ public class UpdateQuizEndpoint : ICarterModule {
 
             var result = await sender.Send(command);
 
-            var response = result.Adapt<UpdateQuizReponse>();
+            var response = result.Adapt<UpdateQuizResponse>();
 
             return Results.Ok(response);
         })
         .WithName("UpdateQuiz")
-        .Produces<UpdateQuizReponse>(StatusCodes.Status200OK)
+        .Produces<UpdateQuizResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithSummary("Update Quiz");
     }

@@ -27,5 +27,9 @@ public class QuizRepository : Repository<Quiz>, IQuizRepository {
                         .FirstOrDefaultAsync(q => q.Id.Equals(QuizId.Of(Id)));
         return quiz;
     }
+
+    public async Task<IQueryable<Quiz>> GetAllQueryAbleAsync() {
+        return _dbContext.Quizs.AsQueryable();
+    }
 }
 

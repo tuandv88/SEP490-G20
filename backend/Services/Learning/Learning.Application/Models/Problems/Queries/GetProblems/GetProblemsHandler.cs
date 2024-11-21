@@ -10,7 +10,7 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IProblemSu
         var isAdmin = userRole == PoliciesType.Administrator;
 
         // lấy ra toàn bộ data của problem
-        var allDataProblem = await problemRepository.GetAllAsync();
+        var allDataProblem = await problemRepository.GetAllAsQueryableAsync();
 
         // Lọc dữ liệu: Chỉ admin mới thấy được các problem chưa active
         var filteredProblems = isAdmin
@@ -22,26 +22,16 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IProblemSu
         var pageSize = request.PaginationRequest.PageSize;
 
         var totalCount = filteredProblems.Count();
-        var problems = filteredProblems.OrderBy(c => c.CreatedAt)
+        var problems = filteredProblems
+                            .Include(pb => pb.ProblemSubmissions)
+                            .OrderBy(c => c.CreatedAt)
                             .Where(p => p.ProblemType == ProblemType.Challenge)
                             .Skip(pageSize * (pageIndex - 1))
                             .Take(pageSize)
                             .ToList();
-
-        var listProlemId = problems.Select(p => p.Id).ToArray();
-
-        //Lấy ra các problem solution của problem
-        var problemSubmissions = await problemSubmissionRepository.GetProblemSubmissionsByProblemAsync(listProlemId);
-
-        //map problemSolution vào Problem
-        problems.ForEach(p => {
-            var listSubmission = problemSubmissions.Where(pl => pl.ProblemId.Value.Equals(p.Id.Value)).ToList();
-            p.ProblemSubmissions = listSubmission;
-        });
 
         var problemListDtos = problems.Select(p => p.ToProblemListDto(userId)).ToList();
         return new GetProblemsResult(
              new PaginatedResult<ProblemListDto>(pageIndex, pageSize, totalCount, problemListDtos));
     }
 }
-

@@ -16,6 +16,11 @@ public class QuestionRepository : Repository<Question>, IQuestionRepository {
         }
     }
 
+    public async Task<Question?> GetByIdAndQuizId(QuizId quizId, QuestionId questionId) {
+        return await _dbContext.Questions.Include(q => q.QuestionOptions)
+            .FirstOrDefaultAsync(q => q.QuizId.Equals(quizId) && q.Id.Equals(questionId));
+    }
+
     public override async Task<Question?> GetByIdAsync(Guid id) {
         var question = await _dbContext.Questions
                         .FirstOrDefaultAsync(q => q.Id.Equals(QuestionId.Of(id)));

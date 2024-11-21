@@ -1,6 +1,6 @@
 ﻿using Learning.Application.Models.TestCases.Dtos;
 
-namespace Learning.Application.Models.Submissions.Dtos.CodeExecution;
+namespace Learning.Application.Models.Submissions.Dtos;
 public record BatchCodeExecuteDto(
     string LanguageCode,
     List<TestCaseDto> TestCases,

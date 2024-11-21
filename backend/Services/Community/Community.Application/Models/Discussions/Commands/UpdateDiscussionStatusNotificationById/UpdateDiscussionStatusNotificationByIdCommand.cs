@@ -1,0 +1,4 @@
+﻿namespace Community.Application.Models.Discussions.Commands.UpdateDiscussionStatusNotification;
+
+public record UpdateDiscussionStatusNotificationByIdResult(bool IsSuccess, bool NewStatus);
+public record UpdateDiscussionStatusNotificationByIdCommand(Guid Id) : ICommand<UpdateDiscussionStatusNotificationByIdResult>;

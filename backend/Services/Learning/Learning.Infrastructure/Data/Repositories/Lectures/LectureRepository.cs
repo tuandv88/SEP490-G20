@@ -29,7 +29,6 @@ public class LectureRepository : Repository<Lecture>, ILectureRepository {
     public async Task<Lecture?> GetLectureByIdDetail(Guid Id) {
         var lecture = await _dbContext.Lectures
                         .Include(l => l.Files)
-                        .AsNoTracking()
                         .FirstOrDefaultAsync(l => l.Id.Equals(LectureId.Of(Id)));
 
         return lecture;

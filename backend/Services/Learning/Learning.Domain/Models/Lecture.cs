@@ -1,7 +1,4 @@
-﻿
-using Learning.Domain.Events.Lectures;
-
-namespace Learning.Domain.Models;
+﻿namespace Learning.Domain.Models;
 public class Lecture : Aggregate<LectureId> {
     public ChapterId ChapterId { get; set; } = default!;
     public ProblemId? ProblemId { get; set; } = default!; // Unique
@@ -35,17 +32,10 @@ public class Lecture : Aggregate<LectureId> {
 
     public void AddFile(File file) {
         Files.Add(file);
-        AddDomainEvent(new FileAddedToLectureEvent(file));
     }
 
-    public void DeleteFile(FileId fileId) {
-        var file = Files.FirstOrDefault(f => f.Id == fileId);
-        if (file == null) {
-            throw new Exception("File not found");
-        }
-
+    public void DeleteFile(File file) {
         Files.Remove(file);
-        AddDomainEvent(new FileDeletedInLectureEvent(file));
     }
 
 }

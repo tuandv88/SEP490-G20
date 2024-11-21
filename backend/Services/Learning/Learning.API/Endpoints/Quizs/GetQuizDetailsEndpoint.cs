@@ -3,7 +3,7 @@ using Learning.Application.Models.Quizs.Queries.GetQuizDetails;
 
 namespace Learning.API.Endpoints.Quizs;
 
-public record GetQuizDetailsResponse(QuizDto QuizDto);
+public record GetQuizDetailsResponse(QuizDto QuizDto, AnswerDto Answer);
 public class GetQuizDetailsEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
 

@@ -32,14 +32,7 @@ public static class AuthenticationExtensions
             x.Events = options != null ? options.Events : x.Events;
         });
 
-        services.AddAuthorization(x =>
-        {
-            x.AddPolicy("Administrator", policy => policy.RequireRole("Administrator"));
-            x.AddPolicy("Author", policy => policy.RequireRole("Author"));
-            x.AddPolicy("Moderator", policy => policy.RequireRole("Moderator"));
-            x.AddPolicy("Learner", policy => policy.RequireRole("Learner"));
-            x.AddPolicy("Blogger", policy => policy.RequireRole("Blogger"));
-        });
+        services.AddAuthorization(x => {});
 
         return services;
     }

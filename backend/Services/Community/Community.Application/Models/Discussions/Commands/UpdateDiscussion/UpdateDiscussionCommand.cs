@@ -16,9 +16,6 @@ public class UpdateDiscussionCommandValidator : AbstractValidator<UpdateDiscussi
             .NotNull().WithMessage("Description must not be null.")
             .NotEmpty().WithMessage("Description must not be empty.");
 
-        RuleFor(x => x.UpdateDiscussionDto.UserId)
-            .NotEmpty().WithMessage("UserId must not be empty.");
-
         RuleFor(x => x.UpdateDiscussionDto.CategoryId)
             .NotEmpty().WithMessage("CategoryId must not be empty.");
 

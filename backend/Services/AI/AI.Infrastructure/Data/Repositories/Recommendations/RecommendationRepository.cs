@@ -16,9 +16,8 @@ public class RecommendationRepository : Repository<Recommendation>, IRecommendat
     }
 
     public async override Task<Recommendation?> GetByIdAsync(Guid id) {
-        var recommendation = _dbContext.Recommendations
-                       .AsEnumerable()
-                       .FirstOrDefault(c => c.Id.Value == id);
+        var recommendation =await _dbContext.Recommendations
+                       .FirstOrDefaultAsync(c => c.Id.Equals(RecommendationId.Of(id))) ;
         return recommendation;
     }
 }

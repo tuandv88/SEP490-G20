@@ -1,11 +1,12 @@
 ﻿using AI.Application.Data;
+using AI.Application.Models.Documents.EventHandlers.Integration;
 using AI.Infrastructure.Data;
 using AI.Infrastructure.Data.Interceptors;
 using AI.Infrastructure.Data.Repositories.Conversations;
 using AI.Infrastructure.Data.Repositories.Documents;
 using AI.Infrastructure.Data.Repositories.Messages;
 using AI.Infrastructure.Data.Repositories.Recommendations;
-using AI.Infrastructure.Extensions.Kafkas;
+using AI.Infrastructure.Extensions;
 using AI.Infrastructure.Extensions.Kernels;
 using AI.Infrastructure.Services;
 using BuidingBlocks.Storage;
@@ -14,26 +15,34 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Npgsql;
+using System.Reflection;
 
 namespace AI.Infrastructure;
 public static class DependencyInjection {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration) {
+        
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        //Configuration kernel
-        services.AddKernelConfiguration(configuration);
+        var dataSource = new NpgsqlDataSourceBuilder(connectionString)
+            .EnableDynamicJson()
+            .Build();
 
+        services.AddDbContext<ApplicationDbContext>((sp, options) => {
+            options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
+            options.UseNpgsql(dataSource).LogTo(Console.WriteLine, LogLevel.Information); ;
+        });
+        //Add Messagebroker
+        services.AddMassTransitWithRabbitMQ(configuration, typeof(CoursePublishedEventHandler).Assembly);
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
-        services.AddDbContext<ApplicationDbContext>((sp, options) => {
-            options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseNpgsql(connectionString).LogTo(Console.WriteLine, LogLevel.Information); ;
-        });
 
         services.AddHttpContextAccessor();
-        services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
+        //Configuration kernel
+        services.AddKernelConfiguration(configuration);
         //Caching
         services.AddConfigureCaching(configuration);
 
@@ -48,9 +57,6 @@ public static class DependencyInjection {
 
         //Add storage
         services.AddStorage(configuration);
-
-        //Add Messagebroker
-        services.AddMassTransitWithKafka(configuration);
         return services;
     }
     private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration) {

@@ -1,5 +1,4 @@
-﻿using AI.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace AI.Application.Data;
 public interface IApplicationDbContext {

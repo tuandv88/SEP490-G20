@@ -1,4 +1,5 @@
 ﻿using AI.Application.Data;
+using MassTransit;
 using System.Reflection;
 
 namespace AI.Infrastructure.Data;
@@ -25,6 +26,10 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext {
 
     protected override void OnModelCreating(ModelBuilder builder) {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
         base.OnModelCreating(builder);
+        builder.AddInboxStateEntity();
+        builder.AddOutboxMessageEntity();
+        builder.AddOutboxStateEntity();
     }
 }

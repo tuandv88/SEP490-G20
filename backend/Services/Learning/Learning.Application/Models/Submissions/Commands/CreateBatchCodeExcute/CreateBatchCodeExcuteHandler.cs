@@ -1,11 +1,12 @@
-﻿using Learning.Application.Models.Submissions.Dtos.CodeExecution;
+﻿using Learning.Application.Models.Submissions.Dtos;
 using Learning.Application.Models.TestCases.Dtos;
+using Newtonsoft.Json.Linq;
 
 
 namespace Learning.Application.Models.Submissions.Commands.CreateBatchCodeExcute;
 public class CreateBatchCodeExcuteHandler(ISubmissionService submissionService, ISourceCombiner sourceCombiner) : ICommandHandler<CreateBatchCodeExcuteCommand, CreateBatchCodeExcuteResult> {
     private const int DelayMilliseconds = 200;
-    private const int MaxAttempts = 30;
+    private const int MaxAttempts = 100;
     public async Task<CreateBatchCodeExcuteResult> Handle(CreateBatchCodeExcuteCommand request, CancellationToken cancellationToken) {
         // lấy ra tất cả test case gửi lên, mỗi param trong một test case là một hàng
         var allTestCaseInputs = string.Join("\n", request.BatchCodeExecuteDto.TestCases
@@ -13,14 +14,20 @@ public class CreateBatchCodeExcuteHandler(ISubmissionService submissionService, 
                                 .ToList());
 
         Enum.TryParse<LanguageCode>(request.BatchCodeExecuteDto.LanguageCode, out var LanguageCode);
-         
         //Tạo batch submission
         var submissionBatch = new SubmissionBatch() {
             Submissions = request.BatchCodeExecuteDto.SolutionCodes
                                     .Select(solutionCode => {
                                         var combieCode = sourceCombiner.MergeSourceCodesJava(request.BatchCodeExecuteDto.TestCode, solutionCode);
                                         return new Submission(combieCode, (int)LanguageCode) {
-                                            Stdin = allTestCaseInputs
+                                            Stdin = allTestCaseInputs,
+                                            CpuTimeLimit = request.ResourceLimits.CpuTimeLimit,
+                                            CpuExtraTime = request.ResourceLimits.CpuExtraTime,
+                                            MemoryLimit = request.ResourceLimits.MemoryLimit,
+                                            EnableNetwork = request.ResourceLimits.EnableNetwork,
+                                            StackLimit = request.ResourceLimits.StackLimit,
+                                            MaxProcessesAndOrThreads = request.ResourceLimits.MaxThread,
+                                            MaxFileSize = request.ResourceLimits.MaxFileSize
                                         };
                                     })
                                     .ToList()
@@ -41,7 +48,7 @@ public class CreateBatchCodeExcuteHandler(ISubmissionService submissionService, 
             submissionsDone = submissions.Submissions.Where(x => tokens.Contains(x.Token) && x.Status!.Id >= 3).ToList();
             if (submissionsDone.Count == tokens.Count()) {
                 break;
-            } 
+            }
 
             attempts++;
             await Task.Delay(DelayMilliseconds, cancellationToken);
@@ -63,6 +70,7 @@ public class CreateBatchCodeExcuteHandler(ISubmissionService submissionService, 
         bool CheckIfOutputMatchesExpected(string? output, string? expected) => output == expected;
 
         var addData = lsCodeExecuteDtos.Select(x => new CodeExecuteDto(
+            Token: x.Token,
             RunTimeErrors: x.RunTimeErrors,
             CompileErrors: x.CompileErrors,
             ExecutionTime: x.ExecutionTime,
@@ -80,6 +88,7 @@ public class CreateBatchCodeExcuteHandler(ISubmissionService submissionService, 
 
         return addData;
     }
+
 
 }
 

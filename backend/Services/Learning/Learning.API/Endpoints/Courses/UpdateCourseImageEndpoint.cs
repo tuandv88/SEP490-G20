@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace Learning.API.Endpoints.Courses;
 public record UpdateCourseImageRequest(ImageDto ImageDto);
 public record UpdateCourseImageRepsonse(string PresignedUrl);
-public class UpdateCourseImageEndpoint : ICarterModule {
-    public void AddRoutes(IEndpointRouteBuilder app) {
+public class UpdateCourseImageEndpoint : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
+    {
 
-        app.MapPut("/courses/{CourseId}/image", async ([FromRoute] Guid CourseId, UpdateCourseImageRequest request, ISender sender) => {
+        app.MapPut("/courses/{CourseId}/image", async ([FromRoute] Guid CourseId, UpdateCourseImageRequest request, ISender sender) =>
+        {
 
             var result = await sender.Send(new UpdateCourseImageCommand(CourseId, request.ImageDto));
 

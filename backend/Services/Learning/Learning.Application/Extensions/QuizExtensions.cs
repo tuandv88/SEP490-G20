@@ -18,5 +18,22 @@ public static class QuizExtensions {
         Questions: questions.ToListQuestionDto());
 
     }
+    public static QuizFullDto ToFullQuizDto(this Quiz quiz) {
+        return new QuizFullDto(
+        Id: quiz.Id.Value,
+        IsActive: quiz.IsActive,
+        IsRandomized: quiz.IsRandomized,
+        Title: quiz.Title,
+        Description: quiz.Description,
+        PassingMark: quiz.PassingMark,
+        TimeLimit: quiz.TimeLimit,
+        HasTimeLimit: quiz.HasTimeLimit,
+        AttemptLimit: quiz.AttemptLimit,
+        HasAttemptLimit: quiz.HasAttemptLimit,
+        QuizType: quiz.QuizType.ToString(),
+        Questions: quiz.Questions.ToListFullQuestionDto());
+
+    }
+
 }
 

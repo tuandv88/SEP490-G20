@@ -9,7 +9,6 @@ public class CreateDiscussionCommandValidator : AbstractValidator<CreateDiscussi
 {
     public CreateDiscussionCommandValidator()
     {
-        RuleFor(x => x.CreateDiscussionDto.UserId).NotEmpty().WithMessage("UserId must not be empty.");
         RuleFor(x => x.CreateDiscussionDto.CategoryId).NotEmpty().WithMessage("CategoryId must not be empty.");
         RuleFor(x => x.CreateDiscussionDto.Title).NotEmpty().WithMessage("Title must not be empty.");
         RuleFor(x => x.CreateDiscussionDto.Description).NotEmpty().WithMessage("Description must not be empty.");

@@ -1,8 +1,8 @@
 ﻿using Learning.Application.Models.Quizs.Dtos;
 
 namespace Learning.Application.Models.Quizs.Commands.CreateQuiz;
-public class CreateQuizHandler(IQuizRepository quizRepository, ILectureRepository lectureRepository) : ICommandHandler<CreateQuizComand, CreateQuizResult> {
-    public async Task<CreateQuizResult> Handle(CreateQuizComand request, CancellationToken cancellationToken) {
+public class CreateQuizHandler(IQuizRepository quizRepository, ILectureRepository lectureRepository) : ICommandHandler<CreateQuizCommand, CreateQuizResult> {
+    public async Task<CreateQuizResult> Handle(CreateQuizCommand request, CancellationToken cancellationToken) {
         Lecture? lecture = null;
         if (request.LectureId.HasValue) {
             lecture = await lectureRepository.GetByIdAsync(request.LectureId.Value);

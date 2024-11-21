@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq;
 
 namespace Learning.Infrastructure.Data.Repositories.ProblemSubmissions;
 public class ProblemSubmissionRepository : Repository<ProblemSubmission>, IProblemSubmissionRepository {
@@ -19,13 +19,6 @@ public class ProblemSubmissionRepository : Repository<ProblemSubmission>, IProbl
         var problemSubmission = await  _dbContext.ProblemSubmissions
                                     .FirstOrDefaultAsync(p => p.Id.Equals(ProblemSolutionId.Of(id)));
         return problemSubmission;
-    }
-
-    public async Task<List<ProblemSubmission>> GetProblemSubmissionsByProblemAsync(params ProblemId[] problems) {
-        var problemSubmissions = await _dbContext.ProblemSubmissions
-                                .Where(ps => problems.Contains(ps.ProblemId))
-                                .ToListAsync();
-        return problemSubmissions;
     }
 }
 

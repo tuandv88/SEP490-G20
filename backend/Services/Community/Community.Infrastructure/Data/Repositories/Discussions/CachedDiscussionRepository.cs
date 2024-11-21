@@ -38,7 +38,7 @@ public class CachedDiscussionRepository : IDiscussionRepository
         // Xóa cached
         DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS);
         DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS);
-        DeleteCached(string.Format(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS, entity.Id.Value));
+        DeleteCached(string.Format(CacheKey.COMMUNITY_DISCUSSION_DETAILS, entity.Id.Value));
     }
 
     public async Task DeleteAsync(Discussion entity)
@@ -47,7 +47,7 @@ public class CachedDiscussionRepository : IDiscussionRepository
         // Xóa cached
         DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS);
         DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS);
-        DeleteCached(string.Format(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS, entity.Id.Value));
+        DeleteCached(string.Format(CacheKey.COMMUNITY_DISCUSSION_DETAILS, entity.Id.Value));
     }
 
     public async Task DeleteByIdAsync(Guid id)
@@ -56,7 +56,7 @@ public class CachedDiscussionRepository : IDiscussionRepository
         // Xóa cached
         DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS);
         DeleteCached(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS);
-        DeleteCached(string.Format(CacheKey.COMMUNITY_DISCUSSIONS_DETAILS, id));
+        DeleteCached(string.Format(CacheKey.COMMUNITY_DISCUSSION_DETAILS, id));
     }
 
     public async Task<List<Discussion>> GetAllAsync()

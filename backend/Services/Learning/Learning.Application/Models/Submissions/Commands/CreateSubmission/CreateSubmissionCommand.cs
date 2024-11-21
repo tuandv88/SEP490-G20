@@ -1,16 +1,20 @@
 ﻿using Learning.Application.Models.Submissions.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Submissions.Commands.CreateSubmission;
 
-public record CreateSubmissionCommand(SubmissionDto SubmissionDto) : ICommand<CreateSubmissionResult>;
-public record CreateSubmissionResult(SubmissionResponse SubmissionResponse);
-public class CreateSubmissionCommandValidator : AbstractValidator<CreateSubmissionCommand>
-{
-    public CreateSubmissionCommandValidator()
-    {
-        //Validate
-        RuleFor(s => s.SubmissionDto.ProblemId).NotEmpty().WithMessage("ProblemId is required");
-        RuleFor(s => s.SubmissionDto.LanguageId).NotEmpty().WithMessage("LanguageId is required");
-        RuleFor(s => s.SubmissionDto.SourceCode).NotEmpty().WithMessage("SourceCode is required");
+[Authorize]
+public record CreateSubmissionCommand(Guid ProblemId, SubmissionCodeDto Submission) : ICommand<CreateSubmissionResult>;
+public record CreateSubmissionResult(Guid SubmissionId, SubmissionResponseDto SubmissionResponse);
+public class CreateSubmissionCommandValidator : AbstractValidator<CreateSubmissionCommand> {
+    public CreateSubmissionCommandValidator() {
+        RuleFor(command => command.Submission.LanguageCode)
+            .NotEmpty()
+            .WithMessage("LanguageCode is required.")
+            .Must(BeAValidLanguageCode)
+            .WithMessage("LanguageCode must be a valid programming language.");
+    }
+    private bool BeAValidLanguageCode(string languageCode) {
+        return Enum.TryParse(languageCode, true, out LanguageCode parsedLanguageCode) && Enum.IsDefined(typeof(LanguageCode), parsedLanguageCode);
     }
 }

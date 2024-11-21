@@ -10,9 +10,6 @@ public class CreateVoteCommandValidator : AbstractValidator<CreateVoteCommand>
 {
     public CreateVoteCommandValidator()
     {
-        RuleFor(x => x.CreateVoteDto.UserId)
-            .NotEmpty().WithMessage("UserId must not be empty.");
-
         RuleFor(x => x.CreateVoteDto.VoteType)
             .NotNull().WithMessage("VoteType must not be null.")
             .NotEmpty().WithMessage("VoteType must not be empty.")

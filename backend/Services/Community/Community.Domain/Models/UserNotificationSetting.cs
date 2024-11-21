@@ -2,7 +2,7 @@
 {
     public class UserNotificationSetting : Aggregate<UserNotificationSettingId>
     {
-        public UserId UserId { get; set; } = default!;                       // ID của người dùng
+        public UserId UserId { get; set; } = default!;                         // ID của người dùng
         public NotificationTypeId NotificationTypeId { get; set; } = default!; // ID loại thông báo áp dụng cài đặt này
         public bool IsNotificationEnabled { get; set; }                      // Kích hoạt thông báo hay không
         public bool IsEmailEnabled { get; set; }                             // Kích hoạt email hay không
@@ -10,10 +10,11 @@
         public NotificationFrequency NotificationFrequency { get; set; } = NotificationFrequency.Daily; // Tần suất nhận thông báo
 
         // Phương thức khởi tạo một UserNotificationSetting
-        public static UserNotificationSetting Create(UserId userId, NotificationTypeId notificationTypeId, bool isNotificationEnabled, bool isEmailEnabled, bool isWebsiteEnabled, NotificationFrequency notificationFrequency)
+        public static UserNotificationSetting Create(UserNotificationSettingId userNotificationSettingId, UserId userId, NotificationTypeId notificationTypeId, bool isNotificationEnabled, bool isEmailEnabled, bool isWebsiteEnabled, NotificationFrequency notificationFrequency)
         {
             return new UserNotificationSetting
             {
+                Id = userNotificationSettingId,
                 UserId = userId,
                 NotificationTypeId = notificationTypeId,
                 IsNotificationEnabled = isNotificationEnabled,
@@ -24,8 +25,9 @@
         }
 
         // Phương thức cập nhật cài đặt thông báo
-        public void UpdateSettings(bool isNotificationEnabled, bool isEmailEnabled, bool isWebsiteEnabled, NotificationFrequency notificationFrequency)
+        public void UpdateSettings(NotificationTypeId notificationTypeId, bool isNotificationEnabled, bool isEmailEnabled, bool isWebsiteEnabled, NotificationFrequency notificationFrequency)
         {
+            NotificationTypeId = notificationTypeId;
             IsNotificationEnabled = isNotificationEnabled;
             IsEmailEnabled = isEmailEnabled;
             IsWebsiteEnabled = isWebsiteEnabled;

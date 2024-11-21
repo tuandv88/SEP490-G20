@@ -2,7 +2,6 @@
 
 public record UpdateDiscussionDto(
     Guid Id,
-    Guid UserId,
     Guid CategoryId,
     string Title,
     string Description,
@@ -10,5 +9,6 @@ public record UpdateDiscussionDto(
     List<string> Tags,
     bool Closed,
     bool Pinned,
-    long ViewCount
+    long ViewCount,
+    bool EnableNotification
 );

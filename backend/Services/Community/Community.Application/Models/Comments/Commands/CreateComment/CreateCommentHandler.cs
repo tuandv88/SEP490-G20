@@ -1,5 +1,4 @@
 ﻿using Community.Application.Models.Comments.Dtos;
-using Community.Domain.Models;
 using Community.Domain.ValueObjects;
 
 namespace Community.Application.Models.Comments.Commands.CreateComment;
@@ -32,7 +31,26 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Create
 
     private async Task<Comment> CreateNewComment(CreateCommentDto createCommentDto)
     {
-        var userId = UserId.Of(createCommentDto.UserId);
+        // Dữ liệu test UserId
+        var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
+
+        if (!Guid.TryParse(userContextTest, out var currentUserIdTest))
+        {
+            throw new UnauthorizedAccessException("Invalid user ID.");
+        }
+
+        var userId = UserId.Of(currentUserIdTest);
+
+        // Lấy UserId từ UserContextService
+        //var currentUserId = _userContextService.User.Id;
+
+        //if (currentUserId == null)
+        //{
+        //    throw new UnauthorizedAccessException("User is not authenticated.");
+        //}
+
+        //var userId = UserId.Of(currentUserId.Value);
+
         var discussionId = DiscussionId.Of(createCommentDto.DiscussionId);
         var parentCommentId = createCommentDto.ParentCommentId.HasValue ? CommentId.Of(createCommentDto.ParentCommentId.Value) : null;
 

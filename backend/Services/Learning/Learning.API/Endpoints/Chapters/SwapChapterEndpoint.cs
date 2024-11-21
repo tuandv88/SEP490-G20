@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace Learning.API.Endpoints.Chapters;
 
 public record SwapChapterResponse(int OrderIndexChapter1, int OrderIndexChapter2);
-public class SwapChapterEndpoint : ICarterModule {
-    public void AddRoutes(IEndpointRouteBuilder app) {
+public class SwapChapterEndpoint : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
+    {
 
-        app.MapPut("/chapters/swap/{ChapterId1}/{ChapterId2}", async ([FromRoute] Guid ChapterId1, [FromRoute] Guid ChapterId2, ISender sender) => {
+        app.MapPut("/chapters/swap/{ChapterId1}/{ChapterId2}", async ([FromRoute] Guid ChapterId1, [FromRoute] Guid ChapterId2, ISender sender) =>
+        {
             var result = await sender.Send(new SwapChapterCommand(ChapterId1, ChapterId2));
 
             var response = result.Adapt<SwapChapterResponse>();

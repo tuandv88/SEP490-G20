@@ -8,14 +8,11 @@ public class GetMessageHandler(IMessageRepository messageRepository, IConversati
     IUserContextService userContext, IDocumentService documentService
     ) : IQueryHandler<GetMessagesQuery, GetMessagesResult> {
     public async Task<GetMessagesResult> Handle(GetMessagesQuery query, CancellationToken cancellationToken) {
-        var userId = Guid.Parse("89980ac8-3d50-49af-9a65-9cdcda802e11"); //userContext.User.Id;
+        var userId = userContext.User.Id;
 
-        if (userId == null) {
-            throw new UnauthorizedAccessException();
-        }
         var exist = await conversationRepository.IsConversationOwnedByUserAsync(userId, query.ConversationId);
         if(exist==false) {
-            throw new NotFoundException("Conversation", query.ConversationId);
+            throw new NotFoundException(nameof(Conversation), query.ConversationId);
         }
         var allData = await messageRepository.GetMessageByConversationIdsync(query.ConversationId);
 

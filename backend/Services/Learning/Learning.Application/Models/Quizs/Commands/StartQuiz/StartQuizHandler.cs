@@ -26,7 +26,7 @@ public class StartQuizHandler(IQuizSubmissionRepository quizSubmissionRepository
         //Kiểm tra xem đã có bài nào chưa nộp hay không chưa ?
         var previousSubmission = await quizSubmissionRepository.GetSubmissionInProgressAsync(request.QuizId, userId);
         if (previousSubmission != null && previousSubmission.Status == QuizSubmissionStatus.InProgress) {
-            throw new InvalidOperationException("You already have an active submission for this quiz.");
+            return new StartQuizResult(previousSubmission.Id.Value);
         }
         
 

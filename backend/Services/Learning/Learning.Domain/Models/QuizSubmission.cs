@@ -8,6 +8,7 @@ public class QuizSubmission : Aggregate<QuizSubmissionId> {
     public long TotalScore { get; set; }
     public int TotalQuestions { get; set; }
     public int CorrectAnswers { get; set; }
+    public int PassingMark { get; set; }
     public long Duration => (long)(SubmissionDate - StartTime).TotalSeconds;
     public List<QuestionAnswer>? Answers { get; set; } = default!;
     public QuizSubmissionStatus Status = QuizSubmissionStatus.InProgress;
@@ -15,11 +16,12 @@ public class QuizSubmission : Aggregate<QuizSubmissionId> {
     public void UpdateStatus(QuizSubmissionStatus status) {
         Status = status;
     }
-    public void UpdateSubmitResult(long score,long totalScore, int totalQuestions, int correctAnswers, List<QuestionAnswer>? answers) {
+    public void UpdateSubmitResult(long score,long totalScore, int totalQuestions, int correctAnswers,int passingMark, List<QuestionAnswer>? answers) {
         Score = score;
         TotalScore = totalScore;
         TotalQuestions = totalQuestions;
         CorrectAnswers = correctAnswers;
+        PassingMark = passingMark;
         Answers = answers;
     }
 

@@ -31,7 +31,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
         return;
     }
     private void UpdateSubmissionWithoutAnswers(QuizSubmission quizSubmission, Quiz quiz) {
-        quizSubmission.UpdateSubmitResult(0, quiz.Questions.Sum(q => q.Mark), quiz.Questions.Count, quiz.Questions.Count, null);
+        quizSubmission.UpdateSubmitResult(0, quiz.Questions.Sum(q => q.Mark), quiz.Questions.Count, quiz.PassingMark, quiz.Questions.Count, null);
         
     }
 
@@ -76,7 +76,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
             }
         }
 
-        quizSubmission.UpdateSubmitResult(score, totalScore, totalQuestions, correctAnswers, answers);
+        quizSubmission.UpdateSubmitResult(score, totalScore, totalQuestions, correctAnswers,quiz.PassingMark, answers);
     }
 
 

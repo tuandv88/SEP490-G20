@@ -4,5 +4,5 @@ using Microsoft.AspNetCore.Authorization;
 namespace Learning.Application.Models.Quizs.Queries.GetQuizDetails;
 [Authorize]
 public record GetQuizDetailQuery(Guid Id) : IQuery<GetQuizDetailResult>;
-public record GetQuizDetailResult(QuizDto QuizDto, AnswerDto Answer);
+public record GetQuizDetailResult(QuizDetailDto Quiz, QuizAnswerDto Answer);
 

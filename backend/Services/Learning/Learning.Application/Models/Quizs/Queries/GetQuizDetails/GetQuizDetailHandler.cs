@@ -1,4 +1,5 @@
-﻿using Learning.Application.Models.Quizs.Dtos;
+﻿using Learning.Application.Extensions;
+using Learning.Application.Models.Quizs.Dtos;
 using Learning.Application.Models.Quizs.Dtos.SubmissionDto;
 using Learning.Application.Models.Submissions.Dtos;
 
@@ -31,9 +32,9 @@ public class GetQuizDetailHandler(IQuizRepository repository, IQuizSubmissionRep
         var isAdmin = userRole == PoliciesType.Administrator;
 
         if (!isAdmin && !quiz.IsActive) {
-            throw new NotFoundException(nameof(Problem), request.Id);
+            throw new NotFoundException(nameof(Quiz), request.Id);
         }
-        return new GetQuizDetailResult(quiz.ToQuizDto(), new AnswerDto(activeSubmission.Id.Value, activeSubmission.StartTime, questionAnswers));
+        return new GetQuizDetailResult(quiz.ToQuizDetailDto(), new QuizAnswerDto(activeSubmission.Id.Value, activeSubmission.StartTime, questionAnswers));
     }
 }
 

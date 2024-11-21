@@ -16,6 +16,7 @@ public class QuizSubmissionConfiguration : IEntityTypeConfiguration<QuizSubmissi
         builder.Property(ps => ps.Score);
         builder.Property(ps => ps.TotalQuestions);
         builder.Property(ps => ps.CorrectAnswers);
+        builder.Property(ps => ps.PassingMark);
         builder.Property(ps => ps.TotalScore);
         builder.Ignore(ps => ps.Duration);
 

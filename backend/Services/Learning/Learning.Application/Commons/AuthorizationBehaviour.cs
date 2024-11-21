@@ -6,7 +6,10 @@ namespace Learning.Application.Commons;
 public class AuthorizationBehaviour<TRequest, TResponse>(IHttpContextAccessor _httpContextAccessor, IIdentityService identityService)
  : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken) {
-
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null) {
+            return await next();
+        }
 
         var authorizeAttributes = request.GetType().GetCustomAttributes<AuthorizeAttribute>();
 

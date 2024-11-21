@@ -14,16 +14,10 @@ public class QuizSubmission : Aggregate<QuizSubmissionId> {
 
     public void UpdateStatus(QuizSubmissionStatus status) {
         Status = status;
-        switch (status) {
-            case QuizSubmissionStatus.Processing:
-                // tạo event xử lí submission này (đây là trang thái đã nộp và chờ xử lí ra kết quả)
-                //AddDomainEvent(new QuizSubmissionProcessingEvent(Id.Value));
-                break;
-        }
     }
     public void UpdateSubmitResult(long score,long totalScore, int totalQuestions, int correctAnswers, List<QuestionAnswer>? answers) {
         Score = score;
-        TotalScore = TotalScore;
+        TotalScore = totalScore;
         TotalQuestions = totalQuestions;
         CorrectAnswers = correctAnswers;
         Answers = answers;

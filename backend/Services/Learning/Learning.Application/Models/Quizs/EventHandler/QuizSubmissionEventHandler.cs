@@ -16,23 +16,26 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
             logger.LogWarning($"Submission is not found submissionId : {context.Message.SubmissionId}");
             return;
         }
-        var quiz = await quizRepository.GetByIdDetailAsync(quizSubmission.QuizId.Value);
+        if (quizSubmission.Status == QuizSubmissionStatus.Processing) {
+            var quiz = await quizRepository.GetByIdDetailAsync(quizSubmission.QuizId.Value);
 
-        if (quizSubmission.Answers == null) {
-            UpdateSubmissionWithoutAnswers(quizSubmission, quiz!);
-        } else {
-            UpdateSubmissionWithAnswers(quizSubmission, quiz!);
+            if (quizSubmission.Answers == null) {
+                UpdateSubmissionWithoutAnswers(quizSubmission, quiz!);
+            } else {
+                await UpdateSubmissionWithAnswers(quizSubmission, quiz!);
+            }
+            quizSubmission.UpdateStatus(QuizSubmissionStatus.Success);
+            await quizSubmissionRepository.UpdateAsync(quizSubmission);
+            await quizSubmissionRepository.SaveChangesAsync();
         }
-
-        await quizSubmissionRepository.UpdateAsync(quizSubmission);
-        await quizSubmissionRepository.SaveChangesAsync();
+        return;
     }
     private void UpdateSubmissionWithoutAnswers(QuizSubmission quizSubmission, Quiz quiz) {
         quizSubmission.UpdateSubmitResult(0, quiz.Questions.Sum(q => q.Mark), quiz.Questions.Count, quiz.Questions.Count, null);
-        quizSubmission.UpdateStatus(QuizSubmissionStatus.Success);
+        
     }
 
-    private void UpdateSubmissionWithAnswers(QuizSubmission quizSubmission, Quiz quiz) {
+    private async Task UpdateSubmissionWithAnswers(QuizSubmission quizSubmission, Quiz quiz) {
         long score = 0;
         int totalQuestions;
         int correctAnswers = 0;
@@ -44,7 +47,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
         totalQuestions = questions.Count;
         totalScore = questions.Sum(q => q.Value.Mark);
 
-        quizSubmission.Answers!.ForEach(async q => {
+        foreach (var q in quizSubmission.Answers!) {
             if (q.QuestionType == QuestionType.CodeSnippet.ToString()) {
                 if (questions.TryGetValue(q.Id, out var question)) {
                     var codeExecute = await CreateCodeExecute(
@@ -54,7 +57,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
                     );
                     if (IsCorrect(codeExecute)) {
                         correctAnswers++;
-                        score = score + question.Mark;
+                        score += question.Mark;
                     }
                     answers.Add(CreateAnswerProblem(q, codeExecute));
                 }
@@ -65,16 +68,17 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
                         bool allAnswersCorrect = q.UserAnswers.All(userAnswer => correctChoices.Contains(userAnswer));
                         if (allAnswersCorrect && q.UserAnswers.Count == correctChoices.Count) {
                             correctAnswers++;
-                            score = score + question.Mark;
+                            score += question.Mark;
                         }
                     }
                     answers.Add(q);
                 }
             }
-        });
+        }
 
         quizSubmission.UpdateSubmitResult(score, totalScore, totalQuestions, correctAnswers, answers);
     }
+
 
     private async Task<CodeExecuteDto> CreateCodeExecute(Guid problemId, string solutionCode, string languageCode) {
         var problem = await problemRepository.GetByIdDetailAsync(problemId);

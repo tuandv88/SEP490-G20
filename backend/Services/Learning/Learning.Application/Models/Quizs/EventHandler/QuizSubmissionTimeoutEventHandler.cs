@@ -10,13 +10,15 @@ public class QuizSubmissionTimeoutEventHandler(IQuizSubmissionRepository quizSub
         if (quizSubmission == null) {
             throw new NotFoundException(nameof(QuizSubmission), quizSubmissionId);
         }
+        if (quizSubmission.Status == QuizSubmissionStatus.InProgress) {
+            quizSubmission.UpdateStatus(QuizSubmissionStatus.Processing);
+            await quizSubmissionRepository.UpdateAsync(quizSubmission);
 
-        quizSubmission.UpdateStatus(QuizSubmissionStatus.Processing);
-        await quizSubmissionRepository.UpdateAsync(quizSubmission);
+            await publishEndpoint.Publish(new QuizSubmissionEvent(quizSubmissionId));
 
-        await publishEndpoint.Publish(new QuizSubmissionEvent(quizSubmissionId));
-
-        await quizSubmissionRepository.SaveChangesAsync();
+            await quizSubmissionRepository.SaveChangesAsync();
+        }
+        return;
     }
 }
 

@@ -18,18 +18,6 @@ public class CreateCourseHandler(ICourseRepository repository, IFilesService fil
             ? level
             : throw new ArgumentOutOfRangeException(nameof(createCourseDto.CourseLevel), $"Value '{createCourseDto.CourseLevel}' is not valid for CourseLevel.");
 
-        DateTime? scheduledPublishDate = null;
-        if (!string.IsNullOrWhiteSpace(createCourseDto.ScheduledPublishDate))
-        {
-            if (DateTime.TryParse(createCourseDto.ScheduledPublishDate, out var publishDate))
-            {
-                scheduledPublishDate = publishDate.ToUniversalTime();
-            }
-            else
-            {
-                throw new FormatException($"ScheduledPublishDate '{createCourseDto.ScheduledPublishDate}' is not in a valid DateTime format.");
-            }
-        }
         var bucket = StorageConstants.BUCKET;
         var prefix = StorageConstants.IMAGE_PATH;
         var originFileName = createCourseDto.Image.FileName;
@@ -49,7 +37,6 @@ public class CreateCourseHandler(ICourseRepository repository, IFilesService fil
             prerequisites: createCourseDto.Prerequisites,
             objectives: createCourseDto.Objectives,
             targetAudiences: createCourseDto.TargetAudiences,
-            scheduledPublishDate: scheduledPublishDate,
             imageUrl: fileUrl,
             orderIndex: (await repository.CountByLevelAsync(courseLevel)) + 1,
             courseLevel: courseLevel,

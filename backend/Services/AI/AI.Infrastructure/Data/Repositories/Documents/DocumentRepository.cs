@@ -15,11 +15,12 @@ public class DocumentRepository : Repository<Document>, IDocumentRepository {
     }
 
     public async Task DeleteDocumentsByTagAsync(string tagName, string tagValue) {
-        var documents = await _dbContext.Documents
-                            .Where(d => d.Tags.ContainsKey(tagName) && (string)d.Tags[tagName] == tagValue)
-                            .ToListAsync();
+        var documents = await _dbContext.Documents.ToListAsync();
         if (documents.Any()) {
-            _dbContext.Documents.RemoveRange(documents);
+            _dbContext.Documents.RemoveRange(
+                documents.Where(d => d.Tags.ContainsKey(tagName) && 
+                (string)d.Tags[tagName] == tagValue).ToList()
+                );
         }
     }
 
@@ -30,11 +31,11 @@ public class DocumentRepository : Repository<Document>, IDocumentRepository {
     }
 
     public async Task<List<Guid>> GetDocumentIdsByTagAsync(string tagName, string tagValue) {
-        var documents = await _dbContext.Documents
-            .Where(d => d.Tags.ContainsKey(tagName) && d.Tags[tagName] == tagValue)
+        var documents = await _dbContext.Documents.ToListAsync();
+        return documents
+            .Where(d => d.Tags.ContainsKey(tagName) && d.Tags[tagName].ToString() == tagValue)
             .Select(d => d.Id.Value)
-            .ToListAsync();
-        return documents;
+            .ToList();
     }
 
 

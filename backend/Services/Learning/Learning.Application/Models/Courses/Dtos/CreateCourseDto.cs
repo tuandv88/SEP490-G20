@@ -7,7 +7,6 @@ public record CreateCourseDto(
     string Prerequisites,
     string Objectives,
     string TargetAudiences,
-    string ScheduledPublishDate,
     ImageDto Image,
     string CourseLevel,
     double Price

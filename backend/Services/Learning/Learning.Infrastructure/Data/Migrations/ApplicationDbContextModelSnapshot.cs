@@ -166,8 +166,7 @@ namespace Learning.Infrastructure.Data.Migrations
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
@@ -180,8 +179,7 @@ namespace Learning.Infrastructure.Data.Migrations
 
                     b.Property<string>("Format")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -544,7 +542,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 21, 1, 50, 45, 172, DateTimeKind.Utc).AddTicks(4331));
+                        .HasDefaultValue(new DateTime(2024, 11, 21, 18, 47, 18, 692, DateTimeKind.Utc).AddTicks(5469));
 
                     b.Property<string>("TestResults")
                         .IsRequired()
@@ -746,9 +744,6 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<int>("IncorrectAnswers")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
@@ -764,7 +759,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("StartTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 21, 1, 50, 45, 188, DateTimeKind.Utc).AddTicks(5434));
+                        .HasDefaultValue(new DateTime(2024, 11, 21, 18, 47, 18, 720, DateTimeKind.Utc).AddTicks(354));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -773,10 +768,15 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasDefaultValue("InProgress");
 
                     b.Property<DateTime>("SubmissionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValue(new DateTime(2024, 11, 21, 18, 47, 18, 720, DateTimeKind.Utc).AddTicks(1063));
 
                     b.Property<int>("TotalQuestions")
                         .HasColumnType("integer");
+
+                    b.Property<long>("TotalScore")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -905,7 +905,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 21, 1, 50, 45, 196, DateTimeKind.Utc).AddTicks(1335));
+                        .HasDefaultValue(new DateTime(2024, 11, 21, 18, 47, 18, 728, DateTimeKind.Utc).AddTicks(5214));
 
                     b.Property<string>("Feedback")
                         .IsRequired()

@@ -49,16 +49,25 @@ public class SubmitAnswerHandler(IQuizSubmissionRepository repository, IUserCont
         if ((questionType == QuestionType.MultipleChoice || questionType == QuestionType.TrueFalse) && userAnswers.Count > 1) {
             throw new InvalidOperationException("For MultipleChoice and TrueFalse questions, only one answer is allowed.");
         }
+        // Tạo danh sách Choices và tập hợp các Id hợp lệ trong một lần duyệt
+        var choices = question.QuestionOptions.Select(q => new Choice {
+            Id = q.Id.Value.ToString(),
+            Content = q.Content,
+            IsCorrect = q.IsCorrect,
+            OrderIndex = q.OrderIndex
+        }).ToList();
 
+        var validChoiceIds = choices.Select(c => c.Id).ToHashSet();
+        foreach (var userAnswer in userAnswers) {
+            if (!validChoiceIds.Contains(userAnswer)) {
+                throw new InvalidOperationException($"Invalid answer: {userAnswer}. It must be one of the available choices.");
+            }
+        }
         return new QuestionAnswer {
             Id = question.Id.Value.ToString(),
+            QuestionType = question.QuestionType.ToString(),
             Content = question.Content,
-            Choices = question.QuestionOptions.Select(q => new Choice {
-                Id = q.Id.Value.ToString(),
-                Content = q.Content,
-                IsCorrect = q.IsCorrect,
-                OrderIndex = q.OrderIndex
-            }).ToList(),
+            Choices = choices,
             UserAnswers = userAnswers
         };
     }
@@ -68,6 +77,7 @@ public class SubmitAnswerHandler(IQuizSubmissionRepository repository, IUserCont
         var problem = request.Question.Problem;
         return new QuestionAnswer {
             Id = question.Id.Value.ToString(),
+            QuestionType = question.QuestionType.ToString(),
             Content = question.Content,
             Problem = new ProblemAnswer {
                 Id = problem!.ProblemId.ToString(),

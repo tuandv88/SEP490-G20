@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Learning.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241121012723_InitialCreate")]
+    [Migration("20241121184721_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -169,8 +169,7 @@ namespace Learning.Infrastructure.Data.Migrations
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
@@ -183,8 +182,7 @@ namespace Learning.Infrastructure.Data.Migrations
 
                     b.Property<string>("Format")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -547,7 +545,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 21, 1, 27, 21, 659, DateTimeKind.Utc).AddTicks(4017));
+                        .HasDefaultValue(new DateTime(2024, 11, 21, 18, 47, 18, 692, DateTimeKind.Utc).AddTicks(5469));
 
                     b.Property<string>("TestResults")
                         .IsRequired()
@@ -738,7 +736,6 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Answers")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("CorrectAnswers")
@@ -749,9 +746,6 @@ namespace Learning.Infrastructure.Data.Migrations
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
-
-                    b.Property<int>("IncorrectAnswers")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -768,21 +762,24 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("StartTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 21, 1, 27, 21, 669, DateTimeKind.Utc).AddTicks(3963));
+                        .HasDefaultValue(new DateTime(2024, 11, 21, 18, 47, 18, 720, DateTimeKind.Utc).AddTicks(354));
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
-                        .HasDefaultValue("Processing");
+                        .HasDefaultValue("InProgress");
 
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 21, 1, 27, 21, 669, DateTimeKind.Utc).AddTicks(4604));
+                        .HasDefaultValue(new DateTime(2024, 11, 21, 18, 47, 18, 720, DateTimeKind.Utc).AddTicks(1063));
 
                     b.Property<int>("TotalQuestions")
                         .HasColumnType("integer");
+
+                    b.Property<long>("TotalScore")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -911,7 +908,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 21, 1, 27, 21, 673, DateTimeKind.Utc).AddTicks(9650));
+                        .HasDefaultValue(new DateTime(2024, 11, 21, 18, 47, 18, 728, DateTimeKind.Utc).AddTicks(5214));
 
                     b.Property<string>("Feedback")
                         .IsRequired()

@@ -1,10 +1,17 @@
 import { lazy } from 'react'
 import { createRouter, createRoute, createRootRoute } from '@tanstack/react-router'
 
+// Define the main root route with layout
 const rootRoute = createRootRoute({
   component: lazy(() => import('@/components/layout'))
 })
 
+// Define a separate root route for the login page without layout
+const loginRootRoute = createRootRoute({
+  component: lazy(() => import('@/pages/Login/login')) // Directly load the login component
+})
+
+// Define other routes as children of the main root route
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
@@ -22,18 +29,6 @@ const editCourseRoute = createRoute({
   path: '/edit-course',
   component: lazy(() => import('@/pages/Course/EditCourse'))
 })
-
-// const errorTestRoute = createRoute({
-//   getParentRoute: () => rootRoute,
-//   path: '/error-test',
-//   component: lazy(() => import('@/components/error-test'))
-// })
-
-// const loadingTestRoute = createRoute({
-//   getParentRoute: () => rootRoute,
-//   path: '/loading-test',
-//   component: lazy(() => import('@/components/loading-test'))
-// })
 
 const createCourseRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -53,6 +48,25 @@ const createProblemRoute = createRoute({
   component: lazy(() => import('@/pages/Problem/CreateProblem'))
 })
 
-const routeTree = rootRoute.addChildren([indexRoute, courseTableRoute, createCourseRoute, createCodeProblemRoute, editCourseRoute,createProblemRoute])
+// Define the login route as a child of the login root route
+const loginRoute = createRoute({
+  getParentRoute: () => loginRootRoute,
+  path: '/login',
+  component: lazy(() => import('@/pages/Login/login'))
+})
 
-export const router = createRouter({ routeTree })
+// Create the route trees
+const mainRouteTree = rootRoute.addChildren([
+  indexRoute,
+  courseTableRoute,
+  createCourseRoute,
+  createCodeProblemRoute,
+  editCourseRoute,
+  createProblemRoute
+])
+
+const loginRouteTree = loginRootRoute.addChildren([loginRoute])
+
+// Export the routers
+export const mainRouter = createRouter({ routeTree: mainRouteTree })
+export const loginRouter = createRouter({ routeTree: loginRouteTree })

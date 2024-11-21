@@ -18,6 +18,7 @@
         public DateTime DateUpdated { get; set; }                // Thời gian cập nhật gần nhất
         public bool Closed { get; set; }                         // Đánh dấu nếu thảo luận đã đóng
         public bool Pinned { get; set; }                         // Đánh dấu nếu thảo luận được ghim
+        public bool NotificationsEnabled { get; set; } = true;  // Mặc định là tắt thông báo
 
         // Phương thức tạo mới một Discussion
         public static Discussion Create(DiscussionId discussionId, UserId userId, CategoryId categoryId, string title, string description, bool isActive, List<string> tags, string? imageUrl = null)
@@ -36,7 +37,8 @@
                 DateUpdated = DateTime.Now,
                 ViewCount = 0,
                 Closed = false,
-                Pinned = false
+                Pinned = false,
+                NotificationsEnabled = true // Gán giá trị
             };
 
             discussion.AddDomainEvent(new DiscussionCreatedEvent(discussion));
@@ -44,7 +46,7 @@
         }
 
         // Phương thức cập nhật thông tin của Discussion
-        public void Update(UserId userId, CategoryId categoryId, string title, string description, bool isActive, List<string> tags, bool closed, bool pinned, long viewCount)
+        public void Update(UserId userId, CategoryId categoryId, string title, string description, bool isActive, List<string> tags, bool closed, bool pinned, long viewCount, bool notificationsEnabled)
         {
             UserId = userId;
             CategoryId = categoryId;
@@ -56,6 +58,7 @@
             Pinned = pinned;
             ViewCount = viewCount;
             DateUpdated = DateTime.Now;
+            NotificationsEnabled = notificationsEnabled;
 
             // Thêm sự kiện cập nhật nếu cần thiết
             // AddDomainEvent(new DiscussionUpdatedEvent(this));
@@ -64,26 +67,6 @@
         public void UpdateImage(string imageUrl)
         {
             ImageUrl = imageUrl;
-        }
-
-        // Tăng số lượt xem
-        public void IncrementViewCount()
-        {
-            ViewCount++;
-        }
-
-        // Đóng hoặc mở thảo luận
-        public void ToggleClosed()
-        {
-            Closed = !Closed;
-            DateUpdated = DateTime.Now;
-        }
-
-        // Ghim hoặc bỏ ghim thảo luận
-        public void TogglePinned()
-        {
-            Pinned = !Pinned;
-            DateUpdated = DateTime.Now;
         }
     }
 }

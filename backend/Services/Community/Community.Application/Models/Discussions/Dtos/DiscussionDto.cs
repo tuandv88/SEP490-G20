@@ -17,5 +17,6 @@ public record DiscussionDto(
         long VoteCount,                 // Số lượng vote
         long CommentCount,              // Số lượng bình luận
         bool Closed,                    // Trạng thái đóng của thảo luận
+        bool EnableNotification,
         bool IsActive
     );

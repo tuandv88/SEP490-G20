@@ -2,6 +2,8 @@
 {
     public class NotificationType : Aggregate<NotificationTypeId>
     {
+        public List<UserNotificationSetting> UserNotificationSettings = new();
+        public List<NotificationHistory> NotificationHistorys = new();
         public string Name { get; set; } = default!;                   // Tên loại thông báo
         public string Description { get; set; } = default!;            // Mô tả loại thông báo
         public bool CanSendEmail { get; set; }                         // Có thể gửi email hay không
@@ -20,6 +22,16 @@
                 CanSendWebsite = canSendWebsite,
                 Priority = priority
             };
+        }
+
+        // Phương thức cập nhật NotificationType
+        public void Update(string name, string description, bool canSendEmail, bool canSendWebsite, int priority)
+        {
+            Name = name;
+            Description = description;
+            CanSendEmail = canSendEmail;
+            CanSendWebsite = canSendWebsite;
+            Priority = priority;
         }
     }
 }

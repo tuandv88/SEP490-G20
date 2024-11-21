@@ -1,7 +1,6 @@
 ﻿namespace Community.Application.Models.UserDiscussions.Dtos;
 
 public record CreateUserDiscussionDto(
-        Guid UserId,                        // ID của người dùng
         Guid DiscussionId,                   // ID của thảo luận
         bool IsFollowing,                    // Trạng thái theo dõi thảo luận
         DateTime? DateFollowed,              // Ngày bắt đầu theo dõi (có thể null)

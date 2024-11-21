@@ -1,0 +1,4 @@
+﻿namespace Community.Application.Models.UserNotificationSettings.Commands.RemoveUserNotificationSettingById;
+
+public record RemoveUserNotificationSettingByIdResult(bool IsSuccess);
+public record RemoveUserNotificationSettingByIdCommand(Guid Id) : ICommand<RemoveUserNotificationSettingByIdResult>;

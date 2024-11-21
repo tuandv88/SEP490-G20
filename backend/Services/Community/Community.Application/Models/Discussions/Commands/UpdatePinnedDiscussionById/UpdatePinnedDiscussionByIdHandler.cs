@@ -27,6 +27,7 @@ public class UpdatePinnedDiscussionByIdHandler : ICommandHandler<UpdatePinnedDis
 
         // Chuyển đổi trạng thái IsActive
         discussion.Pinned = !discussion.Pinned;
+        discussion.DateUpdated = DateTime.Now;
 
         await _repository.UpdateAsync(discussion);
         await _repository.SaveChangesAsync(cancellationToken);

@@ -1,5 +1,4 @@
-﻿using Community.Domain.Enums;
-using Community.Domain.Models;
+﻿using Community.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,57 +9,47 @@ namespace Community.Infrastructure.Data.Configurations
         public void Configure(EntityTypeBuilder<NotificationHistory> builder)
         {
             // Định nghĩa khóa chính
-            builder.HasKey(n => n.Id);
-            builder.Property(n => n.Id)
+            builder.HasKey(nh => nh.Id);
+            builder.Property(nh => nh.Id)
                 .HasConversion(
-                    notificationHistoryId => notificationHistoryId.Value,  // Chuyển NotificationHistoryId thành Guid
-                    dbId => NotificationHistoryId.Of(dbId));              // Chuyển Guid thành NotificationHistoryId
+                    id => id.Value,                  // Chuyển NotificationHistoryId thành Guid
+                    guid => new NotificationHistoryId(guid));
 
-            // Ánh xạ UserId với Value Converter
-            builder.Property(n => n.UserId)
+            // Cấu hình thuộc tính
+            builder.Property(nh => nh.UserId)
                 .HasConversion(
-                    userId => userId.Value,                              // Chuyển UserId thành Guid
-                    dbUserId => new UserId(dbUserId))                    // Chuyển Guid thành UserId
+                    id => id.Value,
+                    guid => new UserId(guid))
                 .IsRequired();
 
-            // Ánh xạ NotificationTypeId với Value Converter
-            builder.Property(n => n.NotificationTypeId)
+            builder.Property(nh => nh.NotificationTypeId)
                 .HasConversion(
-                    notificationTypeId => notificationTypeId.Value,      // Chuyển NotificationTypeId thành Guid
-                    dbNotificationTypeId => new NotificationTypeId(dbNotificationTypeId)) // Chuyển Guid thành NotificationTypeId
+                    id => id.Value,
+                    guid => new NotificationTypeId(guid))
                 .IsRequired();
 
-            // Cấu hình các thuộc tính còn lại
-            builder.Property(n => n.Message)
+            builder.Property(nh => nh.Message)
                 .IsRequired()
-                .HasMaxLength(500);                                      // Giới hạn độ dài nội dung thông báo
+                .HasMaxLength(1000);
 
-            builder.Property(n => n.DateSent)
+            builder.Property(nh => nh.DateSent)
                 .IsRequired();
 
-            builder.Property(n => n.DateRead)
-                .IsRequired(false);                                      // Có thể null nếu người dùng chưa đọc
+            builder.Property(nh => nh.IsRead)
+                .HasDefaultValue(false);
 
-            builder.Property(n => n.IsRead)
-                .HasDefaultValue(false);                                 // Mặc định thông báo chưa đọc
+            builder.Property(nh => nh.DateRead);
 
-            // Chuyển đổi kiểu SentVia (enum) thành chuỗi
-            builder.Property(n => n.SentVia)
-                .IsRequired()
-                .HasConversion(
-                    v => v.ToString(),                                   // Chuyển SentVia thành chuỗi
-                    v => (SentVia)Enum.Parse(typeof(SentVia), v));       // Chuyển chuỗi thành SentVia
+            builder.Property(nh => nh.SentVia)
+                .IsRequired();
 
-            // Chuyển đổi kiểu Status (enum) thành chuỗi
-            builder.Property(n => n.Status)
-                .IsRequired()
-                .HasConversion(
-                    v => v.ToString(),                                   // Chuyển Status thành chuỗi
-                    v => (Status)Enum.Parse(typeof(Status), v));         // Chuyển chuỗi thành Status
+            builder.Property(nh => nh.Status)
+                .IsRequired();
 
-            // Thiết lập các chỉ mục để tối ưu hóa hiệu năng truy vấn
-            builder.HasIndex(n => n.UserId);
-            builder.HasIndex(n => n.NotificationTypeId);
+            // Thiết lập chỉ mục
+            builder.HasIndex(nh => nh.UserId);
+            builder.HasIndex(nh => nh.NotificationTypeId);
+            builder.HasIndex(nh => nh.DateSent);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Community.Application.Data.Repositories;
+using Community.Application.Interfaces;
 using Community.Application.Models.Discussions.Dtos;
 using Community.Domain.Models;
 using Community.Domain.ValueObjects;
@@ -9,11 +10,13 @@ public class UpdateDiscussionHandler : ICommandHandler<UpdateDiscussionCommand, 
 {
     private readonly IDiscussionRepository _discussionRepository;
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IUserContextService _userContextService;
 
-    public UpdateDiscussionHandler(IDiscussionRepository discussionRepository, ICategoryRepository categoryRepository)
+    public UpdateDiscussionHandler(IDiscussionRepository discussionRepository, ICategoryRepository categoryRepository, IUserContextService userContextService)
     {
         _discussionRepository = discussionRepository;
         _categoryRepository = categoryRepository;
+        _userContextService = userContextService;
     }
 
     public async Task<UpdateDiscussionResult> Handle(UpdateDiscussionCommand request, CancellationToken cancellationToken)
@@ -42,7 +45,26 @@ public class UpdateDiscussionHandler : ICommandHandler<UpdateDiscussionCommand, 
 
     private void UpdateDiscussionWithNewValues(Discussion discussion, UpdateDiscussionDto updateDiscussionDto)
     {
-        var userId = UserId.Of(updateDiscussionDto.UserId);
+        // Dữ liệu test UserId
+        var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
+
+        if (!Guid.TryParse(userContextTest, out var currentUserIdTest))
+        {
+            throw new UnauthorizedAccessException("Invalid user ID.");
+        }
+
+        var userId = UserId.Of(currentUserIdTest);
+
+        // Lấy UserId từ UserContextService
+        //var currentUserId = _userContextService.User.Id;
+
+        //if (currentUserId == null)
+        //{
+        //    throw new UnauthorizedAccessException("User is not authenticated.");
+        //}
+
+        //var userId = UserId.Of(currentUserId.Value);
+
         var categoryId = CategoryId.Of(updateDiscussionDto.CategoryId);
 
         discussion.Update(
@@ -54,7 +76,8 @@ public class UpdateDiscussionHandler : ICommandHandler<UpdateDiscussionCommand, 
             tags: updateDiscussionDto.Tags,
             closed: updateDiscussionDto.Closed,
             pinned: updateDiscussionDto.Pinned,
-            viewCount: updateDiscussionDto.ViewCount
+            viewCount: updateDiscussionDto.ViewCount,
+            notificationsEnabled: updateDiscussionDto.EnableNotification
         );
     }
 }

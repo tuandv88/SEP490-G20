@@ -3,8 +3,9 @@
 /* eslint-disable react/prop-types */
 import { ChevronDown, ChevronRight, TableOfContents, Tag, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-
+import useStore from '@/data/store'
 const ToggleCurriculum = ({ title, chapters, setSelectedLectureId, isProblemListOpen, toggleProblemList, navigate }) => {
+  const selectedCourse = useStore((state) => state.selectedCourse)
   const [expandedSections, setExpandedSections] = useState(() => {
     // Lấy trạng thái từ Local Storage khi component mount
     const savedSections = localStorage.getItem('expandedSections')
@@ -20,7 +21,7 @@ const ToggleCurriculum = ({ title, chapters, setSelectedLectureId, isProblemList
     // console.log(lectureId)
     setActiveLectureId(lectureId)
     setSelectedLectureId(lectureId)
-    navigate(`/learning-space/9209cb44-0581-4107-a080-fa210fe9b09c/lecture/${lectureId}`);
+    navigate(`/learning-space/${selectedCourse}/lecture/${lectureId}`);
     console.log("Navigate")
     if (toggleProblemList) {
       toggleProblemList(false)

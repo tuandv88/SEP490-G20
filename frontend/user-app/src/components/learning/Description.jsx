@@ -44,16 +44,7 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
     };
   }, [onTimeUpdate]);
 
-  if (!description) {
-    return (
-      <div className='bg-gray-900 text-gray-300 h-full w-full p-6 mx-auto font-sans flex justify-items-center items-center'>
-        <div className='bg-slate-300 w-full h-[150px] flex items-center  font-medium text-black p-3 rounded-lg'>
-          <Frown className='mr-3' size={48} color='#22bfbc' />
-          <p>No lecture have been chosen yet. Please choose 1 lecture.</p>
-        </div>
-      </div>
-    )
-  }
+  
 
 
 
@@ -63,8 +54,9 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
         <DescriptionLoading />
       ) : (
         <div className='bg-bGprimary text-gray-300 p-6 mx-auto font-sans'>
-          <div className='relative pb-[56.25%] h-0'>
-            <video           
+          {videoSrc && (
+            <div className='relative pb-[56.25%] h-0'>
+              <video           
               ref={videoRef}
               className='absolute top-0 left-0 w-full h-full'
               controls
@@ -72,8 +64,9 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
               title='Lecture Video'             
             >
               Your browser does not support the video tag.
-            </video>
-          </div>
+              </video>
+            </div>
+          )}
 
           <div className='p-3 rounded-lg flex items-center mb-10 mt-10 w-full border border-spacing-10'>
             <BookOpenCheck className='inline mr-4' size={40} color='#ffffff' />

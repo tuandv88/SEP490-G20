@@ -2,7 +2,6 @@
 public record CategoryId
 {
     public Guid Value { get; }
-    public CategoryId() { }
     public CategoryId(Guid value) => Value = value;
     public static CategoryId Of(Guid value)
     {

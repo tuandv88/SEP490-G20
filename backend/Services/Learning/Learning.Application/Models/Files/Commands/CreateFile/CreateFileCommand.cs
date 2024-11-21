@@ -1,7 +1,8 @@
 ﻿using Learning.Application.Models.Files.Dtos;
-using Learning.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Files.Commands.CreateFile;
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateFileCommand(Guid LectureId, CreateFileDto CreateFileDto) : ICommand<CreateFileResult>;
 public record CreateFileResult(Guid Id);
 

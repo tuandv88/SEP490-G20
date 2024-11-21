@@ -7,7 +7,7 @@ public class Quiz : Aggregate<QuizId> {
     public string Title { get; set; } = default!;
     public string Description { get; set; } = default!;
     public int PassingMark { get; set; } = default!;
-    public double TimeLimit { get; set; } = default!; // giới hạn thời gian làm bài
+    public double TimeLimit { get; set; } = default!; // giới hạn thời gian làm bài -- thời gian là phút
     public bool HasTimeLimit { get; set; } = false; // xác định xem có giới hạn thời gian làm bài không 
     public int AttemptLimit { get; set; } = 1;
     public bool HasAttemptLimit { get; set; } = false;
@@ -28,8 +28,30 @@ public class Quiz : Aggregate<QuizId> {
         };
         return quiz;
     }
+
+    public void Update(bool isActive, bool isRandomized, string title, string description, int passingMark, double timeLimit, bool hasTimeLimit, int attemptLimit, bool hasAttemptLimit, QuizType quizType) {
+        IsActive = isActive;
+        IsRandomized = isRandomized;
+        Title = title;
+        Description = description;
+        PassingMark = passingMark;
+        TimeLimit = timeLimit;
+        HasTimeLimit = hasTimeLimit;
+        AttemptLimit = attemptLimit;
+        HasAttemptLimit = hasAttemptLimit;
+        QuizType = quizType;
+    }
     public void AddQuestion(Question question) {
         Questions.Add(question);
     }
+
+    public void RemoveQuestion(Question question) {
+        Questions.Remove(question);
+    }
+
+    public void ChangeActive() {
+        IsActive = IsActive ? false : true;
+    }
+
 }
 

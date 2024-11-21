@@ -1,6 +1,4 @@
-﻿
-using Learning.API.Endpoints.Problems;
-using Learning.Application.Models.Quizs.Commands.CreateQuiz;
+﻿using Learning.Application.Models.Quizs.Commands.CreateQuiz;
 using Learning.Application.Models.Quizs.Dtos;
 
 namespace Learning.API.Endpoints.Quizs;
@@ -11,7 +9,7 @@ public class CreateQuizEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
 
         app.MapPost("/quizs", async (Guid? LectureId, CreateQuizRequest request, ISender sender) => {
-            var command = new CreateQuizComand() { LectureId = LectureId, CreateQuizDto = request.CreateQuizDto };
+            var command = new CreateQuizCommand() { LectureId = LectureId, CreateQuizDto = request.CreateQuizDto };
 
             var result = await sender.Send(command);
 

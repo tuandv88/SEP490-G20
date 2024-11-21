@@ -23,6 +23,7 @@ DateTime DateCreated,              // Thời gian tạo
 DateTime DateUpdated,              // Thời gian cập nhật
 bool Closed,                       // Đánh dấu nếu thảo luận đã đóng
 bool Pinned,                       // Đánh dấu nếu thảo luận được ghim
+bool EnableNotification,
 List<CommentDetailDto> Comments,   // Danh sách các bình luận
 List<VoteDto> Votes,               // Danh sách vote cho thảo luận
 List<BookmarkDto> Bookmarks,       // Danh sách các bookmark

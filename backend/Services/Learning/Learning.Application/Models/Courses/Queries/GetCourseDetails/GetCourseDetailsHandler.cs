@@ -1,17 +1,24 @@
-﻿using BuidingBlocks.Storage.Interfaces;
-using Learning.Application.Data.Repositories;
-using Learning.Application.Extensions;
-
-namespace Learning.Application.Models.Courses.Queries.GetCourseDetails;
-public class GetCourseDetailsHandler(ICourseRepository courseRepository, IFilesService filesService) 
+﻿namespace Learning.Application.Models.Courses.Queries.GetCourseDetails;
+public class GetCourseDetailsHandler(ICourseRepository courseRepository, IFilesService filesService, IUserContextService userContext) 
     : IQueryHandler<GetCourseDetailsQuery, GetCourseDetailsResult>
 {
     public async Task<GetCourseDetailsResult> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)
     {
+        var userRole = userContext.User?.Role;
+
         var course = await courseRepository.GetByIdDetailAsync(request.Id);
-        if(course == null) {
+        if (course == null) {
             throw new NotFoundException("Course", request.Id);
         }
+
+        var isAdmin = userRole == PoliciesType.Administrator;
+        var isPublished = course.CourseStatus == CourseStatus.Published;
+
+        if (!isAdmin && !isPublished) {
+            throw new NotFoundException("Course", request.Id);
+        }
+        //Thêm điều kiện phải tham gia khóa học đấy nữa
+
         var s3Object = await filesService.GetFileAsync(StorageConstants.BUCKET, course.ImageUrl, 60);
         var courseDto = course.ToCourseDetailsDto(s3Object.PresignedUrl!);
 

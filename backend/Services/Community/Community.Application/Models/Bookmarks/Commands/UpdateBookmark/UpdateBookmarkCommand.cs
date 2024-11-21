@@ -10,9 +10,6 @@ public class UpdateBookmarkCommandValidator : AbstractValidator<UpdateBookmarkCo
 {
     public UpdateBookmarkCommandValidator()
     {
-        RuleFor(x => x.UpdateBookmarkDto.UserId)
-            .NotEmpty().WithMessage("UserId must not be empty.");
-
         RuleFor(x => x.UpdateBookmarkDto.DiscussionId)
             .NotEmpty().WithMessage("DiscussionId must not be empty.");
 

@@ -1,6 +1,4 @@
-﻿using Community.Application.Models.Comments.Commands.UpdateStatusComment;
-
-namespace Community.Application.Models.Discussions.Commands.UpdateStatusDiscussionById;
+﻿namespace Community.Application.Models.Discussions.Commands.UpdateStatusDiscussionById;
 
 public class UpdateStatusDiscussionByIdHandler : ICommandHandler<UpdateStatusDiscussionByIdCommand, UpdateStatusDiscussionByIdResult>
 {
@@ -22,6 +20,7 @@ public class UpdateStatusDiscussionByIdHandler : ICommandHandler<UpdateStatusDis
 
         // Chuyển đổi trạng thái IsActive
         discussion.IsActive = !discussion.IsActive;
+        discussion.DateUpdated = DateTime.Now;
 
         await _repository.UpdateAsync(discussion);
         await _repository.SaveChangesAsync(cancellationToken);

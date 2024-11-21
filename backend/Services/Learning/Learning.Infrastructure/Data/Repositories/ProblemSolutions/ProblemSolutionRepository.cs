@@ -1,4 +1,5 @@
 ﻿
+
 namespace Learning.Infrastructure.Data.Repositories.ProblemSolutions;
 
 public class ProblemSolutionRepository : Repository<ProblemSolution>, IProblemSolutionRepository {
@@ -10,15 +11,21 @@ public class ProblemSolutionRepository : Repository<ProblemSolution>, IProblemSo
     public override async Task DeleteByIdAsync(Guid id) {
         var problemSolution = await GetByIdAsync(id);
         if (problemSolution != null) {
-            _dbContext.ProblemSolutions.Remove(problemSolution); 
+            _dbContext.ProblemSolutions.Remove(problemSolution);
         }
     }
 
     public override async Task<ProblemSolution?> GetByIdAsync(Guid id) {
-        var problemSolution = _dbContext.ProblemSolutions
-                            .AsEnumerable()
-                            .FirstOrDefault(p => p.Id.Value == id);
+        var problemSolution = await _dbContext.ProblemSolutions
+                            .FirstOrDefaultAsync(p => p.Id.Equals(ProblemSolutionId.Of(id)));
         return problemSolution;
+    }
+
+    public async Task<List<ProblemSolution>> GetByProblemIdAsync(ProblemId id) {
+        var problemSolutions = await _dbContext.ProblemSolutions
+                            .Where(p => p.ProblemId.Equals(id))
+                            .ToListAsync();
+        return problemSolutions;
     }
 }
 

@@ -10,9 +10,6 @@ public class CreateUserDiscussionCommandValidator : AbstractValidator<CreateUser
 {
     public CreateUserDiscussionCommandValidator()
     {
-        RuleFor(x => x.CreateUserDiscussionDto.UserId)
-            .NotEmpty().WithMessage("UserId must not be empty.");
-
         RuleFor(x => x.CreateUserDiscussionDto.DiscussionId)
             .NotEmpty().WithMessage("DiscussionId must not be empty.");
 

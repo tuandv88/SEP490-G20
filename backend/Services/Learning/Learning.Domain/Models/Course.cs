@@ -1,5 +1,4 @@
 ﻿using Learning.Domain.Events;
-using Learning.Domain.Events.Courses;
 
 namespace Learning.Domain.Models;
 public class Course : Aggregate<CourseId> {
@@ -19,7 +18,7 @@ public class Course : Aggregate<CourseId> {
     public int OrderIndex { get; set; } // Vị trí  trong các level
     public CourseLevel CourseLevel { get; set; } = CourseLevel.Basic;
     public double Price {  get; set; } // giá bán của khóa học
-
+    
     public static Course Create(CourseId courseId, string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, 
         string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, string imageUrl, int orderIndex, CourseLevel courseLevel, double price) {
         var course = new Course() {
@@ -38,33 +37,64 @@ public class Course : Aggregate<CourseId> {
             CourseLevel = courseLevel,
             Price = price
         };
-        course.AddDomainEvent(new CourseCreatedEvent(course));
         return course;
     }
 
-    public void AddChapter(Chapter chapter) {
-        Chapters.Add(chapter);
-
-    }
-
-    public void Update(string title, string description, string headline, CourseStatus courseStatus, double timeEstimation, string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, int orderIndex, CourseLevel courseLevel, double price) {
+    public void Update(string title, string description, string headline, double timeEstimation, string prerequisites, string objectives, string targetAudiences, DateTime? scheduledPublishDate, double price) {
         Title = title;
         Description = description;
         Headline = headline;
-        CourseStatus = courseStatus;
         TimeEstimation = timeEstimation;
         Prerequisites = prerequisites;
         Objectives = objectives;
         TargetAudiences = targetAudiences;
         ScheduledPublishDate = scheduledPublishDate;
-        OrderIndex = orderIndex;
-        CourseLevel = courseLevel;
         Price = price;
-        //TODO add event vào domain
     }
     public void UpdateImage(string imageUrl) {
         ImageUrl = imageUrl;
     }
 
+    public void UpdateOrderIndex(int orderIndex) {
+        OrderIndex = orderIndex;
+    }
+
+    public void UpdateStatus(CourseStatus status) {
+        CourseStatus = status;
+        //THÊM Event ở đây để publish khóa học 
+        AddDomainEvent(new CourseUpdatedStatusEvent(this));
+    }
+    public void UpdateCourseLevel(CourseLevel courseLevel, int orderIndex) {
+        CourseLevel = courseLevel;
+        OrderIndex = orderIndex;
+    }
+    public void AddChapter(Chapter chapter) {
+        Chapters.Add(chapter);
+    }
+    public Chapter UpdateChapter(ChapterId chapterId, string title, string description, double timeEstimation, bool isActive) {
+        var chapter = Chapters.FirstOrDefault(c => c.Id == chapterId);
+        if (chapter == null) {
+            throw new NotFoundException("Chapter not found", chapterId.Value);
+        }
+        chapter.Title = title;
+        chapter.Description = description;
+        chapter.TimeEstimation = timeEstimation;
+        chapter.IsActive = isActive;
+        return chapter;
+    }
+
+    public Chapter DeleteChapter(ChapterId chapterId) {
+        var chapter = Chapters.FirstOrDefault(c => c.Id == chapterId);
+        if (chapter == null) {
+            throw new Exception("Chapter not found");
+        }
+
+        Chapters.Remove(chapter);
+        return chapter;
+    }
+
+    public void UpdateOrderIndexChapter(Chapter chapter, int orderIndex) {
+        chapter.OrderIndex = orderIndex;
+    }
 }
 

@@ -1,6 +1,9 @@
 ﻿using Learning.Application.Models.Chapters.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Chapters.Commands.CreateChapter;
+
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateChapterCommand : ICommand<CreateChapterResult> {
     public required Guid CourseId;
     public required CreateChapterDto CreateChapterDto;
@@ -19,8 +22,5 @@ public class CreateChapterCommandValidator : AbstractValidator<CreateChapterComm
 
         RuleFor(x => x.CreateChapterDto.TimeEstimation)
             .GreaterThan(0).WithMessage("Time estimation must be greater than zero.");
-
-        RuleFor(x => x.CreateChapterDto.OrderIndex)
-            .GreaterThan(0).WithMessage("Order index must be greater than to zero.");
     }
 }

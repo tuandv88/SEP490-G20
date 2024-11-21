@@ -1,7 +1,6 @@
 ﻿namespace Community.Application.Models.Discussions.Dtos;
 
 public record CreateDiscussionDto(
-    Guid UserId,                           // ID của người tạo thảo luận
     Guid CategoryId,                       // ID của chuyên mục
     string Title,                          // Tiêu đề thảo luận
     string Description,                    // Mô tả nội dung

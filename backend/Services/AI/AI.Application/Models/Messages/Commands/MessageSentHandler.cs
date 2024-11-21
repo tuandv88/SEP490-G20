@@ -2,13 +2,15 @@
 using AI.Application.Models.Messages.Dtos;
 using AI.Domain.Enums;
 using AI.Domain.ValueObjects;
+using Microsoft.Extensions.Configuration;
 using Microsoft.KernelMemory;
 
 namespace AI.Application.Models.Messages.Commands;
 public class MessageSentHandler(
     IMessageRepository messageRepository, IConversationRepository conversationRepository,
     IUserContextService userContext, IChatService chatService, IMessageService messageService,
-    IDocumentRepository documentRepository,IKernelMemory memory, IDocumentService documentService
+    IDocumentRepository documentRepository,IKernelMemory memory, IDocumentService documentService,
+    IConfiguration configuration
     ) : ICommandHandler<MessageSentCommand, MessageSentResult> {
     public async Task<MessageSentResult> Handle(MessageSentCommand request, CancellationToken cancellationToken) {
         var userId = Guid.Parse("89980ac8-3d50-49af-9a65-9cdcda802e11"); //userContext.User.Id;
@@ -38,8 +40,9 @@ public class MessageSentHandler(
             await conversationRepository.SaveChangesAsync(cancellationToken);
         }
 
+        var minRelevance = configuration.GetValue("SearchClient:MinRelevance", 0.4);
         //lấy ra thông tin liên quan 
-        var facts = await memory.AskAsync(request.MessageSend.Content, minRelevance: 0.4);
+        var facts = await memory.AskAsync(request.MessageSend.Content, minRelevance: minRelevance);
 
         var prompt = messageService.BuildPrompt(promptType, request.MessageSend.Content, facts.Result, context);
 
@@ -98,7 +101,10 @@ public class MessageSentHandler(
     }
     private async Task<Message> CreateNewMessageFromAI(Conversation conversation, MessageAnswer messageAnswer, 
         PromptType promptType, IDictionary<string, object> context) {
-        var document = await documentRepository.GetDocuments(messageAnswer.DocumentIds.Select(Guid.Parse).ToArray());
+        var document = await documentRepository.GetDocumentsAsync(
+            messageAnswer.DocumentIds.Select(
+                s => DocumentId.Of(Guid.Parse(s))
+                ).ToArray());
         var message = new Message() {
             Id = MessageId.Of(Guid.NewGuid()),
             ConversationId = conversation.Id,

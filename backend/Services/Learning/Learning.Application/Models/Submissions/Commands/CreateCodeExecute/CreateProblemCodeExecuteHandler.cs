@@ -1,9 +1,6 @@
-﻿using Learning.Application.Data.Repositories;
-using Learning.Application.Models.Submissions.Commands.CreateBatchCodeExcute;
-using Learning.Application.Models.Submissions.Dtos.CodeExecution;
+﻿using Learning.Application.Models.Submissions.Commands.CreateBatchCodeExcute;
+using Learning.Application.Models.Submissions.Dtos;
 using Learning.Application.Models.TestCases.Dtos;
-using Learning.Domain.ValueObjects;
-using MediatR;
 
 namespace Learning.Application.Models.Submissions.Commands.CreateCodeExecute;
 
@@ -11,7 +8,7 @@ public class CreateProblemCodeExecuteHandler(IProblemRepository problemRepositor
     public async Task<CreateProblemCodeExecuteResult> Handle(CreateProblemCodeExecuteCommand request, CancellationToken cancellationToken) {
         var problem = await problemRepository.GetByIdDetailAsync(request.ProblemId);
         if (problem == null) {
-            throw new NotFoundException("Problem", request.ProblemId);
+            throw new NotFoundException(nameof(Problem), request.ProblemId);
         }
 
         var codeExecuteDto = await ExecuteTestScripts(request.CreateCodeExecuteDto, problem);
@@ -27,7 +24,7 @@ public class CreateProblemCodeExecuteHandler(IProblemRepository problemRepositor
 
 
         //code người dùng trước, source code hệ thống sau 
-        var solutionCodes = new List<string>() { createCodeExecuteDto.SolutionCode, trustSolutionCode!.SolutionCode};
+        var solutionCodes = new List<string>() { createCodeExecuteDto.SolutionCode, trustSolutionCode!.SolutionCode };
 
         var testScript = problem.TestScripts.FirstOrDefault(t => t.LanguageCode.ToString().Equals(languageCode));
 
@@ -39,7 +36,10 @@ public class CreateProblemCodeExecuteHandler(IProblemRepository problemRepositor
                 TestCases: testCases,
                 SolutionCodes: solutionCodes,
                 TestCode: testScript!.TestCode
-            )
+            ),
+            new ResourceLimits(problem.CpuTimeLimit, problem.CpuExtraTime, problem.MemoryLimit,
+                problem.EnableNetwork, problem.StackLimit, problem.MaxThread, problem.MaxFileSize
+                )
         ));
         var userCodeResult = batchCodeExecuteResult.CodeExecuteDtos[0];
         var systemCodeResult = batchCodeExecuteResult.CodeExecuteDtos[1];
@@ -61,7 +61,23 @@ public class CreateProblemCodeExecuteHandler(IProblemRepository problemRepositor
 
             updatedTestResults.Add(updatedTestResult);
         }
-        var updatedUserCodeResult = userCodeResult with { TestResults = updatedTestResults };
+
+        // Kiểm tra xem tất cả test case có pass hay không
+        var allTestsPassed = updatedTestResults.All(t => t.IsPass);
+
+        // Cập nhật status dựa trên kết quả test
+        var updatedStatus = userCodeResult.Status.Id == 3
+            ? new SubmissionStatus(
+                userCodeResult.Status.Id,
+                allTestsPassed ? SubmissionConstant.Accepted : SubmissionConstant.TestFailed
+              )
+            : userCodeResult.Status;
+
+
+        var updatedUserCodeResult = userCodeResult with {
+            TestResults = updatedTestResults,
+            Status = updatedStatus
+        };
 
         return updatedUserCodeResult;
 

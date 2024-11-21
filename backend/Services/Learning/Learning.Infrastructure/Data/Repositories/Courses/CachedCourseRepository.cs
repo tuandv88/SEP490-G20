@@ -1,11 +1,14 @@
-﻿using Learning.Domain.Abstractions;
-
+﻿
 namespace Learning.Infrastructure.Data.Repositories.Courses;
 public class CachedCourseRepository(ICourseRepository repository, ICacheService cacheService) : ICourseRepository {
     public async Task AddAsync(Course entity) {
         await repository.AddAsync(entity);
         //Xóa cached
         DeleteCached(CacheKey.COURSES);
+    }
+
+    public async Task<int> CountByLevelAsync(CourseLevel courseLevel) {
+        return await repository.CountByLevelAsync(courseLevel);
     }
 
     public async Task DeleteAsync(Course entity) {
@@ -35,6 +38,10 @@ public class CachedCourseRepository(ICourseRepository repository, ICacheService 
         return allData;
     }
 
+    public async Task<List<Course>> GetByCourseLevelAsync(CourseLevel courseLevel) {
+        return await repository.GetByCourseLevelAsync(courseLevel);
+    }
+
     public async Task<Course?> GetByIdAsync(Guid id) {
         var allData = await GetAllAsync();
         var course = allData.Where(c => c.Id.Value == id).FirstOrDefault();
@@ -53,10 +60,25 @@ public class CachedCourseRepository(ICourseRepository repository, ICacheService 
         return allData;
     }
 
+    public async Task<Course?> GetCourseByChapterIdAsync(Guid chapterId) {
+        return await repository.GetCourseByChapterIdAsync(chapterId);
+    }
+
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken) {
         int n = await repository.SaveChangesAsync(cancellationToken);
         return n;
     }
+
+    public void Update(params Course[] courses) {
+        repository.Update(courses);
+
+        //Xóa cached 
+        DeleteCached(CacheKey.COURSES);
+        foreach (var course in courses) {
+            DeleteCached(string.Format(CacheKey.COURSES_DETAILS, course.Id));
+        }
+    }
+
 
     public async Task UpdateAsync(Course entity) {
         await repository.UpdateAsync(entity);

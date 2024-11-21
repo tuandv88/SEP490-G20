@@ -12,10 +12,11 @@
         public Status Status { get; set; } = Status.Sent!;                       // Trạng thái gửi: Đã gửi, Thất bại, Chờ, Đã nhận
 
         // Phương thức khởi tạo một NotificationHistory
-        public static NotificationHistory Create(UserId userId, NotificationTypeId notificationTypeId, string message, SentVia sentVia, Status status)
+        public static NotificationHistory Create(NotificationHistoryId notificationHistoryId, UserId userId, NotificationTypeId notificationTypeId, string message, SentVia sentVia, Status status)
         {
             return new NotificationHistory
             {
+                Id = notificationHistoryId,
                 UserId = userId,
                 NotificationTypeId = notificationTypeId,
                 Message = message,
@@ -24,6 +25,23 @@
                 SentVia = sentVia,
                 Status = status
             };
+        }
+
+        // Cập nhật thông báo với dữ liệu mới
+        public void Update(
+            NotificationTypeId notificationTypeId,
+            string message,
+            DateTime? dateRead,
+            bool isRead,
+            SentVia sentVia,
+            Status status)
+        {
+            NotificationTypeId = notificationTypeId;
+            Message = message;
+            DateRead = dateRead;
+            IsRead = isRead;
+            SentVia = sentVia;
+            Status = status;
         }
 
         // Phương thức đánh dấu thông báo là đã đọc

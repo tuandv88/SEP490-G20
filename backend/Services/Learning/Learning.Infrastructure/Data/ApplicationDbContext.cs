@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using Learning.Domain.ValueObjects;
+using MassTransit;
+using MassTransit.EntityFrameworkCoreIntegration;
+using System.Reflection;
 
 namespace Learning.Infrastructure.Data;
 public class ApplicationDbContext : DbContext, IApplicationDbContext {
@@ -47,6 +50,10 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext {
     protected override void OnModelCreating(ModelBuilder builder) {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(builder);
+
+        builder.AddInboxStateEntity();
+        builder.AddOutboxMessageEntity();
+        builder.AddOutboxStateEntity();
     }
 }
 

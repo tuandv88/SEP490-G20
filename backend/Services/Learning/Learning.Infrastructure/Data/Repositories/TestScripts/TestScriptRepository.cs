@@ -1,5 +1,6 @@
 ﻿
 
+
 namespace Learning.Infrastructure.Data.Repositories.TestScripts;
 public class TestScriptRepository : Repository<TestScript>, ITestScriptRepository {
     private IApplicationDbContext _dbContext;
@@ -15,10 +16,16 @@ public class TestScriptRepository : Repository<TestScript>, ITestScriptRepositor
     }
 
     public override async Task<TestScript?> GetByIdAsync(Guid id) {
-        var testScript = _dbContext.TestScripts
-                         .AsEnumerable()
-                         .FirstOrDefault(c => c.Id.Value == id);
+        var testScript = await _dbContext.TestScripts
+                         .FirstOrDefaultAsync(c => c.Id.Equals(TestScriptId.Of(id)));
         return testScript;
+    }
+
+    public async Task<List<TestScript>> GetByProblemIdAsync(ProblemId id) {
+        var testScripts = await _dbContext.TestScripts
+                            .Where(t => t.ProblemId.Equals(id))
+                            .ToListAsync();
+        return testScripts;
     }
 }
 

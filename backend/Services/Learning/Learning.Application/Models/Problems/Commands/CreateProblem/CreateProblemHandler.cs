@@ -1,12 +1,8 @@
-﻿using Learning.Application.Data.Repositories;
-using Learning.Application.Exceptions;
+﻿using Learning.Application.Exceptions;
 using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.Submissions.Commands.CreateBatchCodeExcute;
-using Learning.Application.Models.Submissions.Dtos.CodeExecution;
+using Learning.Application.Models.Submissions.Dtos;
 using Learning.Application.Models.TestCases.Dtos;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
-using MediatR;
 namespace Learning.Application.Models.Problems.Commands.CreateProblem;
 public class CreateProblemHandler(ILectureRepository lectureRepository, IProblemRepository problemRepository, ISender sender)
     : ICommandHandler<CreateProblemCommand, CreateProblemResult> {
@@ -43,7 +39,16 @@ public class CreateProblemHandler(ILectureRepository lectureRepository, IProblem
                     TestCases: testCases,
                     SolutionCodes: testScript.Solutions.Select(x => x.SolutionCode).ToList(),
                     TestCode: testScript.TestCode
-                )
+                ),
+                new ResourceLimits(
+                    createProblemDto.CpuTimeLimit,
+                    createProblemDto.CpuExtraTime,
+                    createProblemDto.MemoryLimit,
+                    createProblemDto.EnableNetwork,
+                    createProblemDto.StackLimit,
+                    createProblemDto.MaxThread,
+                    createProblemDto.MaxFileSize
+                    )
             ));
 
             foreach (var codeExecuteDto in batchCodeExecuteResult.CodeExecuteDtos) {
@@ -108,8 +113,8 @@ public class CreateProblemHandler(ILectureRepository lectureRepository, IProblem
             problemSolutions.AddRange(mapToProblemSolution);
         }
 
-        problem.AddProblemSolution(problemSolutions);
-        problem.AddTestScript(testScripts);
+        problem.AddProblemSolution(problemSolutions.ToArray());
+        problem.AddTestScript(testScripts.ToArray());
 
         var testCases = createProblemDto.TestCases.Select(t => new TestCase() {
             Id = TestCaseId.Of(Guid.NewGuid()),
@@ -119,7 +124,7 @@ public class CreateProblemHandler(ILectureRepository lectureRepository, IProblem
             IsHidden = t.IsHidden,
             OrderIndex = t.OrderIndex
         }).ToList();
-        problem.AddTestCase(testCases);
+        problem.AddTestCase(testCases.ToArray());
 
         return problem;
     }

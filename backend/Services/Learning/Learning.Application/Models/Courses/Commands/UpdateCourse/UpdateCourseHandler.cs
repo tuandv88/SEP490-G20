@@ -1,6 +1,4 @@
-﻿using Learning.Application.Data.Repositories;
-using Learning.Application.Models.Courses.Dtos;
-using Learning.Domain.Enums;
+﻿using Learning.Application.Models.Courses.Dtos;
 
 namespace Learning.Application.Models.Courses.Commands.UpdateCourse;
 
@@ -9,11 +7,11 @@ public class UpdateCourseHandler(ICourseRepository repository) : ICommandHandler
     public async Task<UpdateCourseResult> Handle(UpdateCourseCommand request, CancellationToken cancellationToken)
     {
 
-        var course = await repository.GetByIdAsync(request.UpdateCourseDto.Id);
+        var course = await repository.GetByIdAsync(request.CourseId);
 
         if (course == null)
         {
-            throw new NotFoundException("Course", request.UpdateCourseDto.Id);
+            throw new NotFoundException("Course", request.CourseId);
 
         }
         UpdateCourseWithNewValues(course, request.UpdateCourseDto);
@@ -24,14 +22,6 @@ public class UpdateCourseHandler(ICourseRepository repository) : ICommandHandler
     }
     private void UpdateCourseWithNewValues(Course course, UpdateCourseDto updateCourseDto)
     {
-        var courseStatus = Enum.TryParse<CourseStatus>(updateCourseDto.CourseStatus, out var status)
-        ? status
-        : throw new ArgumentOutOfRangeException(nameof(updateCourseDto.CourseStatus), $"Value '{updateCourseDto.CourseStatus}' is not valid for CourseStatus.");
-
-        var courseLevel = Enum.TryParse<CourseLevel>(updateCourseDto.CourseLevel, out var level)
-        ? level
-        : throw new ArgumentOutOfRangeException(nameof(updateCourseDto.CourseLevel), $"Value '{updateCourseDto.CourseLevel}' is not valid for CourseLevel.");
-
         DateTime? scheduledPublishDate = null;
         if (!string.IsNullOrWhiteSpace(updateCourseDto.ScheduledPublishDate))
         {
@@ -48,14 +38,11 @@ public class UpdateCourseHandler(ICourseRepository repository) : ICommandHandler
             title: updateCourseDto.Title,
             description: updateCourseDto.Description,
             headline: updateCourseDto.Headline,
-            courseStatus: courseStatus,
             timeEstimation: updateCourseDto.TimeEstimation,
             prerequisites: updateCourseDto.Prerequisites,
             objectives: updateCourseDto.Objectives,
             targetAudiences: updateCourseDto.TargetAudiences,
             scheduledPublishDate: scheduledPublishDate,
-            orderIndex: updateCourseDto.OrderIndex,
-            courseLevel: courseLevel,
             price: updateCourseDto.Price
         );
     }

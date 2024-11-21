@@ -8,7 +8,6 @@ public record CreateQuestionDto(
     string QuestionType,
     string QuestionLevel,
     int Mark,
-    int OrderIndex,
     CreateProblemDto? Problem,
     List<CreateQuestionOptionDto> QuestionOptions
 );

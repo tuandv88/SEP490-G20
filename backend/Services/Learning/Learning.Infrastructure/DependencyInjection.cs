@@ -1,4 +1,4 @@
-using BuildingBlocks.Extensions;
+﻿using BuildingBlocks.Extensions;
 using Learning.Application.Interfaces;
 using Learning.Infrastructure.Data.Interceptors;
 using Learning.Infrastructure.Data.Repositories.Chapters;
@@ -8,47 +8,59 @@ using Learning.Infrastructure.Data.Repositories.Lectures;
 using Learning.Infrastructure.Data.Repositories.Problems;
 using Learning.Infrastructure.Data.Repositories.ProblemSolutions;
 using Learning.Infrastructure.Data.Repositories.ProblemSubmissions;
+using Learning.Infrastructure.Data.Repositories.QuestionOptions;
 using Learning.Infrastructure.Data.Repositories.Questions;
 using Learning.Infrastructure.Data.Repositories.Quizs;
+using Learning.Infrastructure.Data.Repositories.QuizSubmissions;
 using Learning.Infrastructure.Data.Repositories.TestCases;
 using Learning.Infrastructure.Data.Repositories.TestScripts;
+using Learning.Infrastructure.Extentions;
 using Learning.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace Learning.Infrastructure;
 public static class DependencyInjection {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration) {
 
-
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-
         services.AddDbContext<ApplicationDbContext>((sp, options) => {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseNpgsql(connectionString).LogTo(Console.WriteLine, LogLevel.Information); ;
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
+                 npgsqlOptions => {
+                     npgsqlOptions.EnableRetryOnFailure(5);
+                 });
+
+            options.LogTo(Console.WriteLine, LogLevel.Information);
         });
+        services.AddMassTransitWithRabbitMQ(configuration, Assembly.GetExecutingAssembly());
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
 
         services.AddHttpContextAccessor();
-        services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+
+        //trong context đã tạo một ApplicationDbContext rồi, phải lấy ra chứ không add scoped mới 
+        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+
+        //Thêm hangfire vào 
+        services.AddHangfireWithPostgreSQL(configuration);
 
         //Caching
         services.AddConfigureCaching(configuration);
 
-        //Configuration Repository
-        ConfigureRepository(services, configuration);
+        //IBase64Converter
+        services.AddScoped<IBase64Converter, Base64Converter>();
 
         //Configuration Service
         services.AddScoped<ISourceCombiner, SourceCombiner>();
 
-        //IBase64Converter
-        services.AddScoped<IBase64Converter, Base64Converter>();
+        services.AddScoped<IQuizSubmissionStateService, QuizSubmissionStateService>();
 
-        //UserContext
-        services.AddScoped<IUserContextService, UserContextService>();
+        //Configuration Repository
+        ConfigureRepository(services, configuration);
 
         return services;
     }
@@ -88,5 +100,11 @@ public static class DependencyInjection {
 
         //QuestionRepository
         services.AddScoped<IQuestionRepository, QuestionRepository>();
+
+        //QuestionOptionRepository
+        services.AddScoped<IQuestionOptionRepository, QuestionOptionRepository>();
+
+        //IQuizSubmissionRepositoru
+        services.AddScoped<IQuizSubmissionRepository, QuizSubmissionRepository>();
     }
 }

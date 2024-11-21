@@ -34,7 +34,9 @@ public static class DiscussionExtensions
             VoteCount: (long)discussion.Votes.Count,
             CommentCount: discussion.Comments.Count,
             Pinned: discussion.Pinned,
-            Closed: discussion.Closed
+            Closed: discussion.Closed,
+            EnableNotification: discussion.NotificationsEnabled,
+            IsActive: discussion.IsActive
         );
     }
 
@@ -59,6 +61,7 @@ public static class DiscussionExtensions
             CommentCount: (long)discussion.Comments.Count,
             Pinned: discussion.Pinned,
             Closed: discussion.Closed,
+            EnableNotification: discussion.NotificationsEnabled,
             IsActive: discussion.IsActive,              // Trạng thái hoạt động của thảo luận
             Comments: discussion.Comments.Select(c => c.ToCommentDetailDto()).ToList(),
             Votes: discussion.Votes.Select(v => v.ToVoteDto()).ToList(),

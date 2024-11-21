@@ -1,10 +1,4 @@
-﻿using BuidingBlocks.Storage.Interfaces;
-using Learning.Application.Data.Repositories;
-using Learning.Application.Interfaces;
-using Learning.Application.Models.Courses.Dtos;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
-
+﻿using Learning.Application.Models.Courses.Dtos;
 namespace Learning.Application.Models.Courses.Commands.CreateCourse;
 public class CreateCourseHandler(ICourseRepository repository, IFilesService filesService, IBase64Converter base64Converter) : ICommandHandler<CreateCourseCommand, CreateCourseResult>
 {
@@ -20,10 +14,6 @@ public class CreateCourseHandler(ICourseRepository repository, IFilesService fil
 
     private async Task<Course> CreateNewCourse(CreateCourseDto createCourseDto)
     {
-        var courseStatus = Enum.TryParse<CourseStatus>(createCourseDto.CourseStatus, out var status)
-            ? status
-            : throw new ArgumentOutOfRangeException(nameof(createCourseDto.CourseStatus), $"Value '{createCourseDto.CourseStatus}' is not valid for CourseStatus.");
-
         var courseLevel = Enum.TryParse<CourseLevel>(createCourseDto.CourseLevel, out var level)
             ? level
             : throw new ArgumentOutOfRangeException(nameof(createCourseDto.CourseLevel), $"Value '{createCourseDto.CourseLevel}' is not valid for CourseLevel.");
@@ -54,14 +44,14 @@ public class CreateCourseHandler(ICourseRepository repository, IFilesService fil
             title: createCourseDto.Title,
             description: createCourseDto.Description,
             headline: createCourseDto.Headline,
-            courseStatus: courseStatus,
+            courseStatus: CourseStatus.Draft,
             timeEstimation: createCourseDto.TimeEstimation,
             prerequisites: createCourseDto.Prerequisites,
             objectives: createCourseDto.Objectives,
             targetAudiences: createCourseDto.TargetAudiences,
             scheduledPublishDate: scheduledPublishDate,
             imageUrl: fileUrl,
-            orderIndex: createCourseDto.OrderIndex,
+            orderIndex: (await repository.CountByLevelAsync(courseLevel)) + 1,
             courseLevel: courseLevel,
             price: createCourseDto.Price
         );

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.Context;
+using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
@@ -208,7 +209,14 @@ namespace AI.API.Rest {
             dynamic a = new { result, result.Content };
             return Ok(result);
         }
+        [HttpGet("/find")]
+        public async Task<IActionResult> Find(string documentId) {
+            MemoryFilter f = new MemoryFilter();
+            f.ByDocument(documentId);
+            var answer = await _kernelMemory.SearchAsync("", filter: f);
 
+            return Ok(answer.ToJson(true));
+        }
     }
 }
 #pragma warning disable SKEXP0001

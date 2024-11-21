@@ -12,31 +12,39 @@ namespace Community.Infrastructure.Data.Configurations
             builder.HasKey(nt => nt.Id);
             builder.Property(nt => nt.Id)
                 .HasConversion(
-                    notificationTypeId => notificationTypeId.Value,      // Chuyển NotificationTypeId thành Guid
-                    dbId => NotificationTypeId.Of(dbId));                // Chuyển Guid thành NotificationTypeId
+                    id => id.Value,                             // Chuyển NotificationTypeId thành Guid
+                    guid => new NotificationTypeId(guid));
 
-            // Cấu hình các thuộc tính của NotificationType
+            // Cấu hình thuộc tính
             builder.Property(nt => nt.Name)
                 .IsRequired()
-                .HasMaxLength(100);                                      // Tên loại thông báo, giới hạn 100 ký tự
+                .HasMaxLength(100);
 
             builder.Property(nt => nt.Description)
-                .IsRequired(false)
-                .HasMaxLength(500);                                      // Mô tả, có thể null, giới hạn 500 ký tự
+                .HasMaxLength(500);
 
             builder.Property(nt => nt.CanSendEmail)
-                .IsRequired();                                           // Bắt buộc có, đánh dấu có thể gửi email
+                .IsRequired();
 
             builder.Property(nt => nt.CanSendWebsite)
-                .IsRequired();                                           // Bắt buộc có, đánh dấu có thể gửi qua website
+                .IsRequired();
 
             builder.Property(nt => nt.Priority)
-                .IsRequired()
-                .HasDefaultValue(3);                                     // Độ ưu tiên mặc định là 3 (trung bình)
+                .IsRequired();
 
-            // Thiết lập chỉ mục cho các trường cần tìm kiếm nhanh
-            builder.HasIndex(nt => nt.Name).IsUnique();                  // Đảm bảo tên là duy nhất
-            builder.HasIndex(nt => nt.Priority);                         // Chỉ mục cho Priority để tìm kiếm theo độ ưu tiên
+            // Quan hệ với UserNotificationSetting và NotificationHistory
+            builder.HasMany(nt => nt.UserNotificationSettings)
+                .WithOne()
+                .HasForeignKey("NotificationTypeId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(nt => nt.NotificationHistorys)
+                .WithOne()
+                .HasForeignKey("NotificationTypeId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Thiết lập chỉ mục
+            builder.HasIndex(nt => nt.Name);
         }
     }
 }

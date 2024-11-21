@@ -16,42 +16,38 @@ public class ConversationRepository : Repository<Conversation>, IConversationRep
     }
 
     public async override Task<Conversation?> GetByIdAsync(Guid id) {
-        var conversation = _dbContext.Conversations
-                       .AsEnumerable()
-                       .FirstOrDefault(c => c.Id.Value == id);
+        var conversation = await _dbContext.Conversations
+                            .FirstOrDefaultAsync(c => c.Id.Equals(ConversationId.Of(id)));
         return conversation;
     }
 
     public async Task<List<Conversation>> GetConversationByUserIdAsync(Guid userId) {
         var conversations = await _dbContext.Conversations
-            .AsAsyncEnumerable()
-            .Where(c => c.UserId.Value == userId)
+            .Where(c => c.UserId.Equals(UserId.Of(userId)))
             .ToListAsync();
 
         return conversations;
     }
 
     public async Task<Conversation?> GetRecentMessagesAsync(Guid id, int pastMessages) {
-        var conversation = _dbContext.Conversations
-                       .Include(c => c.Messages)
-                       .AsNoTracking()
-                       .AsEnumerable()
-                       .FirstOrDefault(c => c.Id.Value == id);
+        var conversation = await _dbContext.Conversations
+                           .AsNoTracking()
+                           .FirstOrDefaultAsync(c => c.Id.Equals(ConversationId.Of(id)));
 
         if (conversation != null) {
-            conversation.Messages = conversation.Messages
-                .Where(m => m.ConversationId.Value == id)
+            conversation.Messages = await _dbContext.Messages
+                .Where(m => m.ConversationId.Equals(conversation.Id))
                 .OrderByDescending(m => m.CreatedAt)
                 .Take(pastMessages)
-                .ToList();
+                .ToListAsync();
         }
+
         return conversation;
     }
 
     public async Task<bool> IsConversationOwnedByUserAsync(Guid userId, Guid conversationId) {
         var exist = await _dbContext.Conversations
-            .AsAsyncEnumerable()
-            .AnyAsync(c => c.UserId.Value == userId);
+            .AnyAsync(c => c.UserId.Equals(UserId.Of(userId)));
         return exist;
     }
 }

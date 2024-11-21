@@ -1,0 +1,33 @@
+{
+  "name": "learning-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "database.hostname": "109.123.238.31",
+    "database.port": "31435",
+    "database.user": "postgres",
+    "database.password": "HDEXXlCvY7",
+    "database.dbname": "learningdb",
+    "database.server.name": "learning",
+    "schema.include.list": "public",
+    "table.include.list": "public.OutboxMessages",
+    "tombstones.on.delete": "false",
+    "topic.creation.default.partitions": 2,
+    "topic.creation.default.replication.factor": 1,
+    "transforms": "outbox",
+    "transforms.outbox.type": "io.debezium.transforms.outbox.EventRouter",
+    "transforms.outbox.table.field.event.id": "Id",
+    "transforms.outbox.table.field.event.key": "AggregateId",
+    "transforms.outbox.table.field.event.timestamp": "Timestamp",
+    "transforms.outbox.table.field.event.payload": "Payload",
+    "transforms.outbox.table.expand.json.payload": true,
+    "transforms.outbox.route.by.field": "AggregateType",
+    "transforms.outbox.route.topic.replacement": "${routedByValue}.events",
+    "transforms.outbox.table.fields.additional.placement": "Type:header:eventType",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": false,
+    "plugin.name": "pgoutput",
+    "topic.prefix": "LearningSync",
+    "slot.name": "db_learning_sync_slot"
+  }
+}

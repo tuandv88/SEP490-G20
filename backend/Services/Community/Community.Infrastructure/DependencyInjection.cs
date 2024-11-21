@@ -5,7 +5,10 @@ using Community.Infrastructure.Data.Repositories.Bookmarks;
 using Community.Infrastructure.Data.Repositories.Categorys;
 using Community.Infrastructure.Data.Repositories.Comments;
 using Community.Infrastructure.Data.Repositories.Discussions;
+using Community.Infrastructure.Data.Repositories.NotificationHistories;
+using Community.Infrastructure.Data.Repositories.NotificationTypes;
 using Community.Infrastructure.Data.Repositories.UserDiscussions;
+using Community.Infrastructure.Data.Repositories.UserNotificationSettings;
 using Community.Infrastructure.Data.Repositories.Votes;
 using Community.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -27,27 +30,31 @@ public static class DependencyInjection
         //Configuration Repository
         ConfigureRepository(services, configuration);
 
+        //IBase64Converter
+        services.AddScoped<IBase64Converter, Base64Converter>();
+
         //Caching
         services.AddConfigureCaching(configuration);
 
         services.AddHttpContextAccessor();
 
+        //UserContext
+        services.AddScoped<IUserContextService, UserContextService>();
+
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
 
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
-        //IBase64Converter
-        services.AddScoped<IBase64Converter, Base64Converter>();
 
         return services;
     }
     private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ICategoryRepository, CategoryRepository>();
-        //services.Decorate<ICategoryRepository, CategoryRepository>();
+        services.Decorate<ICategoryRepository, CachedCategoryRepository>();
 
         services.AddScoped<IDiscussionRepository, DiscussionRepository>();
-        //services.Decorate<ICategoryRepository, CategoryRepository>();
+        services.Decorate<IDiscussionRepository, CachedDiscussionRepository>();
 
         services.AddScoped<IVoteRepository, VoteRepository>();
 
@@ -56,6 +63,12 @@ public static class DependencyInjection
         services.AddScoped<IBookmarkRepository, BookmarkReponsitory>();
 
         services.AddScoped<IUserDiscussionRepository, UserDiscussionRepository>();
+
+        services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
+
+        services.AddScoped<INotificationHistoryRepository, NotificationHistoryRepository>();
+
+        services.AddScoped<IUserNotificationSettingRepository, UserNotificationSettingRepository>();
 
     }
 }

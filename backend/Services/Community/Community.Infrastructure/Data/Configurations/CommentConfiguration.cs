@@ -29,9 +29,9 @@ namespace Community.Infrastructure.Data.Configurations
                     dbDiscussionId => new DiscussionId(dbDiscussionId)) // Chuyển Guid thành DiscussionId
                 .IsRequired();
 
-            // Thiết lập mối quan hệ với Votes
+            // Thiết lập mối quan hệ với Votes (1-nhiều) mà không cần sử dụng navigation property
             builder.HasMany(c => c.Votes)
-                .WithOne(v => v.Comment)
+                .WithOne() // Không có navigation property `Vote.Comment`
                 .HasForeignKey(v => v.CommentId)
                 .OnDelete(DeleteBehavior.Cascade);
 

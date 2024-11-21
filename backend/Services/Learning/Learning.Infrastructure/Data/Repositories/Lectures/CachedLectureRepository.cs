@@ -5,9 +5,18 @@ public class CachedLectureRepository(ILectureRepository lectureRepository, IChap
         await RemoveCachedCourseDetails(entity);
     }
 
+    public async Task<int> CountByChapterAsync(Guid chapterId) {
+         return await lectureRepository.CountByChapterAsync(chapterId);
+    }
+
     public async Task DeleteAsync(Lecture entity) {
         await lectureRepository.DeleteAsync(entity);
         await RemoveCachedCourseDetails(entity);
+    }
+
+    public async Task DeleteAsync(params Lecture[] lectures) {
+        await lectureRepository.DeleteAsync(lectures);
+        await RemoveCachedCourseDetails(lectures.FirstOrDefault());
     }
 
     public async Task DeleteByIdAsync(Guid id) {

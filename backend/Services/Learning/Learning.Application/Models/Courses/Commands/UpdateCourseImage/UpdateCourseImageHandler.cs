@@ -1,9 +1,4 @@
-﻿
-using BuidingBlocks.Storage.Interfaces;
-using BuidingBlocks.Storage.Services;
-using Learning.Application.Data.Repositories;
-using Learning.Application.Interfaces;
-using Learning.Application.Models.Courses.Dtos;
+﻿using Learning.Application.Models.Courses.Dtos;
 
 namespace Learning.Application.Models.Courses.Commands.UpdateCourseImage;
 public class UpdateCourseImageHandler(ICourseRepository repository, IFilesService filesService, IBase64Converter base64Converter) : ICommandHandler<UpdateCourseImageCommand, UpdateCourseImageResult> {

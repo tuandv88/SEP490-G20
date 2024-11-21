@@ -21,6 +21,7 @@
 	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.8.1" />
 	  <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.8.1" />
 	  <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.10" />
+	  <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="8.0.10" />
   </ItemGroup>
 
   <ItemGroup>

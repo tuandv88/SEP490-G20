@@ -1,14 +1,17 @@
 ﻿using AuthServer.Data;
 using AuthServer.Models;
 using AuthServer.Repository.Services.Profile;
-using AuthServer.Repository.Services.SendMailWithModoboa;
 using IdentityServer4.EntityFramework.DbContexts;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using BuidingBlocks.Storage;
+using BuildingBlocks.Email;
 using AuthServer.Repository.Services.Base64Converter;
+using Microsoft.Extensions.DependencyInjection;
+using BuildingBlocks.Email.Interfaces;
+using BuildingBlocks.Email.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -112,7 +115,6 @@ builder.Services.AddAuthentication(options =>
 // Cấu hình SendMail - Nuget: FluentMail
 builder.Services.AddFluentEmail(builder.Configuration);
 builder.Services.AddTransient<IEmailService, EmailService>();
-
 // AddStorate
 builder.Services.AddStorage(builder.Configuration);
 builder.Services.AddScoped<IBase64Converter, Base64Converter>();

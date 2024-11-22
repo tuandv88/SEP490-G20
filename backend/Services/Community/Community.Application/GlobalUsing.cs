@@ -4,7 +4,6 @@ global using Microsoft.Extensions.DependencyInjection;
 global using BuildingBlocks.Pagination;
 global using BuildingBlocks.CQRS;
 global using BuildingBlocks.Exceptions;
-global using BuildingBlocks.Messaging.MassTransit;
 global using BuildingBlocks.Behaviors;
 global using BuidingBlocks.Storage;
 global using BuidingBlocks.Storage.Interfaces;

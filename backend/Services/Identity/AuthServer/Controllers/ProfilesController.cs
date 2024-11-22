@@ -37,7 +37,7 @@ namespace AuthServer.Controllers
             var bucket = StorageConstants.BUCKET;
             var s3Object = await _filesService.GetFileAsync(bucket, userCurrent.ProfilePicture, 60);
 
-            return Ok($"ImageUrlProfile: {s3Object.PresignedUrl}");
+            return Ok(new { ImageUrlProfile = s3Object.PresignedUrl });
         }
 
         [HttpPut("updateprofileimage")]

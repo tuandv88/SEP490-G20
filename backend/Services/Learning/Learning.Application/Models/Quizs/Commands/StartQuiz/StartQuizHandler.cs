@@ -41,7 +41,7 @@ public class StartQuizHandler(IQuizSubmissionRepository quizSubmissionRepository
 
         if (quiz.HasTimeLimit) {
            // sau giới hạn thời gian tự động nộp bài quiz
-           await ScheduleTimeLimit(quizSubmission.Id, DateTime.Now.AddMinutes(quiz.TimeLimit));
+           await ScheduleTimeLimit(quizSubmission.Id, DateTime.UtcNow.AddMinutes(quiz.TimeLimit));
         }
         await quizSubmissionRepository.AddAsync(quizSubmission);
         await quizSubmissionRepository.SaveChangesAsync(cancellationToken);

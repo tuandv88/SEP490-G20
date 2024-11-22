@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AuthServer.Controllers
 {
-    [Route("auth-service/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class TokensController : ControllerBase
     {

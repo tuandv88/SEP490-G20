@@ -24,16 +24,23 @@ const courseTableRoute = createRoute({
   component: lazy(() => import('@/pages/Course/CourseTable'))
 })
 
-const editCourseRoute = createRoute({
+export const editCourseRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/edit-course',
+  path: '/edit-course/$courseId',
   component: lazy(() => import('@/pages/Course/EditCourse'))
-})
+});
+
 
 const createCourseRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/create-course',
   component: lazy(() => import('@/pages/Course/CreateCourse'))
+})
+
+const testRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/test/:testId',
+  component: lazy(() => import('@/pages/Test'))
 })
 
 const createCodeProblemRoute = createRoute({
@@ -46,6 +53,12 @@ const createProblemRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/create-problem',
   component: lazy(() => import('@/pages/Problem/Create/CreateProblem'))
+})
+
+export const quizManagementRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/create-question/$quizId',
+  component: lazy(() => import('@/pages/Quiz/QuizManagement'))
 })
 
 // Define the login route as a child of the login root route
@@ -69,7 +82,9 @@ const mainRouteTree = rootRoute.addChildren([
   createCodeProblemRoute,
   editCourseRoute,
   createProblemRoute,
-  callbackRoute
+  callbackRoute,
+  quizManagementRoute,
+  testRoute
 ])
 
 const loginRouteTree = loginRootRoute.addChildren([loginRoute])

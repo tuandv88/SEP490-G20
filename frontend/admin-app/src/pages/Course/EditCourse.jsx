@@ -5,14 +5,18 @@ import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button" // Added Button import
 import Curriculum from '@/components/CreateCourse/Curriculum'
 import { getCourseDetails } from '@/services/api/courseApi'
+import { useMatch } from '@tanstack/react-router'
+import { editCourseRoute } from '@/routers/router'
 const EditCourse = () => {
+  const { params } = useMatch( editCourseRoute.id )
+  const { courseId } = params
   const [course, setCourse] = useState(null);
   const [chapter, setChapter]=useState(null)
   const [updateChapter, setUpdateChapter]=useState(false)
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const courseData = await getCourseDetails();
+        const courseData = await getCourseDetails(courseId);
         console.log(courseData)
         
         setCourse(courseData.courseDetailsDto.courseDto);
@@ -80,7 +84,7 @@ const EditCourse = () => {
 
       {/* Right side: Curriculum */}
       <div className="w-full lg:w-3/4 p-4 overflow-auto">
-        <Curriculum chapter={chapter} handleUpdateChapter={handleUpdateChapter}/>
+        <Curriculum chapter={chapter} courseId={courseId} handleUpdateChapter={handleUpdateChapter}/>
       </div>
     </div>
   )

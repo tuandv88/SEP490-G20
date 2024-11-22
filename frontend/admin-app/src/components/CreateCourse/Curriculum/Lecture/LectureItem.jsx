@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { createFile } from '@/services/api/fileApi';
 import { Pencil1Icon, Cross2Icon, FileIcon, VideoIcon, CodeIcon, QuestionMarkCircledIcon } from '@radix-ui/react-icons'
 import {
   AlertDialog,
@@ -12,31 +13,18 @@ import {
   AlertDialogCancel,
   AlertDialogAction
 } from '@/components/ui/alert-dialog'
+
 import { useNavigate } from '@tanstack/react-router'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import { useForm, Controller, FormProvider } from 'react-hook-form'
-import MarkdownFormField from '@/components/markdown-form-field'
+import { useForm, Controller, FormProvider, set } from 'react-hook-form'
 import { useToast } from '@/hooks/use-toast'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose
-} from '@/components/ui/dialog'
-import { createQuiz } from '@/services/api/quizApi'
+
+import { createQuiz, deleteQuiz } from '@/services/api/quizApi'
+import { getLectureDetails } from '@/services/api/lectureApi'
+import { deleteFileFromLecture } from '@/services/api/lectureApi'
+import { getVideoDuration } from '@/lib/utils'
+import { Loader2 } from 'lucide-react'
+import QuizCreationForm from './QuizCreationForm'
+import { FileQuestion } from 'lucide-react'
 
 export default function LectureItem({
   lecture,
@@ -45,12 +33,18 @@ export default function LectureItem({
   onFileUpload,
   onVideoUpload,
   onFileRemove,
-  onVideoRemove
+  onVideoRemove,
+
 }) {
+  const [isRunning1, setIsRunning1] = useState(false)
+  const [isRunning2, setIsRunning2] = useState(false)
   const navigate = useNavigate()
+  const [isUpdate, setIsUpdate] = useState(false)
+  const [lectureFiles, setLectureFiles] = useState(null)
   const fileInputRef = useRef(null)
   const videoInputRef = useRef(null)
   const [isQuizFormOpen, setIsQuizFormOpen] = useState(false)
+  const [createdQuiz, setCreatedQuiz] = useState(null);
   const { toast } = useToast()
   const methods = useForm({
     defaultValues: {
@@ -66,6 +60,20 @@ export default function LectureItem({
       quizType: 'PRACTICE'
     }
   })
+  useEffect(() => {
+    const fetchLectureDetails = async () => {
+      try {
+        const response = await getLectureDetails(lecture.id)
+        setCreatedQuiz(response.lectureDetailsDto.quiz)
+        setLectureFiles(response.lectureDetailsDto.files)
+        console.log(response.lectureDetailsDto.files)
+      } catch (error) {
+        console.error('Error getting lecture details:', error)
+      }
+    }
+    fetchLectureDetails()
+  }, [lecture.id,isUpdate])
+
 
   useEffect(() => {
     const restoreScroll = () => {
@@ -82,20 +90,71 @@ export default function LectureItem({
     }
   }, [isQuizFormOpen])
   const { control, handleSubmit } = methods
-
-  const handleFileUpload = (event) => {
-    const files = event.target.files
-    for (let i = 0; i < files.length; i++) {
-      onFileUpload(files[i])
+  const handleFileUpload = async (lectureId,file,fileType ) => {
+    try {
+      setIsRunning1(true)
+      // Prepare the file data for the API
+      const fileData = new FormData();
+      fileData.append('file', file);
+      fileData.append('fileType', fileType); 
+      console.log(fileData)
+      // Call the API to upload the file
+      const uploadedFile = await createFile(fileData, lectureId);
+      toast({
+        title: 'File uploaded',
+        description: 'The file has been successfully uploaded.',
+        duration: 1500,
+      });
+      setIsUpdate(!isUpdate)
+  
+      // Show a success message
+      
+    } catch (error) {
+      console.error('Failed to upload file:', error);
+      toast({
+        title: 'Upload failed',
+        description: 'There was an error uploading the file.',
+        duration: 1500,
+      });
     }
-  }
-
-  const handleVideoUpload = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-      onVideoUpload(file)
+    finally{
+      setIsRunning1(false)
     }
-  }
+  };
+
+  const handleVideoUpload = async (event) => {
+    
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try{
+      setIsRunning2(true)
+      const videoDuration = await getVideoDuration(file);
+      const fileData = new FormData();
+      fileData.append('file', file);
+      fileData.append('fileType', 'VIDEO'); 
+      fileData.append('duration', videoDuration);
+      console.log(fileData)
+      const uploadedFile = await createFile(fileData, lecture.id);
+      toast({
+        title: 'Video uploaded',
+        description: 'The video has been successfully uploaded.',
+        duration: 1500,
+      });
+      setIsUpdate(!isUpdate)
+      event.target.value = null;
+    }catch(error){
+      toast({
+        title: 'Upload failed',
+        description: 'There was an error uploading the video.',
+        duration: 1500,
+      });
+      console.error('Failed to upload video:', error);
+    }
+    finally{
+      setIsRunning2(false)
+    }
+  };
 
   const triggerFileUpload = () => {
     fileInputRef.current.click()
@@ -115,6 +174,46 @@ export default function LectureItem({
   const handleQuizFormClose = () => {
     setIsQuizFormOpen(false)
   }
+  const handleVideoRemove = async (fileId) => {
+    try {
+      const response = await deleteFileFromLecture(fileId, lecture.id)
+      setIsUpdate(!isUpdate)
+      console.log(response)
+      toast({
+        title: 'File deleted',
+        description: 'The file has been successfully deleted.',
+        duration: 1500,
+      })
+
+    } catch (error) {
+      console.error('Error deleting file:', error)
+      toast({
+        title: 'Delete failed',
+        description: 'There was an error deleting the file.',
+        duration: 1500,
+      })
+    }
+  }
+
+  const handleFileRemove = async (fileId) => {
+    try {
+      const response = await deleteFileFromLecture(fileId, lecture.id)
+      setIsUpdate(!isUpdate)
+      console.log(response)
+      toast({
+        title: 'File deleted',
+        description: 'The file has been successfully deleted.',
+        duration: 1500,
+      })
+    } catch (error) {
+      console.error('Error deleting file:', error)
+      toast({
+        title: 'Delete failed',
+        description: 'There was an error deleting the file.',
+        duration: 1500,
+      })
+    }
+  }
 
 
 
@@ -129,16 +228,47 @@ export default function LectureItem({
       toast({
         title: 'Quiz created successfully',
         description: 'Quiz created successfully',
+        duration: 1500,
       })
+      setIsUpdate(!isUpdate)
       setIsQuizFormOpen(false)
       // Optionally, navigate to another page or show a success message
     } catch (error) {
+      toast({
+        title: 'Quiz creation failed',
+        description: 'There was an error creating the quiz.',
+        duration: 1500,
+      })
       console.error('Error creating quiz:', error)
       // Optionally, show an error message to the user
     }
     console.log(data)
     handleQuizFormClose()
   }
+
+  const handleEditQuiz = (quizId) => {
+    // Implement edit functionality
+    navigate({ to: `/create-question/${quizId}` })
+  };
+
+  const handleDeleteQuiz = async (quizId) => {
+    try {
+      const response = await deleteQuiz(quizId)
+      setIsUpdate(!isUpdate)
+      toast({
+        title: 'Quiz deleted',
+        description: 'The quiz has been successfully deleted.',
+        duration: 1500,
+      })
+    } catch (error) {
+      console.error('Error deleting quiz:', error)
+      toast({
+        title: 'Delete failed',
+        description: 'There was an error deleting the quiz.',
+        duration: 1500,
+      })
+    }
+  };
   return (
     <div className='flex flex-col p-4 mt-4 rounded-md shadow-sm bg-gray-50'>
       <div className='flex items-center justify-between mb-4'>
@@ -186,227 +316,154 @@ export default function LectureItem({
               type='file'
               ref={fileInputRef}
               className='hidden'
-              onChange={handleFileUpload}
+              onChange={(event) => handleFileUpload(lecture.id, event.target.files[0], 'DOCUMENT')}
               accept='.pdf,.doc,.docx,.txt'
               multiple
             />
             <Button onClick={triggerFileUpload} size='sm' className='w-full sm:w-auto'>
-              <FileIcon className='w-4 h-4 mr-2' /> Upload Files
+              
+              {isRunning1 ? (
+                      <>
+                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                        Uploading...
+                      </>
+                    )
+                    :(<><FileIcon className='w-4 h-4 mr-2' /> Upload Files</>)}
             </Button>
-            {lecture.files &&
-              lecture.files.map((file, index) => (
-                <div key={index} className='flex items-center p-2 mt-2 bg-white rounded-md'>
+            {lectureFiles &&
+              lectureFiles.map((file, index) => (
+                file.fileType === 'DOCUMENT' && (
+                  <div key={file.fileId} className='flex items-center p-2 mt-2 bg-white rounded-md'>
                   <FileIcon className='w-4 h-4 mr-2 text-blue-500' />
-                  <span className='flex-grow text-sm truncate'>{file.name}</span>
-                  <Button onClick={() => onFileRemove(index)} size='sm' variant='ghost' className='ml-2'>
+                  <span className='flex-grow text-sm truncate'>{file.fileName}</span>
+                  <Button onClick={() => handleFileRemove(file.fileId,)} size='sm' variant='ghost' className='ml-2'>
                     <Cross2Icon className='w-4 h-4 text-red-500' />
                     <span className='sr-only'>Remove file</span>
                   </Button>
                 </div>
+                )
               ))}
           </div>
           <div>
-            <input type='file' ref={videoInputRef} className='hidden' onChange={handleVideoUpload} accept='video/*' />
-            <Button onClick={triggerVideoUpload} size='sm' className='w-full sm:w-auto' disabled={lecture.video}>
-              <VideoIcon className='w-4 h-4 mr-2' /> {lecture.video ? 'Change Video' : 'Upload Video'}
+            <input type='file' ref={videoInputRef} className='hidden' onChange={handleVideoUpload} accept='video/*' multiple/>
+            <Button onClick={triggerVideoUpload} size='sm' className='w-full sm:w-auto' disabled={lectureFiles && lectureFiles.some(file => file.fileType === 'VIDEO')}>
+             
+              {isRunning2 ? (
+                      <>
+                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                        Uploading...
+                      </>
+                    )
+                    :(<> <VideoIcon className='w-4 h-4 mr-2' /> Upload Video</>)}
             </Button>
-            {lecture.video && (
-              <div className='flex items-center p-2 mt-2 bg-white rounded-md'>
+            {lectureFiles && 
+              lectureFiles.map((file, index) => ( 
+                file.fileType === 'VIDEO' && (
+                  <div key={index} className='flex items-center p-2 mt-2 bg-white rounded-md'>
                 <VideoIcon className='w-4 h-4 mr-2 text-blue-500' />
-                <span className='flex-grow text-sm truncate'>{lecture.video.name}</span>
-                <Button onClick={onVideoRemove} size='sm' variant='ghost' className='ml-2'>
+                <span className='flex-grow text-sm truncate'>{file.fileName}</span>
+                <Button onClick={() => handleVideoRemove(file.fileId)} size='sm' variant='ghost' className='ml-2'>
                   <Cross2Icon className='w-4 h-4 text-red-500' />
                   <span className='sr-only'>Remove video</span>
                 </Button>
               </div>
-            )}
+                )
+            ))}
           </div>
-          <Button onClick={handleCreateCodeProblem} size='sm' className='w-full sm:w-auto'>
-            <CodeIcon className='w-4 h-4 mr-2' /> Create Code Problem
-          </Button>
+
         </div>
       )}
       {lecture.lectureType === 'Practice' && (
-        <div className='mt-2'>
-          <Button onClick={handleCreateCodeProblem} size='sm' className='w-full sm:w-auto'>
-            <CodeIcon className='w-4 h-4 mr-2' /> Create Code Problem
+        <div className='space-y-4'>
+        <div>
+          <input
+            type='file'
+            ref={fileInputRef}
+            className='hidden'
+            onChange={(event) => handleFileUpload(lecture.id, event.target.files[0], 'DOCUMENT')}
+            accept='.pdf,.doc,.docx,.txt'
+            multiple
+          />
+          <Button onClick={triggerFileUpload} size='sm' className='w-full sm:w-auto'>
+            
+            {isRunning1 ? (
+                    <>
+                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                      Uploading...
+                    </>
+                  )
+                  :(<><FileIcon className='w-4 h-4 mr-2' /> Upload Files</>)}
           </Button>
+          {lectureFiles &&
+            lectureFiles.map((file, index) => (
+              file.fileType === 'DOCUMENT' && (
+                <div key={file.fileName} className='flex items-center p-2 mt-2 bg-white rounded-md'>
+                <FileIcon className='w-4 h-4 mr-2 text-blue-500' />
+                <span className='flex-grow text-sm truncate'>{file.fileName}</span>
+                <Button onClick={() => handleFileRemove(file.fileId,)} size='sm' variant='ghost' className='ml-2'>
+                  <Cross2Icon className='w-4 h-4 text-red-500' />
+                  <span className='sr-only'>Remove file</span>
+                </Button>
+              </div>
+              )
+            ))}
         </div>
+        <div>
+          <input type='file' ref={videoInputRef} className='hidden' onChange={handleVideoUpload} accept='video/*' multiple/>
+          <Button onClick={triggerVideoUpload} size='sm' className='w-full sm:w-auto' disabled={lectureFiles && lectureFiles.some(file => file.fileType === 'VIDEO')}>
+           
+            {isRunning2 ? (
+                    <>
+                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                      Uploading...
+                    </>
+                  )
+                  :(<> <VideoIcon className='w-4 h-4 mr-2' /> Upload Video</>)}
+          </Button>
+          {lectureFiles && 
+            lectureFiles.map((file, index) => ( 
+              file.fileType === 'VIDEO' && (
+                <div className='flex items-center p-2 mt-2 bg-white rounded-md'>
+              <VideoIcon className='w-4 h-4 mr-2 text-blue-500' />
+              <span className='flex-grow text-sm truncate'>{file.fileName}</span>
+              <Button onClick={() => handleVideoRemove(file.fileId)} size='sm' variant='ghost' className='ml-2'>
+                <Cross2Icon className='w-4 h-4 text-red-500' />
+                <span className='sr-only'>Remove video</span>
+              </Button>
+            </div>
+              )
+          ))}
+        </div>
+        <Button onClick={handleCreateCodeProblem} size='sm' className='w-full sm:w-auto'>
+          <CodeIcon className='w-4 h-4 mr-2' /> Create Code Problem
+        </Button>
+      </div>
       )}
        {lecture.lectureType === 'Quiz' && (
         <div className='mt-2'>
           <Button onClick={handleQuizFormOpen} size='sm' className='w-full sm:w-auto'>
             <QuestionMarkCircledIcon className='w-4 h-4 mr-2' /> Create Quiz
           </Button>
+          {createdQuiz && (
+            <div key={createdQuiz.id} className='flex items-center p-2 mt-2 bg-white rounded-md'>
+            <FileQuestion className='w-4 h-4 mr-2 text-blue-500' />
+            <span className='flex-grow text-sm truncate'>{createdQuiz.title}</span>
+            <Button onClick={() => handleEditQuiz(createdQuiz.id)} size="sm" variant="outline" className='ml-2' >
+                    <Pencil1Icon className="w-4 h-4 mr-2" /> 
+                  </Button>
+                  <Button onClick={() => handleDeleteQuiz(createdQuiz.id)} size="sm" variant="destructive" className='ml-2'>
+                    <Cross2Icon className="w-4 h-4 mr-2" /> 
+                  </Button>
+            </div>
+            
+          )}
         </div>
       )}
-      <Dialog open={isQuizFormOpen} onOpenChange={setIsQuizFormOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Create Quiz</DialogTitle>
-            <DialogDescription>Fill in the details to create a new quiz.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className='grid gap-4 py-4'>
-                <div className="grid grid-cols-6 items-center gap-4">
-                  <Label htmlFor="title" className="text-right col-span-2">
-                    Title
-                  </Label>
-                  <Controller
-                    name="title"
-                    control={control}
-                    render={({ field }) => (
-                      <Input {...field} id="title" className="col-span-4" />
-                    )}
-                  />
-                </div>
-                <div className='grid grid-cols-6 items-start gap-4'>
-                  <Label htmlFor='description' className='text-right col-span-2 pt-2'>
-                    Description
-                  </Label>
-                  <div className="col-span-4">
-                    <MarkdownFormField
-                      name="description"
-                      label=""
-                      placeholder="Enter quiz description"
-                    />
-                  </div>
-                </div>
-                <div className='grid grid-cols-6 items-center gap-4'>
-                  <Label htmlFor='passingMark' className='text-right col-span-2'>
-                    Passing Mark
-                  </Label>
-                  <Controller
-                    name="passingMark"
-                    control={control}
-                    render={({ field }) => (
-                      <Input {...field} id="passingMark" type="number" className="col-span-4" />
-                    )}
-                  />
-                </div>
-                <div className='grid grid-cols-6 items-center gap-4'>
-                  <Label htmlFor='timeLimit' className='text-right col-span-2'>
-                    Time Limit (minutes)
-                  </Label>
-                  <Controller
-                    name="timeLimit"
-                    control={control}
-                    render={({ field }) => (
-                      <Input {...field} id="timeLimit" type="number" className="col-span-4" />
-                    )}
-                  />
-                </div>
-                <div className='grid grid-cols-6 items-center gap-4'>
-                  <Label htmlFor='hasTimeLimit' className='text-right col-span-2'>
-                    Has Time Limit
-                  </Label>
-                  <Controller
-                    name="hasTimeLimit"
-                    control={control}
-                    render={({ field }) => (
-                      <Checkbox
-                        id='hasTimeLimit'
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    )}
-                  />
-                </div>
-                <div className='grid grid-cols-6 items-center gap-4'>
-                  <Label htmlFor='attemptLimit' className='text-right col-span-2'>
-                    Attempt Limit
-                  </Label>
-                  <Controller
-                    name="attemptLimit"
-                    control={control}
-                    render={({ field }) => (
-                      <Input {...field} id="attemptLimit" type="number" className="col-span-4" />
-                    )}
-                  />
-                </div>
-                <div className='grid grid-cols-6 items-center gap-4'>
-                  <Label htmlFor='hasAttemptLimit' className='text-right col-span-2'>
-                    Has Attempt Limit
-                  </Label>
-                  <Controller
-                    name="hasAttemptLimit"
-                    control={control}
-                    render={({ field }) => (
-                      <Checkbox
-                        id='hasAttemptLimit'
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    )}
-                  />
-                </div>
-                <div className='grid grid-cols-6 items-center gap-4'>
-                  <Label htmlFor='isActive' className='text-right col-span-2'>
-                    Is Active
-                  </Label>
-                  <Controller
-                    name="isActive"
-                    control={control}
-                    render={({ field }) => (
-                      <Checkbox
-                        id='isActive'
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    )}
-                  />
-                </div>
-                <div className='grid grid-cols-6 items-center gap-4'>
-                  <Label htmlFor='isRandomized' className='text-right col-span-2'>
-                    Is Randomized
-                  </Label>
-                  <Controller
-                    name="isRandomized"
-                    control={control}
-                    render={({ field }) => (
-                      <Checkbox
-                        id='isRandomized'
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    )}
-                  />
-                </div>
-                <div className='grid grid-cols-6 items-center gap-4'>
-                  <Label htmlFor='quizType' className='text-right col-span-2'>
-                    Quiz Type
-                  </Label>
-                  <Controller
-                    name="quizType"
-                    control={control}
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger className='col-span-4'>
-                          <SelectValue placeholder='Select quiz type' />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value='PRACTICE'>Practice</SelectItem>
-                          <SelectItem value='ASSESSMENT'>Assessment</SelectItem>
-                          <SelectItem value='FINAL'>Final</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button type='button' variant='secondary'>
-                    Cancel
-                  </Button>
-                </DialogClose>
-                <Button type='submit'>Create Quiz</Button>
-              </DialogFooter>
-            </form>
-          </FormProvider>
-        </DialogContent>
-      </Dialog>
+      <QuizCreationForm
+        isOpen={isQuizFormOpen}
+        onOpenChange={setIsQuizFormOpen}
+        onSubmit={onSubmit}
+      />
     </div>
   )
 }

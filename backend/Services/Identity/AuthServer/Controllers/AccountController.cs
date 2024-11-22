@@ -374,6 +374,7 @@ namespace AuthServer.Controllers
 
             if (result.Succeeded)
             {
+                
                 if (model.RememberMe)
                 {
                     var cookieOptions = new CookieOptions

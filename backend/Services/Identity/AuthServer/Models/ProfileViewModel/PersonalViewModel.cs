@@ -4,6 +4,8 @@ namespace AuthServer.Models.ProfileViewModel
 {
     public class PersonalViewModel
     {
+        public string? urlAvatar { get; set; }
+
         [Required]
         public string UserName { get; set; }
 

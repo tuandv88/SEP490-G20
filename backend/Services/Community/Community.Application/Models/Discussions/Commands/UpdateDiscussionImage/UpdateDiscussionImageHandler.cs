@@ -10,6 +10,7 @@ public class UpdateDiscussionImageHandler: ICommandHandler<UpdateDiscussionImage
     private readonly IBase64Converter _base64Converter;
 
     private static string bucket = StorageConstants.BUCKET;
+
     public UpdateDiscussionImageHandler(IDiscussionRepository discussionRepository, IFilesService filesService, IBase64Converter base64Converter)
     {
         _discussionRepository = discussionRepository;

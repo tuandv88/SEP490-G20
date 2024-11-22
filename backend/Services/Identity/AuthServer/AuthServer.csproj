@@ -100,4 +100,8 @@
 	  <Folder Include="Keys\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\BuildingBlocks\BuidingBlocks.Storage\BuidingBlocks.Storage.csproj" />
+	</ItemGroup>
+
 </Project>

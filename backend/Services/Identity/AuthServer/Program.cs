@@ -1,17 +1,14 @@
-﻿using AuthServer.Config;
-using AuthServer.Data;
+﻿using AuthServer.Data;
 using AuthServer.Models;
 using AuthServer.Repository.Services.Profile;
 using AuthServer.Repository.Services.SendMailWithModoboa;
 using IdentityServer4.EntityFramework.DbContexts;
-using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using BuidingBlocks.Storage;
+using AuthServer.Repository.Services.Base64Converter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,7 +98,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.ExpireTimeSpan = TimeSpan.FromMinutes(15);   // Thời gian sống của cookie là 15 phút
     options.SlidingExpiration = true;                    // Tự động gia hạn thời gian sống khi người dùng hoạt động
-    options.AccessDeniedPath = "/Account/accessdenied";  // Đường dẫn khi truy cập bị từ chối
+    options.AccessDeniedPath = "/Account/AccessDenied";  // Đường dẫn khi truy cập bị từ chối
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
 })
@@ -115,6 +112,10 @@ builder.Services.AddAuthentication(options =>
 // Cấu hình SendMail - Nuget: FluentMail
 builder.Services.AddFluentEmail(builder.Configuration);
 builder.Services.AddTransient<IEmailService, EmailService>();
+
+// AddStorate
+builder.Services.AddStorage(builder.Configuration);
+builder.Services.AddScoped<IBase64Converter, Base64Converter>();
 
 var app = builder.Build();
 

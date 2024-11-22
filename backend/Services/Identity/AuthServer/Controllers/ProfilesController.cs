@@ -24,6 +24,22 @@ namespace AuthServer.Controllers
             _base64Converter = base64Converter;
         }
 
+        [HttpGet("getprofileimagebyuserid/{userId}")]
+        public async Task<IActionResult> GetProfileImageByUserId(Guid userId)
+        {
+            var userCurrent = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (userCurrent == null)
+            {
+                return BadRequest($"Can not find user!");
+            }
+
+            var bucket = StorageConstants.BUCKET;
+            var s3Object = await _filesService.GetFileAsync(bucket, userCurrent.ProfilePicture, 60);
+
+            return Ok($"ImageUrlProfile: {s3Object.PresignedUrl}");
+        }
+
         [HttpPut("updateprofileimage")]
         public async Task<IActionResult> UpdateProfileImage([FromBody] UpdateProfileImageDto updateProfileImageDto)
         {

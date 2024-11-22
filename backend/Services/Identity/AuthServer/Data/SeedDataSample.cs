@@ -33,7 +33,7 @@ namespace AuthServer.Data
 
             // Seed Users
             var users = new List<Users>();
-            for (int i = 1; i <= 5; i++) // Chỉ tạo 5 người dùng
+            for (int i = 1; i <= 6; i++) // Chỉ tạo 6 người dùng
             {
                 var user = new Users
                 {
@@ -69,16 +69,15 @@ namespace AuthServer.Data
             // Seed Roles
             var roles = new List<Roles>
             {
-                new Roles { Id = Guid.NewGuid(), Name = "admin", NormalizedName = "ADMIN", ConcurrencyStamp = Guid.NewGuid().ToString() },
-                new Roles { Id = Guid.NewGuid(), Name = "user", NormalizedName = "USER", ConcurrencyStamp = Guid.NewGuid().ToString() }
+                 new Roles { Id = Guid.NewGuid(), Name = "admin", NormalizedName = "ADMIN", ConcurrencyStamp = Guid.NewGuid().ToString() },
+                 new Roles { Id = Guid.NewGuid(), Name = "moderator", NormalizedName = "MODERATOR", ConcurrencyStamp = Guid.NewGuid().ToString() },
+                 new Roles { Id = Guid.NewGuid(), Name = "learner", NormalizedName = "LEARNER", ConcurrencyStamp = Guid.NewGuid().ToString() }
             };
             appDbContext.Roles.AddRange(roles);
             appDbContext.SaveChanges();
 
             // Giả sử bạn đã có danh sách người dùng từ trước
             var userList = appDbContext.Users.ToList();
-            // Đếm số lượng người dùng để chia làm 2
-            int halfUserCount = userList.Count / 2;
 
             // Seed UserRoles
             var userRoles = new List<UserRoles>();
@@ -86,22 +85,28 @@ namespace AuthServer.Data
             // Vòng lặp để gán vai trò cho người dùng
             for (int i = 0; i < userList.Count; i++)
             {
-                if (i < halfUserCount)
+                if (i == 0)
                 {
-                    // Gán vai trò Admin cho nửa đầu danh sách
                     userRoles.Add(new UserRoles
                     {
                         UserId = users[i].Id,
                         RoleId = roles[0].Id // Vai trò Admin
                     });
                 }
-                else
+                else if(i == 1 || i == 2)
                 {
-                    // Gán vai trò User cho nửa sau danh sách
                     userRoles.Add(new UserRoles
                     {
                         UserId = users[i].Id,
-                        RoleId = roles[1].Id // Vai trò User
+                        RoleId = roles[1].Id 
+                    });
+                }
+                else
+                {
+                    userRoles.Add(new UserRoles
+                    {
+                        UserId = users[i].Id,
+                        RoleId = roles[2].Id 
                     });
                 }
             }
@@ -117,7 +122,7 @@ namespace AuthServer.Data
         private static void SeedUserClaimsTokensLogins(ApplicationDbContext appDbContext, List<Users> users)
         {
             // Seeding UserClaims
-            for (int i = 1; i <= 5; i++)
+            for (int i = 1; i <= 6; i++)
             {
                 appDbContext.UserClaims.Add(new UserClaims
                 {
@@ -129,7 +134,7 @@ namespace AuthServer.Data
             appDbContext.SaveChanges();
 
             // Seeding UserTokens và UserLogins
-            for (int i = 1; i <= 5; i++)
+            for (int i = 1; i <= 6; i++)
             {
                 appDbContext.UserTokens.Add(new UserTokens
                 {

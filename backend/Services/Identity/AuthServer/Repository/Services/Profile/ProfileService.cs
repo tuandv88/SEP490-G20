@@ -42,7 +42,7 @@ namespace AuthServer.Repository.Services.Profile
             }
 
             // Thêm userId vào claims
-            context.IssuedClaims.Add(new Claim("userId", userId.ToString()));  // Sử dụng "userId" thay vì JwtClaimTypes.Subject
+            context.IssuedClaims.Add(new Claim(JwtClaimTypes.Subject, user.Id.ToString()));  // Sử dụng JwtClaimTypes.Subject
 
             // Thêm username vào claims
             context.IssuedClaims.Add(new Claim("username", username));  // Sử dụng "username" thay vì JwtClaimTypes.PreferredUserName

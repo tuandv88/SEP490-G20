@@ -15,7 +15,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
         if (quizSubmission == null) {
             logger.LogWarning($"Submission is not found submissionId : {context.Message.SubmissionId}");
             return;
-        }
+        } 
         if (quizSubmission.Status == QuizSubmissionStatus.Processing) {
             var quiz = await quizRepository.GetByIdDetailAsync(quizSubmission.QuizId.Value);
 

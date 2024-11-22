@@ -1,9 +1,12 @@
 import axiosInstance from '@/lib/axios'
-
+import Cookies from 'js-cookie'
 export const getCourses = async (pageIndex, pageSize) => {
   try {
     const response = await axiosInstance.get('/learning-service/courses', {
-      params: { pageIndex, pageSize }
+      params: { pageIndex, pageSize },
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('authToken')}`
+      }
     })
     console.log('API Response:', response.data)
     return response.data.courseDtos.data

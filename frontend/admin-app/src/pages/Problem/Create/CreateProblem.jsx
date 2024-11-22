@@ -12,6 +12,7 @@ const CreateProblem = ({ navigationUrl, navigationTitle, lectureId, problemType 
   const [activeTab, setActiveTab] = useState('basic');
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
   const { toast } = useToast();
+  const [isRunSuccess, setIsRunSuccess] = useState(false)
 
   console.log(isSaveTemplate)
   
@@ -67,12 +68,13 @@ const CreateProblem = ({ navigationUrl, navigationTitle, lectureId, problemType 
       <Header backTo='Back to Curriculum' />
       <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormTabs activeTab={activeTab} form={form} setIsSaveTemplate={setIsSaveTemplate}/>
+        <FormTabs activeTab={activeTab} form={form} setIsSaveTemplate={setIsSaveTemplate} setIsRunSuccess={setIsRunSuccess}/>
         <BottomTabs 
           
           activeTab={activeTab} 
           setActiveTab={setActiveTab}
           isSaveTemplate={isSaveTemplate}
+          isRunSuccess={isRunSuccess}
         />
         </form>
       </FormProvider>

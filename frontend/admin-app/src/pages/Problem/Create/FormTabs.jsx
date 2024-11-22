@@ -3,7 +3,7 @@ import BasicInfoStep from '@/components/CreateCourse/CreateCodeProblem/basic-inf
 import CodeEditor from '@/pages/Problem/Create/CodeEditor'
 import Template from '@/pages/Problem/Create/Template';
 
-const FormTabs = ({ activeTab, form, setIsSaveTemplate }) => {
+const FormTabs = ({ activeTab, form, setIsSaveTemplate, setIsRunSuccess }) => {
 
   return (
     <div className='mx-auto px-4 py-24'>
@@ -12,7 +12,7 @@ const FormTabs = ({ activeTab, form, setIsSaveTemplate }) => {
           <BasicInfoStep form={form} />
         </div>
         <div style={{ display: activeTab === 'code' ? 'block' : 'none' }}>
-          <CodeEditor form={form} />
+          <CodeEditor form={form} setIsRunSuccess={setIsRunSuccess} />
         </div>
         <div style={{ display: activeTab === 'description' ? 'block' : 'none' }}>
           <Template form={form} setIsSaveTemplate={setIsSaveTemplate} />

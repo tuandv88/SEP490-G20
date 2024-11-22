@@ -61,6 +61,24 @@ const callbackRoute = createRoute({
   component: lazy(() => import('@/oidc/Callback'))
 })
 
+export const testRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/test',
+  component: lazy(() => import('@/pages/Test/Test'))
+})
+
+export const testDetailRoute = createRoute({
+  getParentRoute: () => testRoute,
+  path: '$testId',
+  component: lazy(() => import('@/pages/Test/Test'))
+})
+
+const mainTestRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/main-test',
+  component: lazy(() => import('@/pages/Test/MainTest'))
+})
+
 // Create the route trees
 const mainRouteTree = rootRoute.addChildren([
   indexRoute,
@@ -69,7 +87,9 @@ const mainRouteTree = rootRoute.addChildren([
   createCodeProblemRoute,
   editCourseRoute,
   createProblemRoute,
-  callbackRoute
+  callbackRoute,
+  mainTestRoute,
+  testRoute.addChildren([testDetailRoute])
 ])
 
 const loginRouteTree = loginRootRoute.addChildren([loginRoute])

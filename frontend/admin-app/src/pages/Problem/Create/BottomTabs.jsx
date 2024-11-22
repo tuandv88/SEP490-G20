@@ -1,5 +1,8 @@
 import { FileText, Code, BookOpen, ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useState } from 'react'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { AlertDialogDescription } from '@radix-ui/react-alert-dialog'
 
 const tabs = [
   { id: 'basic', label: 'Basic Info', icon: FileText },
@@ -7,10 +10,11 @@ const tabs = [
   { id: 'description', label: 'Template', icon: BookOpen }
 ]
 
-export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate  }) {
+export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, isRunSuccess }) {
   const currentTabIndex = tabs.findIndex((tab) => tab.id === activeTab)
   const isLastTab = currentTabIndex === tabs.length - 1
   const isFirstTab = currentTabIndex === 0
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
 
   const handlePrevious = () => {
     if (!isFirstTab) {
@@ -45,8 +49,9 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate  })
               return (
                 <button
                   type='button'
+                  
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {isRunSuccess === false && activeTab === 'code' ? setIsAlertOpen(true) : setActiveTab(tab.id)}  }
                   className={`
           flex flex-row items-center justify-center px-4 relative
           ${activeTab === tab.id ? 'text-purple-600' : 'text-gray-600 hover:text-gray-900'}
@@ -66,13 +71,13 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate  })
           }
 
           {!isLastTab && (
-            <Button type='button' variant='ghost' onClick={handleNext} className='flex items-center'>
+            <Button disabled={isRunSuccess === false && activeTab === 'code'} type='button' variant='ghost' onClick={handleNext} className='flex items-center'>
             Next
             <ArrowRight className='h-4 w-4 ml-2' />
           </Button>
           )}
         </div>
-      </div>
+      </div>     
     </div>
   )
 }

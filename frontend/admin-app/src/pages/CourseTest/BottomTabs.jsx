@@ -7,10 +7,11 @@ const tabs = [
   { id: 'description', label: 'Template', icon: BookOpen }
 ]
 
-export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate  }) {
+export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate }) {
   const currentTabIndex = tabs.findIndex((tab) => tab.id === activeTab)
   const isLastTab = currentTabIndex === tabs.length - 1
   const isFirstTab = currentTabIndex === 0
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
 
   const handlePrevious = () => {
     if (!isFirstTab) {
@@ -53,23 +54,23 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate  })
         `}
                 >
                   <Icon className='h-5 w-5 mr-2' />
-                  <span className='text-xs'>{tab.label}</span>                 
+                  <span className='text-xs'>{tab.label}</span>
                 </button>
               )
             })}
           </div>
 
-          {isLastTab && 
+          {isLastTab && (
             <Button disabled={isSaveTemplate === false} type='submit' variant='default' className='flex items-center'>
               Submit
             </Button>
-          }
+          )}
 
           {!isLastTab && (
             <Button type='button' variant='ghost' onClick={handleNext} className='flex items-center'>
-            Next
-            <ArrowRight className='h-4 w-4 ml-2' />
-          </Button>
+              Next
+              <ArrowRight className='h-4 w-4 ml-2' />
+            </Button>
           )}
         </div>
       </div>

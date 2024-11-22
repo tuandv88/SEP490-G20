@@ -8,7 +8,6 @@ public class LectureProgressConfiguration : IEntityTypeConfiguration<LectureProg
                         dbId => LectureProgressId.Of(dbId));
         builder.Property(uc => uc.CompletionDate).HasDefaultValue(null);
         builder.Property(uc => uc.IsCurrent).HasDefaultValue(false);
-        builder.Property(uc => uc.Notes).HasMaxLength(int.MaxValue);
         builder.Property(uc => uc.Duration);
     }
 }

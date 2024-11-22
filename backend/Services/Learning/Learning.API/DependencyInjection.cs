@@ -1,8 +1,8 @@
 ﻿using BuildingBlocks.Exceptions.Handler;
 using BuildingBlocks.Extensions;
-using Hangfire;
 using Learning.API.Services;
 using Learning.Application.Interfaces;
+using Learning.Infrastructure.Extentions;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 namespace Learning.API;
 public static class DependencyInjection {
@@ -31,7 +31,7 @@ public static class DependencyInjection {
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapCarter();
-        app.MapHangfireDashboard();
+        app.AddHangfireDashboard();
         app.UseExceptionHandler(options => { });
         return app;
     }

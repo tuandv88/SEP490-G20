@@ -1,7 +1,8 @@
-﻿using AI.Application.Common.Constants;
-using FluentValidation;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateDocumentFileCommand(IEnumerable<IFormFile> Files) : ICommand<CreateDocumentFileResult>;
 
 public record CreateDocumentFileResult(List<Guid> DocumentIds);

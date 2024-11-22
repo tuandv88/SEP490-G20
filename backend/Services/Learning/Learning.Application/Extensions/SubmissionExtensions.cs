@@ -1,4 +1,5 @@
-﻿using Learning.Application.Models.Submissions.Dtos;
+﻿using Learning.Application.Models.Quizs.Dtos;
+using Learning.Application.Models.Submissions.Dtos;
 
 namespace Learning.Application.Extensions;
 public static class SubmissionExtensions {
@@ -7,7 +8,7 @@ public static class SubmissionExtensions {
                 Token: s.Token,
                 RunTimeErrors: s.Stderr,
                 CompileErrors: s.CompileOutput,
-                ExecutionTime: double.TryParse(s.Time, out var time) ? time : 0.0, 
+                ExecutionTime: double.TryParse(s.Time, out var time) ? time : 0.0,
                 MemoryUsage: s.Memory.HasValue ? (long)s.Memory.Value : 0L,
                 TestResults: DeserializeObjectToTestResult(s.Stdout),
                 Status: new SubmissionStatus(s.Status!.Id, s.Status.Description),
@@ -23,5 +24,17 @@ public static class SubmissionExtensions {
             return new List<TestResult>() {
                 new TestResult(Inputs: new(), Output: "", Stdout: output!, Expected: "", IsPass: false) };
         }
+    }
+    public static SubmissionLectureViewDto ToSubmissionLectureViewDto(this ProblemSubmission submission) {
+        return new SubmissionLectureViewDto(
+                submission.SubmissionDate,
+                submission.LanguageCode.ToString(),
+                submission.TestResults.Count,
+                submission.TestResults.Count(t => t.IsPass),
+                submission.ExecutionTime,
+                submission.MemoryUsage,
+                submission.RunTimeErrors,
+                submission.CompileErrors
+                );
     }
 }

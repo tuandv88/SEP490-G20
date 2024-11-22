@@ -1,8 +1,8 @@
 ﻿using AI.API.Hubs;
+using AI.API.Services;
 using AI.Application.Interfaces;
 using BuildingBlocks.Exceptions.Handler;
 using BuildingBlocks.Extensions;
-using Carter;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using StackExchange.Redis;
@@ -50,10 +50,11 @@ public static class DependencyInjection {
         //ClientCommunicationService
         services.AddScoped<IClientCommunicationService, ClientCommunicationService>();
 
-        //Config max size body
-        //services.Configure<IISServerOptions>(options => {
-        //    options.MaxRequestBodySize = 200 * 1024 * 1024; // 200MB
-        //});
+        //UserContext
+        services.AddScoped<IUserContextService, UserContextService>();
+
+        //IdentityService
+        services.AddScoped<IIdentityService, IdentityService>();
 
         services.Configure<KestrelServerOptions>(options =>
         {

@@ -1,6 +1,4 @@
-﻿using Learning.Application.Models.Questions.Dtos;
-
-namespace Learning.Application.Models.Quizs.Dtos;
+﻿namespace Learning.Application.Models.Quizs.Dtos;
 public record QuizDto(
     Guid Id,
     string Title,
@@ -9,7 +7,7 @@ public record QuizDto(
     double TimeLimit,
     bool HasTimeLimit,
     int AttemptLimit,
-    bool HasAttemptLimit,
-    List<QuestionDto> Questions
+    int AttemptCount,
+    bool HasAttemptLimit
 );
 

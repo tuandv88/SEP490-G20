@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 namespace Learning.API.Endpoints.Courses;
-public record ChangeCourseStatusRequest(string CourseStatus);
+public record ChangeCourseStatusRequest(string CourseStatus, DateTime? ScheduledPublishDate);
 public record ChageCourseStatusResponse(bool IsSuccess, string Message);
 public class ChangeCourseStatusEndpoint : ICarterModule
 {
@@ -11,7 +11,7 @@ public class ChangeCourseStatusEndpoint : ICarterModule
 
         app.MapPut("/courses/{CourseId}/change-status", async ([FromRoute] Guid CourseId, ChangeCourseStatusRequest request, ISender sender) =>
         {
-            var result = await sender.Send(new ChangeCourseStatusCommand(CourseId, request.CourseStatus));
+            var result = await sender.Send(new ChangeCourseStatusCommand(CourseId, request.CourseStatus, request.ScheduledPublishDate));
 
             var response = result.Adapt<ChageCourseStatusResponse>();
 

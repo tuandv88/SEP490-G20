@@ -4,7 +4,17 @@ public class LectureProgress : Entity<LectureProgressId>{
     public LectureId LectureId { get; set; } = default!;
     public DateTime? CompletionDate { get; set; }
     public bool IsCurrent { get; set; } = false;
-    public string Notes { get; set; } = default!;
     public long Duration { get; set; } = default!;
+
+    public static LectureProgress Create(LectureProgressId Id, UserCourseId userCourseId, LectureId lectureId, DateTime? completionDate, bool isCurrent, long duration ) {
+        return new LectureProgress() {
+            Id = Id,
+            UserCourseId = userCourseId,
+            LectureId = lectureId,
+            CompletionDate = completionDate,
+            IsCurrent = isCurrent,
+            Duration = duration
+        };
+    }
 }
 

@@ -5,5 +5,6 @@ public static class StorageConstants {
     public const string DOCUMENT_PATH = "document";
     public const string IMAGE_PATH = "image";
     public const string IMAGE_COMMUNITY_PATH = "backend/imagediscussions";
+    public const string IMAGE_IDENTITY_PATH = "backend/imageidentity";
 }
 

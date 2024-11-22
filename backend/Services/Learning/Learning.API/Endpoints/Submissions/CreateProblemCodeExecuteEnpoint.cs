@@ -1,6 +1,5 @@
 ﻿
 using Learning.Application.Models.Submissions.Commands.CreateCodeExecute;
-using Learning.Application.Models.Submissions.Commands.CreateSubmission;
 using Learning.Application.Models.Submissions.Dtos;
 
 namespace Learning.API.Endpoints.Submissions;

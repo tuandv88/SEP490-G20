@@ -1,5 +1,6 @@
 ﻿
 
+
 namespace Learning.Infrastructure.Data.Repositories.Files;
 public class FileRepository : Repository<Domain.Models.File>, IFileRepository {
     private IApplicationDbContext _dbContext;
@@ -17,6 +18,13 @@ public class FileRepository : Repository<Domain.Models.File>, IFileRepository {
     public override async Task<Domain.Models.File?> GetByIdAsync(Guid id) {
         var file = _dbContext.Files
                         .FirstOrDefault(c => c.Id.Equals(FileId.Of(id)));
+        return file;
+    }
+
+    public Domain.Models.File GetByVideoLectureId(LectureId id) {
+        var file = _dbContext.Files.
+                    FirstOrDefault(c => c.LectureId.Equals(id) && c.FileType==FileType.VIDEO);
+
         return file;
     }
 }

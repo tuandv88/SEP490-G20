@@ -24,7 +24,7 @@ const CreateProblem = ({ navigationUrl, navigationTitle, lectureId, problemType 
       cpuTimeLimit: 2,
       cpuExtraTime: 2.5,
       memoryLimit: 250,
-      stackLimit: 250,
+      stackLimit: 64,
       maxThread: 70,
       maxFileSize: 10,
       enableNetwork: false,

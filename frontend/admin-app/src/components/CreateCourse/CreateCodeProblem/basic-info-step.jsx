@@ -184,12 +184,12 @@ export default function BasicInfoStep({ form }) {
               <FormControl>
                 <Input
                   min={30}
-                  max={500}
+                  max={125}
                   type='number'
                   step='1'
                   placeholder='Enter Stack Limit'
                   {...field}
-                  value={field.value || 250}
+                  value={field.value || 64}
                 />
               </FormControl>
               <FormMessage />

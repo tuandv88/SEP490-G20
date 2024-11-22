@@ -6,6 +6,7 @@ import PopularCoursesList from '@/components/Dashboard/components-popular-course
 import UpcomingContestsList from '@/components/Dashboard/components-upcoming-contests-list'
 import AlgorithmStatsList from '@/components/Dashboard/components-algorithm-stats-list'
 import { PageContainer } from '@/components/page-container'
+import Cookies from 'js-cookie'
 
 
 // Existing data (unchanged)
@@ -75,6 +76,8 @@ const breadcrumbs = [{ label: 'Dashboard', href: '/' }]
 
 export default function AdminDashboard() {
   
+  const authToken = Cookies.get('authToken');
+  console.log(authToken);
 
   return (
     <PageContainer breadcrumbs={breadcrumbs}>

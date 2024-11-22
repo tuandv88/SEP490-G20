@@ -178,14 +178,32 @@ const CodeEditor = ({ form }) => {
   const handleRun = async () => {
     setIsRunning(true)
     setTestCaseTab('result')
+
+    const values = form.getValues()
+
+    const resource = {
+      resourceLimits: {
+        cpuTimeLimit: values.cpuTimeLimit,
+        cpuExtraTime: values.cpuExtraTime,
+        memoryLimit: values.memoryLimit * 1024,
+        enableNetwork: values.enableNetwork,
+        stackLimit: values.stackLimit * 1024,
+        maxThread: values.maxThread,
+        maxFileSize: values.maxFileSize * 1024
+      }
+    }
+
+    console.log(resource)
+
     const testCase = transformTestCases(testCases)
     const createCode = {
       batchCodeExecuteDto: {
         languageCode: 'Java',
         testCases: testCase.testCases,
         solutionCodes: files.map((file) => file.content),
-        testCode: testContent
-      }
+        testCode: testContent,       
+      },
+      resourceLimits: resource.resourceLimits
     }
 
     console.log(createCode)
@@ -200,11 +218,11 @@ const CodeEditor = ({ form }) => {
         description: '',
         languageCode: 'Java',
         solutions: files.map((file) => ({
-        fileName: 'Main.java',
-        solutionCode: file.content,
-        description: '',
-        languageCode: 'Java',
-        priority: true
+          fileName: 'Main.java',
+          solutionCode: file.content,
+          description: '',
+          languageCode: 'Java',
+          priority: true
         }))
       }
     ]
@@ -227,7 +245,7 @@ const CodeEditor = ({ form }) => {
   }
 
   const getDisplayFields = (testCase) => {
-    return Object.keys(testCase).filter((key) => key !== 'expectedOutput')
+    return Object.keys(testCase).filter((key) => key !== 'expectedOutput' && key !== 'isHidden')
   }
 
   const currentSolutionResult = testResults && testResults[selectedSolutionIndex]

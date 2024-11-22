@@ -5,7 +5,7 @@ export const createQuestion = async (questionData, quizId) => {
   try {
     const response = await axiosInstance.post(`/learning-service/quizs/${quizId}/questions`, questionData, {
       headers: {
-        Authorization: `Bearer ${Cookies.get('access_token')}`
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
     return response.data
@@ -15,10 +15,32 @@ export const createQuestion = async (questionData, quizId) => {
   }
 }
 
+export const getFullQuizDetail = async (quizId) => {
+  try {
+    const response = await axiosInstance.get(`/learning-service/quizs/${quizId}/full-details`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error getting full quiz detail:', error)
+    throw error
+  }
+}
+
 // Method to update a question
 export const updateQuestion = async (quizId, questionId, questionData) => {
   try {
-    const response = await axiosInstance.put(`/learning-service/quizs/${quizId}/questions/${questionId}`, questionData)
+    const response = await axiosInstance.put(
+      `/learning-service/quizs/${quizId}/questions/${questionId}`,
+      questionData,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+      }
+    )
     return response.data
   } catch (error) {
     console.error('Error updating question:', error)
@@ -27,11 +49,13 @@ export const updateQuestion = async (quizId, questionId, questionData) => {
 }
 
 // Method to delete a question
-export const deleteQuestion = async (questionId) => {
+export const deleteQuestion = async (quizId, questionId) => {
   try {
-    const response = await axiosInstance.delete(
-      `/learning-service/quizs/4d9c671b-ffe6-4490-8ca1-8004e8270db4/questions/${questionId}`
-    )
+    const response = await axiosInstance.delete(`/learning-service/quizs/${quizId}/questions/${questionId}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     console.error('Error deleting question:', error)

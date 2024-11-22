@@ -10,33 +10,23 @@ import { ChevronLeft, Clock, RotateCcw } from 'lucide-react'
 import { QuestionItem } from "./QuestionItem"
 import { useMatch } from "@tanstack/react-router"
 import { quizManagementRoute } from "@/routers/router"
+import { getFullQuizDetail } from "@/services/api/questionApi"
 
 // Fake question data
-const fakeQuestions = [
-  {
-    id: "1",
-    content: "What is the capital of France?",
-    isActive: true,
-    questionType: "MultipleChoice",
-    questionLevel: "easy",
-    mark: 1,
-    answers: [
-      { text: "London", isCorrect: false },
-      { text: "Berlin", isCorrect: false },
-      { text: "Paris", isCorrect: true },
-      { text: "Madrid", isCorrect: false }
-    ]
-  },
-]
+import { useToast } from "@/hooks/use-toast"
+import { deleteQuestion } from "@/services/api/questionApi"
+
 
 
 export default function QuizManagement() {
 const { params } = useMatch( quizManagementRoute.id )
   const { quizId } = params
   const [showAddQuestionForm, setShowAddQuestionForm] = useState(false)
-  const [questions, setQuestions] = useState(fakeQuestions)
+  const [isUpdate, setIsUpdate] = useState(false)
+  const [quizDetail, setQuizDetail] = useState(null)
+  const [questions, setQuestions] = useState()
   const navigate = useNavigate()
-
+  const { toast } = useToast()
   // Mock data for quiz info
   const quizInfo = {
     title: "Sample Quiz",
@@ -48,24 +38,43 @@ const { params } = useMatch( quizManagementRoute.id )
     quizType: "Graded"
   }
 
-  
+  useEffect(() => {
+    const fetchQuizDetail = async () => {
+       console.log(quizId)
+      try {
+        const response = await getFullQuizDetail(quizId)
+        console.log(response)
+        setQuizDetail(response)
+      } catch (error) {
+        console.error('Error fetching quiz detail:', error)
+      }
+    }
+    fetchQuizDetail()
+  }, [isUpdate])
 
-  const handleAddQuestion = async (newQuestion) => {
-    console.log(newQuestion)
-    // try {
-    //   const response = await addQuestionToQuiz(quizId, newQuestion)
-    //   console.log(response)
-    // } catch (error) {
-    //   console.error('Error adding question:', error)
-    // }
-  }
 
   const handleEditQuestion = (editedQuestion) => {
     setQuestions(questions.map(q => q.id === editedQuestion.id ? editedQuestion : q))
   }
 
-  const handleDeleteQuestion = (questionId) => {
-    setQuestions(questions.filter(q => q.id !== questionId))
+  const handleDeleteQuestion = async (questionId) => {
+    try{
+        const response = await deleteQuestion(quizId,questionId)
+        console.log(response)
+        setIsUpdate(!isUpdate)
+        toast({
+          title: 'Question deleted successfully',
+          description: 'The question has been deleted successfully',
+          duration: 1500
+        })
+    } catch (error) {
+        toast({
+          title: 'Error deleting question',
+          description: 'An error occurred while deleting the question',
+          duration: 1500
+        })
+        console.error('Error deleting question:', error)
+    }
   }
 
   const handleToggleActive = (questionId) => {
@@ -81,17 +90,17 @@ const { params } = useMatch( quizManagementRoute.id )
         </Button>
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">{quizInfo.title}</CardTitle>
+            <CardTitle className="text-2xl">{quizDetail?.quiz?.title}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col space-y-6">
               <div className="flex justify-between items-center">
                 <span className="font-semibold">Quiz Type:</span>
-                <span>{quizInfo.quizType}</span>
+                <span>{quizDetail?.quiz?.quizType}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="font-semibold">Passing Mark:</span>
-                <span>{quizInfo.passingMark}%</span>
+                <span>{quizDetail?.quiz?.passingMark}</span>
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
@@ -99,12 +108,12 @@ const { params } = useMatch( quizManagementRoute.id )
                     <Clock className="h-5 w-5" />
                     <span className="font-semibold">Time Limit</span>
                   </div>
-                  <Switch checked={quizInfo.hasTimeLimit} />
+                  <Switch checked={quizDetail?.quiz?.hasTimeLimit} />
                 </div>
-                {quizInfo.hasTimeLimit && (
+                {quizDetail?.quiz?.hasTimeLimit && (
                   <div className="flex justify-between items-center pl-7">
                     <span>Duration:</span>
-                    <span>{quizInfo.timeLimit} minutes</span>
+                    <span>{quizDetail?.quiz?.timeLimit} minutes</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center">
@@ -112,12 +121,12 @@ const { params } = useMatch( quizManagementRoute.id )
                     <RotateCcw className="h-5 w-5" />
                     <span className="font-semibold">Attempt Limit</span>
                   </div>
-                  <Switch checked={quizInfo.hasAttemptLimit} />
+                  <Switch checked={quizDetail?.quiz?.hasAttemptLimit} />
                 </div>
-                {quizInfo.hasAttemptLimit && (
+                {quizDetail?.quiz?.hasAttemptLimit && (
                   <div className="flex justify-between items-center pl-7">
                     <span>Max Attempts:</span>
-                    <span>{quizInfo.attemptLimit}</span>
+                    <span>{quizDetail?.quiz?.attemptLimit}</span>
                   </div>
                 )}
               </div>
@@ -128,7 +137,7 @@ const { params } = useMatch( quizManagementRoute.id )
       </div>
 
       <div className="w-full md:w-3/4 pl-4">
-        {questions.map((question) => (
+        {quizDetail?.quiz?.questions.map((question) => (
           <QuestionItem
             key={question.id}
             question={question}

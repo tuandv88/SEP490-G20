@@ -48,9 +48,9 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive }) {
               <p><strong>Mark:</strong> {question.mark}</p>
               <p><strong>Answers:</strong></p>
               <ul className="list-disc pl-5">
-                {question.answers.map((answer, index) => (
+                {question.questionOptions.map((answer, index) => (
                   <li key={index} className={answer.isCorrect ? "text-green-600" : ""}>
-                    {answer.text} {answer.isCorrect && "(Correct)"}
+                    {answer.content} {answer.isCorrect && "(Correct)"}
                   </li>
                 ))}
               </ul>
@@ -70,8 +70,8 @@ QuestionItem.propTypes = {
     questionType: PropTypes.string.isRequired,
     questionLevel: PropTypes.string.isRequired,
     mark: PropTypes.number.isRequired,
-    answers: PropTypes.arrayOf(PropTypes.shape({
-      text: PropTypes.string.isRequired,
+    questionOptions: PropTypes.arrayOf(PropTypes.shape({
+      content: PropTypes.string.isRequired,
       isCorrect: PropTypes.bool.isRequired,
     })).isRequired,
   }).isRequired,

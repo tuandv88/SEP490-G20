@@ -26,7 +26,8 @@ namespace User.Infrastructure
 
                 options.LogTo(Console.WriteLine, LogLevel.Information);
             });
-
+            //trong context đã tạo một ApplicationDbContext rồi, phải lấy ra chứ không add scoped mới 
+            services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
             services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
 
             services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();

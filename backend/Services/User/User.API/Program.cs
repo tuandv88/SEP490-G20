@@ -5,7 +5,6 @@ using User.API;
 using Serilog;
 using BuildingBlocks.Extensions;
 using Learning.Application;
-using Learning.API;
 using BuildingBlocks.Logging;
 var builder = WebApplication.CreateBuilder(args);
 

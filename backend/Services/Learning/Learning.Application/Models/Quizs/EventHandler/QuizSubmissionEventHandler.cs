@@ -15,7 +15,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
         if (quizSubmission == null) {
             logger.LogWarning($"Submission is not found submissionId : {context.Message.SubmissionId}");
             return;
-        }
+        } 
         if (quizSubmission.Status == QuizSubmissionStatus.Processing) {
             var quiz = await quizRepository.GetByIdDetailAsync(quizSubmission.QuizId.Value);
 
@@ -31,8 +31,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
         return;
     }
     private void UpdateSubmissionWithoutAnswers(QuizSubmission quizSubmission, Quiz quiz) {
-        quizSubmission.UpdateSubmitResult(0, quiz.Questions.Sum(q => q.Mark), quiz.Questions.Count, quiz.PassingMark, quiz.Questions.Count, null);
-        
+        quizSubmission.UpdateSubmitResult(0, quiz.Questions.Sum(q => q.Mark), quiz.Questions.Count, 0, quiz.PassingMark, null);
     }
 
     private async Task UpdateSubmissionWithAnswers(QuizSubmission quizSubmission, Quiz quiz) {

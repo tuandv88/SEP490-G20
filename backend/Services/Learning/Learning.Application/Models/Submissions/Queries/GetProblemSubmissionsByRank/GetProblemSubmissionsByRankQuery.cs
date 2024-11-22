@@ -1,4 +1,4 @@
 ﻿namespace Learning.Application.Models.Submissions.Queries.GetProblemSubmissionsByRank;
-public class GetProblemSubmissionsByRankQuery {
-}
+public record GetProblemSubmissionsByRankQuery(Guid ProblemId) : IQuery<GetProblemSubmissionByRankResult>;
+public record GetProblemSubmissionByRankResult();
 

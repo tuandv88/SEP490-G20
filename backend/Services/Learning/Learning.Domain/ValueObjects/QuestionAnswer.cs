@@ -2,6 +2,7 @@
 public record QuestionAnswer {
     public string Id { get; set; }
     public string QuestionType {  get; set; }
+    public int OrderIndex { get; set; }
     public string? Content { get; set; }
     public List<Choice>? Choices { get; set; }
     public List<string>? UserAnswers { get; set; } //là các ID ở trong choices

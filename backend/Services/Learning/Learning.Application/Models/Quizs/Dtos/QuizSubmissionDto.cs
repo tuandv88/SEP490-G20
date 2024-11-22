@@ -9,6 +9,7 @@ public record QuizSubmissionDto(
     int CorrectAnswers,
     int PassingMark,
     long Duration,
-    string Status
+    string Status,
+    List<QuestionAnswer>? Answer
 );
 

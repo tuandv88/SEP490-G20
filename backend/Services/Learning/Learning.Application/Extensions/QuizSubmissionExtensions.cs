@@ -2,7 +2,7 @@
 
 namespace Learning.Application.Extensions;
 public static class QuizSubmissionExtensions {
-    public static QuizSubmissionDto ToQuizSubmissionDto(this QuizSubmission quizSubmission) {
+    public static QuizSubmissionDto ToQuizSubmissionDto(this QuizSubmission quizSubmission, bool inAnswer = false) {
         return new QuizSubmissionDto(
                 quizSubmission.Id.Value,
                 quizSubmission.StartTime,
@@ -13,7 +13,8 @@ public static class QuizSubmissionExtensions {
                 quizSubmission.CorrectAnswers,
                 quizSubmission.PassingMark,
                 quizSubmission.Duration,
-                quizSubmission.Status.ToString()
+                quizSubmission.Status.ToString(),
+                Answer: inAnswer ? quizSubmission.Answers : null
             );
     }
 }

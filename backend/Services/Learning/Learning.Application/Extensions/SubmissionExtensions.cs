@@ -1,4 +1,5 @@
-﻿using Learning.Application.Models.Submissions.Dtos;
+﻿using Learning.Application.Models.Quizs.Dtos;
+using Learning.Application.Models.Submissions.Dtos;
 
 namespace Learning.Application.Extensions;
 public static class SubmissionExtensions {

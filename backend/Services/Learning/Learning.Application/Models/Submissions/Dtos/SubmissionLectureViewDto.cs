@@ -1,4 +1,4 @@
-﻿namespace Learning.Application.Models.Submissions.Dtos;
+﻿namespace Learning.Application.Models.Quizs.Dtos;
 public record SubmissionLectureViewDto(
     DateTime SubmissionDate,
     string Language,

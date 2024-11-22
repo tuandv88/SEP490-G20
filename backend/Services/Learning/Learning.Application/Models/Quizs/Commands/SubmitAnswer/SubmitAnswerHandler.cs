@@ -49,7 +49,7 @@ public class SubmitAnswerHandler(IQuizSubmissionRepository repository, IUserCont
         if ((questionType == QuestionType.MultipleChoice || questionType == QuestionType.TrueFalse) && userAnswers.Count > 1) {
             throw new InvalidOperationException("For MultipleChoice and TrueFalse questions, only one answer is allowed.");
         }
-        // Tạo danh sách Choices và tập hợp các Id hợp lệ trong một lần duyệt
+
         var choices = question.QuestionOptions.Select(q => new Choice {
             Id = q.Id.Value.ToString(),
             Content = q.Content,
@@ -66,6 +66,7 @@ public class SubmitAnswerHandler(IQuizSubmissionRepository repository, IUserCont
         return new QuestionAnswer {
             Id = question.Id.Value.ToString(),
             QuestionType = question.QuestionType.ToString(),
+            OrderIndex = question.OrderIndex,
             Content = question.Content,
             Choices = choices,
             UserAnswers = userAnswers
@@ -79,6 +80,7 @@ public class SubmitAnswerHandler(IQuizSubmissionRepository repository, IUserCont
             Id = question.Id.Value.ToString(),
             QuestionType = question.QuestionType.ToString(),
             Content = question.Content,
+            OrderIndex = question.OrderIndex,
             Problem = new ProblemAnswer {
                 Id = problem!.ProblemId.ToString(),
                 CodeAnswer = new CodeAnswer {

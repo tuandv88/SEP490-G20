@@ -15,7 +15,7 @@ public class SubmissionQuizHandler(IQuizSubmissionRepository quizSubmissionRepos
 
         if (quiz!.HasTimeLimit) {
             var timeElapsed = DateTime.UtcNow - quizSubmission.StartTime;
-            var timeLimit = TimeSpan.FromSeconds(quiz.TimeLimit);
+            var timeLimit = TimeSpan.FromMinutes(quiz.TimeLimit);
 
             if (timeElapsed > timeLimit) {
                 return new SubmissionQuizResult("Submission deadline has passed.");

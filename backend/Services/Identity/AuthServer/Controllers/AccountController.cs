@@ -14,12 +14,13 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
 using MailKit;
-using AuthServer.Repository.Services.SendMailWithModoboa;
 using IdentityServer4.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Org.BouncyCastle.Bcpg.Sig;
 using Microsoft.AspNetCore.Authorization;
+using BuildingBlocks.Email.Interfaces;
+using BuildingBlocks.Email.Models;
 
 namespace AuthServer.Controllers
 {
@@ -131,7 +132,7 @@ namespace AuthServer.Controllers
                             body: emailBody
                         );
 
-                        await _emailService.Send(emailMetadata);
+                        await _emailService.SendAndSave(emailMetadata);
 
                         TempData["ConfirmEmailSuccessMessage"] = "Registration successful! Please check your email and confirm your account.";
 
@@ -374,6 +375,7 @@ namespace AuthServer.Controllers
 
             if (result.Succeeded)
             {
+                
                 if (model.RememberMe)
                 {
                     var cookieOptions = new CookieOptions
@@ -538,7 +540,7 @@ namespace AuthServer.Controllers
             );
 
             // Gửi email xác nhận
-            await _emailService.Send(emailMetadata);
+            await _emailService.SendAndSave(emailMetadata);
         }
 
         private async Task HandleLockedOutUser(Users user)
@@ -771,7 +773,7 @@ namespace AuthServer.Controllers
                     );
 
                     // Gửi email xác nhận
-                    await _emailService.Send(emailMetadata);
+                    await _emailService.SendAndSave(emailMetadata);
                 }
 
                 // Sau khi gửi email thành công

@@ -8,7 +8,7 @@ namespace User.API.Endpoints.LearningPath
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapDelete("/user-service/user/{userId}/learningpaths/{learningPathId}", async (Guid userId, Guid learningPathId, ISender sender) =>
+            app.MapDelete("/user/{userId}/learningpaths/{learningPathId}", async (Guid userId, Guid learningPathId, ISender sender) =>
             {
                 // Tạo query từ yêu cầu xóa LearningPath và các PathStep liên quan
                 var query = new DeleteLearningPathQuery(learningPathId);

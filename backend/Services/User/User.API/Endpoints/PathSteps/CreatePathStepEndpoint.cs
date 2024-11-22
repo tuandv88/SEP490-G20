@@ -12,7 +12,7 @@ namespace User.API.Endpoints.PathSteps
         public record CreatePathStepResponse(Guid Id);
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/user-service/user/{userId}/pathsteps", async (Guid userId, CreatePathStepRequest request, ISender sender) =>
+            app.MapPost("/user/{userId}/pathsteps", async (Guid userId, CreatePathStepRequest request, ISender sender) =>
             {
                 // Tạo command từ yêu cầu nhận vào
                 var command = new CreatePathStepCommand
@@ -28,7 +28,7 @@ namespace User.API.Endpoints.PathSteps
                 var response = new CreatePathStepResponse(result.Id);
 
                 // Trả về HTTP 201 với đường dẫn của PathStep vừa tạo
-                return Results.Created($"/user-service/user/{userId}/pathsteps/{response.Id}", response);
+                return Results.Created($"/user/{userId}/pathsteps/{response.Id}", response);
             })
             .WithName("CreatePathStep") // Đặt tên cho endpoint
             .Produces<CreatePathStepResponse>(StatusCodes.Status201Created) // Trả về khi tạo thành công

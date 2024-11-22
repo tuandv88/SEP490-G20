@@ -7,9 +7,11 @@ import Curriculum from '@/components/CreateCourse/Curriculum'
 import { getCourseDetails } from '@/services/api/courseApi'
 import { useMatch } from '@tanstack/react-router'
 import { editCourseRoute } from '@/routers/router'
+import { useStore } from '@/data/store'
 const EditCourse = () => {
   const { params } = useMatch( editCourseRoute.id )
   const { courseId } = params
+  const { setCourseIdToBack } = useStore()
   const [course, setCourse] = useState(null);
   const [chapter, setChapter]=useState(null)
   const [updateChapter, setUpdateChapter]=useState(false)
@@ -18,7 +20,7 @@ const EditCourse = () => {
       try {
         const courseData = await getCourseDetails(courseId);
         console.log(courseData)
-        
+        setCourseIdToBack(courseId)
         setCourse(courseData.courseDetailsDto.courseDto);
         setChapter(courseData.courseDetailsDto.chapterDetailsDtos)
         console.log(courseData.courseDetailsDto.chapterDetailsDtos)

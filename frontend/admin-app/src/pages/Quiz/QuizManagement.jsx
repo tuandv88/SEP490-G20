@@ -11,15 +11,14 @@ import { QuestionItem } from "./QuestionItem"
 import { useMatch } from "@tanstack/react-router"
 import { quizManagementRoute } from "@/routers/router"
 import { getFullQuizDetail } from "@/services/api/questionApi"
-
-// Fake question data
 import { useToast } from "@/hooks/use-toast"
 import { deleteQuestion } from "@/services/api/questionApi"
-
-
-
+import { FullScreenPopup } from "./FullScreenPopup"
+import { useStore } from "@/data/store"
 export default function QuizManagement() {
-const { params } = useMatch( quizManagementRoute.id )
+  const { params } = useMatch(quizManagementRoute.id)
+  const { courseIdToBack } = useStore()
+  console.log(courseIdToBack)
   const { quizId } = params
   const [showAddQuestionForm, setShowAddQuestionForm] = useState(false)
   const [isUpdate, setIsUpdate] = useState(false)
@@ -27,20 +26,11 @@ const { params } = useMatch( quizManagementRoute.id )
   const [questions, setQuestions] = useState()
   const navigate = useNavigate()
   const { toast } = useToast()
-  // Mock data for quiz info
-  const quizInfo = {
-    title: "Sample Quiz",
-    passingMark: 70,
-    hasTimeLimit: true,
-    timeLimit: 60,
-    hasAttemptLimit: true,
-    attemptLimit: 3,
-    quizType: "Graded"
-  }
+  const [isFullScreenPopupOpen, setIsFullScreenPopupOpen] = useState(false)
 
   useEffect(() => {
     const fetchQuizDetail = async () => {
-       console.log(quizId)
+      console.log(quizId)
       try {
         const response = await getFullQuizDetail(quizId)
         console.log(response)
@@ -52,39 +42,38 @@ const { params } = useMatch( quizManagementRoute.id )
     fetchQuizDetail()
   }, [isUpdate])
 
-
   const handleEditQuestion = (editedQuestion) => {
     setQuestions(questions.map(q => q.id === editedQuestion.id ? editedQuestion : q))
   }
 
   const handleDeleteQuestion = async (questionId) => {
-    try{
-        const response = await deleteQuestion(quizId,questionId)
-        console.log(response)
-        setIsUpdate(!isUpdate)
-        toast({
-          title: 'Question deleted successfully',
-          description: 'The question has been deleted successfully',
-          duration: 1500
-        })
+    try {
+      const response = await deleteQuestion(quizId, questionId)
+      console.log(response)
+      setIsUpdate(!isUpdate)
+      toast({
+        title: 'Question deleted successfully',
+        description: 'The question has been deleted successfully',
+        duration: 1500
+      })
     } catch (error) {
-        toast({
-          title: 'Error deleting question',
-          description: 'An error occurred while deleting the question',
-          duration: 1500
-        })
-        console.error('Error deleting question:', error)
+      toast({
+        title: 'Error deleting question',
+        description: 'An error occurred while deleting the question',
+        duration: 1500
+      })
+      console.error('Error deleting question:', error)
     }
   }
 
   const handleToggleActive = (questionId) => {
-    setQuestions(questions.map(q => q.id === questionId ? {...q, isActive: !q.isActive} : q))
+    setQuestions(questions.map(q => q.id === questionId ? { ...q, isActive: !q.isActive } : q))
   }
 
   return (
     <div className="container mx-auto p-4 flex flex-col md:flex-row">
       <div className="w-full md:w-1/4 mb-8 md:mb-0 md:mr-4">
-        <Button variant="outline" className="flex items-center gap-2 mb-4" onClick={() => navigate({ to: '/curriculum' })}>
+        <Button variant="outline" className="flex items-center gap-2 mb-4" onClick={() => navigate({ to: `/edit-course/${courseIdToBack}` })}>
           <ChevronLeft className="h-4 w-4" />
           Back to Curriculum
         </Button>
@@ -134,6 +123,7 @@ const { params } = useMatch( quizManagementRoute.id )
           </CardContent>
         </Card>
         <Button className="mt-4 w-full" onClick={() => setShowAddQuestionForm(true)}>Add Question</Button>
+        <Button className="mt-4 w-full" onClick={() => setIsFullScreenPopupOpen(true)}>Popup-full</Button>
       </div>
 
       <div className="w-full md:w-3/4 pl-4">
@@ -149,8 +139,14 @@ const { params } = useMatch( quizManagementRoute.id )
       </div>
       
       {showAddQuestionForm && (
-        <AddQuestionForm quizId={quizId} onClose={() => setShowAddQuestionForm(false)}  />
+        <AddQuestionForm quizId={quizId} setIsUpdate={setIsUpdate} isUpdate={isUpdate} onClose={() => setShowAddQuestionForm(false)} />
       )}
+
+      <FullScreenPopup
+        isOpen={isFullScreenPopupOpen}
+        onClose={() => setIsFullScreenPopupOpen(false)}
+        quizDetail={quizDetail}
+      />
     </div>
   )
 }

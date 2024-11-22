@@ -27,7 +27,7 @@ const QUESTION_LEVELS = ["EASY", "MEDIUM", "HARD", "EXPERT"];
 
 
 
-  export function AddQuestionForm({ onClose , onAdd , quizId}) {
+  export function AddQuestionForm({ onClose , onAdd , quizId , setIsUpdate , isUpdate}) {
     const [content, setContent] = useState("")
     const [isActive, setIsActive] = useState(true)
     const [questionType, setQuestionType] = useState("MultipleChoice")
@@ -74,6 +74,7 @@ const QUESTION_LEVELS = ["EASY", "MEDIUM", "HARD", "EXPERT"];
     // Here you would typically send the data to your backend
     try {
         const response = await createQuestion(createQues,quizId)
+        setIsUpdate(!isUpdate)
         toast({
             title: "Question created successfully",
             description: "Question created successfully",

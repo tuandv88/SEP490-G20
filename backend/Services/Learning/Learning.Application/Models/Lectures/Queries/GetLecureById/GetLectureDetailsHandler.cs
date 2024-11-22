@@ -1,5 +1,4 @@
-﻿using Learning.Application.Data.Repositories;
-using Learning.Application.Models.Problems.Dtos;
+﻿using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.Quizs.Dtos;
 
 namespace Learning.Application.Models.Lectures.Queries.GetLecureById;

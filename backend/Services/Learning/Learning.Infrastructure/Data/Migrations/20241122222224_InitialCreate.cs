@@ -165,7 +165,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CourseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    EnrollmentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 21, 23, 33, 34, 814, DateTimeKind.Utc).AddTicks(6844)),
+                    EnrollmentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 22, 22, 22, 23, 612, DateTimeKind.Utc).AddTicks(2703)),
                     CompletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UserCourseStatus = table.Column<string>(type: "text", nullable: false, defaultValue: "InProgress"),
                     Rating = table.Column<int>(type: "integer", nullable: false, defaultValue: -1),
@@ -262,7 +262,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProblemId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 21, 23, 33, 34, 794, DateTimeKind.Utc).AddTicks(7299)),
+                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 22, 22, 22, 23, 596, DateTimeKind.Utc).AddTicks(7929)),
                     SourceCode = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
                     LanguageCode = table.Column<string>(type: "text", nullable: false, defaultValue: "Java"),
                     ExecutionTime = table.Column<double>(type: "double precision", nullable: false),
@@ -382,8 +382,8 @@ namespace Learning.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     QuizId = table.Column<Guid>(type: "uuid", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 21, 23, 33, 34, 808, DateTimeKind.Utc).AddTicks(2972)),
-                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 21, 23, 33, 34, 808, DateTimeKind.Utc).AddTicks(3837)),
+                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 22, 22, 22, 23, 607, DateTimeKind.Utc).AddTicks(4737)),
+                    SubmissionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2024, 11, 22, 22, 22, 23, 607, DateTimeKind.Utc).AddTicks(5352)),
                     Score = table.Column<long>(type: "bigint", nullable: false),
                     TotalScore = table.Column<long>(type: "bigint", nullable: false),
                     TotalQuestions = table.Column<int>(type: "integer", nullable: false),
@@ -503,7 +503,7 @@ namespace Learning.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LectureComment",
+                name: "LectureComments",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -517,9 +517,9 @@ namespace Learning.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LectureComment", x => x.Id);
+                    table.PrimaryKey("PK_LectureComments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LectureComment_Lectures_LectureId",
+                        name: "FK_LectureComments_Lectures_LectureId",
                         column: x => x.LectureId,
                         principalTable: "Lectures",
                         principalColumn: "Id",
@@ -535,7 +535,6 @@ namespace Learning.Infrastructure.Data.Migrations
                     LectureId = table.Column<Guid>(type: "uuid", nullable: false),
                     CompletionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsCurrent = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    Notes = table.Column<string>(type: "text", maxLength: 2147483647, nullable: false),
                     Duration = table.Column<long>(type: "bigint", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
@@ -575,8 +574,8 @@ namespace Learning.Infrastructure.Data.Migrations
                 column: "Delivered");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LectureComment_LectureId",
-                table: "LectureComment",
+                name: "IX_LectureComments_LectureId",
+                table: "LectureComments",
                 column: "LectureId");
 
             migrationBuilder.CreateIndex(
@@ -687,7 +686,7 @@ namespace Learning.Infrastructure.Data.Migrations
                 name: "Files");
 
             migrationBuilder.DropTable(
-                name: "LectureComment");
+                name: "LectureComments");
 
             migrationBuilder.DropTable(
                 name: "LecturesProgress");

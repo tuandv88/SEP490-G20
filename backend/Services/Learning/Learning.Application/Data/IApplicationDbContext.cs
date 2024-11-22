@@ -12,6 +12,7 @@ public interface IApplicationDbContext {
     DbSet<TestCase> TestCases { get; }
     DbSet<UserCourse> UserCourses { get; }
     DbSet<LectureProgress> LecturesProgress { get; }
+    DbSet<LectureComment> LectureComments { get; }
     DbSet<QuizSubmission> QuizSubmissions { get; }
     DbSet<ProblemSubmission> ProblemSubmissions { get; }
     DbSet<Domain.Models.File> Files { get; }

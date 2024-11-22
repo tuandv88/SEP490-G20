@@ -29,7 +29,7 @@ namespace User.Infrastructure
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
             //Caching
-            services.ConfigureCaching(configuration);
+            //services.ConfigureCaching(configuration);
 
             services.AddScoped<IPointHistoryRepository, PointHistoryRepository>();
             //services.AddScoped<IPointHistoryRepository, CachedPointHistoryRepository>();

@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Extensions;
 using Learning.Application.Interfaces;
-using Learning.Application.Models.Quizs.EventHandler;
 using Learning.Infrastructure.Data.Interceptors;
 using Learning.Infrastructure.Data.Repositories.Chapters;
 using Learning.Infrastructure.Data.Repositories.Courses;
@@ -15,6 +14,7 @@ using Learning.Infrastructure.Data.Repositories.Quizs;
 using Learning.Infrastructure.Data.Repositories.QuizSubmissions;
 using Learning.Infrastructure.Data.Repositories.TestCases;
 using Learning.Infrastructure.Data.Repositories.TestScripts;
+using Learning.Infrastructure.Data.Repositories.UserCourses;
 using Learning.Infrastructure.Extentions;
 using Learning.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -106,5 +106,8 @@ public static class DependencyInjection {
 
         //IQuizSubmissionRepositoru
         services.AddScoped<IQuizSubmissionRepository, QuizSubmissionRepository>();
+
+        //IUserCourse
+        services.AddScoped<IUserCourseRepository, UserCourseRepository>();
     }
 }

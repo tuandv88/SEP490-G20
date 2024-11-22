@@ -35,6 +35,8 @@ public class QuizSubmission : Aggregate<QuizSubmissionId> {
         if (existingAnswer != null) {
             existingAnswer.Content = answer.Content;
             existingAnswer.Choices = answer.Choices;
+            existingAnswer.OrderIndex = answer.OrderIndex;
+            existingAnswer.QuestionType = answer.QuestionType;
             existingAnswer.UserAnswers = answer.UserAnswers;
             existingAnswer.Problem = answer.Problem;
         } else {

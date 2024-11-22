@@ -15,7 +15,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
         if (quizSubmission == null) {
             logger.LogWarning($"Submission is not found submissionId : {context.Message.SubmissionId}");
             return;
-        } 
+        }
         if (quizSubmission.Status == QuizSubmissionStatus.Processing) {
             var quiz = await quizRepository.GetByIdDetailAsync(quizSubmission.QuizId.Value);
 
@@ -31,51 +31,54 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
         return;
     }
     private void UpdateSubmissionWithoutAnswers(QuizSubmission quizSubmission, Quiz quiz) {
-        quizSubmission.UpdateSubmitResult(0, quiz.Questions.Sum(q => q.Mark), quiz.Questions.Count, 0, quiz.PassingMark, null);
+        quizSubmission.UpdateSubmitResult(0, quiz.Questions.Sum(q => q.Mark), quiz.Questions.Count, 0, quiz.PassingMark,
+            quiz.Questions.Select(CreateQuestionAnswer).ToList());
     }
 
     private async Task UpdateSubmissionWithAnswers(QuizSubmission quizSubmission, Quiz quiz) {
         long score = 0;
-        int totalQuestions;
+        int totalQuestions = 0;
         int correctAnswers = 0;
         long totalScore = 0;
         List<QuestionAnswer> answers = new List<QuestionAnswer>();
 
-        var questions = quiz.Questions.ToDictionary(q => q.Id.Value.ToString());
+        var userAnswers = quizSubmission.Answers?.ToDictionary(a => a.Id, a => a) ?? new Dictionary<string, QuestionAnswer>();
 
-        totalQuestions = questions.Count;
-        totalScore = questions.Sum(q => q.Value.Mark);
+        totalQuestions = quiz.Questions.Count;
+        totalScore = quiz.Questions.Sum(q => q.Mark);
 
-        foreach (var q in quizSubmission.Answers!) {
-            if (q.QuestionType == QuestionType.CodeSnippet.ToString()) {
-                if (questions.TryGetValue(q.Id, out var question)) {
+        foreach (var question in quiz.Questions) {
+            if (userAnswers.TryGetValue(question.Id.Value.ToString(), out var userAnswer)) {
+                if (question.QuestionType == QuestionType.CodeSnippet) {
                     var codeExecute = await CreateCodeExecute(
                         question.ProblemId!.Value,
-                        q.Problem!.CodeAnswer!.SolutionCode,
-                        q.Problem!.CodeAnswer!.LanguageCode
+                        userAnswer.Problem!.CodeAnswer!.SolutionCode,
+                        userAnswer.Problem!.CodeAnswer!.LanguageCode
                     );
+
                     if (IsCorrect(codeExecute)) {
                         correctAnswers++;
                         score += question.Mark;
                     }
-                    answers.Add(CreateAnswerProblem(q, codeExecute));
-                }
-            } else {
-                if (questions.TryGetValue(q.Id, out var question)) {
-                    if (q.Choices != null && q.UserAnswers != null) {
-                        var correctChoices = q.Choices.Where(c => c.IsCorrect).Select(c => c.Id).ToList();
-                        bool allAnswersCorrect = q.UserAnswers.All(userAnswer => correctChoices.Contains(userAnswer));
-                        if (allAnswersCorrect && q.UserAnswers.Count == correctChoices.Count) {
+                    answers.Add(CreateAnswerProblem(userAnswer, codeExecute));
+                } else {
+                    if (userAnswer.Choices != null && userAnswer.UserAnswers != null) {
+                        var correctChoices = userAnswer.Choices.Where(c => c.IsCorrect).Select(c => c.Id).ToList();
+                        bool allAnswersCorrect = userAnswer.UserAnswers.All(correctChoices.Contains);
+                        if (allAnswersCorrect && userAnswer.UserAnswers.Count == correctChoices.Count) {
                             correctAnswers++;
                             score += question.Mark;
                         }
                     }
-                    answers.Add(q);
+                    answers.Add(userAnswer);
                 }
+            } else {
+                //thêm những câu hỏi không nằm trong câu trả lời (không trả lời)
+                answers.Add(CreateQuestionAnswer(question));
             }
         }
 
-        quizSubmission.UpdateSubmitResult(score, totalScore, totalQuestions, correctAnswers,quiz.PassingMark, answers);
+        quizSubmission.UpdateSubmitResult(score, totalScore, totalQuestions, correctAnswers, quiz.PassingMark, answers);
     }
 
 
@@ -98,6 +101,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
             QuestionType = q.QuestionType,
             Content = q.Content,
             Choices = q.Choices,
+            OrderIndex = q.OrderIndex,
             UserAnswers = q.UserAnswers,
             Problem = new ProblemAnswer() {
                 Id = q.Problem!.Id,
@@ -111,6 +115,28 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
                 Status = codeExecute.Status
             }
 
+        };
+    }
+    private QuestionAnswer CreateQuestionAnswer(Question question) {
+        ProblemAnswer? problem = null;
+        if(question.ProblemId != null) {
+            problem = new ProblemAnswer() {
+                Id = question.ProblemId.Value.ToString(),
+            };
+        }
+        return new QuestionAnswer {
+            Id = question.Id.Value.ToString(),
+            QuestionType = question.QuestionType.ToString(),
+            Content = question.Content,
+            OrderIndex = question.OrderIndex,
+            Choices = question.QuestionOptions.Select(q => new Choice {
+                Id = q.Id.Value.ToString(),
+                Content = q.Content,
+                IsCorrect = q.IsCorrect,
+                OrderIndex = q.OrderIndex
+            }).ToList(),
+            UserAnswers = null,
+            Problem = problem
         };
     }
 }

@@ -9,9 +9,8 @@ public class GetQuizSubmissionEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
 
         app.MapGet("/quizs/{QuizId}/submissions", async ([FromRoute] Guid QuizId, ISender sender) => {
-            var command = new GetQuizSubmissionQuery(QuizId);
 
-            var result = await sender.Send(command);
+            var result = await sender.Send(new GetQuizSubmissionQuery(QuizId));
 
             var response = result.Adapt<GetQuizSubmissionResponse>();
 

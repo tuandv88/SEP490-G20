@@ -1,4 +1,6 @@
 ﻿using AuthServer.Models;
+using BuidingBlocks.Storage;
+using BuidingBlocks.Storage.Interfaces;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
@@ -10,10 +12,12 @@ namespace AuthServer.Repository.Services.Profile
     public class CustomProfileService : IProfileService
     {
         private readonly UserManager<Users> _userManager;
+        private readonly IFilesService _filesService;
 
-        public CustomProfileService(UserManager<Users> userManager)
+        public CustomProfileService(UserManager<Users> userManager, IFilesService filesService)
         {
             _userManager = userManager;
+            _filesService = filesService;
         }
 
         public async Task GetProfileDataAsync(ProfileDataRequestContext context)
@@ -42,7 +46,7 @@ namespace AuthServer.Repository.Services.Profile
             }
 
             // Thêm userId vào claims
-            context.IssuedClaims.Add(new Claim("userId", userId.ToString()));  // Sử dụng "userId" thay vì JwtClaimTypes.Subject
+            context.IssuedClaims.Add(new Claim(JwtClaimTypes.Subject, user.Id.ToString()));  // Sử dụng JwtClaimTypes.Subject
 
             // Thêm username vào claims
             context.IssuedClaims.Add(new Claim("username", username));  // Sử dụng "username" thay vì JwtClaimTypes.PreferredUserName
@@ -57,6 +61,13 @@ namespace AuthServer.Repository.Services.Profile
             if (!string.IsNullOrEmpty(lastName))
             {
                 context.IssuedClaims.Add(new Claim("lastName", lastName));  // Sử dụng "lastName" thay vì JwtClaimTypes.FamilyName
+            }
+
+            var s3Object = await _filesService.GetFileAsync(StorageConstants.BUCKET, user.ProfilePicture, 60);
+
+            if (s3Object != null) 
+            {
+                context.IssuedClaims.Add(new Claim("urlImagePresigned", s3Object.PresignedUrl!));
             }
         }
 

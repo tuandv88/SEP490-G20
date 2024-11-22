@@ -1,3 +1,6 @@
-﻿namespace Learning.Application.Models.Quizs.Commands.SubmissionQuiz;
-public record SubmissionQuizCommand(Guid QuizId): ICommand<SubmissionQuizResult>;
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace Learning.Application.Models.Quizs.Commands.SubmissionQuiz;
+[Authorize]
+public record SubmissionQuizCommand(Guid QuizSubmissionId): ICommand<SubmissionQuizResult>;
 public record SubmissionQuizResult(string Status);

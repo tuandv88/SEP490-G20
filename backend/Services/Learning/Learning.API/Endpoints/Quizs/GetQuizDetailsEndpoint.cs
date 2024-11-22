@@ -3,11 +3,11 @@ using Learning.Application.Models.Quizs.Queries.GetQuizDetails;
 
 namespace Learning.API.Endpoints.Quizs;
 
-public record GetQuizDetailsResponse(QuizDto QuizDto, AnswerDto Answer);
+public record GetQuizDetailsResponse(QuizDetailDto Quiz, QuizAnswerDto Answer);
 public class GetQuizDetailsEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
 
-        app.MapGet("/quizs/{QuizId}", async (Guid QuizId, ISender sender) => {
+        app.MapGet("/quizs/{QuizId}/details", async (Guid QuizId, ISender sender) => {
 
             var result = await sender.Send(new GetQuizDetailQuery(QuizId));
 

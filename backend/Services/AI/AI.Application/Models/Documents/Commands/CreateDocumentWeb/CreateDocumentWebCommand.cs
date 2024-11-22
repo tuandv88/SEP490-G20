@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AI.Application.Models.Documents.Commands.CreateDocumentWeb;
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateDocumentWebCommand(List<string> Urls) : ICommand<CreateDocumentWebResult>;
 public record CreateDocumentWebResult(List<Guid> DocumentIds);
 

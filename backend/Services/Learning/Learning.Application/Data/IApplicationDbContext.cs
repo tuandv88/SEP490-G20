@@ -1,6 +1,4 @@
-﻿using MassTransit.EntityFrameworkCoreIntegration;
-
-namespace Learning.Application.Data;
+﻿namespace Learning.Application.Data;
 public interface IApplicationDbContext {
     DbSet<Course> Courses { get; }
     DbSet<Chapter> Chapters { get; }
@@ -14,6 +12,7 @@ public interface IApplicationDbContext {
     DbSet<TestCase> TestCases { get; }
     DbSet<UserCourse> UserCourses { get; }
     DbSet<LectureProgress> LecturesProgress { get; }
+    DbSet<LectureComment> LectureComments { get; }
     DbSet<QuizSubmission> QuizSubmissions { get; }
     DbSet<ProblemSubmission> ProblemSubmissions { get; }
     DbSet<Domain.Models.File> Files { get; }

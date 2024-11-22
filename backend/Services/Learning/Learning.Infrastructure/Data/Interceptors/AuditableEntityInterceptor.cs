@@ -15,7 +15,7 @@ public class AuditableEntityInterceptor(IUserContextService userContextService) 
 
     public void UpdateEntities(DbContext? context) {
         if (context == null) return;
-        var userName = userContextService.User.UserName;
+        var userName = userContextService.User?.UserName??"system";
         foreach (var entry in context.ChangeTracker.Entries<IEntity>()) {
             if (entry.State == EntityState.Added) {
                 entry.Entity.CreatedBy = userName;

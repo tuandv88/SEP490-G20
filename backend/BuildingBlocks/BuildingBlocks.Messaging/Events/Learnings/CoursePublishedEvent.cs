@@ -1,5 +1,6 @@
 ﻿namespace BuildingBlocks.Messaging.Events.Learnings;
 public record CoursePublishedEvent(CourseData Course) : IntegrationEvent;
+
 public record CourseData {
     public Guid Id { get; set; }
     public string Title { get; set; }

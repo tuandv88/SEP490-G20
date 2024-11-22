@@ -4,6 +4,7 @@ using Learning.Infrastructure.Data.Interceptors;
 using Learning.Infrastructure.Data.Repositories.Chapters;
 using Learning.Infrastructure.Data.Repositories.Courses;
 using Learning.Infrastructure.Data.Repositories.Files;
+using Learning.Infrastructure.Data.Repositories.LectureComments;
 using Learning.Infrastructure.Data.Repositories.Lectures;
 using Learning.Infrastructure.Data.Repositories.Problems;
 using Learning.Infrastructure.Data.Repositories.ProblemSolutions;
@@ -14,11 +15,11 @@ using Learning.Infrastructure.Data.Repositories.Quizs;
 using Learning.Infrastructure.Data.Repositories.QuizSubmissions;
 using Learning.Infrastructure.Data.Repositories.TestCases;
 using Learning.Infrastructure.Data.Repositories.TestScripts;
+using Learning.Infrastructure.Data.Repositories.UserCourses;
 using Learning.Infrastructure.Extentions;
 using Learning.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
 
 namespace Learning.Infrastructure;
 public static class DependencyInjection {
@@ -34,7 +35,7 @@ public static class DependencyInjection {
 
             options.LogTo(Console.WriteLine, LogLevel.Information);
         });
-        services.AddMassTransitWithRabbitMQ(configuration, Assembly.GetExecutingAssembly());
+        services.AddMassTransitWithRabbitMQ(configuration, typeof(IApplicationDbContext).Assembly);
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
@@ -57,7 +58,7 @@ public static class DependencyInjection {
         //Configuration Service
         services.AddScoped<ISourceCombiner, SourceCombiner>();
 
-        services.AddScoped<IQuizSubmissionStateService, QuizSubmissionStateService>();
+        services.AddScoped<IManagementStateService, ManagementStateService>();
 
         //Configuration Repository
         ConfigureRepository(services, configuration);
@@ -106,5 +107,11 @@ public static class DependencyInjection {
 
         //IQuizSubmissionRepositoru
         services.AddScoped<IQuizSubmissionRepository, QuizSubmissionRepository>();
+
+        //IUserCourse
+        services.AddScoped<IUserCourseRepository, UserCourseRepository>();
+
+        //ILectureComments
+        services.AddScoped<ILectureCommentRepository, LectureCommentRepository>();
     }
 }

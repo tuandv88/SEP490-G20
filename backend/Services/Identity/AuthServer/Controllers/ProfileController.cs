@@ -9,6 +9,8 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.DataProtection;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authorization;
+using BuidingBlocks.Storage.Interfaces;
+using BuidingBlocks.Storage;
 
 namespace AuthServer.Controllers
 {
@@ -18,16 +20,18 @@ namespace AuthServer.Controllers
         private readonly SignInManager<Users> _signInManager;
         private readonly UserManager<Users> _userManager;
         private readonly UrlEncoder _urlEncoder;
+        private readonly IFilesService _filesService;
         public IActionResult Index()
         {
             return View();
         }
-        public ProfileController(SignInManager<Users> signInManager, UserManager<Users> userManagerr, UrlEncoder urlEncoder)
+        public ProfileController(SignInManager<Users> signInManager, UserManager<Users> userManagerr, UrlEncoder urlEncoder, IFilesService filesService)
         {
 
             _signInManager = signInManager;
             _userManager = userManagerr;
             _urlEncoder = urlEncoder;
+            _filesService = filesService;
         }
 
         [HttpGet]
@@ -38,14 +42,18 @@ namespace AuthServer.Controllers
             ViewData["ReturnUrl"] = returnUrl;
 
             var userCurrent = await _userManager.GetUserAsync(User); // Đợi kết quả trả về
+
             if (userCurrent != null)
             {
+                var s3Object = await _filesService.GetFileAsync(StorageConstants.BUCKET, userCurrent.ProfilePicture, 60);
+
                 PersonalViewModel model = new PersonalViewModel()
                 {
-                    UserName = userCurrent.UserName,
+                    UserName = userCurrent.UserName!,
                     FirstName = userCurrent.FirstName,
                     LastName = userCurrent.LastName,
-                    Dob = userCurrent.DateOfBirth
+                    Dob = userCurrent.DateOfBirth,
+                    urlAvatar = s3Object.PresignedUrl
                 };
 
                 return View(model);

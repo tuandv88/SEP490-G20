@@ -50,15 +50,25 @@ public class SubmitAnswerHandler(IQuizSubmissionRepository repository, IUserCont
             throw new InvalidOperationException("For MultipleChoice and TrueFalse questions, only one answer is allowed.");
         }
 
+        var choices = question.QuestionOptions.Select(q => new Choice {
+            Id = q.Id.Value.ToString(),
+            Content = q.Content,
+            IsCorrect = q.IsCorrect,
+            OrderIndex = q.OrderIndex
+        }).ToList();
+
+        var validChoiceIds = choices.Select(c => c.Id).ToHashSet();
+        foreach (var userAnswer in userAnswers) {
+            if (!validChoiceIds.Contains(userAnswer)) {
+                throw new InvalidOperationException($"Invalid answer: {userAnswer}. It must be one of the available choices.");
+            }
+        }
         return new QuestionAnswer {
             Id = question.Id.Value.ToString(),
+            QuestionType = question.QuestionType.ToString(),
+            OrderIndex = question.OrderIndex,
             Content = question.Content,
-            Choices = question.QuestionOptions.Select(q => new Choice {
-                Id = q.Id.Value.ToString(),
-                Content = q.Content,
-                IsCorrect = q.IsCorrect,
-                OrderIndex = q.OrderIndex
-            }).ToList(),
+            Choices = choices,
             UserAnswers = userAnswers
         };
     }
@@ -68,7 +78,9 @@ public class SubmitAnswerHandler(IQuizSubmissionRepository repository, IUserCont
         var problem = request.Question.Problem;
         return new QuestionAnswer {
             Id = question.Id.Value.ToString(),
+            QuestionType = question.QuestionType.ToString(),
             Content = question.Content,
+            OrderIndex = question.OrderIndex,
             Problem = new ProblemAnswer {
                 Id = problem!.ProblemId.ToString(),
                 CodeAnswer = new CodeAnswer {

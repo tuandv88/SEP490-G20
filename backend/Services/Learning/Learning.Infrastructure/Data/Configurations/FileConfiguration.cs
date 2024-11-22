@@ -8,9 +8,9 @@ public class FileConfiguration : IEntityTypeConfiguration<Domain.Models.File> {
                         fileId => fileId.Value,
                         dbId => FileId.Of(dbId));
 
-        builder.Property(f => f.FileName).HasMaxLength(30).IsRequired();
+        builder.Property(f => f.FileName).IsRequired();
         builder.Property(f => f.Url).HasMaxLength(255).IsRequired();
-        builder.Property(f => f.Format).HasMaxLength(10).IsRequired();
+        builder.Property(f => f.Format).IsRequired();
         builder.Property(f => f.FileSize);
         builder.Property(f => f.IsActive).HasDefaultValue(true);
         builder.Property(f => f.FileType)

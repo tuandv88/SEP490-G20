@@ -16,7 +16,7 @@ public class CoursePublishedEventHandler(
         var courseEvent = context.Message.Course;
         logger.LogInformation($"[CoursePublishedEventConsumer] Message: {courseEvent}");
 
-        var documentIds = await repository.GetDocumentIdsByTagAsync(TagConstant.Learning.Course.CourseId, courseEvent.Id.ToString());
+        var documentIds = await repository.GetDocumentIdsByTagAsync(Learning.Course.CourseId, courseEvent.Id.ToString());
         if (documentIds.Any()) {
             logger.LogWarning($"[CoursePublishedEventHandler] Found document for courseId: {courseEvent.Id}");
             return;

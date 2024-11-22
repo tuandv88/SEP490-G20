@@ -37,9 +37,6 @@ public class UpdateCourseCommandValidator : AbstractValidator<UpdateCourseComman
             .NotNull().WithMessage("TargetAudiences must not be null.")
             .NotEmpty().WithMessage("TargetAudiences must not be empty.");
 
-        RuleFor(x => x.UpdateCourseDto.ScheduledPublishDate)
-            .Must(BeValidDateTimeOrNull).WithMessage("ScheduledPublishDate must be a valid UTC date or null.");
-
         RuleFor(x => x.UpdateCourseDto.Price)
             .GreaterThanOrEqualTo(0).WithMessage("Price must be greater than or equal zero.");
     }

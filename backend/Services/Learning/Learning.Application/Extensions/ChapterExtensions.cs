@@ -1,4 +1,6 @@
 ﻿using Learning.Application.Models.Chapters.Dtos;
+using Learning.Application.Models.Lectures.Dtos;
+using System.Collections.Generic;
 
 namespace Learning.Application.Extensions;
 public static class ChapterExtensions {
@@ -19,6 +21,14 @@ public static class ChapterExtensions {
             LectureDtos: chapter.Lectures
             .OrderBy(l => l.OrderIndex)
             .Select(l => l.ToLectureDto()).ToList()
+            );
+    }
+    public static ChapterPreviewDto ToChapterPreviewDto(this Chapter chapter, List<LecturePreviewDto> lecture) {
+        return new ChapterPreviewDto(
+                chapter.Id.Value,
+                chapter.Title,
+                chapter.OrderIndex,
+                lecture
             );
     }
 }

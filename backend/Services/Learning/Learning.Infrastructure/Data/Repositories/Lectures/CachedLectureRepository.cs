@@ -33,6 +33,10 @@ public class CachedLectureRepository(ILectureRepository lectureRepository, IChap
         return await lectureRepository.GetByIdAsync(id);
     }
 
+    public async Task<Lecture?> GetByQuizIdAsync(Guid quizId) {
+        return await lectureRepository.GetByQuizIdAsync(quizId);
+    }
+
     public async Task<Lecture?> GetLectureByIdDetail(Guid Id) {
         return await lectureRepository.GetLectureByIdDetail(Id);
     }

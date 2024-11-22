@@ -1,10 +1,11 @@
-﻿using Learning.Application.Models.Problems.Dtos;
+﻿using Learning.Application.Data.Repositories;
+using Learning.Application.Models.Problems.Dtos;
 using Learning.Application.Models.Quizs.Dtos;
 
 namespace Learning.Application.Models.Lectures.Queries.GetLecureById;
 public class GetLectureDetailsHandler(ILectureRepository lectureRepository, IQuizRepository quizRepository, 
     IProblemRepository problemRepository, IUserContextService userContext, ICourseRepository courseRepository,
-    IQuizSubmissionRepository quizSubmissionRepository
+    IQuizSubmissionRepository quizSubmissionRepository, IUserCourseRepository userCourseRepository
     ) : IQueryHandler<GetLectureDetailQuery, GetLectureDetailsResult> {
     public async Task<GetLectureDetailsResult> Handle(GetLectureDetailQuery request, CancellationToken cancellationToken) {
         var lecture = await lectureRepository.GetLectureByIdDetail(request.LectureId);
@@ -16,7 +17,7 @@ public class GetLectureDetailsHandler(ILectureRepository lectureRepository, IQui
         // Kiểm tra trạng thái published của khóa học
         var course = await courseRepository.GetCourseByChapterIdAsync(lecture.ChapterId.Value);
 
-        var userRole = userContext.User?.Role;
+        var userRole = userContext.User.Role;
         var isAdmin = userRole == PoliciesType.Administrator;
         var isCoursePublished = course!.CourseStatus == CourseStatus.Published;
         if (!isCoursePublished && !isAdmin) {
@@ -24,6 +25,13 @@ public class GetLectureDetailsHandler(ILectureRepository lectureRepository, IQui
         }
 
         //TODO -- thêm điều kiện phải tham gia khóa học đấy nữa
+        if (!isAdmin) {
+            var userId = userContext.User.Id;
+            var userCourse = await userCourseRepository.GetByUserIdAndCourseIdWithProgressAsync(userId, course.Id.Value);
+            if (userCourse == null) {
+                throw new ForbiddenAccessException();
+            }
+        }
 
         QuizDto? quizDto = null;
         ProblemDto? problemDto = null;

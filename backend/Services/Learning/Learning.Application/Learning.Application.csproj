@@ -39,8 +39,8 @@
 
   <ItemGroup>
     <Folder Include="Models\Chapters\EventHandlers\" />
-    <Folder Include="Models\Courses\Commands\EnrollmentCourse\" />
     <Folder Include="Models\Lectures\EventHandlers\" />
+    <Folder Include="Models\Lectures\Queries\GetLecturePreviewById\" />
   </ItemGroup>
 
 </Project>

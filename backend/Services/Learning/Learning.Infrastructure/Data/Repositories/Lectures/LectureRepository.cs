@@ -26,6 +26,12 @@ public class LectureRepository : Repository<Lecture>, ILectureRepository {
         return lecture;
     }
 
+    public async Task<Lecture?> GetByQuizIdAsync(Guid quizId) {
+        var lecture = await _dbContext.Lectures
+                            .FirstOrDefaultAsync(l => l.QuizId != null && l.QuizId.Equals(QuizId.Of(quizId)));
+        return lecture;
+    }
+
     public async Task<Lecture?> GetLectureByIdDetail(Guid Id) {
         var lecture = await _dbContext.Lectures
                         .Include(l => l.Files)

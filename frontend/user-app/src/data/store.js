@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 
 const useStore = create((set) => ({
+  selectedCourse: null,
+  setSelectedCourse: (newSelectedCourse) => set({ selectedCourse: newSelectedCourse }),
   testCases: [],
   setTestCases: (newTestCases) => set({ testCases: newTestCases }),
   activeTabTestcase: 'Testcase',

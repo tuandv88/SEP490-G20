@@ -20,5 +20,12 @@ public class ProblemSubmissionRepository : Repository<ProblemSubmission>, IProbl
                                     .FirstOrDefaultAsync(p => p.Id.Equals(ProblemSolutionId.Of(id)));
         return problemSubmission;
     }
+
+    public async Task<List<ProblemSubmission>> GetByProblemIdAndUserIdAsync(Guid problemId, Guid userId) {
+         var submissions = await _dbContext.ProblemSubmissions
+                                    .Where(p => p.ProblemId.Equals(ProblemId.Of(problemId)) && p.UserId.Equals(UserId.Of(userId)))
+                                    .ToListAsync();
+        return submissions;
+    }
 }
 

@@ -8,7 +8,7 @@ export const AUTHENTICATION_ROUTERS = {
   THEME: '/themes',
   COURSELIST: '/courseList',
   COURSEDETAIL: '/courseDetail/:id',
-  LEARNINGSPACE: '/learning-space/:id/lecture/:lectureId',
+  LEARNINGSPACE: '/learning-space/:id/lecture/:lectureId?',
   PROBLEMS: '/problems',
   CODE: '/code',
   CALLBACK: '/callback'

@@ -1,3 +1,18 @@
+.custom-list li {
+    color: black;
+    /* Màu chữ đỏ */
+    list-style: disc;
+    /* Hiển thị dấu bullet */
+}
+
+.custom-list li::marker {
+    color: black;
+    /* Màu của dấu bullet */
+}
+
+
+
+
 * {
     scroll-behavior: smooth;
 }

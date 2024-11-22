@@ -11,6 +11,10 @@ public class ChangeCourseStatusHandler(ICourseRepository repository) : ICommandH
             return new ChangeCourseStatusResult(false, "Invalid course status.");
         }
 
+        if (course.CourseStatus == newStatus) {
+            return new ChangeCourseStatusResult(true, "Course status not change");
+        }
+
         if (newStatus == CourseStatus.Scheduled || newStatus == CourseStatus.Published) {
             if (course.Chapters.Count < 3) {
                 return new ChangeCourseStatusResult(false, "The course must have at least 3 chapters.");
@@ -22,6 +26,13 @@ public class ChangeCourseStatusHandler(ICourseRepository repository) : ICommandH
                 }
             }
         }
+        if (newStatus == CourseStatus.Scheduled) {
+            if (request.ScheduledPublishDate == null || request.ScheduledPublishDate.Value < DateTime.Now) {
+                return new ChangeCourseStatusResult(false, "ScheduledPublishDate is not valid.");
+            }
+            course.UpdateSchedule(request.ScheduledPublishDate.Value);
+        }
+
         course.UpdateStatus(newStatus);
 
         await repository.UpdateAsync(course);

@@ -1,17 +1,30 @@
-﻿using BuildingBlocks.Messaging.Events.Learnings;
+﻿using BuildingBlocks.Caching;
+using BuildingBlocks.Messaging.Events.Learnings;
 using Learning.Domain.Events;
 using MassTransit;
 
 namespace Learning.Application.Models.Courses.EventHandlers;
-public class CourseUpdatedStatusEventHandler(IPublishEndpoint publishEndpoint) : INotificationHandler<CourseUpdatedStatusEvent> {
+public class CourseUpdatedStatusEventHandler(IPublishEndpoint publishEndpoint, IMessageScheduler scheduler, ICacheService cacheService) : INotificationHandler<CourseUpdatedStatusEvent> {
     public async Task Handle(CourseUpdatedStatusEvent notification, CancellationToken cancellationToken) {
         //publish event ra ở đây
-        if (notification.Course.CourseStatus == CourseStatus.Published) {
-            var @event = MapData(notification.Course);
-            await publishEndpoint.Publish(@event, cancellationToken);
-        } else {
-            var @event = new CourseRevokedEvent(notification.Course.Id.Value);
-            await publishEndpoint.Publish(@event, cancellationToken);
+        var course = notification.Course;
+        var courseStatus = course.CourseStatus;
+        var scheduleTime = course.ScheduledPublishDate;
+        switch (courseStatus) {
+            case CourseStatus.Published:
+                await publishEndpoint.Publish(MapData(notification.Course), cancellationToken);
+                break;
+            case CourseStatus.Scheduled:
+                if (scheduleTime.HasValue) {
+                   var message =  await scheduler.SchedulePublish(scheduleTime.Value, new CourseScheduledEvent(notification.Course.Id.Value), cancellationToken);
+                   var key = string.Format(RedisRepoKey.CourseTokenId, course.Id.Value);
+                   await cacheService.SetAsync(key, message.TokenId, scheduleTime.Value - DateTime.UtcNow);
+                }
+                await publishEndpoint.Publish(new CourseRevokedEvent(notification.Course.Id.Value), cancellationToken);
+                break;
+            default:
+                await publishEndpoint.Publish(new CourseRevokedEvent(notification.Course.Id.Value), cancellationToken);
+                break;
         }
     }
     private CoursePublishedEvent MapData(Course course) {

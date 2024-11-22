@@ -36,9 +36,6 @@ public class CreateCourseCommandValidator : AbstractValidator<CreateCourseComman
             .NotNull().WithMessage("TargetAudiences must not be null.")
             .NotEmpty().WithMessage("TargetAudiences must not be empty.");
 
-        RuleFor(x => x.CreateCourseDto.ScheduledPublishDate)
-            .Must(BeValidDateTimeOrNull).WithMessage("ScheduledPublishDate must be a valid UTC date or null.");
-
         RuleFor(x => x.CreateCourseDto.Image)
             .NotNull().WithMessage("ImageUrl must not be null.");
 

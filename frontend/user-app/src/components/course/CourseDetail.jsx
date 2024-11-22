@@ -24,6 +24,7 @@ import ErrorPage from '@/pages/ErrorPage'
 import { LearningAPI } from '@/services/api/learningApi'
 import CourseDetailLoading from '../loading/CourseDetailLoading'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
+import useStore from '@/data/store'
 
 export default function CourseDetail() {
   const [expandedSections, setExpandedSections] = useState([0])
@@ -32,16 +33,19 @@ export default function CourseDetail() {
   const [error, setError] = useState(false)
   const { id } = useParams()
   const navigate = useNavigate()
+  const setSelectedCourse = useStore((state) => state.setSelectedCourse)
+
 
   const toggleSection = (index) => {
     setExpandedSections((prev) => (prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]))
   }
 
   const handleLearningCourse = (courseId) => {
-    navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(':lectureId', 'c2e250db-bf56-4dae-8d70-a2d7be39e943'))
+    navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(':lectureId', '30aadbe3-779b-4723-974e-af9e370abfb0'))
   }
 
   useEffect(() => {
+    setSelectedCourse(id)
     window.scrollTo(0, 0)
   }, [])
 
@@ -253,7 +257,9 @@ export default function CourseDetail() {
                   </div>
 
                   {/* Course Description */}
-                  <div className='prose prose-invert text-black max-w-none mb-8 bg-[#dae4f3] p-6 rounded-lg shadow-lg'>
+                  <div className='prose prose-invert
+                   text-black max-w-none mb-8 bg-[#dae4f3] p-6 rounded-lg shadow-lg
+                '>
                     <h2>Prerequisites</h2>
                     <ReactMarkdown>{courseDetail?.courseDetailsDto?.courseDto?.prerequisites}</ReactMarkdown>
 

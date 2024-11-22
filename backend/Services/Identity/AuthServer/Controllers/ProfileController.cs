@@ -37,19 +37,6 @@ namespace AuthServer.Controllers
         [HttpGet]
         public async Task<IActionResult> Personal(string returnUrl = null)
         {
-            if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                foreach (var claim in User.Claims)
-                {
-                    Console.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("User is not authenticated");
-            }
-
-
             returnUrl = returnUrl ?? Url.Content("~/");
 
             ViewData["ReturnUrl"] = returnUrl;

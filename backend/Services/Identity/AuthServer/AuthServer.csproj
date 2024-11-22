@@ -98,6 +98,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Keys\" />
+	  <Folder Include="Extensions\" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -19,12 +19,12 @@ namespace BuildingBlocks.Email.Services {
 
         public async Task SendAndSave(EmailMetadata emailMetadata)
         {
-            // Gửi email
+            // Send email
             var rs = await _fluentEmail
                 .SetFrom("verify@icoder.vn", "Icoder")
                 .To(emailMetadata.ToAddress)
                 .Subject(emailMetadata.Subject)
-                .Body(emailMetadata.Body)
+                .Body(emailMetadata.Body, true)  // Email dưới dạng isHTML = true ( default = false )
                 .SendAsync();
 
             if (rs.Successful)
@@ -36,8 +36,10 @@ namespace BuildingBlocks.Email.Services {
                 message.From.Add(new MailboxAddress("Icoder", "verify@icoder.vn"));
                 message.To.Add(MailboxAddress.Parse(emailMetadata.ToAddress));
                 message.Subject = emailMetadata.Subject;
-                message.Body = new TextPart("plain") { Text = emailMetadata.Body };
+                // message.Body = new TextPart("plain") { Text = emailMetadata.Body };         // Văn bản thuần túy (chỉ chứa chữ cái, số, dấu câu).
+                message.Body = new TextPart("html") { Text = emailMetadata.Body };          // Email dưới dạng HTML
 
+                // Save Email up to MailServer
                 await SaveToSentFolder(message, "verify@icoder.vn", "icodervn");
             }
             else

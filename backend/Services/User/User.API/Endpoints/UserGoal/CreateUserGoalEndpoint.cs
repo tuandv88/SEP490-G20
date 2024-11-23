@@ -9,7 +9,7 @@ public class CreateUserGoalEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/user-service/user/{userId}/UserGoal", async (Guid userId, CreateUserGoalRequest request, ISender sender) =>
+        app.MapPost("/user/{userId}/UserGoal", async (Guid userId, CreateUserGoalRequest request, ISender sender) =>
         {
             
             var command = new CreateUserGoalCommand
@@ -25,7 +25,7 @@ public class CreateUserGoalEndpoint : ICarterModule
             var response = result.Adapt<CreateUserGoalResponse>();
 
             // Trả về HTTP 201 với đường dẫn của PointHistory vừa tạo
-            return Results.Created($"/user-service/user/{userId}/UserGoal/{response.Id}", response);
+            return Results.Created($"/user/{userId}/UserGoal/{response.Id}", response);
 
         })
            .WithName("CreateUserGoal") // Đặt tên cho endpoint

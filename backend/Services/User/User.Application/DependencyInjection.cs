@@ -1,6 +1,5 @@
 ﻿using BuildingBlocks.Behaviors;
 using BuildingBlocks.Extensions;
-using BuildingBlocks.Messaging.MassTransit;
 using FluentValidation;
 using Judge0.DotNet;
 using Microsoft.Extensions.Configuration;
@@ -21,8 +20,6 @@ public static class DependencyInjection
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        //RabbitMQ
-        services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());
         return services;
     }
 }

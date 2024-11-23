@@ -37,5 +37,7 @@ public class Lecture : Aggregate<LectureId> {
     public void DeleteFile(File file) {
         Files.Remove(file);
     }
-
+    public void AddComments(LectureComment comment) {
+        LectureComments.Add(comment);
+    }
 }

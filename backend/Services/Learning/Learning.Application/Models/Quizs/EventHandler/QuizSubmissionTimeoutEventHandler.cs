@@ -12,6 +12,7 @@ public class QuizSubmissionTimeoutEventHandler(IQuizSubmissionRepository quizSub
         }
         if (quizSubmission.Status == QuizSubmissionStatus.InProgress) {
             quizSubmission.UpdateStatus(QuizSubmissionStatus.Processing);
+            quizSubmission.SubmissionDate = DateTime.UtcNow;
             await quizSubmissionRepository.UpdateAsync(quizSubmission);
 
             await publishEndpoint.Publish(new QuizSubmissionEvent(quizSubmissionId));

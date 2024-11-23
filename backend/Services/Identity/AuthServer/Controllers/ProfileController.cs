@@ -11,6 +11,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authorization;
 using BuidingBlocks.Storage.Interfaces;
 using BuidingBlocks.Storage;
+using System.Text.Json;
 
 namespace AuthServer.Controllers
 {
@@ -139,16 +140,131 @@ namespace AuthServer.Controllers
         }
 
         [HttpGet]
-        public IActionResult Contact()
+        public async Task<IActionResult> Contact()
         {
-            return View();
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Profile");
+            }
+
+            // Giá trị mặc định cho Address
+            var address = new Address();
+
+            // Giải tuần tự hóa Address từ JSON với xử lý lỗi
+            if (!string.IsNullOrEmpty(user.Address))
+            {
+                try
+                {
+                    address = JsonSerializer.Deserialize<Address>(user.Address) ?? new Address();
+                }
+                catch (JsonException)
+                {
+                    // Nếu Address không đúng định dạng JSON, giữ giá trị mặc định
+                    address = new Address();
+                }
+            }
+
+
+            // Giá trị mặc định cho Bio
+            var bio = new Bio();
+
+            // Giải tuần tự hóa Address từ JSON với xử lý lỗi
+            if (!string.IsNullOrEmpty(user.Bio))
+            {
+                try
+                {
+                    bio = JsonSerializer.Deserialize<Bio>(user.Bio) ?? new Bio();
+                }
+                catch (JsonException)
+                {
+                    // Nếu Bio không đúng định dạng JSON, giữ giá trị mặc định
+                    bio = new Bio();
+                }
+            }
+
+            // Đặt giá trị mặc định cho PhoneNumber nếu chưa có
+            var phoneNumber = string.IsNullOrEmpty(user.PhoneNumber) ? "" : user.PhoneNumber;
+
+            // Tạo ViewModel và gán giá trị
+            var model = new ContactViewModel
+            {
+                PhoneNumber = phoneNumber,
+                Province = address.Province,
+                District = address.District,
+                School = address.School,
+                Facebook = bio.Facebook,
+                LinkedIn = bio.LinkedIn,
+                Twitter = bio.Twitter
+            };
+
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateContact(EmailViewModel model)
+        public async Task<IActionResult> UpdateContact(ContactViewModel model)
         {
-            return View();
+            if (!ModelState.IsValid)
+            {
+                // Ghi log hoặc hiển thị lỗi nếu cần
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage)
+                                              .ToList();
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"- {error}");
+                }
+                return View("Contact", model); // Trả lại form với thông báo lỗi
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Profile");
+            }
+
+            // Xử lý logic tùy theo điều kiện
+            var address = new Address
+            {
+                Province = model.Province, // Giá trị mặc định nếu không nhập
+                District = model.District,
+                School = model.School
+            };
+
+            string addressJson = JsonSerializer.Serialize(address);
+
+            var bio = new Bio
+            {
+                Facebook = model.Facebook,
+                LinkedIn = model.LinkedIn,
+                Twitter = model.Twitter
+            };
+
+            string bioJson = JsonSerializer.Serialize(bio);
+
+            // Cập nhật thông tin người dùng
+            user.PhoneNumber = model.PhoneNumber;
+            user.Address = addressJson;
+            user.Bio = bioJson;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                TempData["SuccessMessageProfile"] = "Contact information updated successfully.";
+                return RedirectToAction("Index", "Profile");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                TempData["ErrorMessageProfile"] = "Contact information updated failed.";
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View("Contact", model);
         }
 
         [HttpGet]
@@ -186,7 +302,7 @@ namespace AuthServer.Controllers
                                               .ToList();
 
                 var errorMessage = string.Join(", ", errors);
-                ModelState.AddModelError(string.Empty, errorMessage);
+                //ModelState.AddModelError(string.Empty, errorMessage);
                 return View(model);
             }
 

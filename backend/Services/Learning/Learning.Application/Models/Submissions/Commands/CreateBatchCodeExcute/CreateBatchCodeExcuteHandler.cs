@@ -67,25 +67,42 @@ public class CreateBatchCodeExcuteHandler(ISubmissionService submissionService, 
     private List<CodeExecuteDto> AddData(List<CodeExecuteDto> lsCodeExecuteDtos, List<TestCaseDto> testCases) {
         bool CheckIfOutputMatchesExpected(string? output, string? expected) => output == expected;
 
-        var addData = lsCodeExecuteDtos.Select(x => new CodeExecuteDto(
-            Token: x.Token,
-            RunTimeErrors: x.RunTimeErrors,
-            CompileErrors: x.CompileErrors,
-            ExecutionTime: x.ExecutionTime,
-            MemoryUsage: x.MemoryUsage,
-            TestResults: x.TestResults.Zip(testCases, (result, testCase) => new TestResult(
+        var addData = lsCodeExecuteDtos.Select(x => {
+            // Cập nhật TestResults dựa trên testCases
+            var updatedTestResults = x.TestResults.Zip(testCases, (result, testCase) => new TestResult(
                 Inputs: testCase.Inputs,
                 Output: result.Output,
                 Stdout: result.Stdout,
                 Expected: testCase.ExpectedOutput,
                 IsPass: CheckIfOutputMatchesExpected(result.Output, testCase.ExpectedOutput)
-            )).ToList(),
-            Status: x.Status,
-            LanguageCode: x.LanguageCode
-        )).ToList();
+            )).ToList();
+
+            // Kiểm tra xem tất cả test case có pass hay không
+            var allTestsPassed = updatedTestResults.All(t => t.IsPass);
+
+            // Cập nhật trạng thái submission
+            var updatedStatus = x.Status.Id == 3
+                ? new SubmissionStatus(
+                    x.Status.Id,
+                    allTestsPassed ? SubmissionConstant.Accepted : SubmissionConstant.TestFailed
+                  )
+                : x.Status;
+
+            return new CodeExecuteDto(
+                Token: x.Token,
+                RunTimeErrors: x.RunTimeErrors,
+                CompileErrors: x.CompileErrors,
+                ExecutionTime: x.ExecutionTime,
+                MemoryUsage: x.MemoryUsage,
+                TestResults: updatedTestResults,
+                Status: updatedStatus,
+                LanguageCode: x.LanguageCode
+            );
+        }).ToList();
 
         return addData;
     }
+
 
 
 }

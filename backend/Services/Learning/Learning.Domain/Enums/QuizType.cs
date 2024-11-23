@@ -1,7 +1,7 @@
 ﻿namespace Learning.Domain.Enums;
 public enum QuizType {
-    PRACTICE, // Quiz trong bài đánh giá
-    ASSESSMENT,// Quiz thực hành
+    PRACTICE, // Quiz thực hành
+    ASSESSMENT,// Quiz trong bài đánh giá
     FINAL      // Quiz cuối khóa học
 }
 

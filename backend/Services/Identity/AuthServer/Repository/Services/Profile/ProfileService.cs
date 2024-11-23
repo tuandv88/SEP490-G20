@@ -69,6 +69,16 @@ namespace AuthServer.Repository.Services.Profile
             {
                 context.IssuedClaims.Add(new Claim("urlImagePresigned", s3Object.PresignedUrl!));
             }
+
+            // Lấy các claims hiện tại từ UserManager
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            var firstLoginClaim = userClaims.FirstOrDefault(c => c.Type == "firstlogin");
+
+            // Thêm claim "FirstLogin" nếu tồn tại
+            if (firstLoginClaim != null)
+            {
+                context.IssuedClaims.Add(new Claim("firstlogin", firstLoginClaim.Value));
+            }
         }
 
         public Task IsActiveAsync(IsActiveContext context)

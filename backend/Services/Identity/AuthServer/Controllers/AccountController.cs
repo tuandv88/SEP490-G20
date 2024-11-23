@@ -21,6 +21,7 @@ using Org.BouncyCastle.Bcpg.Sig;
 using Microsoft.AspNetCore.Authorization;
 using BuildingBlocks.Email.Interfaces;
 using BuildingBlocks.Email.Models;
+using BuildingBlocks.Email.Helpers;
 
 namespace AuthServer.Controllers
 {
@@ -118,13 +119,15 @@ namespace AuthServer.Controllers
                         // Mã hóa token 
                         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
+                        string fullName = model.FirstName + " " + model.LastName;
+
                         var callbackUrl = Url.Action(
                             action: "ConfirmEmail",
                             controller: "Account",
                             values: new { userId = userId, code = code, expiration = newExpirationTime.Ticks, returnUrl = returnUrl },
                             protocol: Request.Scheme);
 
-                        var emailBody = $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>Confirm Email</a>";
+                        var emailBody = EmailHtmlTemplates.ConfirmEmailTemplate(fullName, callbackUrl);
 
                         var emailMetadata = new EmailMetadata(
                             toAddress: model.Email,
@@ -525,13 +528,15 @@ namespace AuthServer.Controllers
             // Mã hóa token
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
+            var fullName = user.FirstName + " " + user.LastName;
+
             var callbackUrl = Url.Action(
                 action: "ConfirmEmail",
                 controller: "Account",
                 values: new { userId = userId, code = code, expiration = newExpirationTime.Ticks, returnUrl = returnUrl },
                 protocol: Request.Scheme);
 
-            var emailBody = $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>Confirm Email</a>";
+            var emailBody = EmailHtmlTemplates.ConfirmEmailTemplate(fullName, callbackUrl);
 
             var emailMetadata = new EmailMetadata(
                 toAddress: userEmail,
@@ -758,13 +763,15 @@ namespace AuthServer.Controllers
                     // Mã hóa token
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
+                    var fullName = user.FirstName + " " + user.LastName;
+
                     var callbackUrl = Url.Action(
                         action: "ResetPassword",
                         controller: "Account",
                         values: new { email = model.Email, code = code, expiration = newExpirationTime.Ticks },
                         protocol: Request.Scheme);
 
-                    var emailBody = $"Reset password by clicking this link: <a href='{callbackUrl}'>Reset Password</a>";
+                    var emailBody = EmailHtmlTemplates.ResetPasswordTemplate(fullName, callbackUrl);
 
                     var emailMetadata = new EmailMetadata(
                         toAddress: model.Email,

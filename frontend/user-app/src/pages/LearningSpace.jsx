@@ -37,6 +37,8 @@ const LearningSpace = () => {
 
   //courseId
   const { id, lectureId } = useParams()
+  console.log(id)
+  console.log(lectureId)
   const toggleProblemList = () => {
     setIsProblemListOpen(!isProblemListOpen)
   }
@@ -56,7 +58,7 @@ const LearningSpace = () => {
       setError(false)
       try {
         const data = await LearningAPI.getCourseDetails(id)
-        //console.log(data)
+        console.log(data)
         setChapters(data?.courseDetailsDto?.chapterDetailsDtos)
         setTitle(data?.courseDetailsDto?.courseDto?.title)
         // setFirstLectureId(data?.courseDetailsDto.chapterDetailsDtos[4].lectureDtos[0].id)

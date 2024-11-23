@@ -7,7 +7,7 @@ const breadcrumbs = [{ label: 'CourseTable', href: '/course-table' }]
 export default function CoursesPage() {
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
-      <CoursesManagement />
+      <CourseTable />
     </PageContainer>
   )
 }

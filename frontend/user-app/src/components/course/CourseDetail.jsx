@@ -41,7 +41,7 @@ export default function CourseDetail() {
   }
 
   const handleLearningCourse = (courseId) => {
-    navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(':lectureId', '30aadbe3-779b-4723-974e-af9e370abfb0'))
+    navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(':lectureId', 'd9ce3472-3f66-4087-8804-f7b9103d0949'))
   }
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function CourseDetail() {
       setLoading(true)
       setError(false)
       try {
-        const data = await LearningAPI.getCourseDetails(id)
+        const data = await LearningAPI.getCoursePreview(id)
         setCourseDetail(data)
       } catch (error) {
         console.error('Error fetching course detail:', error)

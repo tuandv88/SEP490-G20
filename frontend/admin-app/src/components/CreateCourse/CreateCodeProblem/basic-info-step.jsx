@@ -5,9 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import MarkdownFormField from '@/components/markdown-form-field'
 import { Switch } from '@/components/ui/switch'
 
-export default function BasicInfoStep({ form }) {
+export default function BasicInfoStep({ form, hasLecture }) {
   return (
-    <div className='max-w-5xl mx-auto'>
+    <div className='max-w-5xl mx-auto h-[100vh]'>
       <h1 className='mb-6 text-3xl font-semibold'>Create Code Problem - Basic Info</h1>
       <div className='mb-6'>
         <FormField
@@ -24,12 +24,15 @@ export default function BasicInfoStep({ form }) {
           )}
         />
       </div>
-      <MarkdownFormField
-        control={form.control}
-        name='description'
-        label='Description'
-        placeholder='Enter problem description'
-      />
+      {/* new */}
+      {!hasLecture && (
+        <MarkdownFormField
+          control={form.control}
+          name='description'
+          label='Description'
+          placeholder='Enter problem description'
+        />
+      )}
 
       <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-6'>
         {/* Language Dropdown */}
@@ -166,7 +169,7 @@ export default function BasicInfoStep({ form }) {
                   step='1'
                   placeholder='Enter Memory Limit'
                   {...field}
-                  value={field.value || 250}                 
+                  value={field.value || 250}
                 />
               </FormControl>
               <FormMessage />
@@ -223,7 +226,7 @@ export default function BasicInfoStep({ form }) {
         {/* Max File Size */}
         <FormField
           control={form.control}
-          name='maxFileSize'         
+          name='maxFileSize'
           render={({ field }) => (
             <FormItem>
               <FormLabel className='text-base font-semibold'>Max File Size (MB)</FormLabel>
@@ -235,14 +238,14 @@ export default function BasicInfoStep({ form }) {
                   step='1'
                   placeholder='Enter Max File Size'
                   {...field}
-                  value={field.value || 10}                  
+                  value={field.value || 10}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
         {/* Enable Network Toggle */}
         <FormField
           control={form.control}

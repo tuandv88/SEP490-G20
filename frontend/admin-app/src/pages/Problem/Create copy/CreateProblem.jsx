@@ -6,34 +6,20 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useToast } from '@/hooks/use-toast'
 import FormTabs from './FormTabs';
 import { createProblem } from '@/services/api/problemApi'
-import { useMatch } from '@tanstack/react-router';
-import { createProblemRoute } from '@/routers/router';
+const CreateProblem = ({ navigationUrl, navigationTitle, lectureId, problemType }) => {
 
-const CreateProblem = ({ }) => {
 
-  //new
-  const { params } = useMatch(createProblemRoute.id);
-  const { lectureId } = params;
-
-  console.log(lectureId)
-  
   const [activeTab, setActiveTab] = useState('basic');
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
   const { toast } = useToast();
   const [isRunSuccess, setIsRunSuccess] = useState(false)
-  const [hasLecture, setHasLecture] = useState(false)
 
-  //new
-  useEffect(() => {
-    if (lectureId) {
-      setHasLecture(true)
-    }
-  }, [lectureId])
+  console.log(isSaveTemplate)
   
   const form = useForm({
     defaultValues: {
       title: "",
-      description: "This is a problem for lecture", //new
+      description: "",
       problemType: "Practice",
       difficultyType: "Medium",
       cpuTimeLimit: 2,
@@ -66,12 +52,11 @@ const CreateProblem = ({ }) => {
     console.log(problemData)
 
     try {
-      const response = await createProblem(problemData, lectureId ? lectureId : null)
+      const response = await createProblem(problemData)
       toast({
         title: 'Create problem successfully',
         description: 'Create problem successfully'
       })
-      //navigate here
     } catch (error) {
       console.error('Error creating problem:', error)
     }
@@ -83,7 +68,7 @@ const CreateProblem = ({ }) => {
       <Header backTo='Back to Curriculum' />
       <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormTabs activeTab={activeTab} form={form} setIsSaveTemplate={setIsSaveTemplate} setIsRunSuccess={setIsRunSuccess} hasLecture={hasLecture}/>
+        <FormTabs activeTab={activeTab} form={form} setIsSaveTemplate={setIsSaveTemplate} setIsRunSuccess={setIsRunSuccess}/>
         <BottomTabs 
           
           activeTab={activeTab} 

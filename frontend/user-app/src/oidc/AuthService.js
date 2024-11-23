@@ -1,5 +1,6 @@
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts'
 import { oidcConfig } from './authConfig'
+import Cookies from 'js-cookie';
 
 class AuthService {
   constructor() {
@@ -9,6 +10,7 @@ class AuthService {
     })
 
     this.userManager.events.addUserLoaded((user) => {
+      Cookies.set('authToken', user.access_token, { expires: 7 });
       console.log('User loaded: ', user)
     })
 

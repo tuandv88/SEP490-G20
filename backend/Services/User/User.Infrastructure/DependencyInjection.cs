@@ -32,11 +32,12 @@ namespace User.Infrastructure
 
             services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
-
             services.AddHttpContextAccessor();
+
 
             //Configuration Repository
             ConfigureRepository(services, configuration);
+
 
             return services;
         }

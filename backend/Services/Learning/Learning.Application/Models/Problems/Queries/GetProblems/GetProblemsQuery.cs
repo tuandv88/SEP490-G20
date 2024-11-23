@@ -2,9 +2,13 @@
 using Learning.Application.Models.Problems.Dtos;
 
 namespace Learning.Application.Models.Problems.Queries.GetProblems;
-public record GetProblemsQuery(PaginationRequest PaginationRequest) : IQuery<GetProblemsResult>;
+public record GetProblemsQuery(PaginationRequest PaginationRequest, GetProblemsFilter Filter) : IQuery<GetProblemsResult>;
 public record GetProblemsResult(PaginatedResult<ProblemListDto> Problems);
-
+public record GetProblemsFilter(
+    string? SearchString,
+    string? SortType,
+    bool SortDescending = false
+);
 public class GetProblemsQueryValidator : AbstractValidator<GetProblemsQuery> {
     public GetProblemsQueryValidator() {
         RuleFor(x => x.PaginationRequest.PageIndex)

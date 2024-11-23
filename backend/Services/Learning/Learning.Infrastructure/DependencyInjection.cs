@@ -4,6 +4,7 @@ using Learning.Infrastructure.Data.Interceptors;
 using Learning.Infrastructure.Data.Repositories.Chapters;
 using Learning.Infrastructure.Data.Repositories.Courses;
 using Learning.Infrastructure.Data.Repositories.Files;
+using Learning.Infrastructure.Data.Repositories.LectureComments;
 using Learning.Infrastructure.Data.Repositories.Lectures;
 using Learning.Infrastructure.Data.Repositories.Problems;
 using Learning.Infrastructure.Data.Repositories.ProblemSolutions;
@@ -109,5 +110,8 @@ public static class DependencyInjection {
 
         //IUserCourse
         services.AddScoped<IUserCourseRepository, UserCourseRepository>();
+
+        //ILectureComments
+        services.AddScoped<ILectureCommentRepository, LectureCommentRepository>();
     }
 }

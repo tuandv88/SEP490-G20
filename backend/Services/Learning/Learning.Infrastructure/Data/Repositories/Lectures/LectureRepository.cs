@@ -1,4 +1,6 @@
-﻿namespace Learning.Infrastructure.Data.Repositories.Lectures;
+﻿using Learning.Domain.ValueObjects;
+
+namespace Learning.Infrastructure.Data.Repositories.Lectures;
 public class LectureRepository : Repository<Lecture>, ILectureRepository {
     private readonly IApplicationDbContext _dbContext;
     public LectureRepository(IApplicationDbContext dbContext) : base(dbContext) {
@@ -23,6 +25,12 @@ public class LectureRepository : Repository<Lecture>, ILectureRepository {
     public override async Task<Lecture?> GetByIdAsync(Guid id) {
         var lecture = await _dbContext.Lectures
                         .FirstOrDefaultAsync(l => l.Id.Equals(LectureId.Of(id)));
+        return lecture;
+    }
+
+    public async Task<Lecture?> GetByProblemIdAsync(Guid problemId) {
+        var lecture = await _dbContext.Lectures
+                            .FirstOrDefaultAsync(l => l.ProblemId != null && l.ProblemId.Equals(ProblemId.Of(problemId)));
         return lecture;
     }
 

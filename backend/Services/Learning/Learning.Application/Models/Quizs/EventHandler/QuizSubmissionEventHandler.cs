@@ -31,9 +31,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
             await quizSubmissionRepository.UpdateAsync(quizSubmission);
             //Kiểm tra nếu là kiểu ASSESSMENT thì public lên một event để AI phân tích tạo một lộ trình học
             if (quiz.QuizType == QuizType.ASSESSMENT) {
-                //await publishEndpoint.Publish(new QuizAssessmentSubmissionSuccessEvent() {
-
-                //});
+                //await publishEndpoint.Publish(new AssessmentQuizScoringCompletedEvent());
             }
             await quizSubmissionRepository.SaveChangesAsync();
         }

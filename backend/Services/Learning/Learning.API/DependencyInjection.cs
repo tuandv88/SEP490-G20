@@ -3,6 +3,7 @@ using BuildingBlocks.Extensions;
 using Learning.API.Services;
 using Learning.Application.Interfaces;
 using Learning.Infrastructure.Extentions;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 namespace Learning.API;
 public static class DependencyInjection {
@@ -23,6 +24,9 @@ public static class DependencyInjection {
 
         services.Configure<KestrelServerOptions>(options => {
             options.Limits.MaxRequestBodySize = 5L * 1024 * 1024 * 1024; // 5GB
+        });
+        services.Configure<FormOptions>(options => {
+            options.MultipartBodyLengthLimit = 5L * 1024 * 1024 * 1024;
         });
         return services;
     }

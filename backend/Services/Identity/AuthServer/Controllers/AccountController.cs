@@ -1,26 +1,17 @@
 ﻿using AuthServer.Models;
 using AuthServer.Models.AccountViewModel;
 using IdentityServer4.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.DataProtection;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
-using MailKit;
-using IdentityServer4.Extensions;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Org.BouncyCastle.Bcpg.Sig;
-using Microsoft.AspNetCore.Authorization;
 using BuildingBlocks.Email.Interfaces;
 using BuildingBlocks.Email.Models;
+using BuildingBlocks.Email.Helpers;
+using BuidingBlocks.Storage;
 
 namespace AuthServer.Controllers
 {
@@ -33,7 +24,7 @@ namespace AuthServer.Controllers
         private readonly IEmailService _emailService;
         private readonly UrlEncoder _urlEncoder;
         public AccountController(IIdentityServerInteractionService interactionService, IDataProtectionProvider provider,
-                                  SignInManager<Users> signInManager, UserManager<Users> userManager,
+                                  SignInManager<Users> signInManager, UserManager<Users> userManager, 
                                   IEmailService emailService, UrlEncoder urlEncoder)
         {
             _interactionService = interactionService;
@@ -78,17 +69,20 @@ namespace AuthServer.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     DateOfBirth = model.Dob,
-                    ProfilePicture = string.Empty,
+                    ProfilePicture = StorageConstants.IMAGE_IDENTITY_PATH + "/avatardefault.jpg",
                     Bio = string.Empty,
-                    Address = string.Empty
+                    Address = string.Empty,
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    Console.WriteLine("User created a new account with password.");
+                    // Add Role Default
+                    string defaultRole = "learner";
+                    var roleResult = await _userManager.AddToRoleAsync(user, defaultRole);
 
+                    Console.WriteLine("User created a new account with password.");
                     if (model.ExternalLogin)
                     {
                         var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -110,7 +104,7 @@ namespace AuthServer.Controllers
                         string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                         // Đặt thời gian hết hạn mới (ví dụ 5 phút sau)
-                        DateTime newExpirationTime = DateTime.UtcNow.AddMinutes(5);
+                        DateTime newExpirationTime = DateTime.UtcNow.AddMinutes(30);
 
                         // Lưu token mới vào cơ sở dữ liệu
                         await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
@@ -118,13 +112,15 @@ namespace AuthServer.Controllers
                         // Mã hóa token 
                         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
+                        string fullName = model.FirstName + " " + model.LastName;
+
                         var callbackUrl = Url.Action(
                             action: "ConfirmEmail",
                             controller: "Account",
                             values: new { userId = userId, code = code, expiration = newExpirationTime.Ticks, returnUrl = returnUrl },
                             protocol: Request.Scheme);
 
-                        var emailBody = $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>Confirm Email</a>";
+                        var emailBody = EmailHtmlTemplates.ConfirmEmailTemplate(fullName, callbackUrl);
 
                         var emailMetadata = new EmailMetadata(
                             toAddress: model.Email,
@@ -375,7 +371,23 @@ namespace AuthServer.Controllers
 
             if (result.Succeeded)
             {
-                
+                var existingClaims = await _userManager.GetClaimsAsync(user);
+                var firstLoginClaim = existingClaims.FirstOrDefault(c => c.Type == "firstlogin");
+
+                if (firstLoginClaim == null)
+                {
+                    await _userManager.AddClaimAsync(user, new Claim("firstlogin", "true"));
+                }
+                else
+                {
+                    if (firstLoginClaim.Value == "true")
+                    {
+                        // Nếu đã có "FirstLogin" là "True", cập nhật giá trị thành "False"
+                        await _userManager.RemoveClaimAsync(user, firstLoginClaim);
+                        await _userManager.AddClaimAsync(user, new Claim("firstlogin", "false"));
+                    }
+                }
+
                 if (model.RememberMe)
                 {
                     var cookieOptions = new CookieOptions
@@ -392,7 +404,7 @@ namespace AuthServer.Controllers
                     // Mật khẩu chỉ lưu 5 phút để hạn chế rủi ro bảo mật
                     var passwordCookieOptions = new CookieOptions
                     {
-                        Expires = DateTime.Now.AddMinutes(1), // Cookie mật khẩu tồn tại ngắn hơn
+                        Expires = DateTime.Now.AddMinutes(30), // Cookie mật khẩu tồn tại ngắn hơn
                         Secure = true,
                         HttpOnly = false                      // Không đặt HttpOnly để có thể tự động điền lại
                     };
@@ -498,7 +510,7 @@ namespace AuthServer.Controllers
                     code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                     // Cập nhật thời gian hết hạn mới (ví dụ 5 phút sau)
-                    newExpirationTime = DateTime.UtcNow.AddMinutes(5);
+                    newExpirationTime = DateTime.UtcNow.AddMinutes(30);
 
                     // Cập nhật lại token mới và thời hạn vào cơ sở dữ liệu
                     await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
@@ -516,7 +528,7 @@ namespace AuthServer.Controllers
                 code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                 // Đặt thời gian hết hạn mới (ví dụ 5 phút sau)
-                newExpirationTime = DateTime.UtcNow.AddMinutes(5);
+                newExpirationTime = DateTime.UtcNow.AddMinutes(30);
 
                 // Lưu token mới vào cơ sở dữ liệu
                 await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
@@ -525,13 +537,15 @@ namespace AuthServer.Controllers
             // Mã hóa token
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
+            var fullName = user.FirstName + " " + user.LastName;
+
             var callbackUrl = Url.Action(
                 action: "ConfirmEmail",
                 controller: "Account",
                 values: new { userId = userId, code = code, expiration = newExpirationTime.Ticks, returnUrl = returnUrl },
                 protocol: Request.Scheme);
 
-            var emailBody = $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>Confirm Email</a>";
+            var emailBody = EmailHtmlTemplates.ConfirmEmailTemplate(fullName, callbackUrl);
 
             var emailMetadata = new EmailMetadata(
                 toAddress: userEmail,
@@ -616,6 +630,23 @@ namespace AuthServer.Controllers
 
                 if (signInResult.Succeeded)
                 {
+                    var existingClaims = await _userManager.GetClaimsAsync(user);
+                    var firstLoginClaim = existingClaims.FirstOrDefault(c => c.Type == "firstlogin");
+
+                    if (firstLoginClaim == null)
+                    {
+                        await _userManager.AddClaimAsync(user, new Claim("firstlogin", "true"));
+                    }
+                    else
+                    {
+                        if (firstLoginClaim.Value == "true")
+                        {
+                            // Nếu đã có "FirstLogin" là "True", cập nhật giá trị thành "False"
+                            await _userManager.RemoveClaimAsync(user, firstLoginClaim);
+                            await _userManager.AddClaimAsync(user, new Claim("firstlogin", "false"));
+                        }
+                    }
+
                     // Đăng nhập thành công, chuyển đến trang tiếp theo
                     return RedirectToAction("Index", "Profile");
                 }
@@ -637,9 +668,6 @@ namespace AuthServer.Controllers
                 }
             }
         }
-
-
-
 
         [HttpGet]
         public IActionResult TwoFaceLogin(string email)
@@ -731,7 +759,7 @@ namespace AuthServer.Controllers
                             code = await _userManager.GeneratePasswordResetTokenAsync(user);
 
                             // Cập nhật thời gian hết hạn mới (ví dụ 5 phút sau)
-                            newExpirationTime = DateTime.UtcNow.AddMinutes(1);
+                            newExpirationTime = DateTime.UtcNow.AddMinutes(30);
 
                             // Cập nhật lại token mới và thời hạn vào cơ sở dữ liệu
                             await _userManager.SetAuthenticationTokenAsync(user, "Default", nameTokenUser, $"{code}|{newExpirationTime.Ticks}");
@@ -749,7 +777,7 @@ namespace AuthServer.Controllers
                         code = await _userManager.GeneratePasswordResetTokenAsync(user);
 
                         // Đặt thời gian hết hạn mới (ví dụ 5 phút sau)
-                        newExpirationTime = DateTime.UtcNow.AddMinutes(1);
+                        newExpirationTime = DateTime.UtcNow.AddMinutes(30);
 
                         // Lưu token mới vào cơ sở dữ liệu
                         await _userManager.SetAuthenticationTokenAsync(user, "Default", nameTokenUser, $"{code}|{newExpirationTime.Ticks}");
@@ -758,13 +786,15 @@ namespace AuthServer.Controllers
                     // Mã hóa token
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
+                    var fullName = user.FirstName + " " + user.LastName;
+
                     var callbackUrl = Url.Action(
                         action: "ResetPassword",
                         controller: "Account",
                         values: new { email = model.Email, code = code, expiration = newExpirationTime.Ticks },
                         protocol: Request.Scheme);
 
-                    var emailBody = $"Reset password by clicking this link: <a href='{callbackUrl}'>Reset Password</a>";
+                    var emailBody = EmailHtmlTemplates.ResetPasswordTemplate(fullName, callbackUrl);
 
                     var emailMetadata = new EmailMetadata(
                         toAddress: model.Email,

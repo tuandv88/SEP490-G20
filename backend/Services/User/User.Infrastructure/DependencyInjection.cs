@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Extensions;
+using Elastic.CommonSchema;
 using Learning.Infrastructure.Data.Interceptors;
 
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -16,35 +17,46 @@ namespace User.Infrastructure
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
-
-            services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-            services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
-
             services.AddDbContext<ApplicationDbContext>((sp, options) => {
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-                options.UseNpgsql(connectionString).LogTo(Console.WriteLine, LogLevel.Information); ;
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
+                     npgsqlOptions => {
+                         npgsqlOptions.EnableRetryOnFailure(5);
+                     });
+
+                options.LogTo(Console.WriteLine, LogLevel.Information);
             });
+            //trong context đã tạo một ApplicationDbContext rồi, phải lấy ra chứ không add scoped mới 
+            services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+            services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+
+            services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
             services.AddHttpContextAccessor();
-            services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
-            //Caching
-            //services.ConfigureCaching(configuration);
 
-            services.AddScoped<IPointHistoryRepository, PointHistoryRepository>();
-            //services.AddScoped<IPointHistoryRepository, CachedPointHistoryRepository>();
+            //Configuration Repository
+            ConfigureRepository(services, configuration);
 
-            services.AddScoped<ILearningPathRepository, LearningPathRepository>();
-//services.AddScoped<ILearningPathRepository, CachedLearningPathRepository>();
-
-            services.AddScoped<IPathStepsRepository, PathStepsRepository>();
-            //services.AddScoped<IPathStepsRepository, CachedPathStepRepository>();
-
-            services.AddScoped<IUserGoalRepository, UserGoalRepository>();
-           // services.AddScoped<IUserGoalRepository, CachedUserGoalRepository>();
 
             return services;
         }
-    }
+        private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddScoped<IPointHistoryRepository, PointHistoryRepository>();
 
+            services.AddScoped<ILearningPathRepository, LearningPathRepository>();
+
+            services.AddScoped<IPathStepsRepository, PathStepsRepository>();
+
+            services.AddScoped<IUserGoalRepository, UserGoalRepository>();
+
+        }
+    }
 }
+
+
+
+
+
+

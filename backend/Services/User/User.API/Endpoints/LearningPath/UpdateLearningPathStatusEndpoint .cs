@@ -10,7 +10,7 @@ namespace User.API.Endpoints.LearningPaths
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPut("/user-service/learningpaths/{id}/status", async (Guid id, LearningPathStatus status, ISender sender) =>
+            app.MapPut("/learningpaths/{id}/status", async (Guid id, LearningPathStatus status, ISender sender) =>
             {
                 // Tạo command với id và status
                 var command = new UpdateLearningPathStatusCommand(id, status);

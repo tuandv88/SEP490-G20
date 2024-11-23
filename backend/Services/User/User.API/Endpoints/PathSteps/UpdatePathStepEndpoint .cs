@@ -10,7 +10,7 @@ namespace User.API.Endpoints.PathSteps
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPut("/user-service/pathsteps", async ( UpdatePathStepDto pathStepDto, ISender sender) =>
+            app.MapPut("/pathsteps", async ( UpdatePathStepDto pathStepDto, ISender sender) =>
             {
                 // Cấu trúc Command để truyền vào handler
                 var command = new UpdatePathStepCommand(pathStepDto);

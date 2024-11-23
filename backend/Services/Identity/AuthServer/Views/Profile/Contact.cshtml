@@ -280,6 +280,146 @@
                 color: #0056b3;
                 border-color: #80bfff;
             }
+
+        /* Hiệu ứng toàn bộ form */
+        .content {
+            background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Tạo nền gradient nhẹ */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Đổ bóng tinh tế */
+            border: 1px solid #e3e3e3; /* Viền mỏng màu nhạt */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .content:hover {
+                transform: translateY(-5px); /* Nhấc form khi hover */
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* Đổ bóng mạnh hơn */
+            }
+
+        /* Hiệu ứng input khi focus */
+        input.form-control {
+            background-color: #fcfcfc; /* Màu nền sáng hơn */
+            border: 1px solid #ccc; /* Viền mặc định */
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+            input.form-control:focus {
+                border-color: #007bff; /* Viền xanh khi focus */
+                box-shadow: 0 0 8px rgba(0, 123, 255, 0.25); /* Ánh sáng xanh nhẹ */
+            }
+
+        /* Nút hành động */
+        button {
+            font-size: 1rem;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: transform 0.3s ease, background-color 0.3s;
+        }
+
+        .btn-cancel {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #ced4da;
+            transition: all 0.3s ease;
+        }
+
+            .btn-cancel:hover {
+                background-color: #e9ecef; /* Màu hover nhẹ hơn */
+                color: #495057;
+                transform: translateY(-2px); /* Hiệu ứng nhấc nút */
+            }
+
+        .btn-add {
+            background-color: #007bff; /* Màu xanh chính */
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2); /* Hiệu ứng đổ bóng */
+            border: none;
+        }
+
+            .btn-add:hover {
+                background-color: #0056b3; /* Màu xanh đậm hơn */
+                transform: translateY(-2px); /* Hiệu ứng nhấc nút */
+            }
+
+        /* Hiệu ứng cho nhãn */
+        .form-label {
+            font-size: 1.1rem; /* Tăng kích thước nhãn */
+            font-weight: bold; /* Chữ đậm hơn */
+            color: #495057; /* Màu xám tối */
+            text-transform: capitalize; /* Chữ hoa đầu từ */
+        }
+
+        /* Hiển thị lỗi */
+        span.text-danger {
+            font-size: 0.85rem;
+            color: #e63946; /* Màu đỏ nổi bật */
+        }
+
+        /* Responsive cải tiến */
+        @@media (max-width: 768px) {
+            .content {
+                padding: 20px; /* Giảm padding */
+            }
+
+            button {
+                width: 100%; /* Nút chiếm toàn chiều ngang */
+            }
+
+            input.form-control {
+                margin-bottom: 15px; /* Thêm khoảng cách giữa các input */
+            }
+        }
+
+        /* Hiệu ứng hover toàn form */
+        /* Định dạng container biểu tượng và input */
+        .mb-3.d-flex {
+            align-items: center; /* Căn giữa icon và input theo chiều dọc */
+            gap: 10px; /* Khoảng cách giữa icon và input */
+            margin-bottom: 15px; /* Khoảng cách đều giữa các nhóm input */
+        }
+
+        /* Biểu tượng mạng xã hội */
+        .social-icon {
+            font-size: 1.5rem; /* Kích thước icon */
+            color: #007bff; /* Màu xanh chủ đạo */
+            flex-shrink: 0; /* Giữ kích thước icon cố định */
+            width: 30px; /* Đảm bảo icon có cùng chiều rộng */
+            text-align: center; /* Canh giữa icon */
+        }
+
+        /* Input */
+        input.form-control {
+            flex: 1; /* Input chiếm toàn bộ chiều rộng còn lại */
+            font-size: 1rem; /* Đảm bảo kích thước chữ nhất quán */
+            height: 45px; /* Chiều cao đồng nhất */
+            padding: 10px 12px; /* Padding bên trong */
+            border-radius: 8px; /* Bo góc input */
+            border: 1px solid #ced4da; /* Viền nhạt */
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* Khoảng cách giữa các nhóm input */
+        .mb-3 {
+            margin-bottom: 20px; /* Khoảng cách giữa các nhóm input */
+        }
+
+        /* Focus hiệu ứng cho input */
+        input.form-control:focus {
+            border-color: #007bff; /* Viền xanh khi focus */
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.25); /* Ánh sáng nhẹ */
+        }
+
+        /* Responsive cải tiến */
+        @@media (max-width: 768px) {
+            .mb-3.d-flex {
+                flex-direction: column; /* Stack icon và input trên thiết bị nhỏ */
+                align-items: flex-start; /* Căn trái các phần tử */
+            }
+
+            input.form-control {
+                width: 100%; /* Input chiếm toàn bộ chiều ngang */
+                margin-left: 0; /* Xóa khoảng cách bên trái */
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -406,199 +546,217 @@
 
         <div class="content" id="content">
             <div class="personal-info">
-                <h4>Thông Tin Liên Hệ</h4>
-                <p>Quản lý thông tin liên hệ của bạn.</p>
+                <h4>Contact Information</h4>
+                <p>Manage your contact information.</p>
 
-                <form asp-action="ContactInfo" method="post">
+                <form asp-action="UpdateContact" method="post">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="realName" class="form-label">FullName: </label>
-                            <input type="text" id="realName" class="form-control" asp-for="RealName" placeholder="FullName" required>
-                            <span asp-validation-for="RealName" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="phoneNumber" class="form-label">Phone number: </label>
+                            <label for="phoneNumber" class="form-label">Phone number:</label>
                             <input type="text" id="phoneNumber" class="form-control" asp-for="PhoneNumber" placeholder="Phone number" required>
                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="address" class="form-label">Address: </label>
-                        <input type="text" id="address" class="form-control" asp-for="Address" placeholder="Address" required>
-                        <span asp-validation-for="Address" class="text-danger"></span>
+                        <label for="province" class="form-label">Province:</label>
+                        <input type="text" id="province" class="form-control" asp-for="Province" placeholder="Province" required>
+                        <span asp-validation-for="Province" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <label for="address" class="form-label">University: </label>
-                        <input type="text" asp-for="University" class="form-control" placeholder="University" required>
-                        <span asp-validation-for="University" class="text-danger"></span>
+                        <label for="district" class="form-label">District:</label>
+                        <input type="text" id="district" class="form-control" asp-for="District" placeholder="District" required>
+                        <span asp-validation-for="District" class="text-danger"></span>
                     </div>
-                    <div class="d-flex justify-content-end flex-wrap">
-                        <button type="button" class="btn-cancel me-2 mb-2">Cancel</button>
-                        <button type="submit" class="btn-add mb-2">Update</button>
+                    <div class="mb-3">
+                        <label for="school" class="form-label">School:</label>
+                        <input type="text" id="school" class="form-control" asp-for="School" placeholder="School" required>
+                        <span asp-validation-for="School" class="text-danger"></span>
                     </div>
+
+                    <div class="mb-3 d-flex">
+                        <i class="fab fa-facebook-f social-icon"></i>
+                        <input type="text" id="facebook" class="form-control" asp-for="Facebook" placeholder="Facebook link" data-val="false">
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <i class="fab fa-linkedin-in social-icon"></i>
+                        <input type="text" id="linkedin" class="form-control" asp-for="LinkedIn" placeholder="LinkedIn link" data-val="false">
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <i class="fab fa-twitter social-icon"></i>
+                        <input type="text" id="twitter" class="form-control" asp-for="Twitter" placeholder="Twitter link" data-val="false">
+                    </div>
+                        <div class="d-flex justify-content-end flex-wrap">
+                            <button type="button" class="btn-cancel me-2 mb-2" onclick="clearForm()">Cancel</button>
+                            <button type="submit" class="btn-add mb-2">Update</button>
+                        </div>
                 </form>
             </div>
         </div>
-        </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
 
-            // JavaScript để thu gọn thanh bên
-            document.getElementById("toggleSidebar").addEventListener("click", function () {
-                var sidebar = document.getElementById("sidebar");
-                var content = document.getElementById("content");
-                var toggleIcon = this.querySelector("i");
-                var toggleText = document.getElementById("sidebarToggleText");
+        // JavaScript để thu gọn thanh bên
+        document.getElementById("toggleSidebar").addEventListener("click", function () {
+            var sidebar = document.getElementById("sidebar");
+            var content = document.getElementById("content");
+            var toggleIcon = this.querySelector("i");
+            var toggleText = document.getElementById("sidebarToggleText");
 
-                closeAllCollapses(); // Đóng các collapse nếu cần
-                sidebar.classList.toggle("collapsed"); // Toggle trạng thái collapsed cho sidebar
-                content.classList.toggle("collapsed"); // Toggle trạng thái collapsed cho content
+            closeAllCollapses(); // Đóng các collapse nếu cần
+            sidebar.classList.toggle("collapsed"); // Toggle trạng thái collapsed cho sidebar
+            content.classList.toggle("collapsed"); // Toggle trạng thái collapsed cho content
 
-                // Kiểm tra nếu sidebar đang thu gọn
-                if (sidebar.classList.contains("collapsed")) {
-                    toggleIcon.classList.remove("fa-angle-double-left");
-                    toggleIcon.classList.add("fa-angle-double-right");
-                    toggleText.style.display = "none"; // Ẩn text khi thu gọn
-                } else {
-                    toggleIcon.classList.remove("fa-angle-double-right");
-                    toggleIcon.classList.add("fa-angle-double-left");
-                    toggleText.style.display = "inline"; // Hiển thị text khi sidebar mở
-                }
-
-                closeAllPopups(); // Đóng các pop-up nếu cần
-                resetArrows(); // Reset mũi tên nếu cần
-            });
-
-
-            function closeAllCollapses() {
-                // Đóng tất cả các collapse nếu đang mở
-                var bsCollapseMyInfo = new bootstrap.Collapse(document.getElementById("myInfo"), {
-                    toggle: false
-                });
-                bsCollapseMyInfo.hide();
-
-                var bsCollapseSecurity = new bootstrap.Collapse(document.getElementById("security"), {
-                    toggle: false
-                });
-                bsCollapseSecurity.hide();
-
-                var bsCollapseDeveloperSettings = new bootstrap.Collapse(document.getElementById("developerSettings"), {
-                    toggle: false
-                });
-                bsCollapseDeveloperSettings.hide();
+            // Kiểm tra nếu sidebar đang thu gọn
+            if (sidebar.classList.contains("collapsed")) {
+                toggleIcon.classList.remove("fa-angle-double-left");
+                toggleIcon.classList.add("fa-angle-double-right");
+                toggleText.style.display = "none"; // Ẩn text khi thu gọn
+            } else {
+                toggleIcon.classList.remove("fa-angle-double-right");
+                toggleIcon.classList.add("fa-angle-double-left");
+                toggleText.style.display = "inline"; // Hiển thị text khi sidebar mở
             }
 
-            function closeAllPopups() {
-                document.getElementById("popupMyInfo").style.display = "none";
-                document.getElementById("popupSecurity").style.display = "none";
-                document.getElementById("popupDeveloperSettings").style.display = "none";
-            }
+            closeAllPopups(); // Đóng các pop-up nếu cần
+            resetArrows(); // Reset mũi tên nếu cần
+        });
 
-            function resetArrows() {
-                document.getElementById("arrowMyInfo").classList.remove("rotate");
-                document.getElementById("arrowSecurity").classList.remove("rotate");
-                document.getElementById("arrowDeveloperSettings").classList.remove("rotate");
-            }
 
-            document.getElementById("toggleMyInfo").addEventListener("click", function (e) {
-                var sidebar = document.getElementById("sidebar");
-                var myInfoCollapse = document.getElementById("myInfo");
-                var arrowMyInfo = document.getElementById("arrowMyInfo");
-                var popupMyInfo = document.getElementById("popupMyInfo");
-                closeAllPopups(); // Đóng tất cả pop-up trước khi mở pop-up mới
-
-                // Kiểm tra xem sidebar có thu gọn không
-                if (sidebar.classList.contains("collapsed")) {
-                    var iconRect = e.currentTarget.getBoundingClientRect(); // Lấy vị trí chính xác của phần tử
-                    popupMyInfo.style.top = (iconRect.top - 60) + 'px'; // Điều chỉnh vị trí của pop-up theo vị trí phần tử
-                    popupMyInfo.style.display = "block";
-                } else {
-                    var bsCollapse = new bootstrap.Collapse(myInfoCollapse, {
-                        toggle: false
-                    });
-                    if (myInfoCollapse.classList.contains("show")) {
-                        bsCollapse.hide();
-                        arrowMyInfo.classList.remove("rotate");
-                    } else {
-                        bsCollapse.show();
-                        arrowMyInfo.classList.add("rotate");
-                    }
-                }
+        function closeAllCollapses() {
+            // Đóng tất cả các collapse nếu đang mở
+            var bsCollapseMyInfo = new bootstrap.Collapse(document.getElementById("myInfo"), {
+                toggle: false
             });
+            bsCollapseMyInfo.hide();
 
-            document.getElementById("toggleSecurity").addEventListener("click", function (e) {
-                var sidebar = document.getElementById("sidebar");
-                var securityCollapse = document.getElementById("security");
-                var arrowSecurity = document.getElementById("arrowSecurity");
-                var popupSecurity = document.getElementById("popupSecurity");
-                closeAllPopups(); // Đóng tất cả pop-up trước khi mở pop-up mới
-
-                // Kiểm tra xem sidebar có thu gọn không
-                if (sidebar.classList.contains("collapsed")) {
-                    var iconRect = e.currentTarget.getBoundingClientRect(); // Lấy vị trí chính xác của phần tử
-                    popupSecurity.style.top = (iconRect.top - 60) + 'px'; // Điều chỉnh vị trí của pop-up theo vị trí phần tử
-                    popupSecurity.style.display = "block";
-                } else {
-                    var bsCollapse = new bootstrap.Collapse(securityCollapse, {
-                        toggle: false
-                    });
-                    if (securityCollapse.classList.contains("show")) {
-                        bsCollapse.hide();
-                        arrowSecurity.classList.remove("rotate");
-                    } else {
-                        bsCollapse.show();
-                        arrowSecurity.classList.add("rotate");
-                    }
-                }
+            var bsCollapseSecurity = new bootstrap.Collapse(document.getElementById("security"), {
+                toggle: false
             });
+            bsCollapseSecurity.hide();
 
-            document.getElementById("toggleDeveloperSettings").addEventListener("click", function (e) {
-                var sidebar = document.getElementById("sidebar");
-                var developerSettingsCollapse = document.getElementById("developerSettings");
-                var arrowDeveloperSettings = document.getElementById("arrowDeveloperSettings");
-                var popupDeveloperSettings = document.getElementById("popupDeveloperSettings");
-                closeAllPopups(); // Đóng tất cả pop-up trước khi mở pop-up mới
-
-                // Kiểm tra xem sidebar có thu gọn không
-                if (sidebar.classList.contains("collapsed")) {
-                    var iconRect = e.currentTarget.getBoundingClientRect(); // Lấy vị trí chính xác của phần tử
-                    popupDeveloperSettings.style.top = (iconRect.top - 60) + 'px'; // Điều chỉnh vị trí của pop-up theo vị trí phần tử
-                    popupDeveloperSettings.style.display = "block";
-                } else {
-                    var bsCollapse = new bootstrap.Collapse(developerSettingsCollapse, {
-                        toggle: false
-                    });
-                    if (developerSettingsCollapse.classList.contains("show")) {
-                        bsCollapse.hide();
-                        arrowDeveloperSettings.classList.remove("rotate");
-                    } else {
-                        bsCollapse.show();
-                        arrowDeveloperSettings.classList.add("rotate");
-                    }
-                }
+            var bsCollapseDeveloperSettings = new bootstrap.Collapse(document.getElementById("developerSettings"), {
+                toggle: false
             });
-
-            // Thêm sự kiện lắng nghe click cho toàn bộ tài liệu để đóng pop-up khi nhấn chuột ra ngoài
-            document.addEventListener("click", function (event) {
-                var popupMyInfo = document.getElementById("popupMyInfo");
-                var popupSecurity = document.getElementById("popupSecurity");
-                var popupDeveloperSettings = document.getElementById("popupDeveloperSettings");
-
-                // Kiểm tra nếu nhấp vào bên ngoài pop-up hoặc các nút kích hoạt
-                if (!popupMyInfo.contains(event.target) && !document.getElementById("toggleMyInfo").contains(event.target)) {
-                    popupMyInfo.style.display = "none"; // Đóng pop-up Thông Tin Của Tôi
-                }
-                if (!popupSecurity.contains(event.target) && !document.getElementById("toggleSecurity").contains(event.target)) {
-                    popupSecurity.style.display = "none"; // Đóng pop-up Bảo Mật
-                }
-                if (!popupDeveloperSettings.contains(event.target) && !document.getElementById("toggleDeveloperSettings").contains(event.target)) {
-                    popupDeveloperSettings.style.display = "none"; // Đóng pop-up Cài Đặt Nhà Phát Triển
-                }
-            });
-        </script>
-
-        @section Scripts {
-            <partial name="_ValidationScriptsPartial" />
+            bsCollapseDeveloperSettings.hide();
         }
+
+        function closeAllPopups() {
+            document.getElementById("popupMyInfo").style.display = "none";
+            document.getElementById("popupSecurity").style.display = "none";
+            document.getElementById("popupDeveloperSettings").style.display = "none";
+        }
+
+        function resetArrows() {
+            document.getElementById("arrowMyInfo").classList.remove("rotate");
+            document.getElementById("arrowSecurity").classList.remove("rotate");
+            document.getElementById("arrowDeveloperSettings").classList.remove("rotate");
+        }
+
+        document.getElementById("toggleMyInfo").addEventListener("click", function (e) {
+            var sidebar = document.getElementById("sidebar");
+            var myInfoCollapse = document.getElementById("myInfo");
+            var arrowMyInfo = document.getElementById("arrowMyInfo");
+            var popupMyInfo = document.getElementById("popupMyInfo");
+            closeAllPopups(); // Đóng tất cả pop-up trước khi mở pop-up mới
+
+            // Kiểm tra xem sidebar có thu gọn không
+            if (sidebar.classList.contains("collapsed")) {
+                var iconRect = e.currentTarget.getBoundingClientRect(); // Lấy vị trí chính xác của phần tử
+                popupMyInfo.style.top = (iconRect.top - 60) + 'px'; // Điều chỉnh vị trí của pop-up theo vị trí phần tử
+                popupMyInfo.style.display = "block";
+            } else {
+                var bsCollapse = new bootstrap.Collapse(myInfoCollapse, {
+                    toggle: false
+                });
+                if (myInfoCollapse.classList.contains("show")) {
+                    bsCollapse.hide();
+                    arrowMyInfo.classList.remove("rotate");
+                } else {
+                    bsCollapse.show();
+                    arrowMyInfo.classList.add("rotate");
+                }
+            }
+        });
+
+        document.getElementById("toggleSecurity").addEventListener("click", function (e) {
+            var sidebar = document.getElementById("sidebar");
+            var securityCollapse = document.getElementById("security");
+            var arrowSecurity = document.getElementById("arrowSecurity");
+            var popupSecurity = document.getElementById("popupSecurity");
+            closeAllPopups(); // Đóng tất cả pop-up trước khi mở pop-up mới
+
+            // Kiểm tra xem sidebar có thu gọn không
+            if (sidebar.classList.contains("collapsed")) {
+                var iconRect = e.currentTarget.getBoundingClientRect(); // Lấy vị trí chính xác của phần tử
+                popupSecurity.style.top = (iconRect.top - 60) + 'px'; // Điều chỉnh vị trí của pop-up theo vị trí phần tử
+                popupSecurity.style.display = "block";
+            } else {
+                var bsCollapse = new bootstrap.Collapse(securityCollapse, {
+                    toggle: false
+                });
+                if (securityCollapse.classList.contains("show")) {
+                    bsCollapse.hide();
+                    arrowSecurity.classList.remove("rotate");
+                } else {
+                    bsCollapse.show();
+                    arrowSecurity.classList.add("rotate");
+                }
+            }
+        });
+
+        document.getElementById("toggleDeveloperSettings").addEventListener("click", function (e) {
+            var sidebar = document.getElementById("sidebar");
+            var developerSettingsCollapse = document.getElementById("developerSettings");
+            var arrowDeveloperSettings = document.getElementById("arrowDeveloperSettings");
+            var popupDeveloperSettings = document.getElementById("popupDeveloperSettings");
+            closeAllPopups(); // Đóng tất cả pop-up trước khi mở pop-up mới
+
+            // Kiểm tra xem sidebar có thu gọn không
+            if (sidebar.classList.contains("collapsed")) {
+                var iconRect = e.currentTarget.getBoundingClientRect(); // Lấy vị trí chính xác của phần tử
+                popupDeveloperSettings.style.top = (iconRect.top - 60) + 'px'; // Điều chỉnh vị trí của pop-up theo vị trí phần tử
+                popupDeveloperSettings.style.display = "block";
+            } else {
+                var bsCollapse = new bootstrap.Collapse(developerSettingsCollapse, {
+                    toggle: false
+                });
+                if (developerSettingsCollapse.classList.contains("show")) {
+                    bsCollapse.hide();
+                    arrowDeveloperSettings.classList.remove("rotate");
+                } else {
+                    bsCollapse.show();
+                    arrowDeveloperSettings.classList.add("rotate");
+                }
+            }
+        });
+
+        // Thêm sự kiện lắng nghe click cho toàn bộ tài liệu để đóng pop-up khi nhấn chuột ra ngoài
+        document.addEventListener("click", function (event) {
+            var popupMyInfo = document.getElementById("popupMyInfo");
+            var popupSecurity = document.getElementById("popupSecurity");
+            var popupDeveloperSettings = document.getElementById("popupDeveloperSettings");
+
+            // Kiểm tra nếu nhấp vào bên ngoài pop-up hoặc các nút kích hoạt
+            if (!popupMyInfo.contains(event.target) && !document.getElementById("toggleMyInfo").contains(event.target)) {
+                popupMyInfo.style.display = "none"; // Đóng pop-up Thông Tin Của Tôi
+            }
+            if (!popupSecurity.contains(event.target) && !document.getElementById("toggleSecurity").contains(event.target)) {
+                popupSecurity.style.display = "none"; // Đóng pop-up Bảo Mật
+            }
+            if (!popupDeveloperSettings.contains(event.target) && !document.getElementById("toggleDeveloperSettings").contains(event.target)) {
+                popupDeveloperSettings.style.display = "none"; // Đóng pop-up Cài Đặt Nhà Phát Triển
+            }
+        });
+
+        function clearForm() {
+            // Tải lại trang hiện tại
+            window.location.reload();
+        };
+    </script>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
 </body>
 </html>

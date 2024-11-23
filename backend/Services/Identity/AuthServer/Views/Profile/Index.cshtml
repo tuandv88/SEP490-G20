@@ -351,8 +351,7 @@
                         <i class="fas fa-key icon"></i> Password
                     </a>
                     <a class="nav-link toggle-btn" asp-controller="Profile" asp-action="TwoFactorAuthManager">
-                        <i class="fas fa-mobile-alt icon"></i>
-                        <span>Two-Factor Authentication</span>
+                        <i class="fas fa-mobile-alt icon"></i> Two-Factor Authentication
                     </a>
                     <a href="#!">
                         <i class="fas fa-link icon"></i> Linked Accounts
@@ -408,6 +407,7 @@
             <div class="user-header">
                 @if (currentUser != null)
                 {
+                    <img id="avatarPreview" src="" alt="User Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #ddd;">
                     <h2>Welcome, @currentUser.FirstName @currentUser.LastName</h2>
                 }
                 <p class="custom-paragraph">Manage your personal information and security with ICoder Accounts</p>
@@ -417,33 +417,34 @@
             <div class="grid-container">
                 <a asp-controller="Profile" asp-action="Personal" class="no-underline">
                     <div class="grid-item">
-                        <img src="https://accounts.viblo.asia/assets/webpack/man.4e868c8.svg" alt="Personal Information" style="width:60px;height:60px;">
+                        <img src="https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/backend/imageidentity/personalinformation.png" alt="Personal Information" style="width:60px;height:60px;">
                         <p>Personal Information</p>
                     </div>
                 </a>
-                
+                <a asp-controller="Profile" asp-action="Contact" class="no-underline">
+                    <div class="grid-item">
+                        <img src="https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/backend/imageidentity/contactInfomation.png" alt="Contact Infomation" style="width:60px;height:60px;">
+                        <p>Contact Infomation</p>
+                    </div>
+                </a>
                 <a asp-controller="Profile" asp-action="ChangePassword" class="no-underline">
                     <div class="grid-item">
-                        <img src="https://img.icons8.com/color/64/000000/password.png" alt="Password" style="width:60px;height:60px;">
-                        <p>Password</p>
+                        <img src="https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/backend/imageidentity/password.png" alt="Password" style="width:60px;height:60px;">
+                        <p>Change Password</p>
                     </div>
                 </a>
                 <a asp-controller="Profile" asp-action="TwoFactorAuthManager" class="no-underline">
                     <div class="grid-item">
-                        <img src="https://img.freepik.com/premium-vector/2fa-two-factor-verification-icon-security-code_8071-37351.jpg" alt="Two-Factor Authentication" style="width:60px;height:60px;">
+                        <img src="https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/backend/imageidentity/2fa.png" alt="Two-Factor Authentication" style="width:60px;height:60px;">
                         <p>Two-Factor Authentication</p>
                     </div>
                 </a>
                 <div class="grid-item">
-                    <img src="https://img.icons8.com/color/64/000000/google-groups.png" alt="Linked Accounts" style="width:60px;height:60px;">
-                    <p>Linked Accounts</p>
-                </div>
-                <div class="grid-item">
-                    <img src="https://img.icons8.com/fluency/64/000000/key-security.png" alt="Access security code" style="width:60px;height:60px;">
+                    <img src="https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/backend/imageidentity/key.png" alt="Access security code" style="width:60px;height:60px;">
                     <p>Access security code</p>
                 </div>
                 <div class="grid-item">
-                    <img src="	https://accounts.viblo.asia/assets/webpack/3d.afc3ef4.svg" alt="OAuth Applications" style="width:60px;height:60px;">
+                    <img src="https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/backend/imageidentity/oauth.png" alt="OAuth Applications" style="width:60px;height:60px;">
                     <p>OAuth Applications</p>
                 </div>
             </div>
@@ -633,6 +634,35 @@
                 }, 5000); // Hiện thông báo trong 5 giây (bạn có thể thay đổi thời gian)
             }
         });
+
+        // Extract 'sub' claim (userId) from Razor syntax
+        var userId = '@User.FindFirst("sub")?.Value';
+
+        // Function to fetch profile image URL by userId
+        async function fetchProfileImage(userId) {
+            try {
+                // Make the API call to get the presigned URL
+                const response = await fetch(`https://localhost:6005/users/${userId}/image`);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch the image');
+                }
+
+                // Parse the response as JSON
+                const data = await response.json();
+
+                // Assuming the API response is like: { ImageUrlProfile: 'presigned-url' }
+                const imageUrl = data.imageUrlProfile;
+
+                // Set the image URL as the src of the avatar image
+                document.getElementById('avatarPreview').src = imageUrl;
+            } catch (error) {
+                console.error('Error fetching profile image:', error);
+            }
+        }
+
+        // Call the function to fetch the image using the userId
+        fetchProfileImage(userId);
 
     </script>
 </body>

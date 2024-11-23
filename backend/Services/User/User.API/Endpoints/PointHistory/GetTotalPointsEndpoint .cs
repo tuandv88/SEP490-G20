@@ -11,7 +11,7 @@ namespace User.API.Endpoints.PointHistories
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/user-service/UserId/{UserId}/total-points", async (Guid UserId, ISender sender) =>
+            app.MapGet("/UserId/{UserId}/total-points", async (Guid UserId, ISender sender) =>
             {
                 // Gửi truy vấn để lấy tổng số điểm của người dùng
                 var totalPoints = await sender.Send(new GetTotalPointsByUserIdQuery(UserId));

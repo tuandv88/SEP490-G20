@@ -2,7 +2,8 @@
 public enum PromptType {
     AnswerWithFacts,
     Suggestion,
-    Summarize
+    Summarize,
+    Pathway
 }
 
 public static class PromptTypeExtensions {
@@ -10,7 +11,8 @@ public static class PromptTypeExtensions {
     {
         { PromptType.AnswerWithFacts, "answer-with-facts" },
         { PromptType.Suggestion, "suggestion" },
-        { PromptType.Summarize, "summarize" }
+        { PromptType.Summarize, "summarize" },
+        { PromptType.Pathway, "pathway" }
     };
 
     public static string ToStringValue(this PromptType promptType) {

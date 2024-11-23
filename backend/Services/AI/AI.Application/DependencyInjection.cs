@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Behaviors;
+﻿using AI.Application.Common;
+using BuildingBlocks.Behaviors;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,7 @@ public static class DependencyInjection {
         //MediatR
         services.AddMediatR(config => {
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            config.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

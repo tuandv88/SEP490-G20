@@ -4,6 +4,7 @@ using AuthServer.Models;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using AuthServer.Config;
+using BuidingBlocks.Storage;
 
 namespace AuthServer.Data
 {
@@ -41,7 +42,7 @@ namespace AuthServer.Data
                     FirstName = $"FirstName{i}",
                     LastName = $"LastName{i}",
                     DateOfBirth = DateTime.Now.AddYears(-20).AddDays(-i).ToUniversalTime(),
-                    ProfilePicture = $"profile{i}.jpg",
+                    ProfilePicture = StorageConstants.IMAGE_IDENTITY_PATH + "/avatardefault.jpg",
                     Bio = "{}",
                     Address = "{}",
                     UserName = $"username{i}",

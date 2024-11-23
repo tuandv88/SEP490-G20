@@ -11,7 +11,7 @@ namespace User.API.Endpoints.LearningPaths
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             // Endpoint PUT để cập nhật LearningPath
-            app.MapPut("/user-service/learningpaths", async ( UpdateLearningPathDto learningPathDto, ISender sender) =>
+            app.MapPut("/learningpaths", async ( UpdateLearningPathDto learningPathDto, ISender sender) =>
             {
                 // Tạo command để gửi tới handler
                 var command = new UpdateLearningPathCommand(learningPathDto);

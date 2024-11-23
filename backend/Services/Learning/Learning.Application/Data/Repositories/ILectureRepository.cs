@@ -4,5 +4,6 @@ public interface ILectureRepository : IRepository<Lecture>{
     Task<int> CountByChapterAsync(Guid chapterId);
     Task DeleteAsync(params Lecture[] lectures);
     Task<Lecture?> GetByQuizIdAsync(Guid quizId);
+    Task<Lecture?> GetByProblemIdAsync(Guid problemId);
 }
 

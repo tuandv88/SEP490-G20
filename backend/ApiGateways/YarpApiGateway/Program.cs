@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Yarp.ReverseProxy.Transforms;
 using YarpApiGateway.Middlewares;
 
@@ -10,9 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
       .AddTransforms(transforms => {
-          transforms.AddRequestTransform(async context => {
+          transforms.AddRequestTransform(context => {
               context.HttpContext.Request.EnableBuffering();
               context.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>()!.MaxRequestBodySize = 5L * 1024 * 1024 * 1024; // 5GB
+              return new ValueTask();
           });
       });
 
@@ -31,7 +33,9 @@ builder.Services.AddCors(options => {
                .AllowCredentials();
     });
 });
-
+builder.Services.Configure<KestrelServerOptions>(options => {
+    options.Limits.MaxRequestBodySize = 5L * 1024 * 1024 * 1024; // 5GB
+});
 
 var app = builder.Build();
 

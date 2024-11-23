@@ -1,11 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AI.Application.Common;
 public class AuthorizationBehavior<TRequest, TResponse>(IHttpContextAccessor _httpContextAccessor, IIdentityService identityService)

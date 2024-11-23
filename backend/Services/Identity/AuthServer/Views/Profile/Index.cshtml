@@ -641,7 +641,7 @@
         async function fetchProfileImage(userId) {
             try {
                 // Make the API call to get the presigned URL
-                const response = await fetch(`https://localhost:6005/profiles/getprofileimagebyuserid/${userId}`);
+                const response = await fetch(`https://localhost:6005/users/${userId}/image`);
 
                 if (!response.ok) {
                     throw new Error('Failed to fetch the image');

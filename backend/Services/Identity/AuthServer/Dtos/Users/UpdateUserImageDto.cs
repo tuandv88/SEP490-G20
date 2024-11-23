@@ -1,6 +1,6 @@
-﻿namespace AuthServer.Dtos
+﻿namespace AuthServer.Dtos.Users
 {
-    public class UpdateProfileImageDto
+    public class UpdateImageDto
     {
         public Guid UserId { get; set; }          // ID của người dùng
         public string FileName { get; set; }      // Tên file ảnh

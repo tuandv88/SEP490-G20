@@ -24,7 +24,8 @@ import { deleteFileFromLecture } from '@/services/api/lectureApi'
 import { getVideoDuration } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 import QuizCreationForm from './QuizCreationForm'
-import { FileQuestion } from 'lucide-react'
+import { FileQuestion, PencilIcon, TrashIcon } from 'lucide-react'
+import { deleteProblem } from '@/services/api/problemApi'
 
 export default function LectureItem({
   lecture,
@@ -41,6 +42,7 @@ export default function LectureItem({
   const navigate = useNavigate()
   const [isUpdate, setIsUpdate] = useState(false)
   const [lectureFiles, setLectureFiles] = useState(null)
+  const [codeProblem, setCodeProblem] = useState(null)
   const fileInputRef = useRef(null)
   const videoInputRef = useRef(null)
   const [isQuizFormOpen, setIsQuizFormOpen] = useState(false)
@@ -66,6 +68,7 @@ export default function LectureItem({
         const response = await getLectureDetails(lecture.id)
         setCreatedQuiz(response.lectureDetailsDto.quiz)
         setLectureFiles(response.lectureDetailsDto.files)
+        setCodeProblem(response.lectureDetailsDto.problem)
         console.log(response.lectureDetailsDto.files)
       } catch (error) {
         console.error('Error getting lecture details:', error)
@@ -155,6 +158,27 @@ export default function LectureItem({
       setIsRunning2(false)
     }
   };
+  const handleEditCodeProblem = (problem) => {
+    navigate({ to: `/create-code-problem/${problem.id}` })
+  }
+  const handleDeleteCodeProblem = async (problemId) => {
+    try {
+      const response = await deleteProblem(problemId)
+      setIsUpdate(!isUpdate)
+      toast({
+        title: 'Problem deleted',
+        description: 'The problem has been successfully deleted.',
+        duration: 1500,
+      })
+    } catch (error) {
+      console.error('Error deleting problem:', error)
+      toast({
+        title: 'Delete failed',
+        description: 'There was an error deleting the problem.',
+        duration: 1500,
+      })
+    }
+  }
 
   const triggerFileUpload = () => {
     fileInputRef.current.click()
@@ -434,9 +458,23 @@ export default function LectureItem({
               )
           ))}
         </div>
-        <Button onClick={handleCreateCodeProblem} size='sm' className='w-full sm:w-auto'>
+        <Button onClick={handleCreateCodeProblem} size='sm' className='w-full sm:w-auto' disabled={codeProblem}>
           <CodeIcon className='w-4 h-4 mr-2' /> Create Code Problem
         </Button>
+        {codeProblem  && (
+              <div key={codeProblem.id} className='flex items-center p-2 mt-2 bg-white rounded-md'>
+                <CodeIcon className='w-4 h-4 mr-2 text-blue-500' />
+                <span className='flex-grow text-sm truncate'>{codeProblem.title}</span>
+                <Button onClick={() => handleEditCodeProblem()} size='sm' variant='ghost' className='ml-2'>
+                  <PencilIcon className='w-4 h-4 text-blue-500' />
+                  <span className='sr-only'>Edit problem</span>
+                </Button>
+                <Button onClick={() => handleDeleteCodeProblem(codeProblem.id)} size='sm' variant='ghost' className='ml-2'>
+                  <TrashIcon className='w-4 h-4 text-red-500' />
+                  <span className='sr-only'>Delete problem</span>
+                </Button>
+              </div>
+            )}
       </div>
       )}
        {lecture.lectureType === 'Quiz' && (

@@ -14,7 +14,7 @@ public class GetUserGoalEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/user-service/UserGoals/{UserId}", async (Guid UserId, ISender sender) =>
+        app.MapGet("/UserGoals/{UserId}", async (Guid UserId, ISender sender) =>
         {
             // Gửi truy vấn lấy UserGoal qua MediatR
             var result = await sender.Send(new GetUserGoalsByUserIdQuery(UserId));

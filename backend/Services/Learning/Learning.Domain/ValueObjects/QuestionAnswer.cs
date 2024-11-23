@@ -5,7 +5,7 @@ public record QuestionAnswer {
     public int OrderIndex { get; set; }
     public string? Content { get; set; }
     public List<Choice>? Choices { get; set; }
-    public List<string>? UserAnswers { get; set; } //là các ID ở trong choices
+    public List<string>? UserAnswers { get; set; }
     public ProblemAnswer? Problem { get; set; }
 };
 

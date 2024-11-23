@@ -4,8 +4,8 @@ namespace Learning.API.Endpoints.Courses;
 public record GetCourseResponse(PaginatedResult<CourseDto> CourseDtos);
 public class GetCourseEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
-        app.MapGet("/courses", async ([AsParameters] PaginationRequest request, ISender sender) => {
-            var result = await sender.Send(new GetCoursesQuery(request));
+        app.MapGet("/courses", async ([AsParameters] PaginationRequest request, [AsParameters] GetCourseFilter filter, ISender sender) => {
+            var result = await sender.Send(new GetCoursesQuery(request, filter));
 
             var response = result.Adapt<GetCourseResponse>();
 

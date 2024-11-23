@@ -11,6 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Middlewares\**" />
+    <Content Remove="Middlewares\**" />
+    <EmbeddedResource Remove="Middlewares\**" />
+    <None Remove="Middlewares\**" />
+  </ItemGroup>
+
+  <ItemGroup>
 	<PackageReference Include="Carter" Version="8.0.0" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
 	  <PrivateAssets>all</PrivateAssets>
@@ -25,10 +32,6 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj" />
     <ProjectReference Include="..\Learning.Application\Learning.Application.csproj" />
     <ProjectReference Include="..\Learning.Infrastructure\Learning.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Middlewares\" />
   </ItemGroup>
 
 </Project>

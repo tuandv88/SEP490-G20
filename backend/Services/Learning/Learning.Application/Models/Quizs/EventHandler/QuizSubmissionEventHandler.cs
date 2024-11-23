@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Learning.Application.Models.Quizs.EventHandler;
 public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmissionRepository, ISender sender, IProblemRepository problemRepository,
-    IQuizRepository quizRepository, ILogger<QuizSubmissionEventHandler> logger) : IConsumer<QuizSubmissionEvent> {
+    IQuizRepository quizRepository, ILogger<QuizSubmissionEventHandler> logger, IPublishEndpoint publishEndpoint) : IConsumer<QuizSubmissionEvent> {
     public async Task Consume(ConsumeContext<QuizSubmissionEvent> context) {
 
         //xử lí bài nộp ở đây
@@ -18,14 +18,23 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
         }
         if (quizSubmission.Status == QuizSubmissionStatus.Processing) {
             var quiz = await quizRepository.GetByIdDetailAsync(quizSubmission.QuizId.Value);
-
+            if (quiz == null) {
+                logger.LogWarning($"quiz is not found quizId : {quizSubmission.QuizId.Value}");
+                return;
+            }
             if (quizSubmission.Answers == null) {
-                UpdateSubmissionWithoutAnswers(quizSubmission, quiz!);
+                UpdateSubmissionWithoutAnswers(quizSubmission, quiz);
             } else {
-                await UpdateSubmissionWithAnswers(quizSubmission, quiz!);
+                await UpdateSubmissionWithAnswers(quizSubmission, quiz);
             }
             quizSubmission.UpdateStatus(QuizSubmissionStatus.Success);
             await quizSubmissionRepository.UpdateAsync(quizSubmission);
+            //Kiểm tra nếu là kiểu ASSESSMENT thì public lên một event để AI phân tích tạo một lộ trình học
+            if (quiz.QuizType == QuizType.ASSESSMENT) {
+                //await publishEndpoint.Publish(new QuizAssessmentSubmissionSuccessEvent() {
+
+                //});
+            }
             await quizSubmissionRepository.SaveChangesAsync();
         }
         return;
@@ -119,7 +128,7 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
     }
     private QuestionAnswer CreateQuestionAnswer(Question question) {
         ProblemAnswer? problem = null;
-        if(question.ProblemId != null) {
+        if (question.ProblemId != null) {
             problem = new ProblemAnswer() {
                 Id = question.ProblemId.Value.ToString(),
             };

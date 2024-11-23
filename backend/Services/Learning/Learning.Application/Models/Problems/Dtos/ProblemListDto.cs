@@ -6,4 +6,3 @@ public record ProblemListDto(
     string Difficulty,
     float Acceptance
 );
-

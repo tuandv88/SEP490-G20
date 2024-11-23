@@ -10,7 +10,7 @@ public record GetlearningPathByUserIdReponse (LearningPathDto LearningPathDto);
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/user-service/UserId/{UserId}/LearningPath", async ( Guid UserId, ISender sender) => {
+        app.MapGet("/UserId/{UserId}/LearningPath", async ( Guid UserId, ISender sender) => {
             var result = await sender.Send(new GetLearningPathByUserIdQuery(UserId));
 
             var response = result.Adapt<GetlearningPathByUserIdReponse>();

@@ -1,6 +1,4 @@
-﻿using Learning.Domain.ValueObjects;
-using MassTransit;
-using MassTransit.EntityFrameworkCoreIntegration;
+﻿using MassTransit;
 using System.Reflection;
 
 namespace Learning.Infrastructure.Data;
@@ -36,6 +34,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext {
     public DbSet<ProblemSubmission> ProblemSubmissions => Set<ProblemSubmission>();
 
     public DbSet<Domain.Models.File> Files => Set<Domain.Models.File>();
+
+    public DbSet<LectureComment> LectureComments => Set<LectureComment>();
 
     public async new Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class {
         await Set<T>().AddAsync(entity, cancellationToken);

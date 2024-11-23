@@ -11,7 +11,7 @@ namespace User.API.Endpoints.PointHistories
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/user-service/UserId/{UserId}/point-history", async (Guid UserId, ISender sender) =>
+            app.MapGet("/UserId/{UserId}/point-history", async (Guid UserId, ISender sender) =>
             {
                 var result = await sender.Send(new GetPointHistoryByUserIdQuery(UserId));
 

@@ -38,6 +38,7 @@ class AuthService {
   }
 
   logout() {
+    Cookies.remove('authToken')
     return this.userManager.signoutRedirect()
   }
 

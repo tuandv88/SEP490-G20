@@ -25,6 +25,8 @@ import { LearningAPI } from '@/services/api/learningApi'
 import CourseDetailLoading from '../loading/CourseDetailLoading'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 import useStore from '@/data/store'
+import { CourseAPI } from '@/services/api/courseApi'
+import Cookies from 'js-cookie'
 
 export default function CourseDetail() {
   const [expandedSections, setExpandedSections] = useState([0])
@@ -34,14 +36,32 @@ export default function CourseDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const setSelectedCourse = useStore((state) => state.setSelectedCourse)
-
+  const [enrolledCourses, setEnrolledCourses] = useState(null)
+  const [firstLectureId, setFirstLectureId] = useState(null)
 
   const toggleSection = (index) => {
     setExpandedSections((prev) => (prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]))
   }
 
+  console.log(Cookies.get('authToken'))
+
   const handleLearningCourse = (courseId) => {
-    navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(':lectureId', 'd9ce3472-3f66-4087-8804-f7b9103d0949'))
+    navigate(
+      AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(
+        ':lectureId',
+        'd9ce3472-3f66-4087-8804-f7b9103d0949'
+      )
+    )
+  }
+
+  const handleEnrollCourse = async (courseId) => {
+    try {
+      const data = await CourseAPI.enrollCourse(courseId)
+      console.log(data)
+      
+    } catch (error) {
+      console.error('Error enrolling course:', error)
+    }
   }
 
   useEffect(() => {
@@ -74,6 +94,7 @@ export default function CourseDetail() {
       try {
         const data = await LearningAPI.getCoursePreview(id)
         setCourseDetail(data)
+        setFirstLectureId(data.course.chapters[0].lectures[0].id)
       } catch (error) {
         console.error('Error fetching course detail:', error)
         if (error.response) {
@@ -90,7 +111,18 @@ export default function CourseDetail() {
       }
     }
 
+    const fetchEnrolledCourses = async () => {
+      try {
+        const data = await CourseAPI.getEnrolledCourses(id)
+        setEnrolledCourses(data.enrollmentInfo)
+        console.log(data)
+      } catch (error) {
+        console.error('Error fetching enrolled courses:', error)
+      }
+    }
+
     fetchCourseDetail()
+    fetchEnrolledCourses()
   }, [id])
 
   if (error) {
@@ -111,43 +143,36 @@ export default function CourseDetail() {
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
               {/* Left Column - Course Content */}
               <div className='md:col-span-1 p-6 border-r'>
-                <h2 className='text-2xl font-bold mb-4'>{courseDetail?.courseDetailsDto?.courseDto?.title}</h2>
+                <h2 className='text-2xl font-bold mb-4'>{courseDetail?.course?.title}</h2>
                 <div className='mb-3'>
                   <span className=' bg-purple-600 text-white text-sm font-semibold px-2 py-1 rounded mb-5'>
-                    Course Level: {courseDetail?.courseDetailsDto?.courseDto?.courseLevel}
+                    Course Level: {courseDetail?.course?.courseLevel}
                   </span>
                 </div>
                 <div className='text-sm text-gray-600 mb-4'>
-                  {courseDetail?.courseDetailsDto?.chapterDetailsDtos?.length} sections • 128 lectures •{' '}
-                  {courseDetail?.courseDetailsDto?.courseDto?.timeEstimation}h total length
+                  {courseDetail?.course?.chapters?.length} sections • 128 lectures •{' '}
+                  {courseDetail?.course?.timeEstimation}h total length
                 </div>
                 <div className='space-y-2'>
-                  {courseDetail?.courseDetailsDto?.chapterDetailsDtos.map((chapter, index) => (
-                    <div key={chapter.chapterDto.id}>
+                  {courseDetail?.course?.chapters?.map((chapter, index) => (
+                    <div key={chapter.id}>
                       <button
                         className='flex justify-between items-center w-full text-left py-2 hover:bg-gray-100 rounded transition-colors'
                         onClick={() => toggleSection(index)}
                       >
-                        <span className='font-medium'>{chapter.chapterDto.title}</span>
+                        <span className='font-medium'>{chapter.title}</span>
                         {expandedSections.includes(index) ? (
                           <ChevronDown className='w-5 h-5 text-gray-500' />
                         ) : (
                           <ChevronRight className='w-5 h-5 text-gray-500' />
                         )}
                       </button>
-                      {expandedSections.includes(index) && chapter.lectureDtos.length > 0 && (
+                      {expandedSections.includes(index) && chapter.lectures.length > 0 && (
                         <div className='ml-4 mt-2 space-y-2'>
-                          {chapter.lectureDtos.map((lecture) => (
+                          {chapter.lectures.map((lecture) => (
                             <div key={lecture.id}>
                               <div className='flex justify-between items-center mb-1'>
                                 <span className='text-sm'>{lecture.title}</span>
-                                <span className='text-xs text-gray-500'>{lecture.timeEstimation} mins</span>
-                              </div>
-                              <div className='w-full bg-gray-200 rounded-full h-1'>
-                                <div
-                                  className='bg-purple-600 h-1 rounded-full'
-                                  style={{ width: `${lecture.point}%` }}
-                                ></div>
                               </div>
                             </div>
                           ))}
@@ -202,21 +227,28 @@ export default function CourseDetail() {
                     {/* Course Information and CTA */}
                     <div className='shadow-xl p-6 rounded-lg'>
                       <div className='mb-4'>
-                        <span className='text-3xl font-bold'>${courseDetail?.courseDetailsDto?.courseDto?.price}</span>
+                        <span className='text-3xl font-bold'>${courseDetail?.course?.price}</span>
                         <span className='text-lg line-through text-gray-500 ml-2'>$99.99</span>
                         <span className='ml-2 bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded'>
                           60% OFF
                         </span>
                       </div>
-                      <button
-                        onClick={() => handleLearningCourse(id)}
-                        className='w-full mb-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded'
-                      >
-                        Learning Now
-                      </button>
-                      <button className='w-full mb-4 border border-purple-600 text-purple-600 font-bold py-2 px-4 rounded hover:bg-purple-100'>
-                        Buy now
-                      </button>
+                      {enrolledCourses !== null ? (
+                        <button
+                          onClick={() => handleLearningCourse(id)}
+                          className='w-full mb-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded'
+                        >
+                          Learning Now
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleEnrollCourse(id)}
+                          className='w-full mb-4 border border-purple-600 text-purple-600 font-bold py-2 px-4 rounded hover:bg-purple-100'
+                        >
+                          Enroll Now
+                        </button>
+                      )}
+
                       <div className='text-center text-sm mb-4'>30-day money-back guarantee</div>
                       <div className='space-y-2 text-sm'>
                         <div className='font-bold'>Course includes:</div>
@@ -243,34 +275,34 @@ export default function CourseDetail() {
                   {/* Course Banner */}
                   <div className='relative w-full aspect-video bg-purple-900 rounded-lg overflow-hidden mb-8'>
                     <img
-                      src={courseDetail?.courseDetailsDto?.courseDto?.imageUrl}
+                      src={courseDetail?.course?.imageUrl}
                       alt='Blender 3D Fundamentals'
                       className='w-[800] h-[450] object-cover'
                     />
                     <div className='absolute inset-0 bg-gradient-to-t from-purple-900 to-transparent'></div>
                     <div className='absolute bottom-0 left-0 p-6 text-white'>
-                      <h2 className='text-3xl font-bold mb-2'>
-                        {courseDetail?.courseDetailsDto?.courseDto?.title.toUpperCase()}
-                      </h2>
-                      <p className='text-lg'>{courseDetail?.courseDetailsDto?.courseDto?.headline}</p>
+                      <h2 className='text-3xl font-bold mb-2'>{courseDetail?.course?.title.toUpperCase()}</h2>
+                      <p className='text-lg'>{courseDetail?.course?.headline}</p>
                     </div>
                   </div>
 
                   {/* Course Description */}
-                  <div className='prose prose-invert
+                  <div
+                    className='prose prose-invert
                    text-black max-w-none mb-8 bg-[#dae4f3] p-6 rounded-lg shadow-lg
-                '>
+                '
+                  >
                     <h2>Prerequisites</h2>
-                    <ReactMarkdown>{courseDetail?.courseDetailsDto?.courseDto?.prerequisites}</ReactMarkdown>
+                    <ReactMarkdown>{courseDetail?.course?.prerequisites}</ReactMarkdown>
 
                     <h2>Target Audiences</h2>
-                    <ReactMarkdown>{courseDetail?.courseDetailsDto?.courseDto?.targetAudiences}</ReactMarkdown>
+                    <ReactMarkdown>{courseDetail?.course?.targetAudiences}</ReactMarkdown>
 
                     <h2>Objectives</h2>
-                    <ReactMarkdown>{courseDetail?.courseDetailsDto?.courseDto?.objectives}</ReactMarkdown>
+                    <ReactMarkdown>{courseDetail?.course?.objectives}</ReactMarkdown>
 
                     <h2>Description</h2>
-                    <ReactMarkdown>{courseDetail?.courseDetailsDto?.courseDto?.description}</ReactMarkdown>
+                    <ReactMarkdown>{courseDetail?.course?.description}</ReactMarkdown>
                   </div>
 
                   {/* Feedback Section */}

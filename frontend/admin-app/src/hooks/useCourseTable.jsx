@@ -6,11 +6,12 @@ import {
   getSortedRowModel,
   getFilteredRowModel
 } from '@tanstack/react-table'
-import useCourseQueries from './useCourseQueries';
+import useCourseQueries from './useCourseQueries'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { MoreHorizontal, ArrowUpDown } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -19,16 +20,21 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
+import { editCourseRoute } from '@/routers/router'
 
 export default function useCourseTable(pageIndex, pageSize) {
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
   const [rowSelection, setRowSelection] = useState({})
+  const navigate = useNavigate()
+  const { data: courses, isLoading, error } = useCourseQueries(pageIndex, pageSize)
 
-  const { data: courses, isLoading, error } = useCourseQueries(pageIndex, pageSize);
+  console.log('Courses Data:', courses)
 
-  console.log('Courses Data:', courses);
+  const handleEditCourse = (courseId) => {
+    navigate({ to: `/edit-course/${courseId}` });
+  };
 
   const columns = [
     {
@@ -68,8 +74,6 @@ export default function useCourseTable(pageIndex, pageSize) {
       cell: ({ row }) => <div className='text-left'>{row.getValue('timeEstimation')} hours</div> // Update here as well
     },
 
-
-
     {
       accessorKey: 'scheduledPublishDate',
       header: ({ column }) => (
@@ -81,12 +85,8 @@ export default function useCourseTable(pageIndex, pageSize) {
         </div>
       ),
       cell: ({ row }) => {
-        const date = row.getValue('scheduledPublishDate');
-        return (
-          <div className='text-left'>
-            {date ? new Date(date).toLocaleDateString() : 'N/A'}
-          </div>
-        );
+        const date = row.getValue('scheduledPublishDate')
+        return <div className='text-left'>{date ? new Date(date).toLocaleDateString() : 'N/A'}</div>
       }
     },
     {
@@ -167,7 +167,9 @@ export default function useCourseTable(pageIndex, pageSize) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>View course details</DropdownMenuItem>
-              <DropdownMenuItem>Edit course</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEditCourse(course.id)}>
+                Edit course
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )

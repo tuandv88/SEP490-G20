@@ -3,19 +3,16 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Step1Form from '@/components/CreateCourse/Step1Form'
-import Step2Curriculum from '@/components/CreateCourse/Curriculum'
 import CourseLandingPage from '@/components/CreateCourse/Step2LandingPage'
 import { PageContainer } from '@/components/page-container'
 import { useNavigate } from '@tanstack/react-router'
-import { useMutation } from '@tanstack/react-query';
 import { createCourse } from '@/services/api/courseApi';
 import { Navigate } from '@tanstack/react-router'
 import { useToast } from '@/hooks/use-toast'
 
 export default function CourseCreator() {
   const breadcrumbs = [
-    { label: 'Course Table', href: '/course-table' },
-    { label: 'Create Course', href: '/create-course' }
+    { label: 'Edit basic info', href: '/course-table' },
   ]
   const [step, setStep] = useState(1)
   const [courseData, setCourseData] = useState({
@@ -48,8 +45,8 @@ export default function CourseCreator() {
 
 
 
-  const handleLandingPageSubmit = async (data) => {
-    console.log('Dữ liệu khóa học cuối cùng:', data)
+  const handleLandingPageUpdate = async (data) => {
+    console.log('Dữ liệu khóa học update:', data)
     const courseCreate = { 
       createCourseDto: {
         ...data

@@ -11,7 +11,7 @@ import EditLectureDialog from './Curriculum/Lecture/EditLectureDialog'
 import { createChapter } from '@/services/api/chapterApi'
 import { createLecture } from '@/services/api/lectureApi'
 
-const Step2Curriculum = ({ chapter, handleUpdateChapter }) => {
+const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
   console.log(chapter)
   const [curriculum, setCurriculum] = useState([])
   const [isAddChapterOpen, setIsAddChapterOpen] = useState(false)
@@ -84,19 +84,17 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter }) => {
     })
   }
 
-  const addChapter = async (newChapter) => {
-
-    const chapterCreate = { 
+  const addChapter = async (newChapter, courseId) => {
+    const chapterCreate = {
       createChapterDto: {
-        ...newChapter,
-        orderIndex: 1
+        ...newChapter
       }
     }
     try {
-      const response = await createChapter(chapterCreate)
+      const response = await createChapter(chapterCreate, courseId)
       toast({
         title: 'Chapter created successfully',
-        description: 'Chapter created successfully',
+        description: 'Chapter created successfully'
       })
       setIsAddChapterOpen(false)
       handleUpdateChapter()
@@ -129,18 +127,16 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter }) => {
   }
 
   const addLecture = async (chapterId, newLecture) => {
-
-    const lectureCreate = { 
+    const lectureCreate = {
       createLectureDto: {
-        ...newLecture,
-        orderIndex: 1
+        ...newLecture
       }
     }
     try {
       const response = await createLecture(chapterId, lectureCreate)
       toast({
         title: 'Lecture created successfully',
-        description: 'Lecture created successfully',
+        description: 'Lecture created successfully'
       })
       setIsAddLectureOpen(false)
       handleUpdateChapter()
@@ -189,7 +185,10 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter }) => {
           <DialogHeader>
             <DialogTitle>Add New Chapter</DialogTitle>
           </DialogHeader>
-          <ChapterForm onSave={addChapter} onCancel={() => setIsAddChapterOpen(false)} />
+          <ChapterForm
+            onSave={(newChapter) => addChapter(newChapter, courseId)}
+            onCancel={() => setIsAddChapterOpen(false)}
+          />
         </DialogContent>
       </Dialog>
       <ChapterList
@@ -209,6 +208,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter }) => {
         onFileRemove={handleFileRemove}
         onVideoRemove={handleVideoRemove}
       />
+
       <AddLectureDialog
         isOpen={isAddLectureOpen}
         onClose={() => setIsAddLectureOpen(false)}

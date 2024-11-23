@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Authorization;
 using BuildingBlocks.Email.Interfaces;
 using BuildingBlocks.Email.Models;
 using BuildingBlocks.Email.Helpers;
+using BuidingBlocks.Storage;
 
 namespace AuthServer.Controllers
 {
@@ -79,9 +80,10 @@ namespace AuthServer.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     DateOfBirth = model.Dob,
-                    ProfilePicture = string.Empty,
+                    ProfilePicture = StorageConstants.IMAGE_IDENTITY_PATH + "/avatardefault.jpg",
                     Bio = string.Empty,
-                    Address = string.Empty
+                    Address = string.Empty,
+                    
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);

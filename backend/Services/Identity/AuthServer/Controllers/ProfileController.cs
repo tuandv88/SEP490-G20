@@ -302,7 +302,7 @@ namespace AuthServer.Controllers
                                               .ToList();
 
                 var errorMessage = string.Join(", ", errors);
-                ModelState.AddModelError(string.Empty, errorMessage);
+                //ModelState.AddModelError(string.Empty, errorMessage);
                 return View(model);
             }
 

@@ -36,8 +36,9 @@ namespace AuthServer.Controllers
 
             var bucket = StorageConstants.BUCKET;
             var s3Object = await _filesService.GetFileAsync(bucket, userCurrent.ProfilePicture, 60);
+            var presignedUrl = s3Object.PresignedUrl!;
 
-            return Ok(new { ImageUrlProfile = s3Object.PresignedUrl });
+            return Ok(new { ImageUrlProfile = presignedUrl });
         }
 
         [HttpPut("updateimage")]
@@ -63,7 +64,10 @@ namespace AuthServer.Controllers
 
             userCurrent.ProfilePicture = profileUrlImageNew;
 
-            await _filesService.DeleteFileAsync(bucket, profileUrlImageOld);
+            if(profileUrlImageOld != "backend/imageidentity/avatardefault.jpg")
+            {
+                await _filesService.DeleteFileAsync(bucket, profileUrlImageOld);
+            }
 
             var s3Object = await _filesService.GetFileAsync(bucket, profileUrlImageNew, 60);
             var urlProfileImagePresigned = s3Object.PresignedUrl;

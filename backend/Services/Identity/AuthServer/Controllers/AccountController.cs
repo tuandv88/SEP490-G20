@@ -115,7 +115,7 @@ namespace AuthServer.Controllers
                         string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                         // Đặt thời gian hết hạn mới (ví dụ 5 phút sau)
-                        DateTime newExpirationTime = DateTime.UtcNow.AddMinutes(5);
+                        DateTime newExpirationTime = DateTime.UtcNow.AddMinutes(30);
 
                         // Lưu token mới vào cơ sở dữ liệu
                         await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
@@ -399,7 +399,7 @@ namespace AuthServer.Controllers
                     // Mật khẩu chỉ lưu 5 phút để hạn chế rủi ro bảo mật
                     var passwordCookieOptions = new CookieOptions
                     {
-                        Expires = DateTime.Now.AddMinutes(1), // Cookie mật khẩu tồn tại ngắn hơn
+                        Expires = DateTime.Now.AddMinutes(30), // Cookie mật khẩu tồn tại ngắn hơn
                         Secure = true,
                         HttpOnly = false                      // Không đặt HttpOnly để có thể tự động điền lại
                     };
@@ -505,7 +505,7 @@ namespace AuthServer.Controllers
                     code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                     // Cập nhật thời gian hết hạn mới (ví dụ 5 phút sau)
-                    newExpirationTime = DateTime.UtcNow.AddMinutes(5);
+                    newExpirationTime = DateTime.UtcNow.AddMinutes(30);
 
                     // Cập nhật lại token mới và thời hạn vào cơ sở dữ liệu
                     await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
@@ -523,7 +523,7 @@ namespace AuthServer.Controllers
                 code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                 // Đặt thời gian hết hạn mới (ví dụ 5 phút sau)
-                newExpirationTime = DateTime.UtcNow.AddMinutes(5);
+                newExpirationTime = DateTime.UtcNow.AddMinutes(30);
 
                 // Lưu token mới vào cơ sở dữ liệu
                 await _userManager.SetAuthenticationTokenAsync(user, "Default", "EmailConfirmationToken", $"{code}|{newExpirationTime.Ticks}");
@@ -647,9 +647,6 @@ namespace AuthServer.Controllers
             }
         }
 
-
-
-
         [HttpGet]
         public IActionResult TwoFaceLogin(string email)
         {
@@ -740,7 +737,7 @@ namespace AuthServer.Controllers
                             code = await _userManager.GeneratePasswordResetTokenAsync(user);
 
                             // Cập nhật thời gian hết hạn mới (ví dụ 5 phút sau)
-                            newExpirationTime = DateTime.UtcNow.AddMinutes(1);
+                            newExpirationTime = DateTime.UtcNow.AddMinutes(30);
 
                             // Cập nhật lại token mới và thời hạn vào cơ sở dữ liệu
                             await _userManager.SetAuthenticationTokenAsync(user, "Default", nameTokenUser, $"{code}|{newExpirationTime.Ticks}");
@@ -758,7 +755,7 @@ namespace AuthServer.Controllers
                         code = await _userManager.GeneratePasswordResetTokenAsync(user);
 
                         // Đặt thời gian hết hạn mới (ví dụ 5 phút sau)
-                        newExpirationTime = DateTime.UtcNow.AddMinutes(1);
+                        newExpirationTime = DateTime.UtcNow.AddMinutes(30);
 
                         // Lưu token mới vào cơ sở dữ liệu
                         await _userManager.SetAuthenticationTokenAsync(user, "Default", nameTokenUser, $"{code}|{newExpirationTime.Ticks}");

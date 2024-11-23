@@ -372,20 +372,11 @@ namespace AuthServer.Controllers
             if (result.Succeeded)
             {
                 var existingClaims = await _userManager.GetClaimsAsync(user);
-                var firstLoginClaim = existingClaims.FirstOrDefault(c => c.Type == "firstlogin");
+                var isSurveyClaim = existingClaims.FirstOrDefault(c => c.Type == "issurvey");
 
-                if (firstLoginClaim == null)
+                if (isSurveyClaim == null)
                 {
-                    await _userManager.AddClaimAsync(user, new Claim("firstlogin", "true"));
-                }
-                else
-                {
-                    if (firstLoginClaim.Value == "true")
-                    {
-                        // Nếu đã có "FirstLogin" là "True", cập nhật giá trị thành "False"
-                        await _userManager.RemoveClaimAsync(user, firstLoginClaim);
-                        await _userManager.AddClaimAsync(user, new Claim("firstlogin", "false"));
-                    }
+                    await _userManager.AddClaimAsync(user, new Claim("issurvey", "false"));
                 }
 
                 if (model.RememberMe)
@@ -630,21 +621,13 @@ namespace AuthServer.Controllers
 
                 if (signInResult.Succeeded)
                 {
-                    var existingClaims = await _userManager.GetClaimsAsync(user);
-                    var firstLoginClaim = existingClaims.FirstOrDefault(c => c.Type == "firstlogin");
 
-                    if (firstLoginClaim == null)
+                    var existingClaims = await _userManager.GetClaimsAsync(user);
+                    var isSurveyClaim = existingClaims.FirstOrDefault(c => c.Type == "issurvey");
+
+                    if (isSurveyClaim == null)
                     {
-                        await _userManager.AddClaimAsync(user, new Claim("firstlogin", "true"));
-                    }
-                    else
-                    {
-                        if (firstLoginClaim.Value == "true")
-                        {
-                            // Nếu đã có "FirstLogin" là "True", cập nhật giá trị thành "False"
-                            await _userManager.RemoveClaimAsync(user, firstLoginClaim);
-                            await _userManager.AddClaimAsync(user, new Claim("firstlogin", "false"));
-                        }
+                        await _userManager.AddClaimAsync(user, new Claim("issurvey", "false"));
                     }
 
                     // Đăng nhập thành công, chuyển đến trang tiếp theo

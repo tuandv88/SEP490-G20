@@ -35,7 +35,7 @@ namespace AuthServer.Controllers
         private readonly IEmailService _emailService;
         private readonly UrlEncoder _urlEncoder;
         public AccountController(IIdentityServerInteractionService interactionService, IDataProtectionProvider provider,
-                                  SignInManager<Users> signInManager, UserManager<Users> userManager,
+                                  SignInManager<Users> signInManager, UserManager<Users> userManager, 
                                   IEmailService emailService, UrlEncoder urlEncoder)
         {
             _interactionService = interactionService;
@@ -83,15 +83,17 @@ namespace AuthServer.Controllers
                     ProfilePicture = StorageConstants.IMAGE_IDENTITY_PATH + "/avatardefault.jpg",
                     Bio = string.Empty,
                     Address = string.Empty,
-                    
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    Console.WriteLine("User created a new account with password.");
+                    // Add Role Default
+                    string defaultRole = "learner";
+                    var roleResult = await _userManager.AddToRoleAsync(user, defaultRole);
 
+                    Console.WriteLine("User created a new account with password.");
                     if (model.ExternalLogin)
                     {
                         var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);

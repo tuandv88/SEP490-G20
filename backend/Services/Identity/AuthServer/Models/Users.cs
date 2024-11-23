@@ -12,5 +12,7 @@ namespace AuthServer.Models
         public string Bio { get; set; } 
         // Json
         public string Address { get; set; }
+
+
     }
 }

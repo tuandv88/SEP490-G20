@@ -7,11 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\Lectures\Queries\**" />
     <Compile Remove="Models\TestScripts\CreateTestScriptDto\**" />
-    <EmbeddedResource Remove="Models\Lectures\Queries\**" />
     <EmbeddedResource Remove="Models\TestScripts\CreateTestScriptDto\**" />
-    <None Remove="Models\Lectures\Queries\**" />
     <None Remove="Models\TestScripts\CreateTestScriptDto\**" />
   </ItemGroup>
 

@@ -18,5 +18,9 @@ public class UserCourse : Aggregate<UserCourseId> {
             Feedback = ""
         };
     }
+    public void AddProgress(LectureProgress progress) {
+        LectureProgress.Add(progress);
+        // thêm event vào đây
+    }
 }
 

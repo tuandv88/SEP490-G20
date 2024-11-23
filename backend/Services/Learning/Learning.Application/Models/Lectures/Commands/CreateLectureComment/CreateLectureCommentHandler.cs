@@ -18,7 +18,7 @@ public class CreateLectureCommentHandler(ICourseRepository courseRepository, IUs
         if (lecture == null) {
             throw new NotFoundException(nameof(Lecture), request.LectureId);
         }
-        var lectureComment = CreateNewLectureComment(lecture, userId, request.Comment);
+        var lectureComment = CreateNewLectureComment(lecture, userId, request.Comment.Content);
 
         await lectureCommentRepository.AddAsync(lectureComment);
         await lectureCommentRepository.SaveChangesAsync(cancellationToken);

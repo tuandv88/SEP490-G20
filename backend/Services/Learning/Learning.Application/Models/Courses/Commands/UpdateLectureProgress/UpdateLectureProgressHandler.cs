@@ -38,7 +38,7 @@ public class UpdateLectureProgressHandler(IUserCourseRepository repository, IUse
                     true,
                     duration: request.Duration
                     );
-            userCourse.LectureProgress.Add(newProgress);
+            userCourse.AddProgress(newProgress);
         }
 
         var latestProgress = userCourse.LectureProgress

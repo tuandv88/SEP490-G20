@@ -24,15 +24,22 @@ namespace BuidingBlocks.Storage.Services
             if (!bucketExists) {
                 throw new InvalidOperationException($"Bucket '{bucketName}' does not exist.");
             }
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}"; 
 
-            var request = new PutObjectRequest() {
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var key = string.IsNullOrEmpty(prefix) ? fileName : $"{prefix?.TrimEnd('/')}/{fileName}";
+
+            var transferUtility = new TransferUtility(_s3Client);
+
+            var uploadRequest = new TransferUtilityUploadRequest {
+                InputStream = file.OpenReadStream(),
+                Key = key,
                 BucketName = bucketName,
-                Key = String.IsNullOrEmpty(prefix) ? fileName : $"{prefix?.TrimEnd('/')}/{fileName}",
-                InputStream = file.OpenReadStream()
+                PartSize = 5 * 1024 * 1024, // 5 MB
+                ContentType = file.ContentType,
+                CannedACL = S3CannedACL.PublicRead
             };
-            request.Metadata.Add("Content-type", file.ContentType);
-            await _s3Client.PutObjectAsync(request);
+
+            await transferUtility.UploadAsync(uploadRequest);
 
             return fileName;
         }

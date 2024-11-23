@@ -45,7 +45,7 @@ public class GetLectureDetailsHandler(ILectureRepository lectureRepository, IQui
         if(lecture.ProblemId != null) {
             var problem = await problemRepository.GetByIdDetailAsync(lecture.ProblemId.Value);
             if(problem != null) {
-                problemDto = problem.ToProblemDto(null);
+                problemDto = problem.ToProblemDto(false);
             }
         }
 

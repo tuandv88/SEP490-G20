@@ -15,7 +15,8 @@ namespace BuidingBlocks.Storage {
             AmazonS3Config config = new AmazonS3Config
             {
                 ServiceURL = url,
-                ForcePathStyle = true
+                ForcePathStyle = true,
+                Timeout = TimeSpan.FromMinutes(10),
             };
 
             AmazonS3Client s3Client = new AmazonS3Client(

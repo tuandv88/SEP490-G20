@@ -5,10 +5,16 @@ public class DeleteDocumentHandler(IDocumentRepository repository, IKernelMemory
     public async Task<Unit> Handle(DeleteDocumentsCommand request, CancellationToken cancellationToken) {
 
         foreach (var documentId in request.DocumentIds) {
-            await repository.DeleteByIdAsync(Guid.Parse(documentId));
-            await memory.DeleteDocumentAsync(documentId);
+            var document = await repository.GetByIdAsync(Guid.Parse(documentId));
+            if (document != null) {
+                if (!document.Tags.TryGetValue(TagConstant.Key.Learning, out _)) {
+                    await repository.DeleteAsync(document);
+                    await memory.DeleteDocumentAsync(documentId, cancellationToken: cancellationToken);
+                }
+            }
         }
-        await repository.SaveChangesAsync();
+
+        await repository.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 }

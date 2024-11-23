@@ -5,6 +5,12 @@
         public string Subject { get; set; }
         public string? Body { get; set; } = default!;
         public string? AttachmentPath { get; set; } = default!;
+        public EmailMetadata(string toAddress, string subject, string? body = "")
+        {
+            ToAddress = toAddress;
+            Subject = subject;
+            Body = body;
+        }
         public EmailMetadata(string toAddress, string subject, string? body = "",
            string? attachmentPath = "") {
             ToAddress = toAddress;

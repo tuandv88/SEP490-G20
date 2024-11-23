@@ -16,7 +16,7 @@ namespace User.API.Endpoints.LearningPath
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             // Định nghĩa endpoint POST
-            app.MapPost("/user-service/user/{userId}/learning-paths", async (Guid userId,CreateLearningPathRequest request, ISender sender) =>
+            app.MapPost("/user/{userId}/learning-paths", async (Guid userId,CreateLearningPathRequest request, ISender sender) =>
             {
                 // Tạo command với dữ liệu từ request
                 var command = new CreateLearningPathCommand
@@ -32,7 +32,7 @@ namespace User.API.Endpoints.LearningPath
                 var response = new CreateLearningPathResponse(result.Id);
 
                 // Trả về HTTP 201 với đường dẫn của LearningPath vừa tạo
-                return Results.Created($"/learning-paths/{response.Id}", response);
+                return Results.Created($"/user/{userId}/learning-paths/{response.Id}", response);
             })
             .WithName("CreateLearningPath") // Đặt tên cho endpoint
             .Produces<CreateLearningPathResponse>(StatusCodes.Status201Created) // Trả về khi tạo thành công

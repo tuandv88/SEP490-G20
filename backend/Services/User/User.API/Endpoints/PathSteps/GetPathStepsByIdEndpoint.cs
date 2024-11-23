@@ -11,7 +11,7 @@ namespace User.API.Endpoints.PathSteps
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/user-service/LeaningPathID/{LeaningPathID}/PathSteps", async (Guid LeaningPathID, ISender sender) => {
+            app.MapGet("/LeaningPathID/{LeaningPathID}/PathSteps", async (Guid LeaningPathID, ISender sender) => {
                 var result = await sender.Send(new GetPathStepsByLearningPathIdQuery(LeaningPathID));
 
                 var response = result.Adapt<GetPathStepsByUserIdReponse>();

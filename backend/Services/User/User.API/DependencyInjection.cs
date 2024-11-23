@@ -1,7 +1,10 @@
 ﻿using BuildingBlocks.Exceptions.Handler;
 using BuildingBlocks.Extensions;
-using Carter;
-namespace Learning.API;
+using User.API.Services;
+using User.Application.Interfaces;
+using User.Infrastructure.Extentions;
+using User.Application.Interfaces;
+namespace User.API;
 public static class DependencyInjection
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
@@ -9,7 +12,12 @@ public static class DependencyInjection
         services.AddCarter();
 
         //Authentication
-        services.ConfigureAuthentication(configuration);
+        services.AddConfigureAuthentication(configuration);
+        //UserContext
+        services.AddScoped<IUserContextService, UserContextService>();
+
+        //IdentityService
+        services.AddScoped<IIdentityService, IdentityService>();
         //Exceptions
         services.AddExceptionHandler<CustomExceptionHandler>();
 

@@ -12,6 +12,7 @@ using BuildingBlocks.Email.Interfaces;
 using BuildingBlocks.Email.Models;
 using BuildingBlocks.Email.Helpers;
 using BuidingBlocks.Storage;
+using BuildingBlocks.Email.Constants;
 
 namespace AuthServer.Controllers
 {
@@ -128,7 +129,7 @@ namespace AuthServer.Controllers
                             body: emailBody
                         );
 
-                        await _emailService.SendAndSave(emailMetadata);
+                        await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
 
                         TempData["ConfirmEmailSuccessMessage"] = "Registration successful! Please check your email and confirm your account.";
 
@@ -545,7 +546,7 @@ namespace AuthServer.Controllers
             );
 
             // Gửi email xác nhận
-            await _emailService.SendAndSave(emailMetadata);
+            await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
         }
 
         private async Task HandleLockedOutUser(Users user)
@@ -786,7 +787,7 @@ namespace AuthServer.Controllers
                     );
 
                     // Gửi email xác nhận
-                    await _emailService.SendAndSave(emailMetadata);
+                    await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
                 }
 
                 // Sau khi gửi email thành công

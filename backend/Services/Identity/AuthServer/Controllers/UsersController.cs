@@ -162,5 +162,36 @@ namespace AuthServer.Controllers
                 return BadRequest("Update Failed!");
             }
         }
+
+        [HttpPut("updateissurvey")]
+        public async Task<IActionResult> UpdateSurveyStatus([FromBody] UpdateSurveyStatusDto updateSurveyStatusDto)
+        {
+            if (updateSurveyStatusDto.UserId == Guid.Empty)
+            {
+                return BadRequest(new { message = "Invalid userId." });
+            }
+
+            // Tìm người dùng theo ID
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == updateSurveyStatusDto.UserId);
+
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found!" });
+            }
+
+            // Lấy danh sách claims hiện tại của người dùng
+            var existingClaims = await _userManager.GetClaimsAsync(user);
+            var isSurveyClaim = existingClaims.FirstOrDefault(c => c.Type == "issurvey");
+
+            if (isSurveyClaim != null)
+            {
+                await _userManager.RemoveClaimAsync(user, isSurveyClaim);
+            }
+
+            await _userManager.AddClaimAsync(user, new Claim("issurvey", "true"));
+
+            return Ok(new { message = "Survey status updated successfully." });
+        }
+
     }
 }

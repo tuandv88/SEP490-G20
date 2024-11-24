@@ -8,6 +8,7 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
             PromptType.AnswerWithFacts => BuidAnswerWithFacts(question, facts, context),
             PromptType.Suggestion => BuidSuggestion(question, facts),
             PromptType.Summarize => BuidSummarize(question, facts),
+            PromptType.Pathway => BuidPathway(question, facts, context),
             _ => throw new ArgumentOutOfRangeException(nameof(promptType), promptType, null)
         };
     }
@@ -17,6 +18,7 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
             PromptType.AnswerWithFacts => ExtractAnswerMessage(message),
             PromptType.Suggestion => ExtractSuggestionMessage(message),
             PromptType.Summarize => ExtractSummaryMessage(message),
+            PromptType.Pathway => ExtractPathwayMessage(message),
             _ => throw new ArgumentOutOfRangeException(nameof(promptType), promptType, null)
         };
     }
@@ -44,6 +46,16 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
     private string BuidSummarize(string question, string facts) {
         throw new NotImplementedException();
     }
+
+    private string BuidPathway(string question, string facts, IMessageContext? context) {
+        var prompt = promptProvider.ReadPrompt(PromptType.Pathway.ToStringValue());
+        var answers = context.GetCustomPathwayAnswersOrDefault("");
+
+        prompt = prompt.Replace("{{$facts}}", facts.Trim(), StringComparison.OrdinalIgnoreCase);
+        prompt = prompt.Replace("{{answers}}", answers.Trim(), StringComparison.OrdinalIgnoreCase);
+        return prompt;
+    }
+
     private string ExtractAnswerMessage(string message) {
 
         return "Extracted Answer Message";
@@ -58,5 +70,9 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
 
         throw new NotImplementedException();
     }
+    private string ExtractPathwayMessage(string message) {
+        throw new NotImplementedException();
+    }
+
 }
 

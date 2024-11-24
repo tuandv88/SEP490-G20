@@ -1,24 +1,13 @@
 ﻿using AuthServer.Models;
 using AuthServer.Models.AccountViewModel;
 using IdentityServer4.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.DataProtection;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
-using MailKit;
-using IdentityServer4.Extensions;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Org.BouncyCastle.Bcpg.Sig;
-using Microsoft.AspNetCore.Authorization;
 using BuildingBlocks.Email.Interfaces;
 using BuildingBlocks.Email.Models;
 using BuildingBlocks.Email.Helpers;
@@ -382,7 +371,14 @@ namespace AuthServer.Controllers
 
             if (result.Succeeded)
             {
-                
+                var existingClaims = await _userManager.GetClaimsAsync(user);
+                var isSurveyClaim = existingClaims.FirstOrDefault(c => c.Type == "issurvey");
+
+                if (isSurveyClaim == null)
+                {
+                    await _userManager.AddClaimAsync(user, new Claim("issurvey", "false"));
+                }
+
                 if (model.RememberMe)
                 {
                     var cookieOptions = new CookieOptions
@@ -625,6 +621,15 @@ namespace AuthServer.Controllers
 
                 if (signInResult.Succeeded)
                 {
+
+                    var existingClaims = await _userManager.GetClaimsAsync(user);
+                    var isSurveyClaim = existingClaims.FirstOrDefault(c => c.Type == "issurvey");
+
+                    if (isSurveyClaim == null)
+                    {
+                        await _userManager.AddClaimAsync(user, new Claim("issurvey", "false"));
+                    }
+
                     // Đăng nhập thành công, chuyển đến trang tiếp theo
                     return RedirectToAction("Index", "Profile");
                 }

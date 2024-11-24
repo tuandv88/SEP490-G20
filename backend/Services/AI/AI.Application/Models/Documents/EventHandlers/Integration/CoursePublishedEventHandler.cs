@@ -1,4 +1,6 @@
 ﻿using AI.Domain.ValueObjects;
+using BuidingBlocks.Storage;
+using BuidingBlocks.Storage.Interfaces;
 using BuildingBlocks.Messaging.Events.Learnings;
 using MassTransit;
 using Microsoft.KernelMemory;
@@ -10,7 +12,8 @@ namespace AI.Application.Models.Documents.EventHandlers.Integration;
 public class CoursePublishedEventHandler(
         ILogger<CoursePublishedEventHandler> logger,
         IKernelMemory memory,
-        IDocumentRepository repository)
+        IDocumentRepository repository,
+        IFilesService filesService)
     : IConsumer<CoursePublishedEvent> {
     public async Task Consume(ConsumeContext<CoursePublishedEvent> context) {
         var courseEvent = context.Message.Course;
@@ -82,11 +85,24 @@ public class CoursePublishedEventHandler(
                 var jsonLecture = JsonConvert.SerializeObject(lectureObject);
                 var documentLectureId = await ImportLecture(jsonLecture, lecture.Id, chapter.Id.ToString(), courseData.Id.ToString());
                 logger.LogInformation($"[ProcessCoursePublished] Lecture published successfully with DocumentId: {documentLectureId}");
+                foreach(var file in lecture.Files) {
+                    
+                    try {
+                        logger.LogInformation($"[ProcessCoursePublished] Processing File with DocumentId: {file.Id}");
+
+                        var stream = await filesService.GetFileBykeyAsync(StorageConstants.BUCKET, file.Url);
+                        string documentId =  await  ImportFile(stream, file.Id, file.FileName, file.Format, file.FileSize, courseData.Id.ToString(), lecture.Id.ToString());
+
+                        logger.LogInformation($"[ProcessCoursePublished] File published successfully with DocumentId: {file.Id}");
+                    } catch(Exception ex) {
+                        logger.LogError(ex.Message);
+                    }
+                }
             }
 
         }
     }
-
+    
     private async Task<string> ImportCourse(string json, Guid documentId) {
         var fileName = DocumentConstant.Name.ContentTxt;
         var mimeType = ContentTypeConstant.Web.PlainText;
@@ -127,7 +143,7 @@ public class CoursePublishedEventHandler(
         var tags = new Dictionary<string, object>{
             {Key.Type, TagConstant.Import.Text },
             {Key.MimeType, mimeType },
-            {Key.Learning, TagConstant.Learning.Chapter.Name},
+            {Key.Learning, Learning.Chapter.Name},
             {Learning.Chapter.ChapterId, documentId.ToString()},
             {Learning.Course.CourseId, courseId }
         };
@@ -159,15 +175,51 @@ public class CoursePublishedEventHandler(
         };
         return await Import(json, documentId, fileName, mimeType, fileSize, tags, DocumentConstant.Index.Default, tagCollection);
     }
+
+    private async Task<string> ImportFile(Stream stream, Guid documentId, string fileName, string format, long fileSize, string courseId, string lectureId) {
+
+        TagCollection tagCollection = new TagCollection {
+                { Key.Type, TagConstant.Import.Document },
+                { Key.MimeType, format },
+                { Learning.Course.CourseId, courseId },
+                { Learning.Lecture.LectureId, lectureId},
+                { Learning.File.FileId, documentId.ToString() },
+                { Key.Learning, Learning.File.Name}
+            };
+
+        var tags = new Dictionary<string, object>{
+                { Key.Type, TagConstant.Import.Document },
+                { Key.MimeType, format },
+                { Learning.Course.CourseId, courseId },
+                { Learning.Lecture.LectureId, lectureId},
+                { Learning.File.FileId, documentId.ToString() },
+                { Key.Learning, Learning.File.Name}
+            };
+
+        var document = await repository.GetByIdAsync(documentId);
+        if (document == null) {
+            document = Document.Create(DocumentId.Of(documentId), fileName, format, fileSize, tags, DocumentConstant.Index.Default);
+            await repository.AddAsync(document);
+        } else {
+            document.Update(fileName, format, fileSize, tags, DocumentConstant.Index.Default);
+            await repository.UpdateAsync(document);
+        }
+        await memory.ImportDocumentAsync(stream, fileName, documentId.ToString(), tagCollection);
+
+        await repository.SaveChangesAsync();
+
+        return document.Id.ToString();
+    }
+
     private async Task<string> Import(string json, Guid documentId, string fileName, string mimeType,
         long fileSize, Dictionary<string, object> tags, string index, TagCollection tagCollection) {
 
         var document = await repository.GetByIdAsync(documentId);
         if (document == null) {
-            document = Document.Create(DocumentId.Of(documentId), fileName, mimeType, fileSize, tags, DocumentConstant.Index.Default);
+            document = Document.Create(DocumentId.Of(documentId), fileName, mimeType, fileSize, tags, index);
             await repository.AddAsync(document);
         } else {
-            document.Update(fileName, mimeType, fileSize, tags, DocumentConstant.Index.Default);
+            document.Update(fileName, mimeType, fileSize, tags, index);
             await repository.UpdateAsync(document);
         }
         await memory.ImportTextAsync(json, documentId.ToString(), tagCollection);

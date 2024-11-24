@@ -21,6 +21,9 @@ public static class ContextConstant {
 
         public const string NucleusSampling = "custom_rag_nucleus_sampling_float";
     }
+    public static class Pathway {
+        public const string Answer = "answers";
+    }
 }
 
 

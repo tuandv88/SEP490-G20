@@ -33,12 +33,21 @@ public record LectureData {
     public string Title { get; set; } = default!;
     public string Summary { get; set; } = default!;
     public double TimeEstimation { get; set; }
-    public string LectureType { get; set; }
+    public string LectureType { get; set; } = default!;
     public int OrderIndex { get; set; }
     public int Point { get; set; }
-    public bool IsFree { get; set; } 
+    public bool IsFree { get; set; }
+    public List<File> Files { get; set; } = [];
 }
 
 public record ProblemData {
     //TODO
+}
+
+public record File {
+    public Guid Id { get; set; }
+    public string FileName { get; set; } = default!;
+    public string Url { get; set; } = default!;
+    public string Format { get; set; } = default!;
+    public long FileSize { get; set; } = default!;
 }

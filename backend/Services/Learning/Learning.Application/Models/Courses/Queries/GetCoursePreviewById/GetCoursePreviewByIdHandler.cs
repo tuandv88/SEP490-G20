@@ -26,7 +26,7 @@ public class GetCoursePreviewByIdHandler(ICourseRepository repository, IFilesSer
                 var lectures = c.Lectures
                     .OrderBy(l => l.OrderIndex)
                     .Select(c => {
-                        var file = fileRepository.GetByVideoLectureId(c.Id);
+                        var file = fileRepository.GetVideoByLectureId(c.Id);
                         LecturePreviewDto lecture = new LecturePreviewDto() {
                             Id = c.Id.Value,
                             Title = c.Title,

@@ -31,7 +31,19 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
             await quizSubmissionRepository.UpdateAsync(quizSubmission);
             //Kiểm tra nếu là kiểu ASSESSMENT thì public lên một event để AI phân tích tạo một lộ trình học
             if (quiz.QuizType == QuizType.ASSESSMENT) {
-                //await publishEndpoint.Publish(new AssessmentQuizScoringCompletedEvent());
+                await publishEndpoint.Publish(new AssessmentQuizScoringCompletedEvent() {
+                    QuizSubmissionId = quizSubmission.Id.Value,
+                    UserId = quizSubmission.UserId.Value,
+                    QuizId = quizSubmission.Id.Value,
+                    StartTime = quizSubmission.StartTime,
+                    SubmissionDate = quizSubmission.SubmissionDate,
+                    Score = quizSubmission.Score,
+                    TotalScore = quizSubmission.TotalScore,
+                    TotalQuestions = quizSubmission.TotalQuestions,
+                    CorrectAnswers = quizSubmission.CorrectAnswers,
+                    PassingMark = quizSubmission.PassingMark,
+                    ResultAnswers = JsonConvert.SerializeObject(quizSubmission.Answers),
+                });
             }
             await quizSubmissionRepository.SaveChangesAsync();
         }

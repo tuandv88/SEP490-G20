@@ -69,6 +69,21 @@ public static class MessageContextExtensions {
 
         return defaultValue;
     }
+    public static string GetCustomConnectionIdOrDefault(this IMessageContext? context, string defaultValue) {
+        if (context.TryGetArg<string>(ContextConstant.Community.ConnectionId, out var customValue)) {
+            return customValue;
+        }
+
+        return defaultValue;
+    }
+
+    public static string GetCustomPathwayAnswersOrDefault(this IMessageContext? context, string defaultValue) {
+        if (context.TryGetArg<string>(ContextConstant.Pathway.Answer, out var customValue)) {
+            return customValue;
+        }
+
+        return defaultValue;
+    }
     public static bool TryGetArg<T>(this IMessageContext? context, string key, [NotNullWhen(true)] out T? value) {
         if (context != null && context.Arguments.TryGetValue(key, out object? x)) {
             if (x is JsonValue or JsonElement) {

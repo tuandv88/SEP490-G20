@@ -1,5 +1,4 @@
-﻿using Judge0.DotNet.Models.Statues;
-using User.Application.Models.PathSteps.Dtos;
+﻿using User.Application.Models.PathSteps.Dtos;
 using User.Domain.Enums;
 
 namespace User.Application.Models.LearningPaths.Dtos

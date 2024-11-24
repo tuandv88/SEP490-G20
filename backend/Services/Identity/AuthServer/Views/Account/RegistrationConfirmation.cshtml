@@ -4,6 +4,10 @@
     string email = ViewData["Email"]?.ToString();
 }
 
+@{
+    Layout = null;
+}
+
 <!-- Thông báo thành công -->
 @if (TempData["ConfirmEmailSuccessMessage"] != null)
 {

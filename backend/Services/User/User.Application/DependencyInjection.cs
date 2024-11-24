@@ -1,7 +1,5 @@
 ﻿using BuildingBlocks.Behaviors;
-using BuildingBlocks.Extensions;
 using FluentValidation;
-using Judge0.DotNet;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -12,11 +10,10 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices
     (this IServiceCollection services, IConfiguration configuration)
     {
-        //CodeSandbox
-        services.AddJudge0Dotnet(configuration);
         //MediatR
         services.AddMediatR(config => {
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            config.AddOpenBehavior(typeof(AuthorizationBehaviour<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

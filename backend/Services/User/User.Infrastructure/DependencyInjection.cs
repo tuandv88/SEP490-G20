@@ -9,6 +9,7 @@ using User.Infrastructure.Data.Repositories.LearningPaths;
 using User.Infrastructure.Data.Repositories.PathSteps;
 using User.Infrastructure.Data.Repositories.PointHistories;
 using User.Infrastructure.Data.Repositories.UserGoals;
+using User.Infrastructure.Extentions;
 
 namespace User.Infrastructure
 {
@@ -26,6 +27,8 @@ namespace User.Infrastructure
 
                 options.LogTo(Console.WriteLine, LogLevel.Information);
             });
+            services.AddMassTransitWithRabbitMQ(configuration, typeof(IApplicationDbContext).Assembly);
+
             //trong context đã tạo một ApplicationDbContext rồi, phải lấy ra chứ không add scoped mới 
             services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
             services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();

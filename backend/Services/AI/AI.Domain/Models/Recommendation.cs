@@ -11,5 +11,18 @@ public class Recommendation : Entity<RecommendationId> {
     public DateTime StartDate {  get; set; } = default!;
     public DateTime EndDate { get; set; } = default!;
 
+    public static Recommendation Create(RecommendationId Id, UserId userId, string name, string data, string source, string reason, DateTime startDate, DateTime endDate) {
+        return new Recommendation {
+            Id = Id,
+            UserId = userId,
+            Name = name,
+            Data = data,
+            Source = source,
+            Reason = reason,
+            StartDate = startDate,
+            EndDate = endDate
+        };
+    }
+
 }
 

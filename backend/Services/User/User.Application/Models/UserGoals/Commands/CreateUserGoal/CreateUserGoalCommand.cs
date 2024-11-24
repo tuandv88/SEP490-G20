@@ -1,7 +1,6 @@
 ﻿using Amazon.Runtime.Internal;
 using FluentValidation;
 using MediatR;
-using User.Application.Models.Dtos;
 using User.Application.Models.UserGoals.Dtos;
 
 namespace User.Application.Models.UserGoals.Commands.CreateUserGoal;

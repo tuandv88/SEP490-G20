@@ -128,8 +128,8 @@ builder.Services.ConfigureApplicationCookie(opts =>
 });
 
 // Cấu hình SendMail - Nuget: FluentMail
-builder.Services.AddFluentEmail(builder.Configuration);
 builder.Services.AddTransient<IEmailService, EmailService>();
+
 // AddStorate
 builder.Services.AddStorage(builder.Configuration);
 builder.Services.AddScoped<IBase64Converter, Base64Converter>();

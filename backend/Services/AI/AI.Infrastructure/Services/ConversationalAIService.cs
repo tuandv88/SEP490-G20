@@ -50,7 +50,7 @@ public class ConversationalAIService(
         return messageAnswer;
     }
 
-    public async Task<List<PathwayAnswer>> GenerateAnswer(string prompt, IMessageContext? context, CancellationToken token = default) {
+    public async Task<PathwayAnswer> GenerateAnswer(string prompt, IMessageContext? context, CancellationToken token = default) {
         int maxTokens = context.GetCustomRagMaxTokensOrDefault(_config.AnswerTokens);
         double temperature = context.GetCustomRagTemperatureOrDefault(_config.Temperature);
         double nucleusSampling = context.GetCustomRagNucleusSamplingOrDefault(_config.TopP);
@@ -66,12 +66,12 @@ public class ConversationalAIService(
         };
         var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
         var result = await chatCompletionService.GetChatMessageContentAsync(prompt, settings, kernel, token);
-        List<PathwayAnswer> answers = [];
+        PathwayAnswer answers = new PathwayAnswer();
         try {
-            answers = JsonConvert.DeserializeObject<List<PathwayAnswer>>(result.Content!)!;
+            answers = JsonConvert.DeserializeObject<PathwayAnswer>(result.Content!)!;
         } catch (Exception ex) {
             logger.LogError(ex.Message);
-            answers.Add(new PathwayAnswer() { Reason = result.Content! });
+            answers.Reason = result.Content!;
 
         }
         return answers;

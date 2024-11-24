@@ -82,7 +82,8 @@ public static class ProblemExtensions {
             Status: status,
             Title: problem.Title,
             Difficulty: problem.DifficultyType.ToString(),
-            Acceptance: acceptance
+            Acceptance: acceptance,
+            IsActive: problem.IsActive
             );
         return problemListDto;
     }

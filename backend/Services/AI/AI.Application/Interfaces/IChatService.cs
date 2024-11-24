@@ -4,7 +4,7 @@ using System.ComponentModel;
 namespace AI.Application.Interfaces;
 public interface IChatService {
     Task<MessageAnswer> GenerateAnswer(Guid conversationId, string prompt, IMessageContext? context = default, CancellationToken token = default);
-    Task<List<PathwayAnswer>> GenerateAnswer(string prompt, IMessageContext? context, CancellationToken token = default);
+    Task<PathwayAnswer> GenerateAnswer(string prompt, IMessageContext? context, CancellationToken token = default);
 }
 
 public class MessageAnswer {
@@ -14,16 +14,19 @@ public class MessageAnswer {
 
     [JsonProperty("documentIds")]
     [Description("List of document IDs from facts that are relevant to the answer")]
-    public List<string> DocumentIds { get; set; } = new();
+    public List<string> DocumentIds { get; set; } = [];
 
     [JsonProperty("externalResources")]
     [Description("List of external resources in Markdown format [Text](Url) that are relevant to the answer")]
-    public List<string> ExternalResources { get; set; } = new();
+    public List<string> ExternalResources { get; set; } = [];
 }
 public class PathwayAnswer {
     public string PathwayName { get; set; } = string.Empty;
-    public List<Guid> CourseIds { get; set; } = new();
+    public List<PathStepAnswer> PathSteps { get; set; } = [];
     public string Reason { get; set; } = string.Empty;
-    public DateTime StartDate { get; set; }
-    public DateTime DateTime { get; set; }
+    public TimeSpan EstimatedCompletionTime { get; set; }
+}
+public class PathStepAnswer {
+    public Guid CourseId { get; set; }
+    public TimeSpan EstimatedCompletionTime { get; set; }
 }

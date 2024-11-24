@@ -1,10 +1,12 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://localhost:5008';
+// Sửa API base URL cho đúng với backend
+const API_BASE_URL = 'https://localhost:5008'; // Đổi sang port của backend
 
 export const DiscussApi = {
   getDiscussionOptions: async ({ discussionId, pageIndex, pageSize, orderBy, tags }) => {
     try {
+      console.log("Fetching discussion options...");
       const response = await axios.get(`${API_BASE_URL}/discussions/${discussionId}/options`, {
         params: {
           pageIndex,

@@ -2,4 +2,5 @@
 public interface IQuizRepository : IRepository<Quiz> {
     Task<Quiz?> GetByIdDetailAsync(Guid Id);
     Task<IQueryable<Quiz>> GetAllQueryAbleAsync();
+    Task<Quiz> GetQuizAssessment();
 }

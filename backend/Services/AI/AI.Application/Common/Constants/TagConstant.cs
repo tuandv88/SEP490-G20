@@ -11,7 +11,7 @@ public static class TagConstant {
         public const string Url = "url";
         public const string Learning = "learning";
     }
-    public static class Learning{
+    public static class Learning {
         public static class Course {
             public const string Name = "learning_course";
             public const string CourseId = "course_id";
@@ -23,6 +23,10 @@ public static class TagConstant {
         public static class Lecture {
             public const string Name = "learning_lecture";
             public const string LectureId = "lecture_id";
+        }
+        public static class File {
+            public const string Name = "learning_file";
+            public const string FileId = "file_id";
         }
     }
 }

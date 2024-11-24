@@ -31,5 +31,12 @@ public class QuizRepository : Repository<Quiz>, IQuizRepository {
     public async Task<IQueryable<Quiz>> GetAllQueryAbleAsync() {
         return _dbContext.Quizs.AsQueryable();
     }
+
+    public async Task<Quiz> GetQuizAssessment() {
+        var quiz = await _dbContext.Quizs
+                        .FirstOrDefaultAsync(q => q.QuizType == QuizType.ASSESSMENT);
+
+        return quiz;
+    }
 }
 

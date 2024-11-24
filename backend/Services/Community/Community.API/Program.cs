@@ -1,4 +1,4 @@
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using Serilog;
 using BuildingBlocks.Logging;
 
@@ -21,8 +21,6 @@ builder.Host.UseSerilog(SeriLogger.Configure)
             options.EnableAnnotations();
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Discussion API", Version = "v1" });
         });
-
-        services.AddControllers();
     });
 
 var app = builder.Build();

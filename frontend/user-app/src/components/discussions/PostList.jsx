@@ -1,87 +1,132 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { AUTHENTICATION_ROUTERS } from '../../data/constants';
+import React, { useEffect, useState } from "react";
+import { DiscussApi } from "@/services/api/DiscussApi"; // Đường dẫn phù hợp đến file chứa DiscussApi
 
 function PostList() {
-  const posts = [
-    {
-      id: 1,
-      title: "Google Online Assessment Questions",
-      tags: ["google", "online assessment"],
-      created: "August 6, 2019",
-      views: "813.3K",
-      votes: 2900,
-    },
-    {
-      id: 2,
-      title: "How to write an Interview Question post",
-      tags: ["google"],
-      created: "April 28, 2018",
-      views: "176.4K",
-      votes: 628,
-    },
-    // thêm các bài viết khác
-  ];
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pageIndex, setPageIndex] = useState(1);
+  const pageSize = 10;
+  const discussionId = "11111111-1111-1111-1111-111111111111";
+  const orderBy = "hot";
+  const tags = "ai";
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await DiscussApi.getDiscussionOptions({
+          discussionId,
+          pageIndex,
+          pageSize,
+          orderBy,
+          tags,
+        });
+
+        if (data && data.discussionDtos && data.discussionDtos.data) {
+          setPosts(data.discussionDtos.data);
+        }
+      } catch (err) {
+        setError("Failed to fetch posts");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [pageIndex]);
+
+  const handlePrevPage = () => {
+    if (pageIndex > 1) setPageIndex(pageIndex - 1);
+  };
+
+  const handleNextPage = () => {
+    setPageIndex(pageIndex + 1);
+  };
+
+  const cardStyle = {
+    border: '1px solid #e0e0e0',
+    borderRadius: '8px',
+    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+    transition: 'transform 0.2s, box-shadow 0.2s'
+  };
+
+  const cardHoverStyle = {
+    transform: 'translateY(-4px)',
+    boxShadow: '0px 6px 8px rgba(0, 0, 0, 0.15)'
+  };
+
+  const badgeStyle = {
+    backgroundColor: '#f0f0f0',
+    color: '#333',
+    fontWeight: 500
+  };
+
+  const badgeHoverStyle = {
+    backgroundColor: '#ddd'
+  };
+
+  const paginationStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  };
 
   return (
     <div className="mt-3">
-      {posts.map((post) => (
-        <div key={post.id} className="card mb-3 post-card">
-          <div className="card-body">
-            <h5 className="card-title">
-              <Link to={AUTHENTICATION_ROUTERS.DISCUSSIONDETAIL} className="text-decoration-none text-dark">
-                {post.title}
-              </Link>
-            </h5>
-            <p>
-              {post.tags.map((tag, idx) => (
-                <span key={idx} className="badge bg-secondary me-2">
-                  {tag}
-                </span>
-              ))}
-            </p>
-            <small className="text-muted">Created at: {post.created}</small>
-            <span className="float-end">
-              👁️ {post.views} | ⬆️ {post.votes}
-            </span>
+      {loading && <p>Loading...</p>}
+      {error && <p className="text-danger">{error}</p>}
+      {!loading && posts.length === 0 && <p>No posts available.</p>}
+
+      {!loading &&
+        posts.map((post) => (
+          <div
+            key={post.id}
+            className="card mb-3 post-card"
+            style={cardStyle}
+            onMouseEnter={(e) => e.target.style.transform = cardHoverStyle.transform}
+            onMouseLeave={(e) => e.target.style.transform = ''}
+          >
+            <div className="card-body">
+              <h5 className="card-title">{post.title}</h5>
+              <p>
+                {post.tags.map((tag, idx) => (
+                  <span
+                    key={idx}
+                    className="badge bg-secondary me-2"
+                    style={badgeStyle}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = badgeHoverStyle.backgroundColor}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = ''}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </p>
+              <p>
+                <strong>Username:</strong> {post.userName}
+              </p>
+              <p>
+                <strong>Views:</strong> {post.viewCount} | <strong>Votes:</strong> {post.voteCount}
+              </p>
+            </div>
           </div>
+        ))}
+
+      {/* Phân trang */}
+      {!loading && (
+        <div className="pagination mt-3" style={paginationStyle}>
+          <button className="btn btn-primary me-2" disabled={pageIndex === 1} onClick={handlePrevPage}>
+            Previous
+          </button>
+          <span>Page {pageIndex}</span>
+          <button className="btn btn-primary ms-2" onClick={handleNextPage}>
+            Next
+          </button>
         </div>
-      ))}
-
-      {/* CSS */}
-      <style jsx>{`
-        .post-card {
-          border: 1px solid #e0e0e0;
-          border-radius: 8px;
-          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-          transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .post-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .card-title {
-          font-weight: bold;
-          font-size: 1.2rem;
-        }
-
-        .badge {
-          background-color: #f0f0f0;
-          color: #333;
-          font-weight: 500;
-        }
-
-        .badge:hover {
-          background-color: #ddd;
-        }
-
-        .float-end {
-          font-size: 0.9rem;
-          font-weight: 500;
-        }
-      `}</style>
+      )}
     </div>
   );
 }

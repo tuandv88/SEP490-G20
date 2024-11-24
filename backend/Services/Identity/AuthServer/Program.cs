@@ -12,6 +12,9 @@ using AuthServer.Repository.Services.Base64Converter;
 using Microsoft.Extensions.DependencyInjection;
 using BuildingBlocks.Email.Interfaces;
 using BuildingBlocks.Email.Services;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
+using AuthServer.Repository.Services.Storage;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -110,6 +113,18 @@ builder.Services.AddAuthentication(options =>
     googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
     googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
     googleOptions.CallbackPath = "/signin-google"; // Đảm bảo đường dẫn callback chính xác
+});
+
+builder.Services.ConfigureApplicationCookie(opts =>
+{
+    opts.SessionStore = new RedisCacheTicketStore(new RedisCacheOptions()
+    {
+        // Địa chỉ Redis và cổng
+        Configuration = "109.123.238.31:32644",
+
+        // Cấu hình mật khẩu Redis (nếu có)
+        ConfigurationOptions = ConfigurationOptions.Parse("109.123.238.31:32644, password=icodervn")
+    });
 });
 
 // Cấu hình SendMail - Nuget: FluentMail

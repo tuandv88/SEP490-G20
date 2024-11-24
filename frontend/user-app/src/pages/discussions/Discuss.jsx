@@ -1,58 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../../components/discussions/Navbar";
 import Tabs from "../../components/discussions/Tabs";
-import PostList from "../../components/discussions/PostList"; 
-import Tags from "../../components/discussions/Tags";
+import PostList from "../../components/discussions/PostList";
 
 const Discuss = () => {
+  const [categoryId, setCategoryId] = useState(null); // Lưu categoryId trong state của component cha
+
+  const handleCategoryChange = (newCategoryId) => {
+    setCategoryId(newCategoryId); // Cập nhật categoryId khi người dùng chọn tab mới
+  };
+
   return (
-    <div>
+    <div className="discuss-container">
       <Navbar />
-      <div className="container mt-4">
-        <Tabs />
-        <div className="row">
-          {/* PostList nằm bên trái */}
-          <div className="col-lg-9">
-            <PostList />
-          </div>
-          {/* Tags nằm bên phải */}
-          <div className="col-lg-3">
-            <Tags />
-          </div>
+      <div className="tabs-container">
+        <Tabs onCategoryChange={handleCategoryChange} categoryId={categoryId} />
+      </div>
+      <div className="content-container">
+        <div className="post-list-wrapper">
+          <PostList categoryId={categoryId} />
         </div>
       </div>
 
       {/* CSS */}
       <style jsx>{`
-        .container {
-          margin-top: 20px;
-        }
-
-        .row {
+        .discuss-container {
           display: flex;
-          flex-direction: row;
+          flex-direction: column;
+          align-items: center;
+          margin-top: 20px;
+          font-family: Arial, sans-serif;
         }
 
-        .col-lg-9 {
-          flex: 0 0 75%;
-          max-width: 75%;
-          border-right: 1px solid #ddd;
-          padding-right: 15px;
+        .tabs-container {
+          width: 100%;
+          max-width: 800px;
         }
 
-        .col-lg-3 {
-          flex: 0 0 25%;
-          max-width: 25%;
-          padding-left: 15px;
+        .content-container {
+          display: flex;
+          justify-content: center;
+          width: 100%;
         }
 
-        .container .row {
-          gap: 15px; /* Tạo khoảng cách giữa các cột */
-        }
-
-        .col-lg-9,
-        .col-lg-3 {
+        .post-list-wrapper {
+          width: 100%;
+          max-width: 800px;
+          padding: 20px;
           background-color: #ffffff;
+          border-radius: 8px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
       `}</style>
     </div>

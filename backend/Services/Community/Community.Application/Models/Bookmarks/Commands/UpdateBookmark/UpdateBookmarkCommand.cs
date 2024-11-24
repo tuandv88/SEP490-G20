@@ -3,7 +3,7 @@
 namespace Community.Application.Models.Bookmarks.Commands.UpdateBookmark;
 
 public record UpdateBookmarkResult(bool IsSuccess, string Message);
-
+[Authorize]
 public record UpdateBookmarkCommand(UpdateBookmarkDto UpdateBookmarkDto) : ICommand<UpdateBookmarkResult>;
 
 public class UpdateBookmarkCommandValidator : AbstractValidator<UpdateBookmarkCommand>

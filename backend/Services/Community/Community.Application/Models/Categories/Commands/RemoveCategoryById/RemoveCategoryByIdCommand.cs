@@ -6,4 +6,5 @@ using System.Threading.Tasks;
 
 namespace Community.Application.Models.Categories.Commands.RemoveCategoryById;
 public record RemoveCategoryByIdResult(bool IsSuccess);
+[Authorize($"{PoliciesType.Administrator}")]
 public record RemoveCategoryByIdCommand(Guid Id) : ICommand<RemoveCategoryByIdResult>;

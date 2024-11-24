@@ -6,6 +6,7 @@ namespace Community.Application.Models.Discussions.Queries.GetDiscussionByCatego
 public record GetDiscussionByCateIdResult(PaginatedResult<DiscussionDto> DiscussionDtos);
 
 // Query yêu cầu danh sách Discussion theo Category Id với phân trang
+[Authorize]
 public record GetDiscussionByCateIdQuery(Guid CategoryId, PaginationRequest PaginationRequest) : IQuery<GetDiscussionByCateIdResult>;
 // Validator để kiểm tra các giá trị của query
 public class GetDiscussionByCateIdValidator : AbstractValidator<GetDiscussionByCateIdQuery>

@@ -31,20 +31,29 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 fixed-top">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Profile" asp-action="Index">AuthServer</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <a class="navbar-brand" asp-area="" asp-controller="Profile" asp-action="Index"
+                   style="display: inline-block; padding: 5px; border-radius: 8px; transition: transform 0.3s; text-decoration: none;">
+                    <img src="https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/backend/imageidentity/ICoderlogomain.jpg" alt="ICoder Logo"
+                         style="width: 80px; height: auto; border-radius: 5px;">
+                </a>
 
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     @if (signInManager.IsSignedIn(User))
                     {
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                                <a class="nav-link"
+                                   asp-area=""
+                                   asp-controller="Account"
+                                   asp-action="Logout"
+                                   style="padding: 6px 12px; background-color: #f8f9fa; color: #343a40; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; font-weight: 600; text-decoration: none; transition: background-color 0.3s, color 0.3s;"
+                                   onmouseover="this.style.backgroundColor='#409eff'; this.style.color='#ffffff';"
+                                   onmouseout="this.style.backgroundColor='#f8f9fa'; this.style.color='#343a40';">
+                                    Logout
+                                </a>
                             </li>
                         </ul>
+
                     }
                     else
                     {

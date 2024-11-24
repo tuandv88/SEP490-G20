@@ -32,13 +32,22 @@ You are an AI expert specializing in personalized learning paths for programming
 
 ### Output Format:
 Please provide your response as a plain JSON object without any additional formatting or delimiters. The structure should be as follows:
-[
-  {
-    "courseId": "course-id-1",
-    "reason": "Explain why this course is relevant to the user's needs."
-  },
-  {
-    "courseId": "course-id-2",
-    "reason": "Explain why this course is the next step in the user's learning path."
-  }
-]
+{
+  "PathwayName": "Beginner Java Pathway",
+  "PathSteps": [
+    {
+      "CourseId": "course-id-1",
+      "EstimatedCompletionTime": "7.00:00:00"
+    },
+    {
+      "CourseId": "course-id-2",
+      "EstimatedCompletionTime": "10.00:00:00"
+    },
+    {
+      "CourseId": "course-id-3",
+      "EstimatedCompletionTime": "14.00:00:00"
+    }
+  ],
+  "Reason": "This pathway focuses on strengthening foundational programming concepts and progressing to advanced topics based on the user's assessment results.",
+  "EstimatedCompletionTime": "31.00:00:00"
+}

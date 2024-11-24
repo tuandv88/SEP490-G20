@@ -30,6 +30,11 @@ export const editCourseRoute = createRoute({
   component: lazy(() => import('@/pages/Course/EditCourse'))
 });
 
+const problemTableRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/problem-table',
+  component: lazy(() => import('@/pages/Problem/ProblemTable'))
+})
 
 const createCourseRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -37,11 +42,6 @@ const createCourseRoute = createRoute({
   component: lazy(() => import('@/pages/Course/CreateCourse'))
 })
 
-const testRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/test/:testId',
-  component: lazy(() => import('@/pages/Test'))
-})
 
 const createCodeProblemRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -52,7 +52,7 @@ const createCodeProblemRoute = createRoute({
 const createProblemRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/create-problem',
-  component: lazy(() => import('@/pages/Problem/Create/CreateProblem'))
+  component: lazy(() => import('@/pages/Problem/ProblemTable'))
 })
 
 export const quizManagementRoute = createRoute({
@@ -84,7 +84,7 @@ const mainRouteTree = rootRoute.addChildren([
   createProblemRoute,
   callbackRoute,
   quizManagementRoute,
-  testRoute
+  problemTableRoute
 ])
 
 const loginRouteTree = loginRootRoute.addChildren([loginRoute])

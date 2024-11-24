@@ -29,6 +29,20 @@ export const getLectureDetails = async (lectureId) => {
   }
 }
 
+export const deleteLecture = async (chapterId, lectureId) => {
+  try {
+    const response = await axiosInstance.delete(`/learning-service/chapters/${chapterId}/lectures/${lectureId}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error deleting lecture:', error)
+    throw error
+  }
+}
+
 export const deleteFileFromLecture = async (fileId, lectureId) => {
   try {
     const response = await axiosInstance.delete(`/learning-service/lectures/${lectureId}/files/${fileId}`, {

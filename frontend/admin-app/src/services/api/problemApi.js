@@ -1,6 +1,20 @@
 import axiosInstance from '@/lib/axios'
 import Cookies from 'js-cookie'
 
+export const getProblems = async (pageIndex, pageSize) => {
+  try {
+    const response = await axiosInstance.get(`/learning-service/problems?pageIndex=${pageIndex}&pageSize=${pageSize}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error get problems:', error)
+    throw error
+  }
+}
+
 export const createProblem = async (problemData) => {
   try {
     const response = await axiosInstance.post('/learning-service/problems', problemData, {

@@ -62,11 +62,17 @@ export default function CourseCreator() {
       toast({
         title: 'Course created successfully',
         description: 'Course created successfully',
+        duration: 1500,
       })
       navigate({ to: '/course-table' })
       // Optionally, navigate to another page or show a success message
     } catch (error) {
       console.error('Error creating course:', error)
+      toast({
+        title: 'Error creating course',
+        description: 'Error creating course',
+        duration: 1500,
+      })
       // Optionally, show an error message to the user
     }
   }

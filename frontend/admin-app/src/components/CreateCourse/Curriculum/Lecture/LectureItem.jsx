@@ -19,8 +19,7 @@ import { useForm, Controller, FormProvider, set } from 'react-hook-form'
 import { useToast } from '@/hooks/use-toast'
 
 import { createQuiz, deleteQuiz } from '@/services/api/quizApi'
-import { getLectureDetails } from '@/services/api/lectureApi'
-import { deleteFileFromLecture } from '@/services/api/lectureApi'
+import { getLectureDetails, deleteLecture, deleteFileFromLecture } from '@/services/api/lectureApi'
 import { getVideoDuration } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 import QuizCreationForm from './QuizCreationForm'
@@ -28,8 +27,11 @@ import { FileQuestion, PencilIcon, TrashIcon } from 'lucide-react'
 import { deleteProblem } from '@/services/api/problemApi'
 
 export default function LectureItem({
+  chapterId,
   lecture,
   onEdit,
+  setIsUpdateLecture,
+  isUpdateLecture,
   onDelete,
   onFileUpload,
   onVideoUpload,
@@ -75,6 +77,7 @@ export default function LectureItem({
       }
     }
     fetchLectureDetails()
+    
   }, [lecture.id,isUpdate])
 
 
@@ -293,6 +296,25 @@ export default function LectureItem({
       })
     }
   };
+
+  const onDeleteLecture = async (lectureId) => {
+    try {
+      const response = await deleteLecture(chapterId, lectureId)
+      toast({
+        title: 'Lecture deleted',
+        description: 'The lecture has been successfully deleted.',
+        duration: 1500,
+      })
+      setIsUpdateLecture(!isUpdateLecture)
+    } catch (error) {
+      console.error('Error deleting lecture:', error)
+      toast({
+        title: 'Delete failed',
+        description: 'There was an error deleting the lecture.',
+        duration: 1500,
+      })
+    }
+  } 
   return (
     <div className='flex flex-col p-4 mt-4 rounded-md shadow-sm bg-gray-50'>
       <div className='flex items-center justify-between mb-4'>
@@ -318,7 +340,7 @@ export default function LectureItem({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+                <AlertDialogAction onClick={() => onDeleteLecture(lecture.id)}>Delete</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>

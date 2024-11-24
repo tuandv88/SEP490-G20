@@ -6,7 +6,11 @@ public interface IUserContextService
 }
 public interface IUserContext
 {
-    Guid? Id { get; }
+    Guid Id { get; }
     string UserName { get; }
+    string Email { get; }
+    string FirstName { get; }
+    string LastName { get; }
+    string Role { get; }
 }
 

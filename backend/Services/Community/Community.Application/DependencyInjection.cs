@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Community.Application.Commons;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Community.Application
 {
@@ -11,6 +12,7 @@ namespace Community.Application
             services.AddMediatR(config => {
                 config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());            // Đăng ký các yêu cầu và xử lý trong assembly hiện tại
                 config.AddOpenBehavior(typeof(ValidationBehavior<,>));                           // Thêm hành vi kiểm tra ValidationBehavior cho các yêu cầu
+                config.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
             });
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());                 // Đăng ký các validator từ assembly hiện tại
 

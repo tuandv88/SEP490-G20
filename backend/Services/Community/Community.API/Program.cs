@@ -1,4 +1,4 @@
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using Serilog;
 using BuildingBlocks.Logging;
 
@@ -24,6 +24,16 @@ builder.Host.UseSerilog(SeriLogger.Configure)
 
         services.AddControllers();
     });
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173/")  // Địa chỉ của ứng dụng React
+              .AllowAnyHeader()   // Cho phép bất kỳ header nào
+              .AllowAnyMethod();  // Cho phép bất kỳ phương thức HTTP nào (GET, POST, PUT, DELETE...)
+    });
+});
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

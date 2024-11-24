@@ -22,8 +22,6 @@
 
 	<ItemGroup>
 	  <None Include="Views\Account\Accessdenied.cshtml" />
-	  <None Include="Views\Home\Index.cshtml" />
-	  <None Include="Views\Home\Privacy.cshtml" />
 	  <None Include="Views\Shared\Error.cshtml" />
 	  <None Include="Views\Shared\_Layout.cshtml" />
 	  <None Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
@@ -75,19 +73,6 @@
 		<PackageReference Include="AutoMapper" Version="12.0.0" />
 
 		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.0" />
-	</ItemGroup>
-
-
-
-	<ItemGroup>
-	  <Content Update="Views\Home\Index.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
-	  <Content Update="Views\Home\Privacy.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>

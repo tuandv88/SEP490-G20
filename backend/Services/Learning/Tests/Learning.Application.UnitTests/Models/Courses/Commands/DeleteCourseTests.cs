@@ -1,13 +1,7 @@
-﻿using NUnit.Framework;
-using Moq;
-using Learning.Application.Models.Courses.Commands.Deletecourse;
-using Learning.Application.Interfaces;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Learning.Tests.Application.UnitTest.Models.Course.Helpers;
+﻿using Learning.Application.Models.Courses.Commands.Deletecourse;
+using Learning.Tests.Application.UnitTest.Models.Courses.Helpers;
 
-namespace Learning.Tests.Application.UnitTest.Models.Course.Commands;
+namespace Learning.Tests.Application.UnitTest.Models.Courses.Commands;
 
 [TestFixture]
 public class DeleteCourseTests

@@ -1,7 +1,7 @@
 ﻿using Learning.Application.Models.Courses.Commands.CreateEnrollmentCourse;
 using System;
 
-namespace Learning.Tests.Application.UnitTest.Models.Course.Helpers;
+namespace Learning.Tests.Application.UnitTest.Models.Courses.Helpers;
 
 public static class CreateEnrollmentCourseTestData
 {

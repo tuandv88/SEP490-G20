@@ -1,15 +1,6 @@
 ﻿using Learning.Application.Models.Courses.Commands.ChangeCourseLevel;
-using Learning.Application.Models.Courses.Dtos;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
-using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Learning.Tests.Application.UnitTest.Models.Course.Commands;
+namespace Learning.Tests.Application.UnitTest.Models.Courses.Commands;
 
 [TestFixture]
 public class ChangeCourseLevelTests

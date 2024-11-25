@@ -2,7 +2,7 @@
 using Learning.Application.Models.Courses.Commands.UpdateCourseImage;
 using Learning.Application.Models.Courses.Dtos;
 
-namespace Learning.Tests.Application.UnitTest.Models.Course.Helpers;
+namespace Learning.Tests.Application.UnitTest.Models.Courses.Helpers;
 
 public static class UpdateCourseImageTestData
 {

@@ -1,6 +1,5 @@
 ﻿using Learning.Application.Models.Courses.Commands.SwapCourse;
-using Learning.Domain.ValueObjects;
-using Learning.Tests.Application.UnitTest.Models.Course.Helpers;
+using Learning.Tests.Application.UnitTest.Models.Courses.Helpers;
 
 namespace Learning.Tests.Application.UnitTest.Models.Course.Commands;
 
@@ -74,7 +73,7 @@ public class SwapCourseTests
 
         // Act & Assert
         var ex = Assert.ThrowsAsync<NotFoundException>(() => _handler.Handle(command, CancellationToken.None));
-        Assert.That(ex.Message, Does.Contain($"Course with ID '{command.CourseId1}' was not found."));
+        Assert.That(ex.Message, Does.Contain($"Entity \"Course\" ({command.CourseId1}) was not found."));
     }
 
     [Test]
@@ -93,6 +92,6 @@ public class SwapCourseTests
 
         // Act & Assert
         var ex = Assert.ThrowsAsync<NotFoundException>(() => _handler.Handle(command, CancellationToken.None));
-        Assert.That(ex.Message, Does.Contain($"Course with ID '{command.CourseId2}' was not found."));
+        Assert.That(ex.Message, Does.Contain($"Entity \"Course\" ({command.CourseId2}) was not found."));
     }
 }

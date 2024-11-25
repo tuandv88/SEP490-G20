@@ -17,11 +17,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Remove="Views\Account\Accessdenied.cshtml" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Include="Views\Account\AccessDenied.cshtml" />
 	  <None Include="Views\Shared\Error.cshtml" />
 	  <None Include="Views\Shared\_Layout.cshtml" />
 	  <None Include="Views\Shared\_ValidationScriptsPartial.cshtml" />

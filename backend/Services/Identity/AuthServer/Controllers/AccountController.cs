@@ -951,6 +951,14 @@ namespace AuthServer.Controllers
             // Lấy thông tin context logout từ IdentityServer
             var logoutContext = await _interaction.GetLogoutContextAsync(logoutId);
 
+            // Gọi front_channel_logout_uri nếu có
+            //if (!string.IsNullOrEmpty(logoutContext?.SignOutIFrameUrl))
+            //{
+            //    // Trả về một View chứa iframe để gọi front_channel_logout_uri
+            //    TempData["SignOutIFrameUrl"] = logoutContext.SignOutIFrameUrl;
+            //    return RedirectToAction("LoggedOut", "Account"); // View này sẽ render iframe
+            //}
+
             // Nếu có PostLogoutRedirectUri, redirect về client
             if (!string.IsNullOrEmpty(logoutContext?.PostLogoutRedirectUri))
             {
@@ -959,6 +967,13 @@ namespace AuthServer.Controllers
 
             // Nếu không có PostLogoutRedirectUri, về trang mặc định
             return RedirectToAction("Login", "Account");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AccessDenied()
+        {
+            // Hiển thị trang AccessDenied
+            return View();
         }
 
     }

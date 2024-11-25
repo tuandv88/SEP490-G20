@@ -8,11 +8,10 @@ namespace AuthServer.Config
         public static IEnumerable<ApiResource> GetApiResources =>
             new List<ApiResource>
             {
-                new ApiResource("api.WebApp", "WebApp API"),
                 // Định nghĩa API cho Movies API
-                new ApiResource("moviesApi", "Access to Movies API")
+                new ApiResource("testApi", "Access to Test API")
                 {
-                    Scopes = { "moviesApi" }  // Đặt scope cho API Movies
+                    Scopes = { "testApi" }  // Đặt scope cho API Movies
                 }
 
             };

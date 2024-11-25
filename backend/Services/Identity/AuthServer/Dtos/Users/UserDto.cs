@@ -6,7 +6,6 @@ namespace AuthServer.Dtos.Users
     {
         public Guid Id { get; set; }
         public string UserName { get; set; }
-        public List<string> Roles { get; set; }              // Danh sách vai trò của người dùng
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

@@ -2,7 +2,7 @@
 
 namespace Community.Application.Models.Discussions.Commands.CreateDiscussion;
 public record CreateDiscussionResult(Guid Id);
-
+[Authorize]
 public record CreateDiscussionCommand(CreateDiscussionDto CreateDiscussionDto) : ICommand<CreateDiscussionResult>;
 
 public class CreateDiscussionCommandValidator : AbstractValidator<CreateDiscussionCommand>

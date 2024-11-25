@@ -3,7 +3,7 @@
 namespace Community.Application.Models.Comments.Commands.UpdateComment;
 
 public record UpdateCommentResult(bool IsSuccess);
-
+[Authorize($"{PoliciesType.Administrator},{PoliciesType.Moderator},{PoliciesType.Learner}")]
 public record UpdateCommentCommand(UpdateCommentDto UpdateCommentDto) : ICommand<UpdateCommentResult>;
 
 public class UpdateCommentCommandValidator : AbstractValidator<UpdateCommentCommand>

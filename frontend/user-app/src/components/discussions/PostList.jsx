@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faThumbsUp, faEye } from "@fortawesome/free-solid-svg-icons"; // Import specific icons
+import { faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons"; 
 import { DiscussApi } from "@/services/api/DiscussApi";
 
 function PostList({ categoryId }) {
@@ -27,8 +27,8 @@ function PostList({ categoryId }) {
           orderBy,
           tags,
         });
-        if (data && data.discussionDtos && data.discussionDtos.data) {
-          setPosts(data.discussionDtos.data);
+        if (data && data.updatedDiscussions) {
+          setPosts(data.updatedDiscussions);  
         }
       } catch (err) {
         setError("Failed to fetch posts");
@@ -55,6 +55,17 @@ function PostList({ categoryId }) {
     setPageIndex(1);
   };
 
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <div className="post-list-container">
       {/* Filters Section */}
@@ -67,17 +78,13 @@ function PostList({ categoryId }) {
             Hot
           </span>
           <span
-            className={`filter-button ${
-              orderBy === "newest" ? "active" : ""
-            }`}
+            className={`filter-button ${orderBy === "newest" ? "active" : ""}`}
             onClick={() => handleFilterClick("newest")}
           >
-            Newest to Oldest
+            Newest 
           </span>
           <span
-            className={`filter-button ${
-              orderBy === "mostvotes" ? "active" : ""
-            }`}
+            className={`filter-button ${orderBy === "mostvotes" ? "active" : ""}`}
             onClick={() => handleFilterClick("mostvotes")}
           >
             Most Votes
@@ -112,6 +119,12 @@ function PostList({ categoryId }) {
             >
               <div className="post-content">
                 <div className="post-header">
+                  {/* Avatar Image of User */}
+                  <img
+                    src={post.urlProfilePicture || "default-avatar.png"}
+                    alt={post.userName}
+                    className="user-avatar"
+                  />
                   <h3 className="post-title">{post.title}</h3>
                   <div className="post-tags">
                     {post.tags.map((tag, idx) => (
@@ -131,15 +144,15 @@ function PostList({ categoryId }) {
                 <div className="post-meta">
                   <strong>{post.userName}</strong>
                   <p className="post-info">
-                    Created at:{" "}
-                    <span>{new Date(post.createdAt).toLocaleString()}</span> | Last
-                    Reply: {post.lastReply}
+                    Created at: {formatDate(post.dateCreated)}
+                    <span> | </span> 
+                    Update at: {formatDate(post.dateUpdated)}
                   </p>
                 </div>
               </div>
               <div className="post-stats">
                 <span className="stat">
-                  <FontAwesomeIcon icon={faThumbsUp} className="icon" /> {post.voteCount}
+                  <FontAwesomeIcon icon={faChevronUp} className="icon" /> {post.voteCount}
                 </span>
                 <span className="stat">
                   <FontAwesomeIcon icon={faEye} className="icon" /> {post.viewCount}
@@ -255,7 +268,7 @@ function PostList({ categoryId }) {
           background-color: white;
           transition: box-shadow 0.3s ease;
           display: flex;
-          justify-content: space-between; /* Make sure the content and stats are aligned */
+          justify-content: space-between;
         }
 
         .post-item:hover {
@@ -271,8 +284,15 @@ function PostList({ categoryId }) {
 
         .post-header {
           display: flex;
-          align-items: center; /* Align tags next to title */
-          gap: 10px; /* Small gap between title and tags */
+          align-items: center;
+          gap: 10px;
+        }
+
+        .user-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
         }
 
         .post-title {
@@ -311,10 +331,10 @@ function PostList({ categoryId }) {
 
         .post-stats {
           display: flex;
-          gap: 15px; /* Spacing between like and view */
+          gap: 15px;
           font-size: 12px;
           color: #555;
-          align-items: center; /* Ensure stats are aligned in one row */
+          align-items: center;
         }
 
         .stat {

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
+import { useParams, useNavigate } from "react-router-dom";
 import { DiscussApi } from "@/services/api/DiscussApi";
-import Layout from "@/layouts/layout"; // Assuming Layout component is in the layouts folder
+import Layout from "@/layouts/layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"; // Import the left arrow icon from FontAwesome
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 function DiscussionDetail() {
   const { id } = useParams();
@@ -20,7 +21,7 @@ function DiscussionDetail() {
       setError(null);
       try {
         const data = await DiscussApi.getDiscussionDetails(id);
-        setDiscussion(data.discussionDetailDto);
+        setDiscussion(data);
       } catch (err) {
         setError("Failed to fetch discussion details.");
       } finally {
@@ -35,17 +36,26 @@ function DiscussionDetail() {
     if (!newComment.trim()) return;
     setSubmitting(true);
     try {
-      const newCommentData = {
-        id: `${Date.now()}`,
-        userId: "currentUserId",
+      // Lấy thông tin cần thiết từ bài viết và comment
+      const commentData = {
+        discussionId: id,  // Lấy discussionId từ URL hoặc từ dữ liệu hiện tại
         content: newComment,
         dateCreated: new Date().toISOString(),
+        parentCommentId: null,  // Nếu là comment cấp 1, nếu có reply thì có thể sửa lại
+        depth: 1,  // Độ sâu của comment
+        isActive: true,
       };
+
+      // Gọi API tạo comment
+      const newCommentData = await DiscussApi.createComment(commentData);
+
+      // Cập nhật danh sách comments với comment mới
       setDiscussion((prev) => ({
         ...prev,
-        comments: [newCommentData, ...prev.comments],
+        comments: [newCommentData, ...prev.comments], // Thêm comment mới vào đầu danh sách
       }));
-      setNewComment("");
+
+      setNewComment(""); // Reset nội dung comment
     } catch (err) {
       console.error("Failed to add comment:", err);
       alert("Error adding comment. Please try again.");
@@ -57,24 +67,34 @@ function DiscussionDetail() {
   if (loading) return <p>Loading discussion details...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const styles = {
     container: {
-      margin: "50px auto", // Added margin-top to avoid overlap
-      maxWidth: "1000px", // Wider layout
-      fontFamily: "'Arial', sans-serif", // Academic font
+      margin: "50px auto",
+      maxWidth: "1000px",
+      fontFamily: "'Arial', sans-serif",
       padding: "20px",
       backgroundColor: "#ffffff",
       borderRadius: "12px",
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      lineHeight: "1.6", // More readable line height
-      position: "relative", // Ensure back button is positioned within this context
-      zIndex: "1", // Ensure it is above other content if necessary
+      lineHeight: "1.6",
+      position: "relative",
     },
     backButton: {
-      display: "inline-flex", // Use flex to align icon and text
+      display: "inline-flex",
       alignItems: "center",
       marginBottom: "20px",
-      marginTop: "10px", // Ensure it's not hidden behind the layout
+      marginTop: "10px",
       padding: "10px 20px",
       fontSize: "14px",
       fontWeight: "bold",
@@ -85,10 +105,9 @@ function DiscussionDetail() {
       cursor: "pointer",
       textDecoration: "none",
       transition: "background-color 0.3s",
-      zIndex: 1000, // Ensure it appears above other elements
     },
     backButtonIcon: {
-      marginRight: "8px", // Add space between icon and text
+      marginRight: "8px",
     },
     header: {
       display: "flex",
@@ -104,7 +123,7 @@ function DiscussionDetail() {
       border: "2px solid #f0f0f0",
     },
     title: {
-      fontSize: "30px", // Slightly larger title for emphasis
+      fontSize: "30px",
       fontWeight: "bold",
       color: "#333",
       lineHeight: "1.3",
@@ -113,7 +132,7 @@ function DiscussionDetail() {
       fontSize: "16px",
       color: "#444",
       marginBottom: "20px",
-      textAlign: "justify", // Justify text for a more academic appearance
+      textAlign: "justify",
     },
     image: {
       width: "100%",
@@ -124,9 +143,9 @@ function DiscussionDetail() {
     },
     tags: {
       display: "flex",
-      gap: "15px", // Increased gap between tags
+      gap: "15px",
       flexWrap: "wrap",
-      marginBottom: "30px", // Added margin for better spacing
+      marginBottom: "30px",
     },
     tag: {
       backgroundColor: "#f4f4f4",
@@ -135,6 +154,14 @@ function DiscussionDetail() {
       borderRadius: "25px",
       fontSize: "14px",
       cursor: "pointer",
+    },
+    info: {
+      fontSize: "12px", // Smaller font size
+      color: "#888", // Light gray color
+      marginBottom: "15px",
+      display: "flex", // Align the items horizontally
+      gap: "15px", // Space between items
+      flexWrap: "wrap", // Allow items to wrap if necessary
     },
     commentInputContainer: {
       marginBottom: "40px",
@@ -173,10 +200,21 @@ function DiscussionDetail() {
       boxShadow: "0 2px 6px rgba(0, 0, 0, 0.05)",
       fontSize: "16px",
     },
-    commentUser: {
+    commentUserContainer: {
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+    },
+    commentUserAvatar: {
+      width: "40px",
+      height: "40px",
+      borderRadius: "50%",
+      objectFit: "cover",
+      border: "2px solid #f0f0f0",
+    },
+    commentUserName: {
       fontWeight: "bold",
       fontSize: "14px",
-      marginBottom: "8px",
       color: "#333",
     },
     commentContent: {
@@ -193,33 +231,45 @@ function DiscussionDetail() {
   return (
     <Layout>
       <div style={styles.container}>
-        {/* Back Button with FontAwesome icon */}
         <button
           style={styles.backButton}
           onClick={() => navigate("/discussions/discuss")}
         >
           <FontAwesomeIcon icon={faArrowLeft} style={styles.backButtonIcon} />
-          Back to Posts
+          Back
         </button>
 
         <div style={styles.header}>
           <img
-            src={discussion.userAvatarUrl || "default-avatar.png"}
+            src={discussion?.urlProfilePicture || "default-avatar.png"}
             alt="User Avatar"
             style={styles.avatar}
           />
           <div>
-            <p style={styles.userName}>{discussion.userName}</p>
+            <p style={styles.userName}>{discussion?.userName}</p>
           </div>
         </div>
 
-        <h1 style={styles.title}>{discussion.title}</h1>
-        <p style={styles.description}>{discussion.description}</p>
-        {discussion.imageUrl && (
-          <img src={discussion.imageUrl} alt="Post" style={styles.image} />
+        <div style={styles.info}>
+          <p>Created on: {formatDate(discussion?.dateCreated)}</p>
+          <p>Last updated: {formatDate(discussion?.dateUpdated)}</p>
+          <p>
+            <FontAwesomeIcon icon={faChevronUp} className="icon" /> {discussion?.viewCount}
+          </p>
+          <p>
+            <FontAwesomeIcon icon={faEye} className="icon" /> {discussion?.voteCount}
+          </p>
+        </div>
+
+        <h1 style={styles.title}>{discussion?.title}</h1>
+        <p style={styles.description}>{discussion?.description}</p>
+
+        {discussion?.imageUrl && (
+          <img src={discussion?.imageUrl} alt="Post" style={styles.image} />
         )}
+
         <div style={styles.tags}>
-          {discussion.tags.map((tag, idx) => (
+          {discussion?.tags?.map((tag, idx) => (
             <span key={idx} style={styles.tag}>
               #{tag}
             </span>
@@ -244,10 +294,17 @@ function DiscussionDetail() {
 
         <div style={styles.comments}>
           <h3>Comments</h3>
-          {discussion.comments && discussion.comments.length > 0 ? (
-            discussion.comments.map((comment) => (
+          {discussion?.comments?.length > 0 ? (
+            discussion?.comments?.map((comment) => (
               <div key={comment.id} style={styles.comment}>
-                <p style={styles.commentUser}>User: {comment.userId}</p>
+                <div style={styles.commentUserContainer}>
+                  <img
+                    src={comment.urlProfilePicture || "default-avatar.png"}
+                    alt="User Avatar"
+                    style={styles.commentUserAvatar}
+                  />
+                  <p style={styles.commentUserName}>{comment.userName}</p>
+                </div>
                 <p style={styles.commentContent}>{comment.content}</p>
               </div>
             ))

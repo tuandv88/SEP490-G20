@@ -135,6 +135,20 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Learner", policy => policy.RequireRole("learner"));
 });
 
+
+// Thêm chính sách CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Địa chỉ được phép
+              .AllowAnyHeader()                    // Cho phép tất cả header
+              .AllowAnyMethod()                    // Cho phép tất cả HTTP method (GET, POST, PUT, DELETE, ...)
+              .AllowCredentials();                 // Cho phép gửi cookie hoặc xác thực
+    });
+});
+
+
 // Cấu hình SendMail - Nuget: FluentMail
 builder.Services.AddTransient<IEmailService, EmailService>();
 
@@ -173,6 +187,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Sử dụng chính sách CORS
+app.UseCors("AllowSpecificOrigin");
 
 app.UseIdentityServer();
 

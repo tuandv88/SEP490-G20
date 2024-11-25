@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Clock, RefreshCcw } from "lucide-react";
 import { ArrowRight } from "lucide-react";
+import ReactMarkdown from 'react-markdown'
 
 const QuizScreen = ({ quizData }) => {
 
@@ -16,11 +17,6 @@ const QuizScreen = ({ quizData }) => {
             <Card className="max-w-2xl mx-auto">
               <CardHeader className="bg-primary py-12 text-center rounded-t-lg">
                 <h1 className="text-4xl font-bold text-primary-foreground mb-4">Title 1</h1>
-                <ReactMarkdown 
-                className='prose prose prose-h1:text-primaryText prose-h2:text-primaryText 
-        prose-h3:text-primaryText prose-h4:text-primaryText prose-p:text-primaryText 
-        prose-ol:text-primaryText prose-ul:text-primaryText prose-li:text-primaryText'>{quiz.description}
-                </ReactMarkdown>
               </CardHeader>
               <CardContent className="p-8 text-center">
                 <Button 

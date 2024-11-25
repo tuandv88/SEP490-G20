@@ -15,6 +15,7 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
   const [videoTime, setVideoTime] = useState(0); // Lưu thời gian video khi dừng
   const [isPaused, setIsPaused] = useState(false); // Trạng thái video có tạm dừng hay không
 
+  console.log(videoSrc)
 
   // Khôi phục thời gian khi component mount
   useEffect(() => {

@@ -22,14 +22,14 @@ export default function CourseCreator() {
     title: '',
     description: '',
     headline: '',
-    courseStatus: 'Draft',
+    // courseStatus: 'Draft',
     timeEstimation: 0,
     prerequisites: '',
     objectives: '',
     targetAudiences: '',
-    scheduledPublishDate: '',
+    // scheduledPublishDate: '',
     image: null,
-    orderIndex: 1,      
+    // orderIndex: 1,      
     courseLevel: 'Basic',
     price: 0
   })

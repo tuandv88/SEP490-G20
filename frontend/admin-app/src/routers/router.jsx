@@ -24,11 +24,12 @@ const courseTableRoute = createRoute({
   component: lazy(() => import('@/pages/Course/CourseTable'))
 })
 
-const editCourseRoute = createRoute({
+export const editCourseRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/edit-course',
+  path: '/edit-course/$courseId',
   component: lazy(() => import('@/pages/Course/EditCourse'))
-})
+});
+
 
 const createCourseRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -42,10 +43,17 @@ const createCodeProblemRoute = createRoute({
   component: lazy(() => import('@/pages/CodeProblem/CreateCodeProblem'))
 })
 
-const createProblemRoute = createRoute({
+export const createProblemRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/create-problem',
-  component: lazy(() => import('@/pages/Problem/Create/CreateProblem'))
+  path: '/create-problem/$lectureId',
+  component: lazy(() => import('@/pages/Problem/ProblemLecture/Create/CreateProblem'))
+})
+
+
+export const quizManagementRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/create-question/$quizId',
+  component: lazy(() => import('@/pages/Quiz/QuizManagement'))
 })
 
 // Define the login route as a child of the login root route
@@ -61,6 +69,24 @@ const callbackRoute = createRoute({
   component: lazy(() => import('@/oidc/Callback'))
 })
 
+export const testRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/test',
+  component: lazy(() => import('@/pages/Test/Test'))
+})
+
+export const testDetailRoute = createRoute({
+  getParentRoute: () => testRoute,
+  path: '$testId',
+  component: lazy(() => import('@/pages/Test/Test'))
+})
+
+const mainTestRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/main-test',
+  component: lazy(() => import('@/pages/Test/MainTest'))
+})
+
 // Create the route trees
 const mainRouteTree = rootRoute.addChildren([
   indexRoute,
@@ -69,7 +95,9 @@ const mainRouteTree = rootRoute.addChildren([
   createCodeProblemRoute,
   editCourseRoute,
   createProblemRoute,
-  callbackRoute
+  callbackRoute,
+  quizManagementRoute,
+  testRoute
 ])
 
 const loginRouteTree = loginRootRoute.addChildren([loginRoute])

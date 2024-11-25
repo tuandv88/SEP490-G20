@@ -13,8 +13,16 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../ui/resi
 import Editor from '@/lib/code-editor/components/Editor'
 import { JAVA_LANGUAGE_CONFIG, JAVA_LANGUAGE_EXT_POINT, JAVA_LANGUAGE_ID } from '@/lib/code-editor/constants'
 
-
-const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
+const CodeEditor = ({
+  templates,
+  arrayTestcase,
+  problemId,
+  setIsSuccessCode,
+  isSuccessCode,
+  setActiveTab,
+  setResultCodeSubmit,
+  setCurrentCode
+}) => {
   const [response, setResponse] = useState(null)
   const [loading, setLoading] = useState(false)
   const [code, setCode] = useState()
@@ -24,7 +32,6 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
   const setCodeRun = useStore((state) => state.setCodeRun)
   const setCodeResponse = useStore((state) => state.setCodeResponse)
   const setActiveTabTestcase = useStore((state) => state.setActiveTabTestcase)
-
 
   const handleEditorChange = lodash.debounce((value) => {
     setCode(value)
@@ -76,7 +83,7 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
       setCode(templates)
       handleArrayToDictionary(arrayTestcase)
     }
-     fetchProblem()
+    fetchProblem()
   }, [arrayTestcase, templates])
 
   useEffect(() => {
@@ -85,30 +92,21 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
 
   return (
     <div className='flex flex-col bg-gray-900 h-full'>
-      <PreferenceNav className='h-full' onSubmit={handleRunCode} loading={loading} />
+      <PreferenceNav
+        className='h-full'
+        onSubmit={handleRunCode}
+        loading={loading}
+        isSuccessCode={isSuccessCode}
+        problemId={problemId}
+        setActiveTab={setActiveTab}
+        setResultCodeSubmit={setResultCodeSubmit}
+        setCurrentCode={setCurrentCode}
+      />
 
       <ResizablePanelGroup direction='vertical'>
         <ResizablePanel defaultSize={60}>
           <div className='w-full h-full overflow-auto'>
-            {/* <Editor
-              height='100%'
-              defaultLanguage='java'
-              value={code}
-              onChange={handleEditorChange}
-              theme='vs-dark'
-              options={{
-                fontSize: 14,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-                lineNumbers: 'on',
-                roundedSelection: false,
-                scrollBars: 'visible',
-                cursorStyle: 'line',
-                rulers: [80],
-                wordWrap: 'on'
-              }} */}
-            <Editor             
+            <Editor
               langConfig={{
                 extPoint: JAVA_LANGUAGE_EXT_POINT,
                 langId: JAVA_LANGUAGE_ID,
@@ -130,7 +128,6 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
                 workspaceUri: 'home/mlc/packages/examples/resources/eclipse.jdt.ls/workspace/ICoderVN'
               }}
               initValue={templates}
-              //sampleFile='resources/com/example/app/Solution.java'
               containerId={'editor'}
               onChange={handleEditorChange}
             />
@@ -139,7 +136,12 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
         <ResizableHandle withHandle className='h-[3px] resize-sha overflow-hidden bg-slate-300' />
         <ResizablePanel defaultSize={40}>
           <div className='h-full w-full overflow-auto'>
-            <TestcaseInterface response={response} loading={loading} testCase={testCase}></TestcaseInterface>
+            <TestcaseInterface
+              response={response}
+              loading={loading}
+              testCase={testCase}
+              setIsSuccessCode={setIsSuccessCode}
+            ></TestcaseInterface>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -147,7 +149,7 @@ const CodeEditor = ({ templates, arrayTestcase, problemId }) => {
       <Popup
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        message='The source code is empty. Please choose one lecture.'
+        message='The source code is empty. Please write your code.'
       />
     </div>
   )

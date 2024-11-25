@@ -28,6 +28,8 @@ import { useToast } from '@/hooks/use-toast'
 import { runCode } from '@/services/api/codeApi'
 import { transformTestCases, transformTestScript } from '@/lib/utils'
 import TestResultLoading from '@/components/loading/TestResultLoading'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { AlertDialogDescription } from '@radix-ui/react-alert-dialog'
 
 const TestCaseSelector = ({ testCases, selectedIndex, onSelect, failedTestCases = [] }) => (
   <div className='flex items-center gap-2 flex-wrap'>
@@ -120,7 +122,7 @@ const SolutionResult = ({ result }) => (
   </div>
 )
 
-const CodeEditor = ({ form }) => {
+const CodeEditor = ({ form, setIsRunSuccess }) => {
   const [files, setFiles] = React.useState([{ name: 'Solution.java', content: '' }])
   const [activeFile, setActiveFile] = React.useState('Solution.java')
   const [testContent, setTestContent] = React.useState('')
@@ -131,6 +133,7 @@ const CodeEditor = ({ form }) => {
   const [selectedSolutionIndex, setSelectedSolutionIndex] = React.useState(0)
   const [testResults, setTestResults] = React.useState(null)
   const [isRunning, setIsRunning] = React.useState(false)
+  const [isAlertOpen, setIsAlertOpen] = React.useState(false)
 
   const { toast } = useToast()
   const { setValue } = form
@@ -178,6 +181,8 @@ const CodeEditor = ({ form }) => {
   const handleRun = async () => {
     setIsRunning(true)
     setTestCaseTab('result')
+    setIsRunSuccess(true)
+    setIsAlertOpen(true)
 
     const values = form.getValues()
 
@@ -488,6 +493,27 @@ const CodeEditor = ({ form }) => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
+
+      {isAlertOpen && (
+        <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant="outline">Show Dialog</Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              account and remove your data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      )}
     </div>
   )
 }

@@ -10,6 +10,7 @@ import CourseTableFilters from './CourseTableFilters'
 import { Table } from '@/components/ui/table'
 import useCourseTable from '@/hooks/useCourseTable'
 
+
 function CourseTable() {
   const [pageIndex, setPageIndex] = useState(1); // Start at 0
   const pageSize = 10;

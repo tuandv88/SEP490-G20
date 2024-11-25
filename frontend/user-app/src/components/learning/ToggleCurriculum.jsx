@@ -2,10 +2,54 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { ChevronDown, ChevronRight, TableOfContents, Tag, X } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import useStore from '@/data/store'
-const ToggleCurriculum = ({ title, chapters, setSelectedLectureId, isProblemListOpen, toggleProblemList, navigate }) => {
-  const selectedCourse = useStore((state) => state.selectedCourse)
+const ToggleCurriculum = forwardRef(({ title, chapters, setSelectedLectureId, isProblemListOpen, toggleProblemList, navigate, courseId }, ref) => {
+  //const selectedCourse = useStore((state) => state.selectedCourse)
+  const selectedCourse = courseId
+  useImperativeHandle(ref, () => ({
+    handlePreviousLecture,
+    handleNextLecture
+  }));
+
+
+  const handlePreviousLecture = () => {
+    const currentChapterIndex = chapters.findIndex(chapter => 
+      chapter.lectureDtos.some(lecture => lecture.id === activeLectureId)
+    );
+    const currentLectureIndex = chapters[currentChapterIndex].lectureDtos.findIndex(lecture => lecture.id === activeLectureId);
+
+    if (currentLectureIndex > 0) {
+      const previousLectureId = chapters[currentChapterIndex].lectureDtos[currentLectureIndex - 1].id;
+      handleLectureClick(previousLectureId);
+    } else if (currentChapterIndex > 0) {
+      // Move to the last lecture of the previous chapter
+      const previousChapter = chapters[currentChapterIndex - 1];
+      const previousLectureId = previousChapter.lectureDtos[previousChapter.lectureDtos.length - 1].id;
+      handleLectureClick(previousLectureId);
+    }
+  };
+
+  const handleNextLecture = () => {
+    const currentChapterIndex = chapters.findIndex(chapter => 
+      chapter.lectureDtos.some(lecture => lecture.id === activeLectureId)
+    );
+    const currentLectureIndex = chapters[currentChapterIndex].lectureDtos.findIndex(lecture => lecture.id === activeLectureId);
+
+    if (currentLectureIndex < chapters[currentChapterIndex].lectureDtos.length - 1) {
+      const nextLectureId = chapters[currentChapterIndex].lectureDtos[currentLectureIndex + 1].id;
+      handleLectureClick(nextLectureId);
+    } else if (currentChapterIndex < chapters.length - 1) {
+      // Move to the first lecture of the next chapter
+      const nextChapter = chapters[currentChapterIndex + 1];
+      if (nextChapter.lectureDtos.length > 0) {
+        const nextLectureId = nextChapter.lectureDtos[0].id;
+        handleLectureClick(nextLectureId);
+      }
+    }
+  };
+  
+  
   const [expandedSections, setExpandedSections] = useState(() => {
     // Lấy trạng thái từ Local Storage khi component mount
     const savedSections = localStorage.getItem('expandedSections')
@@ -18,12 +62,12 @@ const ToggleCurriculum = ({ title, chapters, setSelectedLectureId, isProblemList
   })
 
   const handleLectureClick = (lectureId) => {
-    // console.log(lectureId)
+    console.log(lectureId)
     setActiveLectureId(lectureId)
     setSelectedLectureId(lectureId)
     navigate(`/learning-space/${selectedCourse}/lecture/${lectureId}`);
     console.log("Navigate")
-    if (toggleProblemList) {
+    if (isProblemListOpen) {
       toggleProblemList(false)
     }
   }
@@ -102,6 +146,6 @@ const ToggleCurriculum = ({ title, chapters, setSelectedLectureId, isProblemList
       </div>
     </div>
   )
-}
+})
 
 export default React.memo(ToggleCurriculum)

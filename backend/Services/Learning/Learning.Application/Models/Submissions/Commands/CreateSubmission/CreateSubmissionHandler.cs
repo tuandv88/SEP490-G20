@@ -51,6 +51,7 @@ public class CreateSubmissionHandler(IProblemRepository problemRepository, IProb
 
         var responseDto = new SubmissionResponseDto(
             codeExecute.CodeExecuteDto.Token,
+            problemSubmission.SourceCode,
             codeExecute.CodeExecuteDto.RunTimeErrors,
             codeExecute.CodeExecuteDto.CompileErrors,
             codeExecute.CodeExecuteDto.ExecutionTime,

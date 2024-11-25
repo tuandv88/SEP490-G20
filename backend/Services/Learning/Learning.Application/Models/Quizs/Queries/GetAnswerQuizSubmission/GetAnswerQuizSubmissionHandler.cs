@@ -13,7 +13,7 @@ public class GetAnswerQuizSubmissionHandler(IQuizSubmissionRepository repository
         var userId = userContext.User.Id;
         var isAdmin = userRole == PoliciesType.Administrator;
 
-        if (!isAdmin || !submission.UserId.Equals(UserId.Of(userId))) {
+        if (!isAdmin && !submission.UserId.Equals(UserId.Of(userId))) {
             throw new NotFoundException(nameof(QuizSubmission), request.QuizSubmissionId);
         }
 

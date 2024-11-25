@@ -19,7 +19,7 @@ export default function CourseLandingPage({ onSubmit, initialData }) {
     <FormProvider {...methods}>
       <Form {...methods}>
         <form onSubmit={handleSubmit} className='space-y-8'>
-          <FormField
+          {/* <FormField
             control={methods.control}
             name='courseStatus'
             render={({ field }) => (
@@ -41,8 +41,8 @@ export default function CourseLandingPage({ onSubmit, initialData }) {
                 <FormMessage />
               </FormItem>
             )}
-          />
-          <FormField
+          /> */}
+          {/* <FormField
             control={methods.control}
             name='scheduledPublishDate'
             render={({ field }) => (
@@ -54,7 +54,7 @@ export default function CourseLandingPage({ onSubmit, initialData }) {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           <FormField
           control={methods.control}
           name='image'

@@ -6,7 +6,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { X, Clock, RefreshCcw, ArrowRight } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,17 +16,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 
-const StatCard = ({ label, value, className = "" }) => (
-  <div className={`text-center p-4 rounded-lg bg-secondary/20 ${className}`}>
-    <p className="text-sm text-muted-foreground mb-1">{label}</p>
-    <p className="text-2xl font-bold">{value}</p>
-  </div>
-)
 
-export default function QuizComponent({ quiz, userAttempt = null }) {
+export default function QuizComponent({ quiz }) {
   const [isQuizStarted, setIsQuizStarted] = useState(false)
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedOptions, setSelectedOptions] = useState({})
@@ -36,22 +27,23 @@ export default function QuizComponent({ quiz, userAttempt = null }) {
   const [isConfirmSubmitOpen, setIsConfirmSubmitOpen] = useState(false)
   const [quizResults, setQuizResults] = useState(null)
 
-  useEffect(() => {
-    let timer
-    if (isQuizStarted && quiz.hasTimeLimit) {
-      timer = setInterval(() => {
-        setTimeRemaining((prevTime) => {
-          if (prevTime <= 1) {
-            clearInterval(timer)
-            handleSubmit()
-            return 0
-          }
-          return prevTime - 1
-        })
-      }, 1000)
-    }
-    return () => clearInterval(timer)
-  }, [isQuizStarted, quiz.hasTimeLimit])
+
+  // useEffect(() => {
+  //   let timer
+  //   if (isQuizStarted && quiz.hasTimeLimit) {
+  //     timer = setInterval(() => {
+  //       setTimeRemaining((prevTime) => {
+  //         if (prevTime <= 1) {
+  //           clearInterval(timer)
+  //           handleSubmit()
+  //           return 0
+  //         }
+  //         return prevTime - 1
+  //       })
+  //     }, 1000)
+  //   }
+  //   return () => clearInterval(timer)
+  // }, [isQuizStarted, quiz.hasTimeLimit])
 
   const startQuiz = () => setIsQuizStarted(true)
   const closeQuiz = () => setIsQuizStarted(false)
@@ -66,6 +58,10 @@ export default function QuizComponent({ quiz, userAttempt = null }) {
       } else if (currentType === 'MultipleSelect') {
         newOptions[questionId] = { ...prev[questionId], [optionId]: !prev[questionId]?.[optionId] }
       } else if (currentType === 'ShortAnswer') {
+        newOptions[questionId] = optionId
+      } else if (currentType === 'TrueFalse') {
+        newOptions[questionId] = optionId
+      } else if (currentType === 'CodeSnippet') {
         newOptions[questionId] = optionId
       }
       return newOptions
@@ -142,6 +138,28 @@ export default function QuizComponent({ quiz, userAttempt = null }) {
           placeholder='Enter your answer here'
         />
       )
+    } else if (type === 'TrueFalse') {
+      const selectedValue = Object.keys(selectedOptions[question.id] || {})[0]
+      return (
+        <RadioGroup
+          value={selectedValue}
+          onValueChange={(value) => handleOptionChange(question.id, value)}
+          className='space-y-3'
+        >
+          {question.questionOptions.map((option) => (
+            <div key={option.id} className='flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'>
+              <RadioGroupItem value={option.id} id={`${question.id}-${option.id}`} />
+              <Label htmlFor={`${question.id}-${option.id}`} className='flex-grow cursor-pointer'>{option.content}</Label>
+            </div>
+          ))}
+        </RadioGroup>
+      )
+    } else if (type === 'CodeSnippet') {
+      return (
+        <div className="h-[400px] w-full ">
+          This is quiz problem
+        </div>
+      )
     }
   }
 
@@ -160,110 +178,6 @@ export default function QuizComponent({ quiz, userAttempt = null }) {
     </div>
   )
 
-  const renderSidebar = () => (
-    <div className="lg:w-96 p-6 mt-5 border-border/50 bg-bGprimary backdrop-blur-sm">
-      <div className="space-y-6">
-        <div className="space-y-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-primary rounded-lg">
-                  <Clock className="h-6 w-6 text-primary-foreground" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm text-muted-foreground">Passing Mark</p>
-                  <p className="text-lg font-semibold">{quiz.passingMark}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-primary rounded-lg">
-                  <Clock className="h-6 w-6 text-primary-foreground" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm text-muted-foreground">Time Limit</p>
-                  <p className="text-lg font-semibold">{quiz.timeLimit} minutes</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center">
-                <div className="p-3 bg-primary rounded-lg">
-                  <RefreshCcw className="h-6 w-6 text-primary-foreground" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm text-muted-foreground">Attempts Left</p>
-                  <p className="text-lg font-semibold">{quiz.attemptLimit}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <Separator />
-        <Card>
-          <CardHeader>
-            <CardTitle>Quiz Statistics</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <StatCard label="Total Questions" value={quiz.questions.length} />
-              <StatCard label="Answered" value={answeredQuestions.length} />
-              <StatCard 
-                label="Remaining" 
-                value={quiz.questions.length - answeredQuestions.length}
-                className="bg-yellow-100 dark:bg-yellow-900/20" 
-              />
-              <StatCard 
-                label="Time Left" 
-                value={`${Math.floor(timeRemaining / 60)}:${(timeRemaining % 60).toString().padStart(2, '0')}`}
-                className="bg-blue-100 dark:bg-blue-900/20" 
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  )
-
-  if (!isQuizStarted) {
-    return (
-      <div className="min-h-screen bg-bGprimary">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row min-h-screen">
-            <div className="flex-1 py-12 px-4 sm:px-6 lg:px-8">
-              <Card className="max-w-2xl mx-auto border-none">
-                <CardHeader className="bg-primary py-12 rounded-t-lg">       
-                  <ReactMarkdown 
-                    className='prose prose-h1:text-primaryText prose-h2:text-primaryText 
-                    prose-h3:text-primaryText prose-h4:text-primaryText prose-p:text-primaryText 
-                    prose-ol:text-primaryText prose-ul:text-primaryText prose-li:text-primaryText'
-                  >
-                    {quiz.description}
-                  </ReactMarkdown>
-                </CardHeader>
-                <CardContent className="p-8 text-center">
-                  <Button 
-                    size="lg" 
-                    className="text-lg px-8 py-6 rounded-full"
-                    onClick={startQuiz}
-                  >
-                    Start Quiz
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-            {renderSidebar()}
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   const currentQuestionData = quiz.questions[currentQuestion]
 
@@ -274,11 +188,6 @@ export default function QuizComponent({ quiz, userAttempt = null }) {
           <Button variant='ghost' size='icon' className='absolute top-4 right-4' onClick={closeQuiz}>
             <X className='h-4 w-4' />
           </Button>
-          {quiz.hasTimeLimit && (
-            <div className="text-center text-xl font-bold">
-              Time Remaining: {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
-            </div>
-          )}
           {renderQuestionProgress()}
           <div className='space-y-4'>
             <span className='text-sm text-gray-500'>Question {currentQuestion + 1} of {quiz.questions.length}</span>
@@ -305,14 +214,14 @@ export default function QuizComponent({ quiz, userAttempt = null }) {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+<AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction onClick={handleSubmit}>Submit</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        {/* {renderSidebar()} */}
       </div>
     </div>
   )
 }
+

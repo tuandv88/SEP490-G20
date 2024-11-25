@@ -1,5 +1,9 @@
+import React from 'react'
 import { FileText, Code, BookOpen, ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useState } from 'react'
+import { ControlledAlertDialog } from '@/components/alert/ControlledAlertDialog'
+
 
 const tabs = [
   { id: 'basic', label: 'Basic Info', icon: FileText },
@@ -7,10 +11,19 @@ const tabs = [
   { id: 'description', label: 'Template', icon: BookOpen }
 ]
 
-export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate  }) {
+export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, isRunSuccess }) {
   const currentTabIndex = tabs.findIndex((tab) => tab.id === activeTab)
   const isLastTab = currentTabIndex === tabs.length - 1
   const isFirstTab = currentTabIndex === 0
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  const openDialog = () => setIsDialogOpen(true)
+  const closeDialog = () => setIsDialogOpen(false)
+  const handleConfirm = () => {  
+    closeDialog()
+  }
+
 
   const handlePrevious = () => {
     if (!isFirstTab) {
@@ -25,7 +38,7 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate  })
   }
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200'>
+    <div className='sticky bottom-0 left-0 right-0 bg-white border-t border-gray-200'>
       <div className='max-w-4xl mx-auto px-4'>
         <div className='flex justify-between items-center h-16'>
           <Button
@@ -45,8 +58,9 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate  })
               return (
                 <button
                   type='button'
+                  
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+              
                   className={`
           flex flex-row items-center justify-center px-4 relative
           ${activeTab === tab.id ? 'text-purple-600' : 'text-gray-600 hover:text-gray-900'}
@@ -66,13 +80,20 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate  })
           }
 
           {!isLastTab && (
-            <Button type='button' variant='ghost' onClick={handleNext} className='flex items-center'>
+            <Button type='button' variant='ghost' onClick={isRunSuccess === false && activeTab === 'code' ? openDialog : handleNext} className='flex items-center'>
             Next
             <ArrowRight className='h-4 w-4 ml-2' />
           </Button>
           )}
         </div>
-      </div>
+      </div>   
+      <ControlledAlertDialog
+        isOpen={isDialogOpen}
+        onClose={closeDialog}
+        onConfirm={handleConfirm}
+        title="Check the code again!"
+        description="You need to run the code and test case successfully before coming to the next step."
+      />  
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts'
 import { oidcConfig } from './authConfig'
+import Cookies from 'js-cookie';
 
 class AuthService {
   constructor() {
@@ -9,11 +10,12 @@ class AuthService {
     })
 
     this.userManager.events.addUserLoaded((user) => {
+      Cookies.set('authToken', user.access_token, { expires: 7 });
       console.log('User loaded: ', user)
     })
 
     this.userManager.events.addUserUnloaded(() => {
-      console.log('User logged out')
+      console.log('User logged out')      
     })
 
     // Xử lý gia hạn token tự động
@@ -36,6 +38,7 @@ class AuthService {
   }
 
   logout() {
+    Cookies.remove('authToken')
     return this.userManager.signoutRedirect()
   }
 

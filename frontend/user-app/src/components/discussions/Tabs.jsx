@@ -14,17 +14,15 @@ function Tabs({ onCategoryChange, categoryId }) {
       try {
         const data = await DiscussApi.getCategories();
         if (data && data.categoryDtos) {
-          const activeCategories = data.categoryDtos.filter(category => category.isActive);
+          const activeCategories = data.categoryDtos.filter((category) => category.isActive);
           setTabs(activeCategories);
-          
-          // Nếu không có categoryId, chọn tab đầu tiên
+
           if (!categoryId && activeCategories.length > 0) {
             onCategoryChange(activeCategories[0].id);
           }
         }
       } catch (err) {
         setError("Failed to fetch categories");
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -34,27 +32,50 @@ function Tabs({ onCategoryChange, categoryId }) {
   }, [categoryId, onCategoryChange]);
 
   if (loading) return <p>Loading categories...</p>;
-  if (error) return <p className="text-danger">{error}</p>;
+  if (error) return <p>{error}</p>;
 
   return (
-    <div>
-      <div className="flex space-x-4 border-b-2 border-gray-300 pb-4">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`${
-              categoryId === tab.id
-                ? "text-blue-500 font-bold border-b-2 border-blue-500"
-                : "text-gray-500"
-            } text-lg py-2 px-4 cursor-pointer`}
-            onClick={() => {
-              onCategoryChange(tab.id); // Gửi categoryId khi người dùng chọn tab
-            }}
-          >
-            {tab.name}
-          </button>
-        ))}
-      </div>
+    <div className="tabs">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          className={`tab-button ${categoryId === tab.id ? "active" : ""}`}
+          onClick={() => onCategoryChange(tab.id)}
+        >
+          {tab.name}
+        </button>
+      ))}
+
+      {/* CSS */}
+      <style jsx>{`
+        .tabs {
+          display: flex;
+          justify-content: center;
+          gap: 15px;
+        }
+
+        .tab-button {
+          padding: 10px 20px;
+          font-size: 16px;
+          font-family: "Georgia", "Times New Roman", serif;
+          color: #555;
+          border: none;
+          background: none;
+          border-bottom: 2px solid transparent;
+          cursor: pointer;
+          transition: color 0.3s, border-bottom 0.3s;
+        }
+
+        .tab-button:hover {
+          color: #007bff;
+        }
+
+        .tab-button.active {
+          color: #007bff;
+          font-weight: bold;
+          border-bottom: 2px solid #007bff;
+        }
+      `}</style>
     </div>
   );
 }

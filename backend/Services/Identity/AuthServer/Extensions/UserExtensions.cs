@@ -16,20 +16,17 @@ namespace AuthServer.Extensions
 
             foreach (var user in users)
             {
-                // Lấy vai trò của từng người dùng
-                var roles = await userManager.GetRolesAsync(user);
-
                 // Lấy URL ảnh
                 var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, user.ProfilePicture, 60);
 
                 // Chuyển đổi User thành UserDto
-                userDtos.Add(user.ToUserDto(imageUrl.PresignedUrl!, roles.ToList()));
+                userDtos.Add(user.ToUserDto(imageUrl.PresignedUrl!));
             }
 
             return userDtos;
         }
 
-        public static UserDto ToUserDto(this Users user, string imageUrl, List<string> roles)
+        public static UserDto ToUserDto(this Users user, string imageUrl)
         {
             // Giá trị mặc định cho Bio và Address
             var bio = new Bio();
@@ -72,7 +69,6 @@ namespace AuthServer.Extensions
                 DateOfBirth = user.DateOfBirth,
                 PhoneNumber = user.PhoneNumber,
                 UrlProfilePicture = imageUrl,
-                Roles = roles, // Gắn danh sách vai trò vào UserDto
                 Bio = bio,
                 Address = address
             };

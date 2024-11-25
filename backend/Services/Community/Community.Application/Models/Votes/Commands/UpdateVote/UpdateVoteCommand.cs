@@ -3,7 +3,7 @@
 namespace Community.Application.Models.Votes.Commands.UpdateVote;
 
 public record UpdateVoteResult(bool IsSuccess);
-
+[Authorize]
 public record UpdateVoteCommand(UpdateVoteDto UpdateVoteDto) : ICommand<UpdateVoteResult>;
 
 public class UpdateVoteCommandValidator : AbstractValidator<UpdateVoteCommand>

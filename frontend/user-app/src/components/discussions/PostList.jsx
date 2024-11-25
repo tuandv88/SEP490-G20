@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faThumbsUp, faEye } from "@fortawesome/free-solid-svg-icons"; // Import specific icons
 import { DiscussApi } from "@/services/api/DiscussApi";
 
 function PostList({ categoryId }) {
@@ -48,196 +50,307 @@ function PostList({ categoryId }) {
     setTags(tag);
   };
 
-  const styles = {
-    container: {
-      margin: "20px auto",
-      maxWidth: "800px",
-      fontFamily: "Arial, sans-serif",
-    },
-    filters: {
-      display: "flex",
-      justifyContent: "space-between",
-      marginBottom: "20px",
-    },
-    filterGroup: {
-      display: "flex",
-      flexDirection: "column",
-    },
-    select: {
-      padding: "6px 10px",
-      fontSize: "14px",
-      border: "1px solid #ccc",
-      borderRadius: "4px",
-      marginTop: "5px",
-    },
-    input: {
-      padding: "6px 10px",
-      fontSize: "14px",
-      border: "1px solid #ccc",
-      borderRadius: "4px",
-      marginTop: "5px",
-    },
-    postList: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "12px",
-    },
-    card: {
-      border: "1px solid #e0e0e0",
-      borderRadius: "6px",
-      boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-      padding: "12px",
-      transition: "box-shadow 0.2s",
-      cursor: "pointer",
-    },
-    cardContent: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "6px",
-    },
-    cardTitle: {
-      fontSize: "16px",
-      fontWeight: "bold",
-      color: "#333",
-      textDecoration: "none",
-    },
-    tags: {
-      display: "flex",
-      flexWrap: "wrap",
-      gap: "6px",
-    },
-    badge: {
-      backgroundColor: "#f0f0f0",
-      color: "#007bff",
-      fontSize: "12px",
-      padding: "4px 6px",
-      borderRadius: "4px",
-      cursor: "pointer",
-      transition: "background-color 0.2s",
-    },
-    badgeHover: {
-      backgroundColor: "#ddd",
-    },
-    pagination: {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      gap: "12px",
-      marginTop: "20px",
-    },
-    button: {
-      backgroundColor: "#007bff",
-      color: "#fff",
-      border: "none",
-      padding: "8px 14px",
-      borderRadius: "4px",
-      cursor: "pointer",
-      transition: "background-color 0.2s",
-    },
-    buttonDisabled: {
-      backgroundColor: "#ccc",
-      cursor: "not-allowed",
-    },
-    error: {
-      color: "red",
-      fontWeight: "bold",
-    },
+  const handleFilterClick = (filter) => {
+    setOrderBy(filter);
+    setPageIndex(1);
   };
 
   return (
-    <div style={styles.container}>
-      {/* Bộ lọc và tìm kiếm */}
-      <div style={styles.filters}>
-        <div style={styles.filterGroup}>
-          <label htmlFor="orderSelect">Sort by:</label>
-          <select
-            id="orderSelect"
-            value={orderBy}
-            onChange={(e) => setOrderBy(e.target.value)}
-            style={styles.select}
+    <div className="post-list-container">
+      {/* Filters Section */}
+      <div className="filters">
+        <div className="filter-options">
+          <span
+            className={`filter-button ${orderBy === "hot" ? "active" : ""}`}
+            onClick={() => handleFilterClick("hot")}
           >
-            <option value="hot">Hot</option>
-            <option value="newest">Newest</option>
-            <option value="mostvotes">Most Votes</option>
-          </select>
+            Hot
+          </span>
+          <span
+            className={`filter-button ${
+              orderBy === "newest" ? "active" : ""
+            }`}
+            onClick={() => handleFilterClick("newest")}
+          >
+            Newest to Oldest
+          </span>
+          <span
+            className={`filter-button ${
+              orderBy === "mostvotes" ? "active" : ""
+            }`}
+            onClick={() => handleFilterClick("mostvotes")}
+          >
+            Most Votes
+          </span>
         </div>
-        <div style={styles.filterGroup}>
-          <label htmlFor="tagSearch">Search by Tag:</label>
+        <div className="search-container">
           <input
-            id="tagSearch"
             type="text"
-            placeholder="Enter tag"
+            placeholder="Search Tag"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            style={styles.input}
+            className="search-input"
           />
+          <button className="new-button" onClick={() => navigate("/createpost")}>
+            New +
+          </button>
         </div>
       </div>
 
-      {/* Danh sách bài viết */}
+      {/* Posts Section */}
       {loading && <p>Loading...</p>}
-      {error && <p style={styles.error}>{error}</p>}
+      {error && <p className="error">{error}</p>}
       {!loading && posts.length === 0 && <p>No posts available.</p>}
 
       {!loading && (
-        <div style={styles.postList}>
+        <div className="posts">
           {posts.map((post) => (
             <div
               key={post.id}
-              style={styles.card}
+              className="post-item"
               onClick={() => handlePostClick(post.id)}
             >
-              <div style={styles.cardContent}>
-                <h5 style={styles.cardTitle}>{post.title}</h5>
-                <div style={styles.tags}>
-                  {post.tags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      style={styles.badge}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTagClick(tag);
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
+              <div className="post-content">
+                <div className="post-header">
+                  <h3 className="post-title">{post.title}</h3>
+                  <div className="post-tags">
+                    {post.tags.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="tag"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTagClick(tag);
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <p>
-                  <strong>Username:</strong> {post.userName}
-                </p>
-                <p>
-                  👁️ {post.viewCount} | 👍 {post.voteCount}
-                </p>
+                <div className="post-meta">
+                  <strong>{post.userName}</strong>
+                  <p className="post-info">
+                    Created at:{" "}
+                    <span>{new Date(post.createdAt).toLocaleString()}</span> | Last
+                    Reply: {post.lastReply}
+                  </p>
+                </div>
+              </div>
+              <div className="post-stats">
+                <span className="stat">
+                  <FontAwesomeIcon icon={faThumbsUp} className="icon" /> {post.voteCount}
+                </span>
+                <span className="stat">
+                  <FontAwesomeIcon icon={faEye} className="icon" /> {post.viewCount}
+                </span>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Phân trang */}
+      {/* Pagination */}
       {!loading && (
-        <div style={styles.pagination}>
+        <div className="pagination">
           <button
-            style={
-              pageIndex === 1
-                ? { ...styles.button, ...styles.buttonDisabled }
-                : styles.button
-            }
-            disabled={pageIndex === 1}
+            className={`page-button ${pageIndex === 1 ? "disabled" : ""}`}
             onClick={() => setPageIndex(pageIndex - 1)}
+            disabled={pageIndex === 1}
           >
             Previous
           </button>
           <span>Page {pageIndex}</span>
           <button
-            style={styles.button}
+            className="page-button"
             onClick={() => setPageIndex(pageIndex + 1)}
           >
             Next
           </button>
         </div>
       )}
+
+      {/* Styles */}
+      <style jsx>{`
+        .post-list-container {
+          margin: 20px auto;
+          width: 100%; /* Take full container width */
+          max-width: 1200px; /* Wider layout */
+          font-family: Arial, sans-serif;
+          padding: 20px;
+          background-color: #fff;
+          border-radius: 8px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .filters {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .filter-options {
+          display: flex;
+          gap: 10px;
+        }
+
+        .filter-button {
+          cursor: pointer;
+          color: #555;
+          font-size: 14px;
+          padding: 5px 10px;
+          border-radius: 4px;
+          transition: background-color 0.3s, color 0.3s;
+        }
+
+        .filter-button:hover {
+          background-color: #e9ecef;
+        }
+
+        .filter-button.active {
+          color: white;
+          background-color: #007bff;
+          font-weight: bold;
+        }
+
+        .search-container {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .search-input {
+          padding: 8px 14px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 14px;
+          width: 300px;
+        }
+
+        .new-button {
+          padding: 8px 14px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+        }
+
+        .new-button:hover {
+          background-color: #0056b3;
+        }
+
+        .posts {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .post-item {
+          padding: 15px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          background-color: white;
+          transition: box-shadow 0.3s ease;
+          display: flex;
+          justify-content: space-between; /* Make sure the content and stats are aligned */
+        }
+
+        .post-item:hover {
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .post-header {
+          display: flex;
+          align-items: center; /* Align tags next to title */
+          gap: 10px; /* Small gap between title and tags */
+        }
+
+        .post-title {
+          font-size: 16px;
+          font-weight: bold;
+          color: #333;
+        }
+
+        .post-tags {
+          display: flex;
+          gap: 5px;
+        }
+
+        .tag {
+          background-color: #e0e0e0;
+          color: #007bff;
+          padding: 2px 6px;
+          font-size: 12px;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+
+        .tag:hover {
+          background-color: #d6d6d6;
+        }
+
+        .post-meta {
+          font-size: 12px;
+          color: #555;
+        }
+
+        .post-info {
+          font-size: 12px;
+          color: #888;
+        }
+
+        .post-stats {
+          display: flex;
+          gap: 15px; /* Spacing between like and view */
+          font-size: 12px;
+          color: #555;
+          align-items: center; /* Ensure stats are aligned in one row */
+        }
+
+        .stat {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 14px;
+        }
+
+        .icon {
+          font-size: 16px;
+          color: #555;
+        }
+
+        .pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 20px;
+          gap: 10px;
+        }
+
+        .page-button {
+          padding: 8px 14px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+
+        .page-button.disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+        }
+      `}</style>
     </div>
   );
 }

@@ -10,12 +10,12 @@ namespace User.Domain.Models
         public CourseId CourseId { get; set; }
         public int StepOrder { get; set; }
         public PathStepStatus Status { get; set; } // Enum từ User.Domain.Enums
-        public DateTime EnrollmentDate { get; set; }
+        public DateTime? EnrollmentDate { get; set; }
         public DateTime? CompletionDate { get; set; }
         public DateTime ExpectedCompletionDate { get; set; }
 
         // Phương thức khởi tạo tĩnh (static factory method)
-        public static PathStep Create(LearningPathId learningPathId, CourseId courseId, int stepOrder, PathStepStatus status, DateTime enrollmentDate, DateTime expectedCompletionDate)
+        public static PathStep Create(LearningPathId learningPathId, CourseId courseId, int stepOrder, PathStepStatus status, DateTime? enrollmentDate, DateTime expectedCompletionDate)
         {
             return new PathStep
             {

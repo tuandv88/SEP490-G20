@@ -2,6 +2,7 @@
 
 namespace Community.Application.Models.Categories.Commands.UpdateCategory;
 
+[Authorize($"{PoliciesType.Administrator}")]
 public record UpdateCategoryCommand(UpdateCategoryDto UpdateCategoryDto) : ICommand<UpdateCategoryResult>;
 public record UpdateCategoryResult(bool IsSuccess, string Message);
 

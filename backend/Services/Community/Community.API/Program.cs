@@ -22,18 +22,18 @@ builder.Host.UseSerilog(SeriLogger.Configure)
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Discussion API", Version = "v1" });
         });
 
-        services.AddControllers();
-
-        // Thêm CORS
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowReactApp", policy =>
+            options.AddPolicy("AllowLocalhost5173", b =>
             {
-                policy.WithOrigins("http://localhost:5173")  // Địa chỉ của ứng dụng React
-                      .AllowAnyHeader()   // Cho phép bất kỳ header nào
-                      .AllowAnyMethod();  // Cho phép bất kỳ phương thức HTTP nào (GET, POST, PUT, DELETE...)
+                b.WithOrigins("http://localhost:5173")
+                        .AllowAnyMethod()    // Cho phép mọi phương thức HTTP (GET, POST, PUT, DELETE, v.v.)
+                        .AllowAnyHeader()    // Cho phép mọi header
+                        .AllowCredentials(); // Cho phép gửi cookies và thông tin xác thực nếu cần
             });
+
         });
+
     });
 
 var app = builder.Build();
@@ -43,7 +43,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowReactApp");
+// Use CORS
+app.UseCors("AllowLocalhost5173");
 
 // DI - UseApiServices
 app.UseApiServices();

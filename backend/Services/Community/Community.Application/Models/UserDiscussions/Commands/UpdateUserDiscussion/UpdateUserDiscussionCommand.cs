@@ -1,6 +1,7 @@
 ﻿using Community.Application.Models.UserDiscussions.Dtos;
 
 namespace Community.Application.Models.UserDiscussions.Commands.UpdateUserDiscussion;
+[Authorize]
 public record UpdateUserDiscussionCommand(UpdateUserDiscussionDto UpdateUserDiscussionDto) : ICommand<UpdateUserDiscussionResult>;
 public record UpdateUserDiscussionResult(bool IsSuccess);
 public class UpdateUserDiscussionCommandValidator : AbstractValidator<UpdateUserDiscussionCommand>

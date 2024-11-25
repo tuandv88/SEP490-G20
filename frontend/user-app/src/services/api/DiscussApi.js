@@ -41,4 +41,14 @@ export const DiscussApi = {
       throw error; // Ném lỗi để xử lý ở nơi sử dụng hàm
     }
   },
+  createDiscuss: async (discussionData) => {
+    try {
+      console.log("Creating new discussion with data:", discussionData);
+      const response = await axios.post(`${API_BASE_URL}/discussions`, discussionData);
+      return response.data; // Trả về dữ liệu từ API
+    } catch (error) {
+      console.error("Error creating discussion:", error);
+      throw error; // Ném lỗi để xử lý ở nơi sử dụng hàm
+    }
+  },
 };

@@ -60,14 +60,11 @@ namespace AuthServer.Controllers
                 return NotFound(new { message = $"No user found with ID {id}." });
             }
 
-            // Lấy danh sách vai trò
-            var roles = await _userManager.GetRolesAsync(user);
-
             // Lấy URL ảnh đại diện
             var imageUrl = await _filesService.GetFileAsync(StorageConstants.BUCKET, user.ProfilePicture, 60);
 
             // Chuyển đổi thành UserDto
-            var userDto = user.ToUserDto(imageUrl.PresignedUrl!, roles.ToList());
+            var userDto = user.ToUserDto(imageUrl.PresignedUrl!);
 
             return Ok(userDto);
         }

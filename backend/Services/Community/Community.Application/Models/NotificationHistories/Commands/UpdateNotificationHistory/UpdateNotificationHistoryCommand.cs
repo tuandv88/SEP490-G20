@@ -3,6 +3,7 @@
 namespace Community.Application.Models.Notifications.Commands.UpdateNotificationHistory;
 
 public record UpdateNotificationHistoryResult(bool IsSuccess);
+[Authorize]
 public record UpdateNotificationHistoryCommand(UpdateNotificationHistoryDto UpdateNotificationHistoryDto) : ICommand<UpdateNotificationHistoryResult>;
 
 public class UpdateNotificationHistoryCommandValidator : AbstractValidator<UpdateNotificationHistoryCommand>

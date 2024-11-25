@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
 import { DiscussApi } from "@/services/api/DiscussApi";
+import Layout from "@/layouts/layout"; // Assuming Layout component is in the layouts folder
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"; // Import the left arrow icon from FontAwesome
 
 function DiscussionDetail() {
   const { id } = useParams();
-  const navigate = useNavigate(); // Khởi tạo useNavigate
+  const navigate = useNavigate();
   const [discussion, setDiscussion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -56,37 +59,42 @@ function DiscussionDetail() {
 
   const styles = {
     container: {
-      margin: "30px auto",
-      maxWidth: "900px",
-      fontFamily: "'Roboto', sans-serif",
-      padding: "25px",
+      margin: "50px auto", // Added margin-top to avoid overlap
+      maxWidth: "1000px", // Wider layout
+      fontFamily: "'Arial', sans-serif", // Academic font
+      padding: "20px",
       backgroundColor: "#ffffff",
       borderRadius: "12px",
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      lineHeight: "1.6",
+      lineHeight: "1.6", // More readable line height
+      position: "relative", // Ensure back button is positioned within this context
+      zIndex: "1", // Ensure it is above other content if necessary
     },
     backButton: {
-      display: "inline-block",
+      display: "inline-flex", // Use flex to align icon and text
+      alignItems: "center",
       marginBottom: "20px",
-      padding: "10px 15px",
+      marginTop: "10px", // Ensure it's not hidden behind the layout
+      padding: "10px 20px",
       fontSize: "14px",
       fontWeight: "bold",
       color: "#007bff",
-      backgroundColor: "#f4f4f4",
+      backgroundColor: "#f5f5f5",
       border: "1px solid #ddd",
       borderRadius: "8px",
       cursor: "pointer",
       textDecoration: "none",
       transition: "background-color 0.3s",
+      zIndex: 1000, // Ensure it appears above other elements
     },
-    backButtonHover: {
-      backgroundColor: "#e0e0e0",
+    backButtonIcon: {
+      marginRight: "8px", // Add space between icon and text
     },
     header: {
       display: "flex",
       alignItems: "center",
       gap: "15px",
-      marginBottom: "20px",
+      marginBottom: "30px",
     },
     avatar: {
       width: "60px",
@@ -96,15 +104,16 @@ function DiscussionDetail() {
       border: "2px solid #f0f0f0",
     },
     title: {
-      fontSize: "28px",
+      fontSize: "30px", // Slightly larger title for emphasis
       fontWeight: "bold",
-      margin: "15px 0",
-      color: "#222",
+      color: "#333",
+      lineHeight: "1.3",
     },
     description: {
       fontSize: "16px",
       color: "#444",
       marginBottom: "20px",
+      textAlign: "justify", // Justify text for a more academic appearance
     },
     image: {
       width: "100%",
@@ -115,16 +124,43 @@ function DiscussionDetail() {
     },
     tags: {
       display: "flex",
-      gap: "10px",
+      gap: "15px", // Increased gap between tags
       flexWrap: "wrap",
-      marginBottom: "20px",
+      marginBottom: "30px", // Added margin for better spacing
     },
     tag: {
       backgroundColor: "#f4f4f4",
       color: "#007bff",
-      padding: "6px 12px",
-      borderRadius: "20px",
-      fontSize: "13px",
+      padding: "8px 16px",
+      borderRadius: "25px",
+      fontSize: "14px",
+      cursor: "pointer",
+    },
+    commentInputContainer: {
+      marginBottom: "40px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "15px",
+    },
+    commentInput: {
+      width: "100%",
+      padding: "12px",
+      fontSize: "16px",
+      borderRadius: "8px",
+      border: "1px solid #ddd",
+      boxShadow: "inset 0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+    commentButton: {
+      alignSelf: "flex-end",
+      padding: "12px 20px",
+      fontSize: "16px",
+      fontWeight: "bold",
+      color: "#fff",
+      backgroundColor: submitting ? "#ccc" : "#007bff",
+      border: "none",
+      borderRadius: "8px",
+      cursor: submitting ? "not-allowed" : "pointer",
+      transition: "background-color 0.3s",
     },
     comments: {
       marginTop: "30px",
@@ -135,6 +171,7 @@ function DiscussionDetail() {
       backgroundColor: "#f9f9f9",
       borderRadius: "8px",
       boxShadow: "0 2px 6px rgba(0, 0, 0, 0.05)",
+      fontSize: "16px",
     },
     commentUser: {
       fontWeight: "bold",
@@ -146,32 +183,6 @@ function DiscussionDetail() {
       fontSize: "14px",
       color: "#555",
     },
-    commentInputContainer: {
-      marginBottom: "30px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "10px",
-    },
-    commentInput: {
-      width: "100%",
-      padding: "10px",
-      fontSize: "14px",
-      borderRadius: "8px",
-      border: "1px solid #ddd",
-      boxShadow: "inset 0 2px 4px rgba(0, 0, 0, 0.1)",
-    },
-    commentButton: {
-      alignSelf: "flex-end",
-      padding: "10px 20px",
-      fontSize: "14px",
-      fontWeight: "bold",
-      color: "#fff",
-      backgroundColor: submitting ? "#ccc" : "#007bff",
-      border: "none",
-      borderRadius: "8px",
-      cursor: submitting ? "not-allowed" : "pointer",
-      transition: "background-color 0.3s",
-    },
     noComments: {
       fontSize: "14px",
       color: "#999",
@@ -180,65 +191,72 @@ function DiscussionDetail() {
   };
 
   return (
-    <div style={styles.container}>
-      {/* Nút Back */}
-      <button style={styles.backButton} onClick={() => navigate("/discussions/discuss")}>
-        ← Back to Posts
-      </button>
+    <Layout>
+      <div style={styles.container}>
+        {/* Back Button with FontAwesome icon */}
+        <button
+          style={styles.backButton}
+          onClick={() => navigate("/discussions/discuss")}
+        >
+          <FontAwesomeIcon icon={faArrowLeft} style={styles.backButtonIcon} />
+          Back to Posts
+        </button>
 
-      <div style={styles.header}>
-        <img
-          src={discussion.userAvatarUrl || "default-avatar.png"}
-          alt="User Avatar"
-          style={styles.avatar}
-        />
-        <div>
-          <p style={styles.userName}>{discussion.userName}</p>
+        <div style={styles.header}>
+          <img
+            src={discussion.userAvatarUrl || "default-avatar.png"}
+            alt="User Avatar"
+            style={styles.avatar}
+          />
+          <div>
+            <p style={styles.userName}>{discussion.userName}</p>
+          </div>
+        </div>
+
+        <h1 style={styles.title}>{discussion.title}</h1>
+        <p style={styles.description}>{discussion.description}</p>
+        {discussion.imageUrl && (
+          <img src={discussion.imageUrl} alt="Post" style={styles.image} />
+        )}
+        <div style={styles.tags}>
+          {discussion.tags.map((tag, idx) => (
+            <span key={idx} style={styles.tag}>
+              #{tag}
+            </span>
+          ))}
+        </div>
+
+        <div style={styles.commentInputContainer}>
+          <textarea
+            style={styles.commentInput}
+            placeholder="Write your comment..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+          />
+          <button
+            style={styles.commentButton}
+            onClick={handleAddComment}
+            disabled={submitting}
+          >
+            {submitting ? "Submitting..." : "Post Comment"}
+          </button>
+        </div>
+
+        <div style={styles.comments}>
+          <h3>Comments</h3>
+          {discussion.comments && discussion.comments.length > 0 ? (
+            discussion.comments.map((comment) => (
+              <div key={comment.id} style={styles.comment}>
+                <p style={styles.commentUser}>User: {comment.userId}</p>
+                <p style={styles.commentContent}>{comment.content}</p>
+              </div>
+            ))
+          ) : (
+            <p style={styles.noComments}>No comments available.</p>
+          )}
         </div>
       </div>
-      <h1 style={styles.title}>{discussion.title}</h1>
-      <p style={styles.description}>{discussion.description}</p>
-      {discussion.imageUrl && (
-        <img src={discussion.imageUrl} alt="Post" style={styles.image} />
-      )}
-      <div style={styles.tags}>
-        {discussion.tags.map((tag, idx) => (
-          <span key={idx} style={styles.tag}>
-            #{tag}
-          </span>
-        ))}
-      </div>
-
-      <div style={styles.commentInputContainer}>
-        <textarea
-          style={styles.commentInput}
-          placeholder="Write your comment..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-        />
-        <button
-          style={styles.commentButton}
-          onClick={handleAddComment}
-          disabled={submitting}
-        >
-          {submitting ? "Submitting..." : "Post Comment"}
-        </button>
-      </div>
-
-      <div style={styles.comments}>
-        <h3>Comments</h3>
-        {discussion.comments && discussion.comments.length > 0 ? (
-          discussion.comments.map((comment) => (
-            <div key={comment.id} style={styles.comment}>
-              <p style={styles.commentUser}>User: {comment.userId}</p>
-              <p style={styles.commentContent}>{comment.content}</p>
-            </div>
-          ))
-        ) : (
-          <p style={styles.noComments}>No comments available.</p>
-        )}
-      </div>
-    </div>
+    </Layout>
   );
 }
 

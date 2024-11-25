@@ -1,15 +1,8 @@
 ﻿using Learning.Application.Models.Courses.Commands.ChangeCourseStatus;
-using Learning.Domain.Enums;
-using Learning.Domain.ValueObjects;
-using Learning.Tests.Application.UnitTest.Models.Course.Helpers;
-using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using Learning.Domain.Models;
+using Learning.Tests.Application.UnitTest.Models.Courses.Helpers;
 
-namespace Learning.Tests.Application.UnitTest.Models.Course.Commands;
+namespace Learning.Tests.Application.UnitTest.Models.Courses.Commands;
 
 [TestFixture]
 public class ChangeCourseStatusTests

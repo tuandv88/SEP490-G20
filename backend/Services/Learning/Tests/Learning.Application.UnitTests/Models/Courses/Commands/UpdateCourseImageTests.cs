@@ -1,14 +1,8 @@
-﻿using NUnit.Framework;
-using Moq;
-using Learning.Application.Models.Courses.Commands.UpdateCourseImage;
-using Learning.Application.Interfaces;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Learning.Application.Models.Courses.Commands.UpdateCourseImage;
 using BuidingBlocks.Storage.Models;
-using Learning.Tests.Application.UnitTest.Models.Course.Helpers;
+using Learning.Tests.Application.UnitTest.Models.Courses.Helpers;
 
-namespace Learning.Tests.Application.UnitTest.Models.Course.Commands;
+namespace Learning.Tests.Application.UnitTest.Models.Courses.Commands;
 
 [TestFixture]
 public class UpdateCourseImageTests

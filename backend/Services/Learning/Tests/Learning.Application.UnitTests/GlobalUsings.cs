@@ -8,3 +8,6 @@ global using Learning.Application.Interfaces;
 global using Learning.Application.Data.Repositories;
 global using Learning.Domain.Models;
 global using Learning.Domain.Enums;
+global using System.ComponentModel.DataAnnotations;
+global using Learning.Domain.ValueObjects;
+global using FluentValidation.Results;

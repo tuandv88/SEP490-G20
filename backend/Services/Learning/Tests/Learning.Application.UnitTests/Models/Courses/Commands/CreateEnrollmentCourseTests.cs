@@ -1,8 +1,7 @@
 ﻿using Learning.Application.Models.Courses.Commands.CreateEnrollmentCourse;
-using Learning.Domain.ValueObjects;
-using Learning.Tests.Application.UnitTest.Models.Course.Helpers;
+using Learning.Tests.Application.UnitTest.Models.Courses.Helpers;
 
-namespace Learning.Tests.Application.UnitTest.Models.Course.Commands;
+namespace Learning.Tests.Application.UnitTest.Models.Courses.Commands;
 
 [TestFixture]
 public class CreateEnrollmentCourseTests

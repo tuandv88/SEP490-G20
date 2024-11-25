@@ -52,5 +52,13 @@ export const LearningAPI = {
       }
     })
     return response.data
+  },
+  submitCode: async (problemId, submissionData) => {
+    const response = await axios.post(`${API_BASE_URL}/learning-service/problems/${problemId}/submission`, submissionData, {
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
   }
 }

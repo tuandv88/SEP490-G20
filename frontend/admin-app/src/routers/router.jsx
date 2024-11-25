@@ -46,8 +46,9 @@ const createCodeProblemRoute = createRoute({
 export const createProblemRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/create-problem/$lectureId',
-  component: lazy(() => import('@/pages/Problem/Create/CreateProblem'))
+  component: lazy(() => import('@/pages/Problem/ProblemLecture/Create/CreateProblem'))
 })
+
 
 export const quizManagementRoute = createRoute({
   getParentRoute: () => rootRoute,

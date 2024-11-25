@@ -15,7 +15,7 @@ class AuthService {
     })
 
     this.userManager.events.addUserUnloaded(() => {
-      console.log('User logged out')
+      console.log('User logged out')      
     })
 
     // Xử lý gia hạn token tự động

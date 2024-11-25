@@ -1,7 +1,7 @@
 import React from 'react'
 import BasicInfoStep from '@/components/CreateCourse/CreateCodeProblem/basic-info-step'
-import CodeEditor from '@/pages/Problem/Create/CodeEditor'
-import Template from '@/pages/Problem/Create/Template';
+import CodeEditor from '@/pages/Problem/ProblemLecture/Create/CodeEditor'
+import Template from '@/pages/Problem/ProblemLecture/Create/Template';
 
 const FormTabs = ({ activeTab, form, setIsSaveTemplate, setIsRunSuccess, hasLecture }) => {
 

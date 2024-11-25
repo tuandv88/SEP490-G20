@@ -11,7 +11,8 @@ export const AUTHENTICATION_ROUTERS = {
   LEARNINGSPACE: '/learning-space/:id/lecture/:lectureId?',
   PROBLEMS: '/problems',
   CODE: '/code',
-  CALLBACK: '/callback'
+  CALLBACK: '/callback',
+  SURVEY: '/survey'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

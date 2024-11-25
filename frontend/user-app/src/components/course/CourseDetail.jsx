@@ -49,7 +49,7 @@ export default function CourseDetail() {
     navigate(
       AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(
         ':lectureId',
-        'd9ce3472-3f66-4087-8804-f7b9103d0949'
+        firstLectureId
       )
     )
   }
@@ -57,8 +57,12 @@ export default function CourseDetail() {
   const handleEnrollCourse = async (courseId) => {
     try {
       const data = await CourseAPI.enrollCourse(courseId)
-      console.log(data)
-      
+      navigate(
+        AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', courseId).replace(
+          ':lectureId',
+          firstLectureId
+        )
+      )
     } catch (error) {
       console.error('Error enrolling course:', error)
     }

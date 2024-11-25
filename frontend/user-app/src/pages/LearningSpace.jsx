@@ -18,6 +18,10 @@ import Quiz1 from '@/components/learning/Quiz1'
 import QuizScreen from '@/components/learning/QuizScreen'
 import Curriculum from '@/components/learning/Curriculum'
 import NormalLecture from '@/components/lecture/NormalLecture'
+import Quiz2 from '@/components/learning/Quiz2'
+import SubmissionHistory from '@/components/learning/submission/SubmissionHistory'
+import { ProblemAPI } from '@/services/api/problemApi'
+import SubmissionResult from '@/components/learning/submission/SubmissionResult'
 
 const LearningSpace = () => {
   const navigate = useNavigate()
@@ -33,16 +37,16 @@ const LearningSpace = () => {
   const [isProblemListOpen, setIsProblemListOpen] = useState(false)
   const videoTimeRef = useRef(0)
   const [isThreePanels, setIsThreePanels] = useState(false)
-  const [firstLectureId, setFirstLectureId] = useState(null)
-
+  const toggleCurriculumRef = useRef()
+  const [isSuccessCode, setIsSuccessCode] = useState(false)
+  const [problemSubmission, setProblemSubmission] = useState(null)
+  const [resultCodeSubmit, setResultCodeSubmit] = useState(null)
+  const [currentCode, setCurrentCode] = useState(null)
   //courseId
   const { id, lectureId } = useParams()
-  console.log(id)
-  console.log(lectureId)
   const toggleProblemList = () => {
     setIsProblemListOpen(!isProblemListOpen)
   }
-  console.log('Load')
 
   const handleVideoTimeUpdate = (time) => {
     videoTimeRef.current = time
@@ -82,7 +86,6 @@ const LearningSpace = () => {
     fetchCourseDetail()
   }, [id])
 
-  
   useEffect(() => {
     if (lectureId) {
       const fetchLectureDetail = async () => {
@@ -92,31 +95,55 @@ const LearningSpace = () => {
           setLectureDetail(data)
 
           //Gọi API để lấy ra file của lecutre đó.
-          const lectureFiles = data?.lectureDetailsDto?.files
-          const fileDetails = await Promise.all(
-            lectureFiles.map(async (file) => {
-              const data = await LearningAPI.getLectureFiles(lectureId, file.fileId)
+          const lectureFiles = data?.lectureDetailsDto?.files || []
+          if (lectureFiles.length === 0) {
+            // Nếu không có file nào, đặt videoBlobUrl thành null
+            setVideoBlobUrl(null)
+          } else {
+            const fileDetails = await Promise.all(
+              lectureFiles.map(async (file) => {
+                const data = await LearningAPI.getLectureFiles(lectureId, file.fileId)
 
-              if (file.fileType === 'VIDEO') {
-                const videoResponse = await fetch(data.presignedUrl)
-                const videoBlob = await videoResponse.blob()
-                const blobUrl = URL.createObjectURL(videoBlob)
-                setVideoBlobUrl(blobUrl)
-                // Giải phóng bộ nhớ blob khi component unmount
-                return () => URL.revokeObjectURL(blobUrl)
-              }
+                if (file.fileType === 'VIDEO') {
+                  const videoResponse = await fetch(data.presignedUrl)
+                  const videoBlob = await videoResponse.blob()
+                  const blobUrl = URL.createObjectURL(videoBlob)
+                  setVideoBlobUrl(blobUrl)
+                  console.log(blobUrl)
+                  // Giải phóng bộ nhớ blob khi component unmount
+                  return () => URL.revokeObjectURL(blobUrl)
+                }
 
-              return {
-                ...data,
-                fileType: file.fileType
-              }
-            })
-          )
-          setFiles(fileDetails)
+                return {
+                  ...data,
+                  fileType: file.fileType
+                }
+              })
+            )
+            setFiles(fileDetails)
+          }
+
+          // Kiểm tra nếu problem tồn tại
+          const problemId = data?.lectureDetailsDto?.problem?.id
+          console.log(problemId)
+          if (problemId) {
+            fetchSubmissionHistory(problemId)
+          }
         } catch (error) {
           console.error('Error fetching chapter detail:', error)
         }
       }
+
+      const fetchSubmissionHistory = async (problemId) => {
+        try {
+          const response = await ProblemAPI.getSubmissionHistory(problemId)
+          setProblemSubmission(response.submissions)
+          console.log(response)
+        } catch (error) {
+          console.error('Error fetching submission history:', error)
+        }
+      }
+
       fetchLectureDetail()
     }
   }, [lectureId])
@@ -125,9 +152,7 @@ const LearningSpace = () => {
     return <ErrorPage />
   }
 
-
-
-  if (!chapters || chapters.length === 0 && !loading) {
+  if (!chapters || (chapters.length === 0 && !loading)) {
     return (
       <NotFound mess='We cannot find documents in this course. Please check the link or search for other courses.' />
     )
@@ -136,48 +161,58 @@ const LearningSpace = () => {
   return (
     <div>
       <div>
-        <HeaderCode onButtonClick={toggleProblemList} onChatClick={togglePanelLayout} />
+        <HeaderCode
+          onButtonClick={toggleProblemList}
+          onChatClick={togglePanelLayout}
+          toggleCurriculumRef={toggleCurriculumRef}
+        />
       </div>
       {lectureDetail?.lectureDetailsDto?.problem && (
         <ResizablePanelGroup
           direction='horizontal'
-        className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
-      >
-        <ResizablePanel id='panel-1' order={1} defaultSize={40}>
-          <div className='scroll-container h-full'>
-            <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={false} />
-            {loading && <ChapterLoading />}
-            {(activeTab === 'descriptions' || activeTab === 'default' || activeTab === 'curriculum') && !loading && (
-              <Description
-                description={lectureDetail?.lectureDetailsDto?.problem?.description}
-                videoSrc={videoBlobUrl}
-                loading={loading}
-                titleProblem={lectureDetail?.lectureDetailsDto?.problem?.title}
-                initialTime={videoTimeRef.current}
-                onTimeUpdate={handleVideoTimeUpdate}
-              />
-            )}
-            {activeTab === 'comments' && !loading && <Comments />}
-          </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle className='resize-sha w-[3px]' />
-        <ResizablePanel id='panel-2' order={2} defaultSize={isThreePanels ? 40 : 60}>
-          {/* <QuizScreen></QuizScreen> */}
-          <CodeEditor
-            templates={lectureDetail?.lectureDetailsDto?.problem?.templates.Java}
-            arrayTestcase={lectureDetail?.lectureDetailsDto?.problem?.testCases}
-            problemId={lectureDetail?.lectureDetailsDto?.problem?.id}
-          />
-        </ResizablePanel>
-        {isThreePanels && (
-          <>
-            <ResizableHandle withHandle className='resize-sha w-[3px]' />
-            <ResizablePanel id='panel-3' order={3} defaultSize={30}>
-              <div className='scroll-container h-full'>
-              <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id}/>
-              </div>
-            </ResizablePanel>
-          </>
+          className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
+        >
+          <ResizablePanel id='panel-1' order={1} defaultSize={40}>
+            <div className='scroll-container h-full'>
+              <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={false} />
+              {loading && <ChapterLoading />}
+              {(activeTab === 'descriptions' || activeTab === 'default' || activeTab === 'curriculum') && !loading && (
+                <Description
+                  description={lectureDetail?.lectureDetailsDto?.problem?.description}
+                  videoSrc={videoBlobUrl}
+                  loading={loading}
+                  titleProblem={lectureDetail?.lectureDetailsDto?.problem?.title}
+                  initialTime={videoTimeRef.current}
+                  onTimeUpdate={handleVideoTimeUpdate}
+                />
+              )}
+              {activeTab === 'submissionResult' && !loading && <SubmissionResult currentCode={currentCode} resultCodeSubmit={resultCodeSubmit}/>}
+              {activeTab === 'submission' && !loading && <SubmissionHistory submissions={problemSubmission}/>}
+              {activeTab === 'comments' && !loading && <Comments />}
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle className='resize-sha w-[3px]' />
+          <ResizablePanel id='panel-2' order={2} defaultSize={isThreePanels ? 40 : 60}>
+            <CodeEditor
+              isSuccessCode={isSuccessCode}
+              setIsSuccessCode={setIsSuccessCode}
+              templates={lectureDetail?.lectureDetailsDto?.problem?.templates.Java}
+              arrayTestcase={lectureDetail?.lectureDetailsDto?.problem?.testCases}
+              problemId={lectureDetail?.lectureDetailsDto?.problem?.id}
+              setActiveTab={setActiveTab}
+              setResultCodeSubmit={setResultCodeSubmit}
+              setCurrentCode={setCurrentCode}
+            />
+          </ResizablePanel>
+          {isThreePanels && (
+            <>
+              <ResizableHandle withHandle className='resize-sha w-[3px]' />
+              <ResizablePanel id='panel-3' order={3} defaultSize={30}>
+                <div className='scroll-container h-full'>
+                  <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id} />
+                </div>
+              </ResizablePanel>
+            </>
           )}
         </ResizablePanelGroup>
       )}
@@ -186,45 +221,45 @@ const LearningSpace = () => {
       {!lectureDetail?.lectureDetailsDto?.problem && !lectureDetail?.lectureDetailsDto?.quiz && (
         <ResizablePanelGroup
           direction='horizontal'
-        className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
-      >
-        <ResizablePanel id='panel-1' order={1} defaultSize={25}>
-          <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={true} />
+          className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
+        >
+          <ResizablePanel id='panel-1' order={1} defaultSize={25}>
+            <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={true} />
             {loading && <ChapterLoading />}
             {(activeTab === 'curriculum' || activeTab === 'default') && !loading && (
-              <Curriculum chapters={chapters} setSelectedLectureId={setSelectedLectureId} title={title} />  
+              <Curriculum chapters={chapters} setSelectedLectureId={setSelectedLectureId} title={title} />
             )}
-            {activeTab === 'comments' && !loading && <Comments />}                  
-        </ResizablePanel>
-        <ResizableHandle withHandle className='resize-sha w-[3px]' />
-        <ResizablePanel id='panel-2' order={2} defaultSize={isThreePanels ? 50 : 75}>        
-        <div className='scroll-container h-full'>            
-            {/* {loading && <ChapterLoading />} */}
+            {activeTab === 'comments' && !loading && <Comments />}
+          </ResizablePanel>
+          <ResizableHandle withHandle className='resize-sha w-[3px]' />
+          <ResizablePanel id='panel-2' order={2} defaultSize={isThreePanels ? 50 : 75}>
+            <div className='scroll-container h-full'>
+              {/* {loading && <ChapterLoading />} */}
 
               <NormalLecture
                 description={lectureDetail?.lectureDetailsDto?.summary}
                 videoSrc={videoBlobUrl}
                 loading={loading}
                 titleProblem={lectureDetail?.lectureDetailsDto?.title}
-              />           
-          </div>
-        </ResizablePanel>
-        {isThreePanels && (
-          <>
-            <ResizableHandle withHandle className='resize-sha w-[3px]' />
-            <ResizablePanel id='panel-3' order={3} defaultSize={25}>
-              <div className='scroll-container h-full'>
-              <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id}/>
-              </div>
-            </ResizablePanel>
-          </>
+              />
+            </div>
+          </ResizablePanel>
+          {isThreePanels && (
+            <>
+              <ResizableHandle withHandle className='resize-sha w-[3px]' />
+              <ResizablePanel id='panel-3' order={3} defaultSize={25}>
+                <div className='scroll-container h-full'>
+                  <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id} />
+                </div>
+              </ResizablePanel>
+            </>
           )}
         </ResizablePanelGroup>
       )}
 
       {lectureDetail?.lectureDetailsDto?.quiz && (
         <div className='h-[94vh] w-full bg-bGprimary scroll-container'>
-          <Quiz1 quiz={lectureDetail?.lectureDetailsDto?.quiz}/>
+          <Quiz2 quiz={lectureDetail?.lectureDetailsDto?.quiz} />
         </div>
       )}
 
@@ -236,12 +271,14 @@ const LearningSpace = () => {
       )}
 
       <ToggleCurriculum
+        ref={toggleCurriculumRef}
         title={title}
         chapters={chapters}
         setSelectedLectureId={setSelectedLectureId}
         isProblemListOpen={isProblemListOpen}
         toggleProblemList={toggleProblemList}
         navigate={navigate}
+        courseId={id}
       />
     </div>
   )

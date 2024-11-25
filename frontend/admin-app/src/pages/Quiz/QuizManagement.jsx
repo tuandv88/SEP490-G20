@@ -27,6 +27,12 @@ export default function QuizManagement() {
   const navigate = useNavigate()
   const { toast } = useToast()
   const [isFullScreenPopupOpen, setIsFullScreenPopupOpen] = useState(false)
+  const { setQuizIdToCreateProblem } = useStore()
+  
+  // Set quizId to create problem
+  useEffect(() => {
+    setQuizIdToCreateProblem(quizId)
+  }, [])
 
   useEffect(() => {
     const fetchQuizDetail = async () => {
@@ -123,7 +129,7 @@ export default function QuizManagement() {
           </CardContent>
         </Card>
         <Button className="mt-4 w-full" onClick={() => setShowAddQuestionForm(true)}>Add Question</Button>
-        <Button className="mt-4 w-full" onClick={() => setIsFullScreenPopupOpen(true)}>Popup-full</Button>
+        <Button className="mt-4 w-full" onClick={() => setIsFullScreenPopupOpen(true)}>Create Problem Quiz</Button>
       </div>
 
       <div className="w-full md:w-3/4 pl-4">
@@ -145,7 +151,7 @@ export default function QuizManagement() {
       <FullScreenPopup
         isOpen={isFullScreenPopupOpen}
         onClose={() => setIsFullScreenPopupOpen(false)}
-        quizDetail={quizDetail}
+        quizId={quizId}
       />
     </div>
   )

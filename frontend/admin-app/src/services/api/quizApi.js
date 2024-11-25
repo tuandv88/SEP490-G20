@@ -28,3 +28,4 @@ export const deleteQuiz = async (quizId) => {
     throw error
   }
 }
+

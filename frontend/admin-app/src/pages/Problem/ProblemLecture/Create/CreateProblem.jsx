@@ -14,7 +14,6 @@ const CreateProblem = ({ }) => {
   //new
   const { params } = useMatch(createProblemRoute.id);
   const { lectureId } = params;
-
   console.log(lectureId)
   
   const [activeTab, setActiveTab] = useState('basic');
@@ -66,7 +65,7 @@ const CreateProblem = ({ }) => {
     console.log(problemData)
 
     try {
-      const response = await createProblem(problemData, lectureId ? lectureId : null)
+      const response = await createProblem(problemData, lectureId)
       toast({
         title: 'Create problem successfully',
         description: 'Create problem successfully'
@@ -80,7 +79,7 @@ const CreateProblem = ({ }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header backTo='Back to Curriculum' />
+      <Header />
       <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormTabs activeTab={activeTab} form={form} setIsSaveTemplate={setIsSaveTemplate} setIsRunSuccess={setIsRunSuccess} hasLecture={hasLecture}/>

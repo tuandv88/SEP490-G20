@@ -1,8 +1,9 @@
 ﻿using Learning.Application.Models.Quizs.Dtos;
+using Learning.Application.Models.Submissions.Dtos;
 using Learning.Application.Models.Submissions.Queries.GetProblemChallenge;
 
 namespace Learning.API.Endpoints.Submissions;
-public record GetProlemSubmissionChallengeResponse(List<SubmissionLectureViewDto> Submissions);
+public record GetProlemSubmissionChallengeResponse(List<SubmissionResponseDto> Submissions);
 public class GetProlemSubmissionChallengeEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
         app.MapGet("/problems/{ProblemId}/submissions/challenge", async (Guid ProblemId, ISender sender) => {

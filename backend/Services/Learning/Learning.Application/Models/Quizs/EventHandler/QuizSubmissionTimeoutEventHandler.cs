@@ -19,7 +19,6 @@ public class QuizSubmissionTimeoutEventHandler(IQuizSubmissionRepository quizSub
 
             await quizSubmissionRepository.SaveChangesAsync();
         }
-        return;
     }
 }
 

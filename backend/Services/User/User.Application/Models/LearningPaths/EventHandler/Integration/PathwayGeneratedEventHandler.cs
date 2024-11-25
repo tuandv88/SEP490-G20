@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal.Util;
-using BuildingBlocks.Messaging.Events.AIs;
+﻿using BuildingBlocks.Messaging.Events.AIs;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 using User.Application.Data.Repositories;

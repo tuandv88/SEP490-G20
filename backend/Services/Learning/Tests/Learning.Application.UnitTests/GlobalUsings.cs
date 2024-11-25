@@ -1,1 +1,13 @@
+global using FluentValidation.TestHelper;
 global using NUnit.Framework;
+global using Moq;
+global using MediatR;
+global using BuidingBlocks.Storage.Interfaces;
+global using BuildingBlocks.Exceptions;
+global using Learning.Application.Interfaces;
+global using Learning.Application.Data.Repositories;
+global using Learning.Domain.Models;
+global using Learning.Domain.Enums;
+global using System.ComponentModel.DataAnnotations;
+global using Learning.Domain.ValueObjects;
+global using FluentValidation.Results;

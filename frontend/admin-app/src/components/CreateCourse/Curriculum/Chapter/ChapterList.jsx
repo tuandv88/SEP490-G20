@@ -5,6 +5,7 @@ import LectureList from '../Lecture/LectureList'
 
 export default function ChapterList({
   curriculum,
+  courseId,
   onEditChapter,
   onDeleteChapter,
   onAddLecture,
@@ -34,6 +35,7 @@ export default function ChapterList({
           onVideoUpload={(file, lectureIndex) => onVideoUpload(file, chapterIndex, lectureIndex)}
           onFileRemove={(lectureIndex) => onFileRemove(chapterIndex, lectureIndex)}
           onVideoRemove={(lectureIndex) => onVideoRemove(chapterIndex, lectureIndex)}
+          courseId={courseId}
         />
       </div>
     </Card>

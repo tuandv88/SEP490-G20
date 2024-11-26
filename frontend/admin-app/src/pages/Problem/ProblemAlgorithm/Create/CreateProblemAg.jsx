@@ -5,8 +5,8 @@ import BottomTabs from './BottomTabs';
 import { FormProvider, useForm } from 'react-hook-form'
 import { useToast } from '@/hooks/use-toast'
 import FormTabs from './FormTabs';
-import { createProblem } from '@/services/api/problemApi'
-const CreateProblem = ({ navigationUrl, navigationTitle, lectureId, problemType }) => {
+import { createProblemAg } from '@/services/api/problemApi'
+const CreateProblemAg = ({ }) => {
 
 
   const [activeTab, setActiveTab] = useState('basic');
@@ -20,7 +20,7 @@ const CreateProblem = ({ navigationUrl, navigationTitle, lectureId, problemType 
     defaultValues: {
       title: "",
       description: "",
-      problemType: "Practice",
+      problemType: "Challenge",
       difficultyType: "Medium",
       cpuTimeLimit: 2,
       cpuExtraTime: 2.5,
@@ -52,12 +52,19 @@ const CreateProblem = ({ navigationUrl, navigationTitle, lectureId, problemType 
     console.log(problemData)
 
     try {
-      const response = await createProblem(problemData)
+      const response = await createProblemAg(problemData)
       toast({
+        variant: 'success',
         title: 'Create problem successfully',
         description: 'Create problem successfully'
       })
     } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Oops! Something went wrong',
+        description: 'Please try again!',
+        action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
+      })
       console.error('Error creating problem:', error)
     }
   
@@ -69,8 +76,7 @@ const CreateProblem = ({ navigationUrl, navigationTitle, lectureId, problemType 
       <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormTabs activeTab={activeTab} form={form} setIsSaveTemplate={setIsSaveTemplate} setIsRunSuccess={setIsRunSuccess}/>
-        <BottomTabs 
-          
+        <BottomTabs          
           activeTab={activeTab} 
           setActiveTab={setActiveTab}
           isSaveTemplate={isSaveTemplate}
@@ -83,4 +89,4 @@ const CreateProblem = ({ navigationUrl, navigationTitle, lectureId, problemType 
   );
 }
 
-export default React.memo(CreateProblem);
+export default React.memo(CreateProblemAg);

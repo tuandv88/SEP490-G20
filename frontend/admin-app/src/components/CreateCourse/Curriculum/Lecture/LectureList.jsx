@@ -13,7 +13,8 @@ export default function LectureList({
   onFileUpload,
   onVideoUpload,
   onFileRemove,
-  onVideoRemove
+  onVideoRemove,
+  courseId
 }) {
   return (
     <>
@@ -34,6 +35,7 @@ export default function LectureList({
           onVideoUpload={(file) => onVideoUpload(file, chapterIndex, lectureIndex)}
           onFileRemove={(fileIndex) => onFileRemove(chapterIndex, lectureIndex, fileIndex)}
           onVideoRemove={() => onVideoRemove(chapterIndex, lectureIndex)}
+          courseId={courseId}
         />
       ))}
     </>

@@ -247,7 +247,7 @@ function DiscussionDetail() {
             style={styles.avatar}
           />
           <div>
-            <p style={styles.userName}>{discussion?.userName}</p>
+            <p style={styles.userName}>{discussion?.firstName} {discussion?.lastName}</p>
           </div>
         </div>
 

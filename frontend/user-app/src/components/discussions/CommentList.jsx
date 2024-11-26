@@ -57,7 +57,7 @@ function CommentList({ discussionId, refresh }) {
                 alt="User Avatar"
                 style={styles.commentUserAvatar}
               />
-              <p style={styles.commentUserName}>{comment.userName}</p>
+              <p style={styles.commentUserName}>{comment.firstName} {comment.lastName}</p>
             </div>
             <p style={styles.commentContent}>{comment.content}</p>
           </div>

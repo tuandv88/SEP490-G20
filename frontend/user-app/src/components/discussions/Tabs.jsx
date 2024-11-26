@@ -31,7 +31,12 @@ function Tabs({ onCategoryChange, categoryId }) {
     fetchCategories();
   }, [categoryId, onCategoryChange]);
 
-  if (loading) return <p>Loading categories...</p>;
+  if (loading)
+    return (
+      <div className="loader-container">
+        <div className="loader"></div>
+      </div>
+    );
   if (error) return <p>{error}</p>;
 
   return (
@@ -50,30 +55,67 @@ function Tabs({ onCategoryChange, categoryId }) {
       <style jsx>{`
         .tabs {
           display: flex;
-          justify-content: center;
-          gap: 15px;
+          justify-content: space-evenly;
+          padding: 30px;
+          border-radius: 8px;
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+          width: 100%;
+          background: #f9f9f9;
         }
 
         .tab-button {
-          padding: 10px 20px;
-          font-size: 16px;
-          font-family: "Georgia", "Times New Roman", serif;
-          color: #555;
-          border: none;
-          background: none;
-          border-bottom: 2px solid transparent;
+          flex: 1;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          max-width: 150px;
+          min-width: 120px;
+          padding: 20px;
+          font-size: 14px;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          font-weight: 500;
+          color: #1e334a;
+          border: 1px solid #e0e0e0;
+          background: #f9f9f9;
+          border-radius: 10px;
+          box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
           cursor: pointer;
-          transition: color 0.3s, border-bottom 0.3s;
+          transition: all 0.3s ease-in-out;
+          position: relative;
+          overflow: hidden;
         }
 
         .tab-button:hover {
-          color: #007bff;
+          color: #14212b;
+          background: rgba(30, 51, 74, 0.1);
+          border-color: #b0b0b0;
+          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .tab-button.active {
-          color: #007bff;
+          color: #ffffff;
+          background: linear-gradient(45deg, #374151, #1e334a);
           font-weight: bold;
-          border-bottom: 2px solid #007bff;
+          border-color: #374151;
+          box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+          transform: scale(1.05);
+        }
+
+        .tab-button::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -50%;
+          width: 200%;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.2);
+          transform: skewX(-45deg);
+          transition: left 0.3s ease-in-out;
+        }
+
+        .tab-button:hover::before {
+          left: 100%;
         }
       `}</style>
     </div>

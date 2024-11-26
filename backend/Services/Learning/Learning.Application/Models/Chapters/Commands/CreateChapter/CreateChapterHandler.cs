@@ -21,7 +21,6 @@ public class CreateChapterHandler(ICourseRepository courseRepository, IChapterRe
             chapterId: ChapterId.Of(Guid.NewGuid()),
             title: createChapterDto.Title,
             description: createChapterDto.Description,
-            timeEstimation: createChapterDto.TimeEstimation,
             orderIndex: (await chapterRepository.CountByCourseAsync(course.Id.Value)) + 1
             );
         course.AddChapter(chapter);

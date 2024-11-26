@@ -3,7 +3,6 @@ public record CreateCourseDto(
     string Title,
     string Description,
     string Headline,
-    double TimeEstimation,
     string Prerequisites,
     string Objectives,
     string TargetAudiences,

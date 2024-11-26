@@ -9,13 +9,12 @@ public class Chapter : Aggregate<ChapterId> {
     public int OrderIndex { get; set; }
     public bool IsActive { get; set; } = true;
 
-    public static Chapter Create(CourseId courseId, ChapterId chapterId, string title, string description, double timeEstimation, int orderIndex) {
+    public static Chapter Create(CourseId courseId, ChapterId chapterId, string title, string description, int orderIndex) {
         var chapter = new Chapter() {
             CourseId = courseId,
             Id = chapterId,
             Title = title,
             Description = description,
-            TimeEstimation = timeEstimation,
             OrderIndex = orderIndex
         };
         //Thêm event nếu cần

@@ -22,9 +22,6 @@ public class UpdateCourseCommandValidator : AbstractValidator<UpdateCourseComman
             .NotNull().WithMessage("Headline must not be null.")
             .NotEmpty().WithMessage("Headline must not be empty.");
 
-        RuleFor(x => x.UpdateCourseDto.TimeEstimation)
-            .GreaterThan(0).WithMessage("TimeEstimation must be greater than zero.");
-
         RuleFor(x => x.UpdateCourseDto.Prerequisites)
             .NotNull().WithMessage("Prerequisites must not be null.")
             .NotEmpty().WithMessage("Prerequisites must not be empty.");

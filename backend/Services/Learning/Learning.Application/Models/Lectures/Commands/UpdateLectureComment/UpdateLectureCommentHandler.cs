@@ -1,7 +1,7 @@
 ﻿
 namespace Learning.Application.Models.Lectures.Commands.UpdateLectureComment;
 public class UpdateLectureCommentHandler(ICourseRepository courseRepository, IUserContextService userContext,
-    IUserCourseRepository userCourseRepository, ILectureCommentRepository lectureCommentRepository) : ICommandHandler<UpdateLectureCommentCommand, UpdateLectureCommentResult> {
+    IUserEnrollmentRepository userCourseRepository, ILectureCommentRepository lectureCommentRepository) : ICommandHandler<UpdateLectureCommentCommand, UpdateLectureCommentResult> {
     public async Task<UpdateLectureCommentResult> Handle(UpdateLectureCommentCommand request, CancellationToken cancellationToken) {
         var course = await courseRepository.GetByIdDetailAsync(request.CourseId);
         if (course == null) {

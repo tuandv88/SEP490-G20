@@ -1,6 +1,6 @@
 ﻿
 namespace Learning.Application.Models.Courses.Queries.GetStatusEnrollment;
-public class GetEnrollmentInfoHandler(IUserContextService userContext, IUserCourseRepository userCourseRepository) : IQueryHandler<GetEnrollmentInfoQuery, GetEnrollmentInfoResult> {
+public class GetEnrollmentInfoHandler(IUserContextService userContext, IUserEnrollmentRepository userCourseRepository) : IQueryHandler<GetEnrollmentInfoQuery, GetEnrollmentInfoResult> {
     public async Task<GetEnrollmentInfoResult> Handle(GetEnrollmentInfoQuery request, CancellationToken cancellationToken) {
         var userId = userContext.User.Id;
         if (userId.Equals(Guid.Empty)){

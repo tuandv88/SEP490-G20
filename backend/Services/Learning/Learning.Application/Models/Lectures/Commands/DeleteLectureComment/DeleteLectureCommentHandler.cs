@@ -1,7 +1,7 @@
 ﻿
 namespace Learning.Application.Models.Lectures.Commands.DeleteLectureComment;
 public class DeleteLectureCommentHandler(ICourseRepository courseRepository, IUserContextService userContext,
-    IUserCourseRepository userCourseRepository, ILectureCommentRepository lectureCommentRepository) : ICommandHandler<DeleteLectureCommentCommand, Unit> {
+    IUserEnrollmentRepository userCourseRepository, ILectureCommentRepository lectureCommentRepository) : ICommandHandler<DeleteLectureCommentCommand, Unit> {
     public async Task<Unit> Handle(DeleteLectureCommentCommand request, CancellationToken cancellationToken) {
         var course = await courseRepository.GetByIdDetailAsync(request.CourseId);
         if (course == null) {

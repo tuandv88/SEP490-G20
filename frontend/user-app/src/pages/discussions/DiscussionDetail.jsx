@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; 
 import { DiscussApi } from "@/services/api/DiscussApi";
-import Layout from "@/layouts/layout";
+import Layout from "@/layouts/layout"; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"; 
 import { faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 function DiscussionDetail() {
@@ -15,6 +15,7 @@ function DiscussionDetail() {
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // Fetch discussion details on component mount
   useEffect(() => {
     const fetchDiscussion = async () => {
       setLoading(true);
@@ -32,30 +33,28 @@ function DiscussionDetail() {
     fetchDiscussion();
   }, [id]);
 
+  // Handle adding a new comment
   const handleAddComment = async () => {
-    if (!newComment.trim()) return;
+    if (!newComment.trim()) return;  // Ensure comment is not empty
     setSubmitting(true);
     try {
-      // Lấy thông tin cần thiết từ bài viết và comment
       const commentData = {
-        discussionId: id,  // Lấy discussionId từ URL hoặc từ dữ liệu hiện tại
+        discussionId: id,  // Get the discussion ID from the URL or current data
         content: newComment,
         dateCreated: new Date().toISOString(),
-        parentCommentId: null,  // Nếu là comment cấp 1, nếu có reply thì có thể sửa lại
-        depth: 1,  // Độ sâu của comment
-        isActive: true,
+        parentCommentId: null,  // Set parent comment ID if it's a reply
+        depth: 1,  // Set depth (comment level)
+        isActive: true,  // Ensure the comment is active
       };
 
-      // Gọi API tạo comment
-      const newCommentData = await DiscussApi.createComment(commentData);
+      // Call the API to create the comment
+      await DiscussApi.createComment(commentData);
 
-      // Cập nhật danh sách comments với comment mới
-      setDiscussion((prev) => ({
-        ...prev,
-        comments: [newCommentData, ...prev.comments], // Thêm comment mới vào đầu danh sách
-      }));
+      // Refetch the comments from the server after a new comment is added
+      const updatedDiscussion = await DiscussApi.getDiscussionDetails(id);
+      setDiscussion(updatedDiscussion);
 
-      setNewComment(""); // Reset nội dung comment
+      setNewComment("");  // Reset the comment input field
     } catch (err) {
       console.error("Failed to add comment:", err);
       alert("Error adding comment. Please try again.");

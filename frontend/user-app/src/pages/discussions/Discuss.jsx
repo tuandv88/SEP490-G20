@@ -3,7 +3,7 @@ import Navbar from "../../components/discussions/Navbar";
 import Tabs from "../../components/discussions/Tabs";
 import PostList from "../../components/discussions/PostList";
 import Layout from "@/layouts/layout";
-import { DiscussApi } from "@/services/api/DiscussApi"; // Import DiscussApi
+import { DiscussApi } from "@/services/api/DiscussApi";
 
 const Discuss = () => {
   const [categoryId, setCategoryId] = useState(null);
@@ -15,7 +15,6 @@ const Discuss = () => {
     setCategoryId(newCategoryId);
   };
 
-  // Lấy danh sách categories trước khi gọi PostList
   useEffect(() => {
     const fetchCategories = async () => {
       setLoadingCategories(true);
@@ -34,7 +33,7 @@ const Discuss = () => {
     };
 
     fetchCategories();
-  }, []); // Chạy một lần khi component mount
+  }, []);
 
   return (
     <Layout>
@@ -43,7 +42,6 @@ const Discuss = () => {
         {loadingCategories && <p>Loading categories...</p>}
         {errorCategories && <p style={{ color: "red" }}>{errorCategories}</p>}
 
-        {/* Hiển thị các phần tử khi categories đã có */}
         {!loadingCategories && !errorCategories && (
           <>
             <Navbar />
@@ -51,7 +49,6 @@ const Discuss = () => {
               <Tabs onCategoryChange={handleCategoryChange} categoryId={categoryId} categories={categories} />
             </div>
             <div className="content-container">
-              {/* Hiển thị PostList khi có categoryId */}
               {categoryId && <PostList categoryId={categoryId} />}
             </div>
           </>
@@ -63,8 +60,8 @@ const Discuss = () => {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
-            font-family: "Georgia", "Times New Roman", serif;
+            padding: 15px;
+            font-family: "Helvetica Neue", Arial, sans-serif;
             background-color: #f9f9f9;
             min-height: 100vh;
           }
@@ -73,20 +70,23 @@ const Discuss = () => {
             width: 100%;
             max-width: 1200px;
             margin: 20px 0;
-            padding: 10px;
-            background: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Đồng bộ đổ bóng */
           }
 
           .content-container {
             width: 100%;
             max-width: 1200px;
-            margin-top: 20px;
+            margin-top: 2px;
+            padding: 0;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
           }
 
           .create-button-container {
             margin-top: 20px;
+            text-align: right; /* Đưa nút về phía bên phải */
           }
 
           .create-button {
@@ -98,7 +98,8 @@ const Discuss = () => {
             border-radius: 8px;
             font-size: 16px;
             font-weight: bold;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease-in-out;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Nhấn nhẹ nút */
           }
 
           .create-button:hover {

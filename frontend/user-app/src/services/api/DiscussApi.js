@@ -17,7 +17,7 @@ export const DiscussApi = {
   getDiscussionOptions: async ({ discussionId, pageIndex, pageSize, orderBy, tags }) => {
     try {
       console.log("Fetching discussion options...", discussionId);
-      
+
       // Gửi yêu cầu GET tới API với header Authorization
       const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/options`, {
         params: { pageIndex, pageSize, orderBy, tags },
@@ -35,9 +35,14 @@ export const DiscussApi = {
           return {
             ...discussion,
             urlProfilePicture: user ? user.urlProfilePicture : null,
+            firstName: user ? user.firstName : null,
+            lastName: user ? user.lastName : null
           };
         });
-        return { updatedDiscussions, users };
+
+        const dataDiscussionDtos = response.data.discussionDtos;
+
+        return { dataDiscussionDtos, updatedDiscussions, users };
       } else {
         console.error("Dữ liệu trả về không hợp lệ:", response);
         throw new Error("Dữ liệu trả về không hợp lệ từ API.");
@@ -63,7 +68,7 @@ export const DiscussApi = {
   getDiscussionDetails: async (discussionId) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/community-service/discussion/${discussionId}/details`, getAuthHeaders());
-      
+
       if (response && response.data) {
         const discussion = response.data.discussionDetailDto;
         const userIds = [discussion.userId];
@@ -114,12 +119,12 @@ export const DiscussApi = {
   // API: Tạo comment mới
   createComment: async ({ discussionId, content, dateCreated, parentCommentId, depth, isActive }) => {
     try {
-      console.log(getAuthHeaders(),123);
+      console.log(getAuthHeaders(), 123);
       const commentData = { discussionId, content, dateCreated, parentCommentId, depth, isActive };
-      
+
       // Gửi yêu cầu POST để tạo comment mới
       const response = await axios.post(`${API_BASE_URL}/community-service/comments`, commentData, getAuthHeaders());
-      
+
       // Trả về dữ liệu comment mới
       return response.data;
     } catch (error) {

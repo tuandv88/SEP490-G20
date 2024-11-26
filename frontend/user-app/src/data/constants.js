@@ -12,8 +12,8 @@ export const AUTHENTICATION_ROUTERS = {
   PROBLEMS: '/problems',
   CODE: '/code',
   CALLBACK: '/callback',
-  DISCUSS : '/discussions/discuss',
- DISCUSSIONDETAIL :'/discussion/:id'
+  DISCUSS: '/discussions/discuss',
+  DISCUSSIONDETAIL: '/discussion/:id'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

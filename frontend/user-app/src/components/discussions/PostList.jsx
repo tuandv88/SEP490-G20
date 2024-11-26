@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons"; 
+import { faThumbtack, faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { formatDistanceToNow } from 'date-fns';
 import { DiscussApi } from "@/services/api/DiscussApi";
 
 function PostList({ categoryId }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalCount, setTotalCount] = useState(0); // Tổng số bài viết
   const [pageIndex, setPageIndex] = useState(1);
+  const [totalPages, setTotalPages] = useState(0); // Tổng số bài viết
   const [orderBy, setOrderBy] = useState("hot");
   const [tags, setTags] = useState("");
 
   const navigate = useNavigate();
-  const pageSize = 10;
+  const pageSize = 3;
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -28,10 +31,15 @@ function PostList({ categoryId }) {
           tags,
         });
         if (data && data.updatedDiscussions) {
-          setPosts(data.updatedDiscussions);  
+          setPosts(data.updatedDiscussions);
+          setTotalCount(data.dataDiscussionDtos.count);
+          setTotalPages(Math.ceil(data.dataDiscussionDtos.count / pageSize)); // Tính tổng số trang
         }
+
+        console.log(data.updatedDiscussions);
       } catch (err) {
         setError("Failed to fetch posts");
+        setLoading(true);
       } finally {
         setLoading(false);
       }
@@ -66,6 +74,26 @@ function PostList({ categoryId }) {
     });
   };
 
+  // Hàm định dạng thời gian, sử dụng formatDate nếu vượt quá 7 ngày
+  const formatRelativeDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+
+    // Tính số ngày đã qua kể từ ngày đăng
+    const diffInTime = now - date;
+    const diffInDays = Math.floor(diffInTime / (1000 * 60 * 60 * 24));
+
+    if (diffInDays >= 7) {
+      // Nếu đã qua 1 tuần, hiển thị theo định dạng ngày giờ đầy đủ
+      return formatDate(dateString);
+    }
+
+    // Nếu chưa qua 7 ngày, sử dụng formatDistanceToNow để hiển thị "x minutes ago", "x days ago", v.v.
+    const distance = formatDistanceToNow(date, { addSuffix: true });
+
+    return distance;
+  };
+
   return (
     <div className="post-list-container">
       {/* Filters Section */}
@@ -81,7 +109,7 @@ function PostList({ categoryId }) {
             className={`filter-button ${orderBy === "newest" ? "active" : ""}`}
             onClick={() => handleFilterClick("newest")}
           >
-            Newest 
+            Newest
           </span>
           <span
             className={`filter-button ${orderBy === "mostvotes" ? "active" : ""}`}
@@ -90,6 +118,7 @@ function PostList({ categoryId }) {
             Most Votes
           </span>
         </div>
+
         <div className="search-container">
           <input
             type="text"
@@ -98,6 +127,7 @@ function PostList({ categoryId }) {
             onChange={(e) => setTags(e.target.value)}
             className="search-input"
           />
+
           <button className="new-button" onClick={() => navigate("/createpost")}>
             New +
           </button>
@@ -105,58 +135,67 @@ function PostList({ categoryId }) {
       </div>
 
       {/* Posts Section */}
-      {loading && <p>Loading...</p>}
+      {loading && (
+        <div className="loader-container">
+          <div className="loader"></div>
+        </div>
+      )}
       {error && <p className="error">{error}</p>}
       {!loading && posts.length === 0 && <p>No posts available.</p>}
 
       {!loading && (
         <div className="posts">
           {posts.map((post) => (
-            <div
-              key={post.id}
-              className="post-item"
-              onClick={() => handlePostClick(post.id)}
-            >
-              <div className="post-content">
-                <div className="post-header">
-                  {/* Avatar Image of User */}
+            <div key={post.id} className="post-item" onClick={() => handlePostClick(post.id)}>
+              {/* Header */}
+              <div className="post-header">
+                <div className="post-header-left">
+                  {/* Avatar */}
                   <img
                     src={post.urlProfilePicture || "default-avatar.png"}
-                    alt={post.userName}
+                    alt="User Avatar"
                     className="user-avatar"
                   />
-                  <h3 className="post-title">{post.title}</h3>
-                  <div className="post-tags">
-                    {post.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="tag"
-                        onClick={(e) => {
+
+                  {/* Title */}
+                  <div>
+                    <h3 className="post-title">
+                      {post.pinned && (
+                        <FontAwesomeIcon icon={faThumbtack} className="icon pin-icon" />
+                      )}
+                      {post.title}
+                    </h3>
+                    <div className="post-tags">
+                      {post.tags.map((tag, idx) => (
+                        <span key={idx} className="tag" onClick={(e) => {
                           e.stopPropagation();
                           handleTagClick(tag);
-                        }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                        }}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="post-meta">
-                  <strong>{post.userName}</strong>
-                  <p className="post-info">
-                    Created at: {formatDate(post.dateCreated)}
-                    <span> | </span> 
-                    Update at: {formatDate(post.dateUpdated)}
-                  </p>
-                </div>
               </div>
-              <div className="post-stats">
-                <span className="stat">
-                  <FontAwesomeIcon icon={faChevronUp} className="icon" /> {post.voteCount}
-                </span>
-                <span className="stat">
-                  <FontAwesomeIcon icon={faEye} className="icon" /> {post.viewCount}
-                </span>
+
+              {/* Footer: Meta and Stats */}
+              <div className="post-footer">
+                {/* Meta */}
+                <div className="post-meta">
+                  <strong>{post.firstName} {post.lastName}</strong>
+                  <p>Created at: {formatRelativeDate(post.dateCreated)} | Updated at: {formatRelativeDate(post.dateUpdated)}</p>
+                </div>
+
+                {/* Stats */}
+                <div className="post-stats">
+                  <span className="stat">
+                    <FontAwesomeIcon icon={faChevronUp} className="icon" /> {post.voteCount}
+                  </span>
+                  <span className="stat">
+                    <FontAwesomeIcon icon={faEye} className="icon" /> {post.viewCount}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
@@ -164,214 +203,451 @@ function PostList({ categoryId }) {
       )}
 
       {/* Pagination */}
-      {!loading && (
+      {!loading && totalPages > 0 && (
         <div className="pagination">
+          {/* Nút Previous */}
           <button
-            className={`page-button ${pageIndex === 1 ? "disabled" : ""}`}
+            className={`page-item ${pageIndex === 1 ? "disabled" : ""}`}
             onClick={() => setPageIndex(pageIndex - 1)}
             disabled={pageIndex === 1}
           >
-            Previous
+            &lt;
           </button>
-          <span>Page {pageIndex}</span>
+
+          {/* Hiển thị số trang */}
+          {totalPages <= 5
+            ? // Nếu tổng số trang <= 5, hiển thị tất cả các trang
+            Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                className={`page-item ${pageIndex === page ? "active" : ""}`}
+                onClick={() => setPageIndex(page)}
+              >
+                {page}
+              </button>
+            ))
+            : // Nếu tổng số trang > 5, hiển thị giới hạn
+            [
+              // Trang đầu tiên
+              1,
+              // Hiển thị dấu "..." nếu không phải trang đầu và trang gần nhất
+              ...(pageIndex > 3 ? ["..."] : []),
+              // Hiển thị các trang xung quanh trang hiện tại
+              ...Array.from(
+                { length: Math.min(5, totalPages - 1) },
+                (_, i) => Math.max(2, Math.min(totalPages - 1, pageIndex - 2 + i))
+              ),
+              // Trang cuối cùng nếu có đủ số trang
+              ...(pageIndex < totalPages - 2 ? ["..."] : []),
+              totalPages,
+            ].map((page, idx) => (
+              <button
+                key={idx}
+                className={`page-item ${pageIndex === page ? "active" : ""}`}
+                onClick={() => setPageIndex(page)}
+              >
+                {page}
+              </button>
+            ))}
+
+          {/* Nút Next */}
           <button
-            className="page-button"
+            className={`page-item ${pageIndex === totalPages ? "disabled" : ""}`}
             onClick={() => setPageIndex(pageIndex + 1)}
+            disabled={pageIndex === totalPages}
           >
-            Next
+            &gt;
           </button>
         </div>
       )}
 
-      {/* Styles */}
       <style jsx>{`
-        .post-list-container {
-          margin: 20px auto;
-          width: 100%; /* Take full container width */
-          max-width: 1200px; /* Wider layout */
-          font-family: Arial, sans-serif;
-          padding: 20px;
-          background-color: #fff;
-          border-radius: 8px;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
+  /* Container chính của PostList */
+  .post-list-container {
+    margin: 20px auto;
+    width: 100%;
+    max-width: 1200px;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    padding: 15px;
+    border-radius: 10px; /* Bo góc */
+    background: #f9f9f9;
+  }
 
-        .filters {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
-        }
+  /* Khu vực filter và tìm kiếm */
+  .filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background: #ffffff; /* Nền trắng */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+  }
 
-        .filter-options {
-          display: flex;
-          gap: 10px;
-        }
+  .filter-options {
+    display: flex;
+    gap: 10px;
+  }
 
-        .filter-button {
-          cursor: pointer;
-          color: #555;
-          font-size: 14px;
-          padding: 5px 10px;
-          border-radius: 4px;
-          transition: background-color 0.3s, color 0.3s;
-        }
+  .filter-button {
+  flex: 1; /* Các nút sẽ tự động chiếm không gian đều nhau */
+  text-align: center; /* Đảm bảo chữ luôn căn giữa */
+  display: flex;
+  align-items: center; /* Căn giữa nội dung trong nút */
+  justify-content: center; /* Căn giữa nội dung trong nút */
+  max-width: 120px; /* Giới hạn kích thước tối đa của nút (giảm lại) */
+  min-width: 100px; /* Đảm bảo kích thước nút không nhỏ hơn */
+  padding: 10px; /* Giảm padding để nút nhỏ gọn hơn */
+  font-size: 12px; /* Font chữ nhỏ hơn */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  color: #1e334a; /* Màu xanh than nhạt */
+  border: 1px solid #e0e0e0; /* Viền mỏng tinh tế */
+  background: #f9f9f9; /* Màu nền trắng */
+  border-radius: 8px; /* Bo góc cho nút */
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1); /* Giảm độ lớn đổ bóng */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative; /* Hiệu ứng ánh sáng cần position */
+  overflow: hidden;
+}
 
-        .filter-button:hover {
-          background-color: #e9ecef;
-        }
+/* Hiệu ứng hover */
+.filter-button:hover {
+  color: #14212b; /* Màu xanh đậm hơn khi hover */
+  background: rgba(30, 51, 74, 0.1); /* Nền xanh nhạt khi hover */
+  border-color: #b0b0b0; /* Viền đậm hơn khi hover */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ khi hover */
+}
 
-        .filter-button.active {
-          color: white;
-          background-color: #007bff;
-          font-weight: bold;
-        }
+/* Nút đang active */
+.filter-button.active {
+  color: #ffffff; /* Chữ trắng */
+  background: linear-gradient(45deg, #374151, #1e334a); /* Gradient nền xanh than đậm */
+  font-weight: bold; /* Tăng đậm chữ */
+  border-color: #374151; /* Viền đậm khi active */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn */
+  transform: scale(1.03); /* Phóng to nhẹ khi active */
+}
 
-        .search-container {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
+/* Hiệu ứng ánh sáng di chuyển qua tab */
+.filter-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: skewX(-45deg);
+  transition: left 0.3s ease-in-out;
+}
 
-        .search-input {
-          padding: 8px 14px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          font-size: 14px;
-          width: 300px;
-        }
+.filter-button:hover::before {
+  left: 100%; /* Ánh sáng trượt qua tab khi hover */
+}
+  
+.new-button {
+  text-align: center; /* Đảm bảo chữ luôn căn giữa */
+  display: flex;
+  align-items: center; /* Căn giữa nội dung theo chiều dọc */
+  justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+  max-width: 150px; /* Giới hạn kích thước tối đa */
+  min-width: 120px; /* Giới hạn kích thước tối thiểu */
+  padding: 12px 16px; /* Kích thước nút vừa phải */
+  font-size: 14px; /* Font chữ lớn hơn để nhấn mạnh */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: bold; /* Font chữ đậm để nổi bật */
+  color: #ffffff; /* Màu chữ trắng */
+  border: none; /* Loại bỏ viền */
+  background: #1e334a; /* Nền màu xanh than đậm */
+  border-radius: 8px; /* Bo góc vừa phải */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn để tạo chiều sâu */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative; /* Hiệu ứng ánh sáng cần position */
+  overflow: hidden;
+}
 
-        .new-button {
-          padding: 8px 14px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-        }
+/* Hiệu ứng hover */
+.new-button:hover {
+  background: #14212b; /* Nền tối hơn khi hover */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Đổ bóng mạnh hơn khi hover */
+  transform: translateY(-2px); /* Nhấn nổi */
+}
 
-        .new-button:hover {
-          background-color: #0056b3;
-        }
+/* Nút đang active */
+.new-button:active {
+  transform: translateY(0); /* Không nổi khi active */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ hơn */
+}
 
-        .posts {
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-        }
+/* Hiệu ứng ánh sáng di chuyển qua nút */
+.new-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -25%;
+  width: 150%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: skewX(-45deg);
+  transition: left 0.3s ease-in-out;
+}
 
-        .post-item {
-          padding: 15px;
-          border: 1px solid #ddd;
-          border-radius: 6px;
-          background-color: white;
-          transition: box-shadow 0.3s ease;
-          display: flex;
-          justify-content: space-between;
-        }
+.new-button:hover::before {
+  left: 100%; /* Ánh sáng trượt qua nút khi hover */
+}
 
-        .post-item:hover {
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+/* Khi nút bị disabled */
+.new-button.disabled {
+  background: #9ca3af; /* Màu xám nhạt */
+  color: #e5e7eb; /* Chữ xám nhạt */
+  cursor: not-allowed; /* Không cho phép click */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
 
-        .post-content {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-        }
+  .search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-        .post-header {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
+  .search-input {
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #ffffff;
+    flex: 1; /* Giãn tìm kiếm theo chiều ngang */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  }
 
-        .user-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          object-fit: cover;
-        }
 
-        .post-title {
-          font-size: 16px;
-          font-weight: bold;
-          color: #333;
-        }
+/* Danh sách bài viết */
+/* Từng bài viết */
+.post-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px; /* Khoảng cách với nội dung ở trên */
+  padding: 20px 25px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
 
-        .post-tags {
-          display: flex;
-          gap: 5px;
-        }
+.post-item:hover {
+  box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
 
-        .tag {
-          background-color: #e0e0e0;
-          color: #007bff;
-          padding: 2px 6px;
-          font-size: 12px;
-          border-radius: 4px;
-          cursor: pointer;
-        }
+/* Header bài viết */
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-        .tag:hover {
-          background-color: #d6d6d6;
-        }
+.post-header-left {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
 
-        .post-meta {
-          font-size: 12px;
-          color: #555;
-        }
+/* Avatar */
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid #eef2ff;
+}
 
-        .post-info {
-          font-size: 12px;
-          color: #888;
-        }
+/* Tiêu đề */
+.post-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-        .post-stats {
-          display: flex;
-          gap: 15px;
-          font-size: 12px;
-          color: #555;
-          align-items: center;
-        }
+.pin-icon {
+  color: #2563eb;
+  font-size: 18px;
+}
 
-        .stat {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          font-size: 14px;
-        }
+/* Tags */
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
 
-        .icon {
-          font-size: 16px;
-          color: #555;
-        }
+.tag {
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #1e334a;
+  background-color: #eef2ff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
 
-        .pagination {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin-top: 20px;
-          gap: 10px;
-        }
+.tag:hover {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
 
-        .page-button {
-          padding: 8px 14px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-        }
+/* Metadata và Stats cùng dòng */
+/* Footer (Meta và Stats) */
+.post-footer {
+  display: flex;
+  justify-content: space-between; /* Căn các phần tử về hai đầu */
+  align-items: center;
+  margin-top: 8px; /* Khoảng cách với nội dung ở trên */
+  width: 100%; /* Đảm bảo chiều rộng đầy đủ */
+}
 
-        .page-button.disabled {
-          background-color: #ccc;
-          cursor: not-allowed;
-        }
-      `}</style>
-    </div>
+/* Metadata */
+.post-meta {
+  font-size: 13px;
+  color: #6b7280;
+  display: flex;
+  gap: 10px; /* Khoảng cách giữa các metadata */
+  align-items: center;
+}
+
+.post-meta strong {
+  font-weight: 600;
+  color: #1e334a;
+}
+
+/* Stats */
+.post-stats {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  color: #64748b;
+  align-items: center;
+}
+
+/* Thống kê (Icon và số liệu) */
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.icon {
+  font-size: 16px;
+  color: #1e334a;
+}
+
+
+/* Hiệu ứng hover tiêu đề */
+.post-item:hover .post-title {
+  color: #2563eb;
+}
+
+/* Phân trang */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.page-item {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px; /* Đặt padding hợp lý để các nút không quá to hoặc quá nhỏ */
+  font-size: 12px; /* Font chữ dễ đọc */
+  color: #1e334a; /* Màu chữ giống với nút filter */
+  background: #f9f9f9; /* Nền trắng như filter */
+  border: 0.2px solid #e0e0e0; /* Viền mỏng tinh tế */
+  border-radius: 6px; /* Bo góc nhẹ */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  margin: 0 5px; /* Khoảng cách giữa các nút */
+}
+
+/* Hiệu ứng hover */
+.page-item:hover {
+  color: #ffffff; /* Màu chữ trắng khi hover */
+  background: #1e334a; /* Nền xanh đậm khi hover */
+  border-color: #1e334a; /* Viền xanh khi hover */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+}
+
+/* Nút đang active */
+.page-item.active {
+  color: #ffffff; /* Chữ trắng khi active */
+  background: #1e334a; /* Nền xanh đậm khi active */
+  font-weight: bold;
+  border-color: #1e334a; /* Viền xanh khi active */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn khi active */
+  transform: scale(1.05); /* Phóng to nhẹ khi active */
+}
+
+/* Nút Next/Previous khi disabled */
+.page-item.disabled {
+  cursor: not-allowed;
+  background-color: #f8f9fa; /* Nền xám khi disabled */
+  color: #adb5bd; /* Màu chữ xám khi disabled */
+}
+
+.page-item.disabled:hover {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+}
+
+/* Dấu ba chấm */
+.dots {
+  margin: 0 10px;
+  font-size: 16px;
+  color: #6c757d; /* Màu xám của dấu ba chấm */
+}
+
+    .loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px; /* Chiều cao loader */
+  }
+
+  .loader {
+    border: 4px solid #f3f3f3; /* Màu viền ngoài */
+    border-top: 4px solid #1e334a; /* Màu viền trên */
+    border-radius: 50%; /* Tạo hình tròn */
+    width: 30px; /* Đường kính loader */
+    height: 30px; /* Đường kính loader */
+    animation: spin 1s linear infinite; /* Hiệu ứng quay */
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+`}</style>
+    </div >
   );
 }
 

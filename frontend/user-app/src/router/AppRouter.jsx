@@ -10,6 +10,7 @@ import Problem from '@/pages/Problem'
 import { lazy, Suspense } from 'react'
 import Callback from '@/oidc/Callback'
 import { SurrveyFirstLogin } from '@/components/surrvey/SurrveyFirstLogin'
+import CourseDetails from '@/pages/CourseDetails'
 const Code = lazy(() => import('@/pages/Code'))
 
 export const AppRouter = () => {
@@ -45,6 +46,10 @@ export const AppRouter = () => {
     {
       path: AUTHENTICATION_ROUTERS.SURVEY,
       element: <SurrveyFirstLogin />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.COURSEDETAILS,
+      element: <CourseDetails />
     },
     { path: AUTHENTICATION_ROUTERS.NOTFOUND, element: <NotFound /> },
     { path: AUTHENTICATION_ROUTERS.ERROR, element: <ErrorPage /> }

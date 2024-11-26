@@ -12,7 +12,8 @@ export const AUTHENTICATION_ROUTERS = {
   PROBLEMS: '/problems',
   CODE: '/code',
   CALLBACK: '/callback',
-  SURVEY: '/survey'
+  SURVEY: '/survey',
+  COURSEDETAILS: '/course-details'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

@@ -3,14 +3,18 @@ using Learning.Domain.Events;
 using MassTransit;
 
 namespace Learning.Application.Models.Quizs.EventHandler;
-public class QuizSubmissionTimeoutEventHandler(IQuizSubmissionRepository quizSubmissionRepository, IPublishEndpoint publishEndpoint) : IConsumer<QuizSubmissionTimeoutEvent> {
-    public async Task Consume(ConsumeContext<QuizSubmissionTimeoutEvent> context) {
+public class QuizSubmissionTimeoutEventHandler(IQuizSubmissionRepository quizSubmissionRepository, IPublishEndpoint publishEndpoint) : IConsumer<QuizSubmissionTimeoutEvent>
+{
+    public async Task Consume(ConsumeContext<QuizSubmissionTimeoutEvent> context)
+    {
         var quizSubmissionId = context.Message.QuizSubmissionId;
         var quizSubmission = await quizSubmissionRepository.GetByIdAsync(quizSubmissionId);
-        if (quizSubmission == null) {
+        if (quizSubmission == null)
+        {
             throw new NotFoundException(nameof(QuizSubmission), quizSubmissionId);
         }
-        if (quizSubmission.Status == QuizSubmissionStatus.InProgress) {
+        if (quizSubmission.Status == QuizSubmissionStatus.InProgress)
+        {
             quizSubmission.UpdateStatus(QuizSubmissionStatus.Processing);
             quizSubmission.SubmissionDate = DateTime.UtcNow;
             await quizSubmissionRepository.UpdateAsync(quizSubmission);
@@ -19,7 +23,6 @@ public class QuizSubmissionTimeoutEventHandler(IQuizSubmissionRepository quizSub
 
             await quizSubmissionRepository.SaveChangesAsync();
         }
-        return;
     }
 }
 

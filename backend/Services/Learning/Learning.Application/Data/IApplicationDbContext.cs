@@ -10,7 +10,7 @@ public interface IApplicationDbContext {
     DbSet<ProblemSolution> ProblemSolutions { get; }
     DbSet<TestScript> TestScripts { get; }
     DbSet<TestCase> TestCases { get; }
-    DbSet<UserCourse> UserCourses { get; }
+    DbSet<UserEnrollment> UserEnrollments { get; }
     DbSet<LectureProgress> LecturesProgress { get; }
     DbSet<LectureComment> LectureComments { get; }
     DbSet<QuizSubmission> QuizSubmissions { get; }

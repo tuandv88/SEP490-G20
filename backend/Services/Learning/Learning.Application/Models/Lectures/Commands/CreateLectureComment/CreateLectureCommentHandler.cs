@@ -1,7 +1,7 @@
 ﻿
 namespace Learning.Application.Models.Lectures.Commands.CreateLectureComment;
 public class CreateLectureCommentHandler(ICourseRepository courseRepository, IUserContextService userContext, 
-    IUserCourseRepository userCourseRepository, ILectureCommentRepository lectureCommentRepository) : ICommandHandler<CreateLectureCommentCommand, CreateLectureCommentResult> {
+    IUserEnrollmentRepository userCourseRepository, ILectureCommentRepository lectureCommentRepository) : ICommandHandler<CreateLectureCommentCommand, CreateLectureCommentResult> {
     public async Task<CreateLectureCommentResult> Handle(CreateLectureCommentCommand request, CancellationToken cancellationToken) {
         var course = await courseRepository.GetByIdDetailAsync(request.CourseId);
         if (course == null) {

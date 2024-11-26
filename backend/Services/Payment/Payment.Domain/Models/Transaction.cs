@@ -4,10 +4,15 @@ public class Transaction : Aggregate<TransactionId>{
     public double Amount { get; set; }
     public string Currency { get; set; } = default!; // loại tiền tệ
     public TransactionStatus Status { get; set; } = TransactionStatus.Pending;
-    public PaymentMethodId PaymentMethodId { get; set; } = default!;
-    public ProductId ProductId { get; set; } = default!;
-    public ProductType ProductType { get; set; } = ProductType.Course;
-    public string? ThirdPartyTransactionId { get; set; } = default!;
-    public string? ThirdPartyCaptureId {  get; set; } = default!;
+    public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.Paypal;
+    public string ExternalOrderId { get; set; } = string.Empty; // paypal, momo thường có một mẫu đơn hàng để giữ duy nhất cho request
+    public string ExternalTransactionId {  get; set; } = string.Empty;
+    public double GrossAmount {  get; set; } // tổng tiền trước khi tính phí
+    public double NetAmount { get; set; } // số tiền sau khi tính phí
+    public double FeeAmount { get; set; } // tiền phí 
+    public string? PayerId { get; set; } // Paypal 
+    public string? PayerEmail { get; set; } // Paypal
+    public string? PayerPhone { get; set; } // Momo
+    public List<TransactionItem> Items { get; set; } = [];
 }
 

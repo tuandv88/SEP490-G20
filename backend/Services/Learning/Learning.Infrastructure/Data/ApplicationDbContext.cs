@@ -25,7 +25,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext {
 
     public DbSet<ProblemSolution> ProblemSolutions => Set<ProblemSolution>();
 
-    public DbSet<UserCourse> UserCourses => Set<UserCourse>();
+    public DbSet<UserEnrollment> UserEnrollments => Set<UserEnrollment>();
 
     public DbSet<LectureProgress> LecturesProgress => Set<LectureProgress>();
 

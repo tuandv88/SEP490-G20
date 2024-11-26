@@ -1,6 +1,6 @@
 ﻿
 namespace Learning.Application.Models.Courses.Commands.UpdateLectureProgress;
-public class UpdateLectureProgressHandler(IUserCourseRepository repository, IUserContextService userContext, ICourseRepository courseRepository
+public class UpdateLectureProgressHandler(IUserEnrollmentRepository repository, IUserContextService userContext, ICourseRepository courseRepository
     ) : ICommandHandler<UpdateLectureProgressCommand, UpdateLectureProgressResult> {
     public async Task<UpdateLectureProgressResult> Handle(UpdateLectureProgressCommand request, CancellationToken cancellationToken) {
         var userId = userContext.User.Id;

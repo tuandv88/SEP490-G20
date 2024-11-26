@@ -1,5 +1,5 @@
 ﻿namespace Learning.Application.Models.Courses.Commands.CreateEnrollmentCourse;
-public class EnrollmentCourseHandler(IUserCourseRepository userCourseRepository, ICourseRepository courseRepository, IUserContextService userContext) : ICommandHandler<CreateEnrollmentCourseCommand, CreateEnrollmentCourseResult>
+public class EnrollmentCourseHandler(IUserEnrollmentRepository userCourseRepository, ICourseRepository courseRepository, IUserContextService userContext) : ICommandHandler<CreateEnrollmentCourseCommand, CreateEnrollmentCourseResult>
 {
     public async Task<CreateEnrollmentCourseResult> Handle(CreateEnrollmentCourseCommand request, CancellationToken cancellationToken)
     {
@@ -20,14 +20,14 @@ public class EnrollmentCourseHandler(IUserCourseRepository userCourseRepository,
             return new CreateEnrollmentCourseResult(false);
         }
 
-        var newUserCourse = UserCourse.Create(
-                UserCourseId.Of(Guid.NewGuid()),
+        var newUserCourse = UserEnrollment.Create(
+                UserEnrollmentId.Of(Guid.NewGuid()),
                 UserId.Of(userId),
                 course.Id,
                 DateTime.UtcNow
                 );
 
-        course.AddUserCourse(newUserCourse);
+        course.AddUserEnrollment(newUserCourse);
         await userCourseRepository.AddAsync(newUserCourse);
         await userCourseRepository.SaveChangesAsync(cancellationToken);
 

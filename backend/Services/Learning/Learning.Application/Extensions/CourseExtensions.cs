@@ -41,11 +41,11 @@ public static class CourseExtensions {
         return courseDetail;
     }
 
-    public static UserEnrollmentDto ToUserEnrollmentDto(this UserCourse userCourse) {
+    public static UserEnrollmentDto ToUserEnrollmentDto(this UserEnrollment userCourse) {
         return new UserEnrollmentDto(
                 userCourse.EnrollmentDate,
                 userCourse.CompletionDate,
-                userCourse.UserCourseStatus.ToString(),
+                userCourse.UserEnrollmentStatus.ToString(),
                 userCourse.Rating,
                 userCourse.Feedback
             );

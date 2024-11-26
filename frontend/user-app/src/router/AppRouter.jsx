@@ -2,6 +2,8 @@
 import CourseDetail from '@/components/course/CourseDetail'
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import { HomePage, About, NotFound, CourseList } from '../pages'
+import Discuss from "@/pages/discussions/Discuss";
+import DiscussionDetail from "@/pages/discussions/DiscussionDetail"; 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import LearningSpace from '@/pages/LearningSpace'
 import ErrorPage from '@/pages/ErrorPage'
@@ -47,7 +49,15 @@ export const AppRouter = () => {
       element: <SurrveyFirstLogin />
     },
     { path: AUTHENTICATION_ROUTERS.NOTFOUND, element: <NotFound /> },
-    { path: AUTHENTICATION_ROUTERS.ERROR, element: <ErrorPage /> }
+    { path: AUTHENTICATION_ROUTERS.ERROR, element: <ErrorPage /> },
+    {
+      path: AUTHENTICATION_ROUTERS.DISCUSS,
+      element: <Discuss />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.DISCUSSIONDETAIL,
+      element: <DiscussionDetail />
+    }
   ])
   return <RouterProvider router={router} />
 }

@@ -7,4 +7,5 @@ using System.Threading.Tasks;
 namespace Community.Application.Models.Discussions.Commands.UpdateDiscussionViewById;
 
 public record UpdateDiscussionViewByIdResult(bool IsSuccess, long viewCount);
+[Authorize]
 public record UpdateDiscussionViewByIdCommand(Guid Id) : ICommand<UpdateDiscussionViewByIdResult>;

@@ -3,7 +3,7 @@
 namespace Community.Application.Models.Votes.Commands.CreateVote;
 
 public record CreateVoteResult(Guid? Id, bool IsSuccess);
-
+[Authorize]
 public record CreateVoteCommand(CreateVoteDto CreateVoteDto) : ICommand<CreateVoteResult>;
 
 public class CreateVoteCommandValidator : AbstractValidator<CreateVoteCommand>

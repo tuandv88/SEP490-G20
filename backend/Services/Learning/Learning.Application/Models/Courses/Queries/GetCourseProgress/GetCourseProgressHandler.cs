@@ -1,6 +1,6 @@
 ﻿
 namespace Learning.Application.Models.Courses.Queries.GetCourseProgress;
-public class GetCourseProgressHandler(IUserCourseRepository repository, IUserContextService userContext) : IQueryHandler<GetCourseProgressQuery, GetCourseProgressResult> {
+public class GetCourseProgressHandler(IUserEnrollmentRepository repository, IUserContextService userContext) : IQueryHandler<GetCourseProgressQuery, GetCourseProgressResult> {
     public async Task<GetCourseProgressResult> Handle(GetCourseProgressQuery request, CancellationToken cancellationToken) {
         var userId = userContext.User.Id;
         var userCourse =await repository.GetByUserIdAndCourseIdWithProgressAsync(userId, request.CourseId);

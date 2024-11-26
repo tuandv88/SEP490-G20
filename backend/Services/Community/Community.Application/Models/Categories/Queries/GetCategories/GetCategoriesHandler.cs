@@ -1,5 +1,4 @@
 ﻿using Community.Application.Extensions;
-using Community.Application.Models.Categories.Dtos;
 using Community.Application.Models.Categories.Queries.GetCategories;
 
 // Định nghĩa một handler ( Làm việc với Interface ) - để xử lí cho query GetCategoriesQuery

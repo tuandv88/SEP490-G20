@@ -19,8 +19,5 @@ public class CreateChapterCommandValidator : AbstractValidator<CreateChapterComm
         RuleFor(x => x.CreateChapterDto.Description)
             .NotNull()
             .NotEmpty().WithMessage("Description is required.");
-
-        RuleFor(x => x.CreateChapterDto.TimeEstimation)
-            .GreaterThan(0).WithMessage("Time estimation must be greater than zero.");
     }
 }

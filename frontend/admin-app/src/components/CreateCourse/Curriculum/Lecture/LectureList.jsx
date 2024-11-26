@@ -5,6 +5,7 @@ import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import LectureItem from './LectureItem'
 
 export default function LectureList({
+  chapterId,
   lectures,
   chapterIndex,
   onAddLecture,
@@ -14,6 +15,8 @@ export default function LectureList({
   onVideoUpload,
   onFileRemove,
   onVideoRemove,
+  setIsUpdate,
+  isUpdate,
   courseId
 }) {
   return (
@@ -27,15 +30,17 @@ export default function LectureList({
       </Dialog>
       {lectures.map((lecture, lectureIndex) => (
         <LectureItem
+          chapterId={chapterId}
           key={lectureIndex}
           lecture={lecture}
           onEdit={(updatedLecture) => onEditLecture(updatedLecture, lectureIndex)}
-          onDelete={() => onDeleteLecture(lectureIndex)}
+          onDelete={() => onDeleteLecture(chapterId, lectureIndex)}
           onFileUpload={(file) => onFileUpload(file, chapterIndex, lectureIndex)}
           onVideoUpload={(file) => onVideoUpload(file, chapterIndex, lectureIndex)}
           onFileRemove={(fileIndex) => onFileRemove(chapterIndex, lectureIndex, fileIndex)}
           onVideoRemove={() => onVideoRemove(chapterIndex, lectureIndex)}
-          courseId={courseId}
+          setIsUpdateLecture={setIsUpdate}
+          isUpdateLecture={isUpdate}
         />
       ))}
     </>

@@ -14,7 +14,9 @@ export default function ChapterList({
   onFileUpload,
   onVideoUpload,
   onFileRemove,
-  onVideoRemove
+  onVideoRemove,
+  setIsUpdate,
+  isUpdate
 }) {
   console.log(curriculum)
   return curriculum.map((chapter, chapterIndex) => (
@@ -26,6 +28,7 @@ export default function ChapterList({
           onDelete={() => onDeleteChapter(chapterIndex)}
         />
         <LectureList
+          chapterId={chapter.chapterDto.id}
           lectures={chapter.lectureDtos}
           chapterIndex={chapterIndex}
           onAddLecture={() => onAddLecture(chapter.chapterDto.id)}
@@ -35,8 +38,10 @@ export default function ChapterList({
           onVideoUpload={(file, lectureIndex) => onVideoUpload(file, chapterIndex, lectureIndex)}
           onFileRemove={(lectureIndex) => onFileRemove(chapterIndex, lectureIndex)}
           onVideoRemove={(lectureIndex) => onVideoRemove(chapterIndex, lectureIndex)}
+          setIsUpdate={setIsUpdate}
+          isUpdate={isUpdate}
           courseId={courseId}
-        />
+        />  
       </div>
     </Card>
   ))

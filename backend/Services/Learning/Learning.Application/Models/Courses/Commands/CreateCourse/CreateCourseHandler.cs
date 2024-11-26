@@ -33,7 +33,6 @@ public class CreateCourseHandler(ICourseRepository repository, IFilesService fil
             description: createCourseDto.Description,
             headline: createCourseDto.Headline,
             courseStatus: CourseStatus.Draft,
-            timeEstimation: createCourseDto.TimeEstimation,
             prerequisites: createCourseDto.Prerequisites,
             objectives: createCourseDto.Objectives,
             targetAudiences: createCourseDto.TargetAudiences,

@@ -10,7 +10,7 @@ public interface IApplicationDbContext {
     DbSet<ProblemSolution> ProblemSolutions { get; }
     DbSet<TestScript> TestScripts { get; }
     DbSet<TestCase> TestCases { get; }
-    DbSet<UserCourse> UserCourses { get; }
+    DbSet<UserEnrollment> UserEnrollments { get; }
     DbSet<LectureProgress> LecturesProgress { get; }
     DbSet<LectureComment> LectureComments { get; }
     DbSet<QuizSubmission> QuizSubmissions { get; }
@@ -21,6 +21,6 @@ public interface IApplicationDbContext {
     Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class;
     void Update<T>(T entity) where T : class;
     void Remove<T>(T entity) where T : class;
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 

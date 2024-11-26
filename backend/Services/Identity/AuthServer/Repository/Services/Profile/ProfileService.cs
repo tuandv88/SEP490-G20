@@ -72,12 +72,12 @@ namespace AuthServer.Repository.Services.Profile
 
             // Lấy các claims hiện tại từ UserManager
             var userClaims = await _userManager.GetClaimsAsync(user);
-            var firstLoginClaim = userClaims.FirstOrDefault(c => c.Type == "firstlogin");
+            var isSurveyClaim = userClaims.FirstOrDefault(c => c.Type == "issurvey");
 
-            // Thêm claim "FirstLogin" nếu tồn tại
-            if (firstLoginClaim != null)
+            // Thêm claim "issurvey" nếu tồn tại
+            if (isSurveyClaim != null)
             {
-                context.IssuedClaims.Add(new Claim("firstlogin", firstLoginClaim.Value));
+                context.IssuedClaims.Add(new Claim("issurvey", isSurveyClaim.Value));
             }
         }
 

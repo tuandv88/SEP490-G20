@@ -15,7 +15,7 @@ using Learning.Infrastructure.Data.Repositories.Quizs;
 using Learning.Infrastructure.Data.Repositories.QuizSubmissions;
 using Learning.Infrastructure.Data.Repositories.TestCases;
 using Learning.Infrastructure.Data.Repositories.TestScripts;
-using Learning.Infrastructure.Data.Repositories.UserCourses;
+using Learning.Infrastructure.Data.Repositories.UserEnrollments;
 using Learning.Infrastructure.Extentions;
 using Learning.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -109,7 +109,7 @@ public static class DependencyInjection {
         services.AddScoped<IQuizSubmissionRepository, QuizSubmissionRepository>();
 
         //IUserCourse
-        services.AddScoped<IUserCourseRepository, UserCourseRepository>();
+        services.AddScoped<IUserEnrollmentRepository, UserEnrollmentRepository>();
 
         //ILectureComments
         services.AddScoped<ILectureCommentRepository, LectureCommentRepository>();

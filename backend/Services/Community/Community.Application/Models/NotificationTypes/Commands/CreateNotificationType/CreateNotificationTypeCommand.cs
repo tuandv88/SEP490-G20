@@ -3,7 +3,7 @@
 namespace Community.Application.Models.NotificationTypes.Commands.CreateNotificationType;
 
 public record CreateNotificationTypeResult(Guid? Id, bool IsSuccess);
-
+[Authorize]
 public record CreateNotificationTypeCommand(CreateNotificationTypeDto CreateNotificationTypeDto) : ICommand<CreateNotificationTypeResult>;
 
 public class CreateNotificationTypeCommandValidator : AbstractValidator<CreateNotificationTypeCommand>

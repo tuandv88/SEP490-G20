@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import Layout from '@/layouts/layout'
 import { useState } from 'react'
-import { Star, Clock, Users, Trophy, ChevronRight } from 'lucide-react'
+import { Star, Clock, Users, Trophy, ChevronRight, Cookie } from 'lucide-react'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import CourseItem from '@/components/course/CourseItem'
 

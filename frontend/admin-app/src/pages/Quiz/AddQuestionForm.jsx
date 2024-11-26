@@ -1,224 +1,355 @@
 'use client'
-import PropTypes from 'prop-types'
-import { useState } from 'react'
+
+import { useState, useEffect } from 'react'
+import { useForm, useFieldArray, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { createQuestion } from '@/services/api/questionApi'
 import { useToast } from '@/hooks/use-toast'
-import { FullScreenPopup } from './FullScreenPopup'
-import { useStore } from '@/data/store'
-const QUESTION_TYPES = ['MultipleChoice', 'MultipleSelect', 'TrueFalse', 'CodeSnippet']
+import { Trash2, Plus } from 'lucide-react'
+
+const QUESTION_TYPES = ['MultipleChoice', 'MultipleSelect', 'TrueFalse']
 const QUESTION_LEVELS = ['EASY', 'MEDIUM', 'HARD', 'EXPERT']
 
-export function AddQuestionForm({ onClose, onAdd, quizId, setIsUpdate, isUpdate }) {
-  const [content, setContent] = useState('')
-  const [isActive, setIsActive] = useState(true)
+const questionSchema = z.object({
+  content: z.string().min(1, 'Content is required'),
+  isActive: z.boolean(),
+  questionType: z.enum(['MultipleChoice', 'MultipleSelect', 'TrueFalse', 'CodeSnippet']),
+  questionLevel: z.enum(['EASY', 'MEDIUM', 'HARD', 'EXPERT']),
+  mark: z.number().min(1, 'Mark must be at least 1'),
+  questionOptions: z
+    .array(
+      z.object({
+        content: z.string().min(1, 'Option content is required'),
+        isCorrect: z.boolean()
+      })
+    )
+    .min(2, 'At least two answer options are required')
+    .refine((options) => options.some((option) => option.isCorrect), {
+      message: 'At least one correct answer is required',
+      path: ['questionOptions']
+    })
+})
+
+export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
   const [questionType, setQuestionType] = useState('MultipleChoice')
-  const [questionLevel, setQuestionLevel] = useState('EASY')
-  const [mark, setMark] = useState(1)
-  const [questionOptions, setQuestionOptions] = useState([{ content: '', isCorrect: false }])
   const { toast } = useToast()
-  const [isFullScreenPopupOpen, setIsFullScreenPopupOpen] = useState(false)
-  const { setFormData } = useStore()
-  const handleAddAnswer = () => {
-    setQuestionOptions([...questionOptions, { content: '', isCorrect: false }])
-  }
+  const [showErrors, setShowErrors] = useState(false)
 
-  const handleAnswerChange = (index, text) => {
-    const newAnswers = [...questionOptions]
-    newAnswers[index].content = text
-    setQuestionOptions(newAnswers)
-  }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+    trigger
+  } = useForm({
+    resolver: zodResolver(questionSchema),
+    defaultValues: {
+      content: '',
+      isActive: true,
+      questionType: 'MultipleChoice',
+      questionLevel: 'EASY',
+      mark: 1,
+      questionOptions: [
+        { content: '', isCorrect: true },
+        { content: '', isCorrect: false }
+      ]
+    }
+  })
 
-  const handleCorrectAnswerChange = (index) => {
-    const newAnswers = questionOptions.map((answer, i) => ({
-      ...answer,
-      isCorrect: questionType === 'MultipleSelect' ? (i === index ? !answer.isCorrect : answer.isCorrect) : i === index
-    }))
-    setQuestionOptions(newAnswers)
-  }
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'questionOptions'
+  })
 
-  const handleSubmit = async () => {
-    const updatedQuestionOptions = questionOptions.map((option, index) => ({
+  const watchQuestionType = watch('questionType')
+  const watchQuestionOptions = watch('questionOptions')
+
+  useEffect(() => {
+    if (watchQuestionType === 'MultipleChoice') {
+      const correctAnswers = watchQuestionOptions.filter((option) => option.isCorrect)
+      if (correctAnswers.length > 1) {
+        const lastCorrectIndex = watchQuestionOptions.findIndex((option) => option.isCorrect)
+        watchQuestionOptions.forEach((_, index) => {
+          setValue(`questionOptions.${index}.isCorrect`, index === lastCorrectIndex)
+        })
+      }
+    }
+    trigger('questionOptions')
+  }, [watchQuestionType, watchQuestionOptions, setValue, trigger])
+
+  useEffect(() => {
+    if (watchQuestionOptions) {
+      setShowErrors(false) // Reset error display when options change
+      trigger('questionOptions')
+    }
+  }, [watchQuestionOptions, trigger])
+
+  const onSubmit = async (data) => {
+    setShowErrors(true)
+    console.log('Form errors:', errors) // Add this line
+    if (Object.keys(errors).length > 0) {
+      return // Ngăn form submit nếu có lỗi
+    }
+
+    const updatedQuestionOptions = data.questionOptions.map((option, index) => ({
       ...option,
       orderIndex: index
     }))
+
     const createQues = {
       createQuestionDto: {
-        content,
-        isActive,
-        questionType,
-        questionLevel,
-        mark,
+        ...data,
         questionOptions: updatedQuestionOptions
       }
     }
-    console.log(createQues)
-    // Here you would typically send the data to your backend
+
     try {
-      const response = await createQuestion(createQues, quizId)
+      await createQuestion(createQues, quizId)
       setIsUpdate(!isUpdate)
       toast({
-        title: 'Question created successfully',
-        description: 'Question created successfully'
+        title: 'Success',
+        description: 'Question created successfully',
+        duration: 1500
       })
+      onClose()
     } catch (error) {
       toast({
-        title: 'Error creating question',
-        description: error.message
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+        duration: 1500
       })
     }
-    onClose()
   }
-
-
-  const handleCreateCodeQuestion = async () => {
-    const createQues = {
-      createQuestionDto: {
-        content,
-        isActive,
-        questionType,
-        questionLevel,
-        mark,
-        questionOptions: []
-      }
-    }
-    setFormData(createQues)
-    setIsFullScreenPopupOpen(true)
-    onClose()
-  }
-
   return (
-    <div>
-      <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent className='sm:max-w-[425px]'>
-          <DialogHeader>
-            <DialogTitle>Add New Question</DialogTitle>
-          </DialogHeader>
-          <div className='grid gap-4 py-4'>
-            <div className='grid grid-cols-4 items-center gap-4'>
-              <Label htmlFor='content' className='text-right'>
-                Content
-              </Label>
-              <Input id='content' value={content} onChange={(e) => setContent(e.target.value)} className='col-span-3' />
-            </div>
-            <div className='grid grid-cols-4 items-center gap-4'>
-              <Label htmlFor='isActive' className='text-right'>
-                Is Active
-              </Label>
-              <Switch id='isActive' checked={isActive} onCheckedChange={setIsActive} />
-            </div>
-            <div className='grid grid-cols-4 items-center gap-4'>
-              <Label htmlFor='questionType' className='text-right'>
-                Question Type
-              </Label>
-              <Select onValueChange={(value) => setQuestionType(value)}>
-                <SelectTrigger className='col-span-3'>
-                  <SelectValue placeholder='Select question type' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='MultipleChoice'>Multiple Choice </SelectItem>
-                  <SelectItem value='MultipleSelect'>Multiple Select</SelectItem>
-                  <SelectItem value='TrueFalse'>True/False</SelectItem>
-                  <SelectItem value='CodeSnippet'>Code Snippet</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className='grid grid-cols-4 items-center gap-4'>
-              <Label htmlFor='questionLevel' className='text-right'>
-                Question Level
-              </Label>
-              <Select onValueChange={(value) => setQuestionLevel(value)}>
-                <SelectTrigger className='col-span-3'>
-                  <SelectValue placeholder='Select question level' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='EASY'>Easy</SelectItem>
-                  <SelectItem value='MEDIUM'>Medium</SelectItem>
-                  <SelectItem value='HARD'>Hard</SelectItem>
-                  <SelectItem value='EXPERT'>Expert</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className='grid grid-cols-4 items-center gap-4'>
-              <Label htmlFor='mark' className='text-right'>
-                Mark
-              </Label>
-              <Input
-                id='mark'
-                type='number'
-                value={mark}
-                onChange={(e) => setMark(parseInt(e.target.value))}
-                className='col-span-3'
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className='max-w-[500px] h-[600px] p-0 overflow-hidden flex flex-col'>
+        <DialogHeader className='px-6 py-4 border-b'>
+          <DialogTitle className='text-xl font-semibold'>Add New Question</DialogTitle>
+        </DialogHeader>
+
+        <ScrollArea className='flex-grow px-6 py-4'>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='content'>Question Content</Label>
+              <Controller
+                name='content'
+                control={control}
+                render={({ field }) => <Input id='content' {...field} placeholder='Enter your question here' />}
               />
+              {showErrors && errors.content && <p className='text-sm text-red-500'>{errors.content.message}</p>}
             </div>
+
+            <div className='flex items-center space-x-2'>
+              <Controller
+                name='isActive'
+                control={control}
+                render={({ field }) => <Switch id='isActive' checked={field.value} onCheckedChange={field.onChange} />}
+              />
+              <Label htmlFor='isActive'>Active</Label>
+            </div>
+
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='space-y-2'>
+                <Label htmlFor='questionType'>Question Type</Label>
+                <Controller
+                  name='questionType'
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value)
+                        setQuestionType(value)
+                      }}
+                      value={field.value}
+                    >
+                      <SelectTrigger id='questionType'>
+                        <SelectValue placeholder='Select type' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {QUESTION_TYPES.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+
+              <div className='space-y-2'>
+                <Label htmlFor='questionLevel'>Difficulty Level</Label>
+                <Controller
+                  name='questionLevel'
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger id='questionLevel'>
+                        <SelectValue placeholder='Select level' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {QUESTION_LEVELS.map((level) => (
+                          <SelectItem key={level} value={level}>
+                            {level.charAt(0) + level.slice(1).toLowerCase()}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='mark'>Mark</Label>
+              <Controller
+                name='mark'
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id='mark'
+                    type='number'
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    min={1}
+                  />
+                )}
+              />
+              {showErrors && errors.mark && <p className='text-sm text-red-500'>{errors.mark.message}</p>}
+            </div>
+
             {(questionType === 'MultipleChoice' || questionType === 'MultipleSelect') && (
-              <>
-                {questionOptions.map((answer, index) => (
-                  <div key={index} className='grid grid-cols-4 items-center gap-4'>
-                    <Label htmlFor={`answer-${index}`} className='text-right'>
-                      Answer {index + 1}
-                    </Label>
-                    <Input
-                      id={`answer-${index}`}
-                      value={answer.text}
-                      onChange={(e) => handleAnswerChange(index, e.target.value)}
-                      className='col-span-2'
-                    />
-                    <Switch checked={answer.isCorrect} onCheckedChange={() => handleCorrectAnswerChange(index)} />
-                  </div>
-                ))}
-                <Button onClick={handleAddAnswer} className='mt-2'>
-                  Add Answer
-                </Button>
-              </>
-            )}
-            {questionType === 'TrueFalse' && (
-              <div className='grid grid-cols-4 items-center gap-4'>
-                <Label className='text-right'>Correct Answer</Label>
-                <div className='col-span-3'>
-                  <Select
-                    onValueChange={(value) =>
-                      setQuestionOptions([
-                        { content: value, isCorrect: true },
-                        { content: value === 'True' ? 'False' : 'True', isCorrect: false }
-                      ])
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select correct answer' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='True'>True</SelectItem>
-                      <SelectItem value='False'>False</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className='space-y-2'>
+                <Label>Answer Options</Label>
+                <div className='max-h-[200px] overflow-y-auto pr-2'>
+                  {fields.map((field, index) => (
+                    <div key={field.id} className='flex flex-col gap-2 mb-2'>
+                      <div className='flex items-center gap-2'>
+                        <Controller
+                          name={`questionOptions.${index}.content`}
+                          control={control}
+                          render={({ field }) => (
+                            <Input {...field} placeholder={`Option ${index + 1}`} className='flex-1' />
+                          )}
+                        />
+                        <Controller
+                          name={`questionOptions.${index}.isCorrect`}
+                          control={control}
+                          render={({ field: { value, onChange } }) => (
+                            <Switch
+                              checked={value}
+                              onCheckedChange={(newValue) => {
+                                if (questionType === 'MultipleChoice' && newValue) {
+                                  watchQuestionOptions.forEach((_, i) => {
+                                    setValue(`questionOptions.${i}.isCorrect`, i === index)
+                                  })
+                                } else {
+                                  onChange(newValue)
+                                }
+                                trigger('questionOptions')
+                              }}
+                              className='mx-2'
+                            />
+                          )}
+                        />
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='icon'
+                          onClick={() => remove(index)}
+                          className='h-8 w-8'
+                          disabled={fields.length <= 2}
+                        >
+                          <Trash2 className='h-4 w-4' />
+                        </Button>
+                      </div>
+                      {showErrors && errors.questionOptions?.[index]?.content && (
+                        <p className='text-sm text-red-500'>{errors.questionOptions[index].content.message}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
+                {showErrors && errors.questionOptions && 'root' in errors.questionOptions && (
+                  <p className='text-sm text-red-500'>{errors.questionOptions.root?.message}</p>
+                )}
+                <Button
+                  type='button'
+                  onClick={() => append({ content: '', isCorrect: false })}
+                  variant='outline'
+                  className='w-full mt-2'
+                >
+                  <Plus className='h-4 w-4 mr-2 mt-1' />
+                  Add Answer Option
+                </Button>
               </div>
             )}
-            {questionType === 'CodeSnippet' && (
-              <Button type='button' onClick={handleCreateCodeQuestion}>
+
+            {watchQuestionType === 'TrueFalse' && (
+              <div className='space-y-2'>
+                <Label>Correct Answer</Label>
+                <Controller
+                  name='questionOptions'
+                  control={control}
+                  defaultValue={[
+                    { content: 'True', isCorrect: true },
+                    { content: 'False', isCorrect: false }
+                  ]}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={(value) =>
+                        field.onChange([
+                          { content: 'True', isCorrect: value === 'True' },
+                          { content: 'False', isCorrect: value === 'False' }
+                        ])
+                      }
+                      defaultValue='True'
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select correct answer' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='True'>True</SelectItem>
+                        <SelectItem value='False'>False</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            )}
+            {/* {watchQuestionType === 'CodeSnippet' && (
+              <Button type='button' variant='outline' className='w-full'>
                 Create Problem Code Question
               </Button>
-            )}
-          </div>
-          <DialogFooter>
-            <Button onClick={handleSubmit}>Add Question</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <FullScreenPopup
-        isOpen={isFullScreenPopupOpen}
-        onClose={() => setIsFullScreenPopupOpen(false)}
-      />
-    </div>
-  )
-}
+            )} */}
+          </form>
+        </ScrollArea>
 
-AddQuestionForm.propTypes = {
-  onClose: PropTypes.func.isRequired
+        <DialogFooter className='px-6 py-4 border-t'>
+          <div className='flex justify-end space-x-2 w-full'>
+            <Button variant='outline' onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                setShowErrors(true)
+                handleSubmit(onSubmit)()
+              }}
+            >
+              Add Question
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
 }

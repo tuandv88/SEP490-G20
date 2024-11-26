@@ -1,0 +1,26 @@
+﻿namespace Learning.Domain.Models;
+public class UserEnrollment : Aggregate<UserEnrollmentId> {
+    public UserId UserId { get; set; } = default!;
+    public List<LectureProgress> LectureProgress = new();
+    public CourseId CourseId { get; set; } = default!;
+    public DateTime EnrollmentDate { get; set; }
+    public DateTime? CompletionDate { get; set; }
+    public UserEnrollmentStatus UserEnrollmentStatus { get; set; } = UserEnrollmentStatus.InProgress;
+    public int Rating { get; set; } = -1;
+    public string Feedback { get; set; } = default!;
+
+    public static UserEnrollment Create(UserEnrollmentId Id, UserId userId, CourseId courseId, DateTime enrollmentDate) {
+        return new UserEnrollment() {
+            Id = Id,
+            UserId = userId,
+            CourseId = courseId,
+            EnrollmentDate = enrollmentDate,
+            Feedback = ""
+        };
+    }
+    public void AddProgress(LectureProgress progress) {
+        LectureProgress.Add(progress);
+        // thêm event vào đây
+    }
+}
+

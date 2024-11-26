@@ -1,4 +1,4 @@
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using Serilog;
 using BuildingBlocks.Logging;
 
@@ -20,9 +20,39 @@ builder.Host.UseSerilog(SeriLogger.Configure)
         {
             options.EnableAnnotations();
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Discussion API", Version = "v1" });
-        });
 
-        services.AddControllers();
+
+
+            var securityScheme = new OpenApiSecurityScheme
+            {
+                Name = "JWT Authentication",
+                Description = "Enter your JWT token: ",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT"
+            };
+
+            options.AddSecurityDefinition("Bearer", securityScheme);
+
+            var securityRequirement = new OpenApiSecurityRequirement
+    {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                };
+
+            options.AddSecurityRequirement(securityRequirement);
+
+        });
     });
 
 var app = builder.Build();

@@ -16,8 +16,5 @@ public class UpdateChapterCommandValidator : AbstractValidator<UpdateChapterComm
         RuleFor(x => x.UpdateChapterDto.Description)
             .NotNull()
             .NotEmpty().WithMessage("Description is required.");
-
-        RuleFor(x => x.UpdateChapterDto.TimeEstimation)
-            .GreaterThan(0).WithMessage("Time estimation must be greater than zero.");
     }
 }

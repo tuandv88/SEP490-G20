@@ -42,24 +42,24 @@ public class CreateDiscussionHandler : ICommandHandler<CreateDiscussionCommand, 
     private async Task<Discussion> CreateNewDiscussion(CreateDiscussionDto createDiscussionDto)
     {
         // Dữ liệu test UserId
-        var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
+        //var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
 
-        if (!Guid.TryParse(userContextTest, out var currentUserIdTest))
-        {
-            throw new UnauthorizedAccessException("Invalid user ID.");
-        }
-
-        var userId = UserId.Of(currentUserIdTest);
-
-        // Lấy UserId từ UserContextService
-        //var currentUserId = _userContextService.User.Id;
-
-        //if (currentUserId == null)
+        //if (!Guid.TryParse(userContextTest, out var currentUserIdTest))
         //{
-        //    throw new UnauthorizedAccessException("User is not authenticated.");
+        //    throw new UnauthorizedAccessException("Invalid user ID.");
         //}
 
-        //var userId = UserId.Of(currentUserId.Value);
+        //var userId = UserId.Of(currentUserIdTest);
+
+        // Lấy UserId từ UserContextService
+        var currentUserId = _userContextService.User.Id;
+
+        if (currentUserId == null)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        }
+
+        var userId = UserId.Of(currentUserId);
 
         var categoryId = CategoryId.Of(createDiscussionDto.CategoryId);
 

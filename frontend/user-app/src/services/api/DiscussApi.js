@@ -28,8 +28,9 @@ export const DiscussApi = {
         const discussions = response.data.discussionDtos.data;
 
         const userIds = discussions.map(discussion => discussion.userId);
+        console.log(userIds);
         const users = await fetchUsers(userIds);
-
+        
         const updatedDiscussions = discussions.map(discussion => {
           const user = users.find(user => user.id === discussion.userId);
           return {
@@ -119,19 +120,67 @@ export const DiscussApi = {
   // API: Tạo comment mới
   createComment: async ({ discussionId, content, dateCreated, parentCommentId, depth, isActive }) => {
     try {
-      console.log(getAuthHeaders(), 123);
+      
       const commentData = { discussionId, content, dateCreated, parentCommentId, depth, isActive };
-
+      console.log(commentData,getAuthHeaders());
       // Gửi yêu cầu POST để tạo comment mới
       const response = await axios.post(`${API_BASE_URL}/community-service/comments`, commentData, getAuthHeaders());
-
       // Trả về dữ liệu comment mới
+
       return response.data;
     } catch (error) {
       console.error("Error creating comment:", error.message);
       throw error;
     }
   },
+  
+  getCommentsByDiscussionId: async (discussionId, pageIndex, pageSize) => {
+    try {
+      // Gọi API để lấy danh sách bình luận
+      const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/comments`, {
+        params: { PageIndex: pageIndex, PageSize: pageSize },
+        ...getAuthHeaders(), // Thêm headers nếu cần
+      });
+  
+      console.log("API Response:", response); // Xem dữ liệu trả về từ API
+  
+      // Kiểm tra và xử lý dữ liệu trả về
+      if (response && response.data && response.data.commentDtos) {
+        const comments = response.data.commentDtos.data;
+        const pagination = {
+          pageIndex: response.data.commentDtos.pageIndex,
+          pageSize: response.data.commentDtos.pageSize,
+          totalCount: response.data.commentDtos.count,
+        };
+  
+        // Lấy danh sách userId từ các bình luận
+        const commentUserIds = comments.map(comment => comment.userId);
+  
+        // Fetch thông tin người dùng cho tất cả các comment
+        const users = await fetchUsers(commentUserIds);
+  
+        // Cập nhật thông tin người dùng cho từng bình luận
+        const updatedComments = comments.map(comment => {
+          const commentUser = users.find(user => user.id === comment.userId);
+          return {
+            ...comment,
+            userName: commentUser ? commentUser.userName : "Unknown",
+            urlProfilePicture: commentUser ? commentUser.urlProfilePicture : "default-avatar.png",
+          };
+        });
+        console.log(updatedComments, pagination,456456);
+        // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang
+        return { updatedComments, pagination };
+      } else {
+        console.error("Dữ liệu trả về không hợp lệ:", response);
+        throw new Error("Dữ liệu trả về không hợp lệ từ API.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi API getCommentsByDiscussionId:", error.message);
+      throw error;
+    }
+  },  
+  
 };
 
 // API thứ hai: Lấy thông tin chi tiết của UserIds

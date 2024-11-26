@@ -5,6 +5,7 @@ import Layout from "@/layouts/layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"; 
 import { faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import CommentList from "../../components/discussions/CommentList"; 
 
 function DiscussionDetail() {
   const { id } = useParams();
@@ -14,6 +15,7 @@ function DiscussionDetail() {
   const [error, setError] = useState(null);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [refreshComments, setRefreshComments] = useState(false); // Thêm state để trigger lại việc tải comment
 
   // Fetch discussion details on component mount
   useEffect(() => {
@@ -33,27 +35,25 @@ function DiscussionDetail() {
     fetchDiscussion();
   }, [id]);
 
-  // Handle adding a new comment
   const handleAddComment = async () => {
     if (!newComment.trim()) return;  // Ensure comment is not empty
     setSubmitting(true);
     try {
       const commentData = {
-        discussionId: id,  // Get the discussion ID from the URL or current data
+        discussionId: id,
         content: newComment,
         dateCreated: new Date().toISOString(),
-        parentCommentId: null,  // Set parent comment ID if it's a reply
-        depth: 1,  // Set depth (comment level)
-        isActive: true,  // Ensure the comment is active
+        parentCommentId: null,
+        depth: 1,
+        isActive: true,
       };
-
+  
       // Call the API to create the comment
       await DiscussApi.createComment(commentData);
-
-      // Refetch the comments from the server after a new comment is added
-      const updatedDiscussion = await DiscussApi.getDiscussionDetails(id);
-      setDiscussion(updatedDiscussion);
-
+  
+      // Toggle the refreshComments state to trigger CommentList to reload comments
+      setRefreshComments((prev) => !prev);
+  
       setNewComment("");  // Reset the comment input field
     } catch (err) {
       console.error("Failed to add comment:", err);
@@ -62,6 +62,8 @@ function DiscussionDetail() {
       setSubmitting(false);
     }
   };
+  
+  
 
   if (loading) return <p>Loading discussion details...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
@@ -275,6 +277,7 @@ function DiscussionDetail() {
           ))}
         </div>
 
+        {/* Comment Input */}
         <div style={styles.commentInputContainer}>
           <textarea
             style={styles.commentInput}
@@ -291,26 +294,8 @@ function DiscussionDetail() {
           </button>
         </div>
 
-        <div style={styles.comments}>
-          <h3>Comments</h3>
-          {discussion?.comments?.length > 0 ? (
-            discussion?.comments?.map((comment) => (
-              <div key={comment.id} style={styles.comment}>
-                <div style={styles.commentUserContainer}>
-                  <img
-                    src={comment.urlProfilePicture || "default-avatar.png"}
-                    alt="User Avatar"
-                    style={styles.commentUserAvatar}
-                  />
-                  <p style={styles.commentUserName}>{comment.userName}</p>
-                </div>
-                <p style={styles.commentContent}>{comment.content}</p>
-              </div>
-            ))
-          ) : (
-            <p style={styles.noComments}>No comments available.</p>
-          )}
-        </div>
+        {/* Pass comments to CommentList */}
+        <CommentList discussionId={id} refresh={refreshComments} />
       </div>
     </Layout>
   );

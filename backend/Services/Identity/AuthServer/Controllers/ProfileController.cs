@@ -2,11 +2,7 @@
 using AuthServer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Text;
 using AuthServer.Models.ProfileViewModel;
-using IdentityServer4.Services;
-using Microsoft.AspNetCore.DataProtection;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authorization;
 using BuidingBlocks.Storage.Interfaces;

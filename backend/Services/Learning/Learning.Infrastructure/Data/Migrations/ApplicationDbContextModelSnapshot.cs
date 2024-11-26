@@ -338,14 +338,14 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<Guid>("LectureId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UserCourseId")
+                    b.Property<Guid>("UserEnrollmentId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("LectureId");
 
-                    b.HasIndex("UserCourseId");
+                    b.HasIndex("UserEnrollmentId");
 
                     b.ToTable("LecturesProgress");
                 });
@@ -537,7 +537,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 22, 22, 22, 23, 596, DateTimeKind.Utc).AddTicks(7929));
+                        .HasDefaultValue(new DateTime(2024, 11, 26, 20, 31, 23, 892, DateTimeKind.Utc).AddTicks(4308));
 
                     b.Property<string>("TestResults")
                         .IsRequired()
@@ -757,7 +757,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("StartTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 22, 22, 22, 23, 607, DateTimeKind.Utc).AddTicks(4737));
+                        .HasDefaultValue(new DateTime(2024, 11, 26, 20, 31, 23, 910, DateTimeKind.Utc).AddTicks(346));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -768,7 +768,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 22, 22, 22, 23, 607, DateTimeKind.Utc).AddTicks(5352));
+                        .HasDefaultValue(new DateTime(2024, 11, 26, 20, 31, 23, 910, DateTimeKind.Utc).AddTicks(1084));
 
                     b.Property<int>("TotalQuestions")
                         .HasColumnType("integer");
@@ -883,7 +883,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.ToTable("TestScripts");
                 });
 
-            modelBuilder.Entity("Learning.Domain.Models.UserCourse", b =>
+            modelBuilder.Entity("Learning.Domain.Models.UserEnrollment", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -903,7 +903,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 22, 22, 22, 23, 612, DateTimeKind.Utc).AddTicks(2703));
+                        .HasDefaultValue(new DateTime(2024, 11, 26, 20, 31, 23, 917, DateTimeKind.Utc).AddTicks(6752));
 
                     b.Property<string>("Feedback")
                         .IsRequired()
@@ -921,7 +921,7 @@ namespace Learning.Infrastructure.Data.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(-1);
 
-                    b.Property<string>("UserCourseStatus")
+                    b.Property<string>("UserEnrollmentStatus")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
@@ -934,7 +934,7 @@ namespace Learning.Infrastructure.Data.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("UserCourses");
+                    b.ToTable("UserEnrollments");
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
@@ -1157,9 +1157,9 @@ namespace Learning.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Learning.Domain.Models.UserCourse", null)
+                    b.HasOne("Learning.Domain.Models.UserEnrollment", null)
                         .WithMany("LectureProgress")
-                        .HasForeignKey("UserCourseId")
+                        .HasForeignKey("UserEnrollmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1231,10 +1231,10 @@ namespace Learning.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Learning.Domain.Models.UserCourse", b =>
+            modelBuilder.Entity("Learning.Domain.Models.UserEnrollment", b =>
                 {
                     b.HasOne("Learning.Domain.Models.Course", null)
-                        .WithMany("UserCourses")
+                        .WithMany("UserEnrollments")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1261,7 +1261,7 @@ namespace Learning.Infrastructure.Data.Migrations
                 {
                     b.Navigation("Chapters");
 
-                    b.Navigation("UserCourses");
+                    b.Navigation("UserEnrollments");
                 });
 
             modelBuilder.Entity("Learning.Domain.Models.Lecture", b =>
@@ -1296,7 +1296,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Navigation("QuizSubmissions");
                 });
 
-            modelBuilder.Entity("Learning.Domain.Models.UserCourse", b =>
+            modelBuilder.Entity("Learning.Domain.Models.UserEnrollment", b =>
                 {
                     b.Navigation("LectureProgress");
                 });

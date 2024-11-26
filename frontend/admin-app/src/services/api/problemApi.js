@@ -29,7 +29,7 @@ export const getProblemById = async (problemId) => {
   }
 }
 
-export const createProblem = async (problemData) => {
+export const createProblem = async (problemData, lectureId) => {
   try {
     const response = await axiosInstance.post('/learning-service/problems', problemData, {
       headers: {

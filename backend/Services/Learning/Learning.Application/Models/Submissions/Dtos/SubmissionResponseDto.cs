@@ -1,6 +1,7 @@
 ﻿namespace Learning.Application.Models.Submissions.Dtos;
 public record SubmissionResponseDto(
     string Token,
+    string SourceCode,
     string? RunTimeErrors,
     string? CompileErrors,
     double ExecutionTime,

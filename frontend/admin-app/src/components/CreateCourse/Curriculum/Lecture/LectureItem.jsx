@@ -191,7 +191,7 @@ export default function LectureItem({
     videoInputRef.current.click()
   }
   const handleCreateCodeProblem = () => {
-    navigate({ to: '/create-code-problem' })
+    navigate({ to: `/create-problem/${lecture.id}` })
   }
 
   const handleQuizFormOpen = () => {

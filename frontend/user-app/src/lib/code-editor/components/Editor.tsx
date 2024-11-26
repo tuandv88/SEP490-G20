@@ -63,7 +63,7 @@ const Editor = ({
     if (data) {
       data.editor.setValue(initValue)
     }
-  }, [initValue])
+  }, [])
 
 
   const run = async (javaEditor: JavaMonacoEditor) => {
@@ -75,8 +75,6 @@ const Editor = ({
       initValue = text
     }
 
-
-    console.log(initValue)
     await javaEditor.createEditor(initValue)
 
     

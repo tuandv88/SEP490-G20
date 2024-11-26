@@ -4,7 +4,7 @@ using Learning.Application.Models.Quizs.Dtos;
 namespace Learning.Application.Models.Lectures.Queries.GetLecureById;
 public class GetLectureDetailsHandler(ILectureRepository lectureRepository, IQuizRepository quizRepository, 
     IProblemRepository problemRepository, IUserContextService userContext, ICourseRepository courseRepository,
-    IQuizSubmissionRepository quizSubmissionRepository, IUserCourseRepository userCourseRepository
+    IQuizSubmissionRepository quizSubmissionRepository, IUserEnrollmentRepository userCourseRepository
     ) : IQueryHandler<GetLectureDetailQuery, GetLectureDetailsResult> {
     public async Task<GetLectureDetailsResult> Handle(GetLectureDetailQuery request, CancellationToken cancellationToken) {
         var lecture = await lectureRepository.GetLectureByIdDetail(request.LectureId);

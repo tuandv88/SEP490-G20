@@ -2,6 +2,7 @@
 
 namespace Community.Application.Models.Categories.Commands.CreateCategory;
 
+[Authorize($"{PoliciesType.Administrator}")]
 public record CreateCategoryCommand(CreateCategoryDto CreateCategoryDto) : ICommand<CreateCategoryResult>;
 public record CreateCategoryResult(Guid? Id, bool IsSuccess, string Message);
 

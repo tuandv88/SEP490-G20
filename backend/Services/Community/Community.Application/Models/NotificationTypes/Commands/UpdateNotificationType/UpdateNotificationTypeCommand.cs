@@ -1,7 +1,7 @@
 ﻿using Community.Application.Models.NotificationTypes.Dtos;
 
 namespace Community.Application.Models.NotificationTypes.Commands.UpdateNotificationType;
-
+[Authorize]
 public record UpdateNotificationTypeCommand(UpdateNotificationTypeDto UpdateNotificationTypeDto)
     : ICommand<UpdateNotificationTypeResult>;
 

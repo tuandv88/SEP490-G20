@@ -13,7 +13,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .WithOne()
             .HasForeignKey(ci => ci.CourseId);
 
-        builder.HasMany(c => c.UserCourses)
+        builder.HasMany(c => c.UserEnrollments)
             .WithOne()
             .HasForeignKey(ci => ci.CourseId);
 

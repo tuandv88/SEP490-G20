@@ -79,3 +79,17 @@ export const deleteQuestion = async (quizId, questionId) => {
     throw error
   }
 }
+
+export const createProblemQuestion = async (quizId, problemData) => {
+  try {
+    const response = await axiosInstance.post(`/learning-service/quizs/${quizId}/questions`, problemData, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error creating problem question:', error)
+    throw error
+  }
+}

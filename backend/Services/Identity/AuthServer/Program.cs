@@ -15,6 +15,7 @@ using BuildingBlocks.Email.Services;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using AuthServer.Repository.Services.Storage;
 using StackExchange.Redis;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -102,11 +103,11 @@ builder.Services.AddAuthentication(options =>
 })
 .AddCookie(options =>
 {
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(15);   // Thời gian sống của cookie là 15 phút
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);   // Thời gian sống của cookie là 60 phút
     options.SlidingExpiration = true;                    // Tự động gia hạn thời gian sống khi người dùng hoạt động
     options.AccessDeniedPath = "/Account/AccessDenied";  // Đường dẫn khi truy cập bị từ chối
-    options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout";
+    options.LoginPath = "/Account/Login";                // Đường dẫn khi người dùng chưa đăng nhập
+    options.LogoutPath = "/Account/Logout";              // Đường dẫn khi người dùng đăng xuất
 })
 .AddGoogle(googleOptions =>
 {
@@ -127,9 +128,30 @@ builder.Services.ConfigureApplicationCookie(opts =>
     });
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireRole("admin"));
+    options.AddPolicy("Moderator", policy => policy.RequireRole("moderator"));
+    options.AddPolicy("Learner", policy => policy.RequireRole("learner"));
+});
+
+
+// Thêm chính sách CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Địa chỉ được phép
+              .AllowAnyHeader()                    // Cho phép tất cả header
+              .AllowAnyMethod()                    // Cho phép tất cả HTTP method (GET, POST, PUT, DELETE, ...)
+              .AllowCredentials();                 // Cho phép gửi cookie hoặc xác thực
+    });
+});
+
+
 // Cấu hình SendMail - Nuget: FluentMail
-builder.Services.AddFluentEmail(builder.Configuration);
 builder.Services.AddTransient<IEmailService, EmailService>();
+
 // AddStorate
 builder.Services.AddStorage(builder.Configuration);
 builder.Services.AddScoped<IBase64Converter, Base64Converter>();
@@ -154,8 +176,6 @@ if (args.Contains("/seeddata"))
     }
 }
 
-
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -167,6 +187,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Sử dụng chính sách CORS
+app.UseCors("AllowSpecificOrigin");
 
 app.UseIdentityServer();
 

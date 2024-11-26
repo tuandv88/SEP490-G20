@@ -12,7 +12,13 @@ const useStore = create((set) => ({
   codeResponse: null,
   setCodeResponse: (newCodeResponse) => set({ codeResponse: newCodeResponse }),
   selectedConversationId: null,
-  setSelectedConversationId: (newSelectedConversationId) => set({ selectedConversationId: newSelectedConversationId })
+  setSelectedConversationId: (newSelectedConversationId) => set({ selectedConversationId: newSelectedConversationId }),
+
+  codeRunQuiz: null,
+  setCodeRunQuiz: (newCodeRunQuiz) => set({ codeRunQuiz: newCodeRunQuiz }),
+  
+  testCasesQuiz: null,
+  setTestCasesQuiz: (newTestCasesQuiz) => set({ testCasesQuiz: newTestCasesQuiz }),
 }))
 
 export default useStore

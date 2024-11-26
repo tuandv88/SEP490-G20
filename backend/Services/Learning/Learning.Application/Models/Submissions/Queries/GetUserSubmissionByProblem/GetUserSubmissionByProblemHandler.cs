@@ -4,7 +4,9 @@ public class GetUserSubmissionByProblemHandler(IProblemSubmissionRepository repo
         var userId = userContext.User.Id;
         var problemSubmission = await repository.GetByProblemIdAndUserIdAsync(request.ProblemId, userId);
 
-        var submission = problemSubmission.Select(p => p.ToSubmissionLectureViewDto()).ToList();
+        var submission = problemSubmission
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => p.ToSubmissionLectureViewDto()).ToList();
 
         return new GetUserSubmissionByProblemResult(submission);
     }

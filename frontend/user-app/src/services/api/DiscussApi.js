@@ -20,8 +20,7 @@ export const DiscussApi = {
 
       // Gửi yêu cầu GET tới API với header Authorization
       const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/options`, {
-        params: { pageIndex, pageSize, orderBy, tags },
-        ...getAuthHeaders(), // Thêm headers
+        params: { pageIndex, pageSize, orderBy, tags }
       });
 
       if (response && response.data && response.data.discussionDtos && response.data.discussionDtos.data) {
@@ -57,7 +56,7 @@ export const DiscussApi = {
   // API: Lấy danh sách các categories
   getCategories: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/community-service/categories`, getAuthHeaders());
+      const response = await axios.get(`${API_BASE_URL}/community-service/categories`);
       return response.data;
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -68,10 +67,10 @@ export const DiscussApi = {
   // API: Lấy chi tiết một discussion và thêm urlProfilePicture
   getDiscussionDetails: async (discussionId) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/community-service/discussion/${discussionId}/details`, getAuthHeaders());
+      const response = await axios.get(`${API_BASE_URL}/community-service/discussion/${discussionId}`);
 
       if (response && response.data) {
-        const discussion = response.data.discussionDetailDto;
+        const discussion = response.data.discussionDto;
         const userIds = [discussion.userId];
         const users = await fetchUsers(userIds);
 
@@ -80,20 +79,6 @@ export const DiscussApi = {
           discussion.urlProfilePicture = user.urlProfilePicture;
           discussion.userName = user.userName;
         }
-
-        const commentUserIds = discussion.comments.map(comment => comment.userId);
-        const commentUsers = await fetchUsers(commentUserIds);
-
-        const updatedComments = discussion.comments.map(comment => {
-          const commentUser = commentUsers.find(user => user.id === comment.userId);
-          return {
-            ...comment,
-            userName: commentUser ? commentUser.userName : "Unknown",
-            urlProfilePicture: commentUser ? commentUser.urlProfilePicture : "default-avatar.png",
-          };
-        });
-
-        discussion.comments = updatedComments;
 
         return discussion;
       } else {
@@ -138,8 +123,7 @@ export const DiscussApi = {
     try {
       // Gọi API để lấy danh sách bình luận
       const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/comments`, {
-        params: { PageIndex: pageIndex, PageSize: pageSize },
-        ...getAuthHeaders(), // Thêm headers nếu cần
+        params: { PageIndex: pageIndex, PageSize: pageSize }
       });
   
       console.log("API Response:", response); // Xem dữ liệu trả về từ API

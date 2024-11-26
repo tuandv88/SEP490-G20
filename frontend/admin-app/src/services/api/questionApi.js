@@ -47,6 +47,23 @@ export const updateQuestion = async (quizId, questionId, questionData) => {
     throw error
   }
 }
+export const updateQuestionById = async (quizId, questionId, questionUpdateData) => {
+  try {
+    const response = await axiosInstance.put(
+      `/learning-service/quizs/${quizId}/questions/${questionId}`,
+      questionUpdateData,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.error('Error updating question:', error)
+    throw error
+  }
+}
 
 // Method to delete a question
 export const deleteQuestion = async (quizId, questionId) => {

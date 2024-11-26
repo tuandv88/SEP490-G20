@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -11,9 +11,9 @@ import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { createQuestion } from '@/services/api/questionApi'
 import { useToast } from '@/hooks/use-toast'
 import { Trash2, Plus } from 'lucide-react'
+import { updateQuestionById } from '@/services/api/questionApi'
 
 const QUESTION_TYPES = ['MultipleChoice', 'MultipleSelect', 'TrueFalse']
 const QUESTION_LEVELS = ['EASY', 'MEDIUM', 'HARD', 'EXPERT']
@@ -38,10 +38,10 @@ const questionSchema = z.object({
     })
 })
 
-export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
-  const [questionType, setQuestionType] = useState('MultipleChoice')
+export function EditQuestionForm({ quizId, question, onSave, onCancel }) {
   const { toast } = useToast()
   const [showErrors, setShowErrors] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     control,
@@ -53,15 +53,11 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
   } = useForm({
     resolver: zodResolver(questionSchema),
     defaultValues: {
-      content: '',
-      isActive: true,
-      questionType: 'MultipleChoice',
-      questionLevel: 'EASY',
-      mark: 1,
-      questionOptions: [
-        { content: '', isCorrect: true },
-        { content: '', isCorrect: false }
-      ]
+      ...question,
+      questionOptions: question.questionOptions.map((option) => ({
+        content: option.content,
+        isCorrect: option.isCorrect
+      }))
     }
   })
 
@@ -95,46 +91,57 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
 
   const onSubmit = async (data) => {
     setShowErrors(true)
-    console.log('Form errors:', errors) // Add this line
     if (Object.keys(errors).length > 0) {
-      return // Ngăn form submit nếu có lỗi
+      return
     }
 
+    setIsSubmitting(true)
+
     const updatedQuestionOptions = data.questionOptions.map((option, index) => ({
-      ...option,
+      id: option.id,
+      content: option.content,
+      isCorrect: option.isCorrect,
       orderIndex: index
     }))
 
-    const createQues = {
-      createQuestionDto: {
-        ...data,
+    const updateQues = {
+      question: {
+        isActive: data.isActive,
+        content: data.content,
+        questionType: data.questionType,
+        questionLevel: data.questionLevel,
+        mark: data.mark,
+        problemId: question.problemId,
+        problem: question.problem,
         questionOptions: updatedQuestionOptions
       }
     }
 
     try {
-      await createQuestion(createQues, quizId)
-      setIsUpdate(!isUpdate)
+      const updatedQuestion = await updateQuestionById(quizId, question.id, updateQues)
       toast({
         title: 'Success',
-        description: 'Question created successfully',
+        description: 'Question updated successfully',
         duration: 1500
       })
-      onClose()
+      onSave(updatedQuestion)
     } catch (error) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error.message || 'Failed to update question',
         variant: 'destructive',
         duration: 1500
       })
+    } finally {
+      setIsSubmitting(false)
     }
   }
+
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog open={true} onOpenChange={onCancel}>
       <DialogContent className='max-w-[500px] h-[600px] p-0 overflow-hidden flex flex-col'>
         <DialogHeader className='px-6 py-4 border-b'>
-          <DialogTitle className='text-xl font-semibold'>Add New Question</DialogTitle>
+          <DialogTitle className='text-xl font-semibold'>Edit Question</DialogTitle>
         </DialogHeader>
 
         <ScrollArea className='flex-grow px-6 py-4'>
@@ -165,13 +172,7 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
                   name='questionType'
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value)
-                        setQuestionType(value)
-                      }}
-                      value={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger id='questionType'>
                         <SelectValue placeholder='Select type' />
                       </SelectTrigger>
@@ -228,7 +229,7 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
               {showErrors && errors.mark && <p className='text-sm text-red-500'>{errors.mark.message}</p>}
             </div>
 
-            {(questionType === 'MultipleChoice' || questionType === 'MultipleSelect') && (
+            {(watchQuestionType === 'MultipleChoice' || watchQuestionType === 'MultipleSelect') && (
               <div className='space-y-2'>
                 <Label>Answer Options</Label>
                 <div className='max-h-[200px] overflow-y-auto pr-2'>
@@ -249,7 +250,7 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
                             <Switch
                               checked={value}
                               onCheckedChange={(newValue) => {
-                                if (questionType === 'MultipleChoice' && newValue) {
+                                if (watchQuestionType === 'MultipleChoice' && newValue) {
                                   watchQuestionOptions.forEach((_, i) => {
                                     setValue(`questionOptions.${i}.isCorrect`, i === index)
                                   })
@@ -288,7 +289,7 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
                   variant='outline'
                   className='w-full mt-2'
                 >
-                  <Plus className='h-4 w-4 mr-2 mt-1' />
+                  <Plus className='h-4 w-4 mr-2' />
                   Add Answer Option
                 </Button>
               </div>
@@ -326,28 +327,22 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
                 />
               </div>
             )}
-            {/* {watchQuestionType === 'CodeSnippet' && (
-              <Button type='button' variant='outline' className='w-full'>
-                Create Problem Code Question
-              </Button>
-            )} */}
           </form>
         </ScrollArea>
 
         <DialogFooter className='px-6 py-4 border-t'>
-          <div className='flex justify-end space-x-2 w-full'>
-            <Button variant='outline' onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                setShowErrors(true)
-                handleSubmit(onSubmit)()
-              }}
-            >
-              Add Question
-            </Button>
-          </div>
+          <Button variant='outline' onClick={onCancel} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              setShowErrors(true)
+              handleSubmit(onSubmit)()
+            }}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Updating...' : 'Update Question'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

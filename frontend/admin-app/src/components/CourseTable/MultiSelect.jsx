@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ChevronDown } from 'lucide-react'
 
-export default function MultiSelect({ options, placeholder, onChange, value, resetKey, isOpen, setIsOpen }) {
+export default function MultiSelect({ options, placeholder, onChange, value, resetKey, isOpen, setIsOpen, icon }) {
   const [selectedItems, setSelectedItems] = useState(value)
   const dropdownRef = useRef(null)
 
@@ -36,6 +36,7 @@ export default function MultiSelect({ options, placeholder, onChange, value, res
   return (
     <div className='relative inline-block' ref={dropdownRef}>
       <Button variant='outline' onClick={() => setIsOpen(!isOpen)} className='w-[200px] justify-between'>
+        {icon}
         {selectedItems.length > 0 ? `${selectedItems.length} selected` : placeholder}
         <ChevronDown className='w-4 h-4 ml-2' />
       </Button>
@@ -63,5 +64,6 @@ MultiSelect.propTypes = {
   value: PropTypes.arrayOf(PropTypes.string),
   resetKey: PropTypes.number.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  setIsOpen: PropTypes.func.isRequired
+  setIsOpen: PropTypes.func.isRequired,
+  icon: PropTypes.node
 }

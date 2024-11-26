@@ -15,6 +15,20 @@ export const getProblems = async (pageIndex, pageSize) => {
   }
 }
 
+export const getProblemById = async (problemId) => {
+  try {
+    const response = await axiosInstance.get(`/learning-service/problems/${problemId}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error get problem by id:', error)
+    throw error
+  }
+}
+
 export const createProblem = async (problemData) => {
   try {
     const response = await axiosInstance.post('/learning-service/problems', problemData, {

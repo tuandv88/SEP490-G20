@@ -56,7 +56,7 @@ function Tabs({ onCategoryChange, categoryId }) {
         .tabs {
           display: flex;
           justify-content: space-evenly;
-          padding: 30px;
+          padding: 22px;
           border-radius: 8px;
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
           width: 100%;

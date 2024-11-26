@@ -35,6 +35,8 @@ export const DiscussApi = {
           return {
             ...discussion,
             urlProfilePicture: user ? user.urlProfilePicture : null,
+            firstName: user ? user.firstName : null,
+            lastName: user ? user.lastName : null
           };
         });
 

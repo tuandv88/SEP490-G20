@@ -60,7 +60,7 @@ const Discuss = () => {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
             font-family: "Helvetica Neue", Arial, sans-serif;
             background-color: #f9f9f9;
             min-height: 100vh;
@@ -77,7 +77,7 @@ const Discuss = () => {
           .content-container {
             width: 100%;
             max-width: 1200px;
-            margin-top: 5px;
+            margin-top: 2px;
             padding: 0;
             background-color: #ffffff;
             border-radius: 8px;

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { faThumbtack, faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { formatDistanceToNow } from 'date-fns';
 import { DiscussApi } from "@/services/api/DiscussApi";
 
 function PostList({ categoryId }) {
@@ -15,7 +16,7 @@ function PostList({ categoryId }) {
   const [tags, setTags] = useState("");
 
   const navigate = useNavigate();
-  const pageSize = 1;
+  const pageSize = 3;
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -33,15 +34,12 @@ function PostList({ categoryId }) {
           setPosts(data.updatedDiscussions);
           setTotalCount(data.dataDiscussionDtos.count);
           setTotalPages(Math.ceil(data.dataDiscussionDtos.count / pageSize)); // Tính tổng số trang
-
         }
 
-        console.log(data.dataDiscussionDtos);
-        console.log(totalCount);
-        console.log(totalPages);
-
+        console.log(data.updatedDiscussions);
       } catch (err) {
         setError("Failed to fetch posts");
+        setLoading(true);
       } finally {
         setLoading(false);
       }
@@ -76,6 +74,26 @@ function PostList({ categoryId }) {
     });
   };
 
+  // Hàm định dạng thời gian, sử dụng formatDate nếu vượt quá 7 ngày
+  const formatRelativeDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+
+    // Tính số ngày đã qua kể từ ngày đăng
+    const diffInTime = now - date;
+    const diffInDays = Math.floor(diffInTime / (1000 * 60 * 60 * 24));
+
+    if (diffInDays >= 7) {
+      // Nếu đã qua 1 tuần, hiển thị theo định dạng ngày giờ đầy đủ
+      return formatDate(dateString);
+    }
+
+    // Nếu chưa qua 7 ngày, sử dụng formatDistanceToNow để hiển thị "x minutes ago", "x days ago", v.v.
+    const distance = formatDistanceToNow(date, { addSuffix: true });
+
+    return distance;
+  };
+
   return (
     <div className="post-list-container">
       {/* Filters Section */}
@@ -100,6 +118,7 @@ function PostList({ categoryId }) {
             Most Votes
           </span>
         </div>
+
         <div className="search-container">
           <input
             type="text"
@@ -108,6 +127,7 @@ function PostList({ categoryId }) {
             onChange={(e) => setTags(e.target.value)}
             className="search-input"
           />
+
           <button className="new-button" onClick={() => navigate("/createpost")}>
             New +
           </button>
@@ -126,51 +146,56 @@ function PostList({ categoryId }) {
       {!loading && (
         <div className="posts">
           {posts.map((post) => (
-            <div
-              key={post.id}
-              className="post-item"
-              onClick={() => handlePostClick(post.id)}
-            >
-              <div className="post-content">
-                <div className="post-header">
-                  {/* Avatar Image of User */}
+            <div key={post.id} className="post-item" onClick={() => handlePostClick(post.id)}>
+              {/* Header */}
+              <div className="post-header">
+                <div className="post-header-left">
+                  {/* Avatar */}
                   <img
                     src={post.urlProfilePicture || "default-avatar.png"}
-                    alt={post.userName}
+                    alt="User Avatar"
                     className="user-avatar"
                   />
-                  <h3 className="post-title">{post.title}</h3>
-                  <div className="post-tags">
-                    {post.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="tag"
-                        onClick={(e) => {
+
+                  {/* Title */}
+                  <div>
+                    <h3 className="post-title">
+                      {post.pinned && (
+                        <FontAwesomeIcon icon={faThumbtack} className="icon pin-icon" />
+                      )}
+                      {post.title}
+                    </h3>
+                    <div className="post-tags">
+                      {post.tags.map((tag, idx) => (
+                        <span key={idx} className="tag" onClick={(e) => {
                           e.stopPropagation();
                           handleTagClick(tag);
-                        }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                        }}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="post-meta">
-                  <strong>{post.userName}</strong>
-                  <p className="post-info">
-                    Created at: {formatDate(post.dateCreated)}
-                    <span> | </span>
-                    Update at: {formatDate(post.dateUpdated)}
-                  </p>
-                </div>
               </div>
-              <div className="post-stats">
-                <span className="stat">
-                  <FontAwesomeIcon icon={faChevronUp} className="icon" /> {post.voteCount}
-                </span>
-                <span className="stat">
-                  <FontAwesomeIcon icon={faEye} className="icon" /> {post.viewCount}
-                </span>
+
+              {/* Footer: Meta and Stats */}
+              <div className="post-footer">
+                {/* Meta */}
+                <div className="post-meta">
+                  <strong>{post.firstName} {post.lastName}</strong>
+                  <p>Created at: {formatRelativeDate(post.dateCreated)} | Updated at: {formatRelativeDate(post.dateUpdated)}</p>
+                </div>
+
+                {/* Stats */}
+                <div className="post-stats">
+                  <span className="stat">
+                    <FontAwesomeIcon icon={faChevronUp} className="icon" /> {post.voteCount}
+                  </span>
+                  <span className="stat">
+                    <FontAwesomeIcon icon={faEye} className="icon" /> {post.viewCount}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
@@ -178,7 +203,7 @@ function PostList({ categoryId }) {
       )}
 
       {/* Pagination */}
-      {totalPages > 0 && (
+      {!loading && totalPages > 0 && (
         <div className="pagination">
           {/* Nút Previous */}
           <button
@@ -235,6 +260,7 @@ function PostList({ categoryId }) {
           </button>
         </div>
       )}
+
       <style jsx>{`
   /* Container chính của PostList */
   .post-list-container {
@@ -242,9 +268,8 @@ function PostList({ categoryId }) {
     width: 100%;
     max-width: 1200px;
     font-family: "Helvetica Neue", Arial, sans-serif;
-    padding: 20px;
+    padding: 15px;
     border-radius: 10px; /* Bo góc */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
     background: #f9f9f9;
   }
 
@@ -400,100 +425,140 @@ function PostList({ categoryId }) {
   }
 
 
-  /* Danh sách bài viết */
-  .posts {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
+/* Danh sách bài viết */
+/* Từng bài viết */
+.post-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px; /* Khoảng cách với nội dung ở trên */
+  padding: 20px 25px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
 
-  .post-item {
-    padding: 20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    background: #ffffff;
-    transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+.post-item:hover {
+  box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
 
-  .post-item:hover {
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(-3px); /* Nhấn nổi */
-  }
+/* Header bài viết */
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .post-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+.post-header-left {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
 
-  .post-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
+/* Avatar */
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid #eef2ff;
+}
 
-  .user-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  }
+/* Tiêu đề */
+.post-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  .post-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: #1e334a;
-  }
+.pin-icon {
+  color: #2563eb;
+  font-size: 18px;
+}
 
-  .post-tags {
-    display: flex;
-    gap: 8px;
-  }
+/* Tags */
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
 
-  .tag {
-    background-color: #f1f5f9;
-    color: #007bff;
-    padding: 4px 10px;
-    font-size: 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
-  }
+.tag {
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #1e334a;
+  background-color: #eef2ff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
 
-  .tag:hover {
-    background-color: #e0e7ff;
-  }
+.tag:hover {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
 
-  .post-meta {
-    font-size: 12px;
-    color: #6b7280;
-  }
+/* Metadata và Stats cùng dòng */
+/* Footer (Meta và Stats) */
+.post-footer {
+  display: flex;
+  justify-content: space-between; /* Căn các phần tử về hai đầu */
+  align-items: center;
+  margin-top: 8px; /* Khoảng cách với nội dung ở trên */
+  width: 100%; /* Đảm bảo chiều rộng đầy đủ */
+}
 
-  .post-stats {
-    display: flex;
-    gap: 15px;
-    font-size: 14px;
-    color: #6b7280;
-    align-items: center;
-  }
+/* Metadata */
+.post-meta {
+  font-size: 13px;
+  color: #6b7280;
+  display: flex;
+  gap: 10px; /* Khoảng cách giữa các metadata */
+  align-items: center;
+}
 
-  .stat {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
+.post-meta strong {
+  font-weight: 600;
+  color: #1e334a;
+}
 
-  .icon {
-    font-size: 16px;
-    color: #6b7280;
-  }
+/* Stats */
+.post-stats {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  color: #64748b;
+  align-items: center;
+}
 
-  .pagination {
+/* Thống kê (Icon và số liệu) */
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.icon {
+  font-size: 16px;
+  color: #1e334a;
+}
+
+
+/* Hiệu ứng hover tiêu đề */
+.post-item:hover .post-title {
+  color: #2563eb;
+}
+
+/* Phân trang */
+.pagination {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -501,31 +566,47 @@ function PostList({ categoryId }) {
 }
 
 .page-item {
-  border: 1px solid #ddd;
-  background-color: #fff;
-  color: #333;
-  padding: 8px 12px;
-  margin: 0 5px;
-  border-radius: 4px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px; /* Đặt padding hợp lý để các nút không quá to hoặc quá nhỏ */
+  font-size: 12px; /* Font chữ dễ đọc */
+  color: #1e334a; /* Màu chữ giống với nút filter */
+  background: #f9f9f9; /* Nền trắng như filter */
+  border: 0.2px solid #e0e0e0; /* Viền mỏng tinh tế */
+  border-radius: 6px; /* Bo góc nhẹ */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  margin: 0 5px; /* Khoảng cách giữa các nút */
 }
 
+/* Hiệu ứng hover */
 .page-item:hover {
-  background-color: #007bff;
-  color: #fff;
+  color: #ffffff; /* Màu chữ trắng khi hover */
+  background: #1e334a; /* Nền xanh đậm khi hover */
+  border-color: #1e334a; /* Viền xanh khi hover */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
 }
 
+/* Nút đang active */
 .page-item.active {
-  background-color: #007bff;
-  color: #fff;
-  border-color: #007bff;
+  color: #ffffff; /* Chữ trắng khi active */
+  background: #1e334a; /* Nền xanh đậm khi active */
+  font-weight: bold;
+  border-color: #1e334a; /* Viền xanh khi active */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn khi active */
+  transform: scale(1.05); /* Phóng to nhẹ khi active */
 }
 
+/* Nút Next/Previous khi disabled */
 .page-item.disabled {
   cursor: not-allowed;
-  background-color: #f8f9fa;
-  color: #adb5bd;
+  background-color: #f8f9fa; /* Nền xám khi disabled */
+  color: #adb5bd; /* Màu chữ xám khi disabled */
 }
 
 .page-item.disabled:hover {
@@ -533,12 +614,12 @@ function PostList({ categoryId }) {
   color: #adb5bd;
 }
 
+/* Dấu ba chấm */
 .dots {
   margin: 0 10px;
   font-size: 16px;
-  color: #6c757d;
+  color: #6c757d; /* Màu xám của dấu ba chấm */
 }
-
 
     .loader-container {
     display: flex;

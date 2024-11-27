@@ -7,15 +7,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using BuidingBlocks.Storage;
-using BuildingBlocks.Email;
 using AuthServer.Repository.Services.Base64Converter;
-using Microsoft.Extensions.DependencyInjection;
 using BuildingBlocks.Email.Interfaces;
 using BuildingBlocks.Email.Services;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using AuthServer.Repository.Services.Storage;
 using StackExchange.Redis;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,7 +88,7 @@ builder.Services.AddIdentityServer(options =>
     options.ConfigureDbContext = b => b.UseNpgsql(connectionString,              // Sử dụng UseNpgsql cho PostgreSQL
         npgsql => npgsql.MigrationsAssembly(migrationsAssembly));
     options.EnableTokenCleanup = builder.Configuration["TokenCleanupOptions:EnableTokenCleanup"] == "true";             // Bật xóa token tự động
-    options.TokenCleanupInterval = int.Parse(builder.Configuration["TokenCleanupOptions:TokenCleanupInterval"]); ;      // Thời gian dọn dẹp token (giây)
+    options.TokenCleanupInterval = int.Parse(builder.Configuration["TokenCleanupOptions:TokenCleanupInterval"]!); ;      // Thời gian dọn dẹp token (giây)
 });
 
 // Cấu hình Google Authentication

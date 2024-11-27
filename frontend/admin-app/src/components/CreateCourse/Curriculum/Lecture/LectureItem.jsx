@@ -37,7 +37,7 @@ export default function LectureItem({
   onVideoUpload,
   onFileRemove,
   onVideoRemove,
-
+  courseId
 }) {
   const [isRunning1, setIsRunning1] = useState(false)
   const [isRunning2, setIsRunning2] = useState(false)
@@ -191,7 +191,9 @@ export default function LectureItem({
     videoInputRef.current.click()
   }
   const handleCreateCodeProblem = () => {
-    navigate({ to: `/create-problem/${lecture.id}` })
+    navigate({
+      to: `/edit-course/${courseId}/create-problem-lecture/${lecture.id}`
+    })
   }
 
   const handleQuizFormOpen = () => {

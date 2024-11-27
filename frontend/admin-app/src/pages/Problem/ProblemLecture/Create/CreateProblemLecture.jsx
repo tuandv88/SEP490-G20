@@ -5,17 +5,20 @@ import BottomTabs from './BottomTabs';
 import { FormProvider, useForm } from 'react-hook-form'
 import { useToast } from '@/hooks/use-toast'
 import FormTabs from './FormTabs';
-import { createProblem } from '@/services/api/problemApi'
-import { useMatch } from '@tanstack/react-router';
-import { createProblemRoute } from '@/routers/router';
+import { createProblemLecture } from '@/services/api/problemApi'
+import { useMatch, useNavigate } from '@tanstack/react-router';
+import { createProblemLectureRoute } from '@/routers/router';
 
-const CreateProblem = ({ }) => {
+
+const CreateProblemLecture = ({ }) => {
 
   //new
-  const { params } = useMatch(createProblemRoute.id);
+  const { params } = useMatch(createProblemLectureRoute.id);
   const { lectureId } = params;
-  console.log(lectureId)
-  
+  const { courseId } = params;
+  const navigate = useNavigate()
+
+
   const [activeTab, setActiveTab] = useState('basic');
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
   const { toast } = useToast();
@@ -32,7 +35,7 @@ const CreateProblem = ({ }) => {
   const form = useForm({
     defaultValues: {
       title: "",
-      description: "This is a problem for lecture", //new
+      description: "",
       problemType: "Practice",
       difficultyType: "Medium",
       cpuTimeLimit: 2,
@@ -65,13 +68,20 @@ const CreateProblem = ({ }) => {
     console.log(problemData)
 
     try {
-      const response = await createProblem(problemData, lectureId)
+      const response = await createProblemLecture(problemData, lectureId)
       toast({
+        variant: 'success',
         title: 'Create problem successfully',
         description: 'Create problem successfully'
       })
-      //navigate here
+      navigate({ to: `/edit-course/${courseId}` })
     } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Oops! Something went wrong',
+        description: 'Please try again!',
+        action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
+      })
       console.error('Error creating problem:', error)
     }
   
@@ -79,10 +89,16 @@ const CreateProblem = ({ }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header courseId={courseId} />
       <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormTabs activeTab={activeTab} form={form} setIsSaveTemplate={setIsSaveTemplate} setIsRunSuccess={setIsRunSuccess} hasLecture={hasLecture}/>
+        <FormTabs 
+          activeTab={activeTab} 
+          form={form} 
+          setIsSaveTemplate={setIsSaveTemplate} 
+          setIsRunSuccess={setIsRunSuccess} 
+          hasLecture={hasLecture}
+        />
         <BottomTabs 
           
           activeTab={activeTab} 
@@ -97,4 +113,4 @@ const CreateProblem = ({ }) => {
   );
 }
 
-export default React.memo(CreateProblem);
+export default React.memo(CreateProblemLecture);

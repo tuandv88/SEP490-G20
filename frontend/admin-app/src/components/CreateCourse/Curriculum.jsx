@@ -211,6 +211,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         onVideoUpload={handleVideoUpload}
         onFileRemove={handleFileRemove}
         onVideoRemove={handleVideoRemove}
+        courseId={courseId}
       />
 
       <AddLectureDialog

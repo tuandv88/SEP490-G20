@@ -206,6 +206,10 @@ export default function QuizManagement() {
             </div>
           </CardContent>
         </Card>
+        <Button className="mt-4 w-full" onClick={() => setShowAddQuestionForm(true)}>Add Question Normal</Button>
+        <Button className="mt-4 w-full" onClick={() => setIsFullScreenPopupOpen(true)}>Create Problem Quiz</Button>
+      </div>
+
 
         <Card className='md:col-span-2'>
           <CardHeader className='flex flex-row items-center justify-between'>

@@ -58,29 +58,6 @@ export default function BasicInfoStep({ form }) {
           )}
         />
 
-        {/* Problem Type Dropdown */}
-        <FormField
-          control={form.control}
-          name='problemType'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className='text-base font-semibold'>Problem Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value || 'Practice'}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select problem type' />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value='Practice'>Practice</SelectItem>
-                  <SelectItem value='Challenge'>Challenge</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         {/* Difficulty Type Dropdown */}
         <FormField
           control={form.control}
@@ -166,7 +143,7 @@ export default function BasicInfoStep({ form }) {
                   step='1'
                   placeholder='Enter Memory Limit'
                   {...field}
-                  value={field.value || 250}                 
+                  value={field.value || 250}
                 />
               </FormControl>
               <FormMessage />
@@ -223,7 +200,7 @@ export default function BasicInfoStep({ form }) {
         {/* Max File Size */}
         <FormField
           control={form.control}
-          name='maxFileSize'         
+          name='maxFileSize'
           render={({ field }) => (
             <FormItem>
               <FormLabel className='text-base font-semibold'>Max File Size (MB)</FormLabel>
@@ -235,14 +212,16 @@ export default function BasicInfoStep({ form }) {
                   step='1'
                   placeholder='Enter Max File Size'
                   {...field}
-                  value={field.value || 10}                  
+                  value={field.value || 10}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
+        <div></div>
+
         {/* Enable Network Toggle */}
         <FormField
           control={form.control}

@@ -152,6 +152,8 @@ export const DiscussApi = {
             ...comment,
             userName: commentUser ? commentUser.userName : "Unknown",
             urlProfilePicture: commentUser ? commentUser.urlProfilePicture : "default-avatar.png",
+            firstName : commentUser ? commentUser.firstName : "xxx",
+            lastName :commentUser ? commentUser.lastName :"xxx",
           };
         });
         // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang

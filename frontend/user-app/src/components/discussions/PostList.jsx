@@ -364,7 +364,7 @@ function PostList({ categoryId }) {
   font-weight: bold; /* Font chữ đậm để nổi bật */
   color: #ffffff; /* Màu chữ trắng */
   border: none; /* Loại bỏ viền */
-  background: #1e334a; /* Nền màu xanh than đậm */
+  background: #; /* Nền màu xanh than đậm */
   border-radius: 8px; /* Bo góc vừa phải */
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn để tạo chiều sâu */
   cursor: pointer;

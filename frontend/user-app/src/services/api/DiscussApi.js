@@ -17,23 +17,23 @@ export const DiscussApi = {
   getDiscussionOptions: async ({ discussionId, pageIndex, pageSize, orderBy, tags }) => {
     try {
       console.log("Fetching discussion options...", discussionId, orderBy, tags);
-  
+
       // Gửi yêu cầu GET tới API với header Authorization
       const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/options`, {
         params: { pageIndex, pageSize, orderBy, tags }
       });
-  
+
       // Kiểm tra xem có thảo luận nào không
       if (response && response.data && response.data.discussionDtos && response.data.discussionDtos.data && response.data.discussionDtos.data.length > 0) {
         const discussions = response.data.discussionDtos.data;
-  
+
         // Lấy các userId từ các thảo luận
         const userIds = discussions.map(discussion => discussion.userId);
         console.log(userIds);
-  
+
         // Gọi API fetchUsers chỉ khi có thảo luận
         const users = await fetchUsers(userIds);
-  
+
         // Cập nhật thông tin người dùng cho các thảo luận
         const updatedDiscussions = discussions.map(discussion => {
           const user = users.find(user => user.id === discussion.userId);
@@ -44,10 +44,14 @@ export const DiscussApi = {
             lastName: user ? user.lastName : null
           };
         });
-  
-        const dataDiscussionDtos = response.data.discussionDtos;
-  
-        return { dataDiscussionDtos, updatedDiscussions, users };
+
+        const pagination = {
+          pageIndex: response.data.discussionDtos.pageIndex,
+          pageSize: response.data.discussionDtos.pageSize,
+          totalCount: response.data.discussionDtos.count,
+        };
+
+        return { pagination, updatedDiscussions, users };
       } else {
         // Trả về mảng dataDiscussionDtos rỗng nếu không có thảo luận
         console.log("No discussions found, returning empty data.");
@@ -58,7 +62,7 @@ export const DiscussApi = {
       throw error;
     }
   },
-  
+
 
   // API: Lấy danh sách các categories
   getCategories: async () => {
@@ -104,7 +108,7 @@ export const DiscussApi = {
   // API: Tạo mới một discussion
   createDiscuss: async (discussionData) => {
     try {
-      console.log(discussionData,getAuthHeaders());
+      console.log(discussionData, getAuthHeaders());
       const response = await axios.post(`${API_BASE_URL}/community-service/discussions`, discussionData, getAuthHeaders());
       return response.data;
     } catch (error) {
@@ -160,8 +164,8 @@ export const DiscussApi = {
             ...comment,
             userName: commentUser ? commentUser.userName : "Unknown",
             urlProfilePicture: commentUser ? commentUser.urlProfilePicture : "default-avatar.png",
-            firstName : commentUser ? commentUser.firstName : "xxx",
-            lastName :commentUser ? commentUser.lastName :"xxx",
+            firstName: commentUser ? commentUser.firstName : "xxx",
+            lastName: commentUser ? commentUser.lastName : "xxx",
           };
         });
         // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang

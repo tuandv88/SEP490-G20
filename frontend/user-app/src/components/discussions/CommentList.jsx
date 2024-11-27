@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { DiscussApi } from "@/services/api/DiscussApi";
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
 function CommentList({ discussionId, refresh }) {
+  const [transitioning, setTransitioning] = useState(false);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
-    pageSize: 5,
+    pageSize: 3,
     totalCount: 0,
   });
-  const [transitioning, setTransitioning] = useState(false);
 
   useEffect(() => {
     const fetchComments = async () => {
       setLoading(true);
       setError(null);
       try {
-        const { updatedComments, pagination: newPagination } = await DiscussApi.getCommentsByDiscussionId(
-          discussionId,
-          pagination.pageIndex,
-          pagination.pageSize
-        );
+        const { updatedComments, pagination: newPagination } =
+          await DiscussApi.getCommentsByDiscussionId(
+            discussionId,
+            pagination.pageIndex,
+            pagination.pageSize
+          );
 
         if (updatedComments && newPagination) {
           setComments(updatedComments);
@@ -43,51 +46,11 @@ function CommentList({ discussionId, refresh }) {
     fetchComments();
   }, [discussionId, pagination.pageIndex, pagination.pageSize, refresh]);
 
-  const renderPaginationButtons = () => {
-    const totalPages = Math.ceil(pagination.totalCount / pagination.pageSize);
-    const pageButtons = [];
-
-    // If total pages <= 5, display all
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) {
-        pageButtons.push(i);
-      }
-    } else {
-      pageButtons.push(1); // Always show first page
-
-      if (pagination.pageIndex > 3) pageButtons.push("..."); // Show ... if gap from first page
-
-      const startPage = Math.max(2, pagination.pageIndex - 2);
-      const endPage = Math.min(totalPages - 1, pagination.pageIndex + 2);
-
-      for (let i = startPage; i <= endPage; i++) {
-        pageButtons.push(i);
-      }
-
-      if (pagination.pageIndex < totalPages - 2) pageButtons.push("..."); // Show ... if gap from last page
-
-      pageButtons.push(totalPages); // Always show last page
-    }
-
-    return pageButtons.map((page, idx) => (
-      <button
-        key={idx}
-        className={`comment-list__pagination-button ${pagination.pageIndex === page ? "active" : ""}`}
-        onClick={() => page !== "..." && handlePageChange(page)}
-        disabled={page === "..." || pagination.pageIndex === page}
-      >
-        {page}
-      </button>
-    ));
-  };
-
-  const handlePageChange = (pageIndex) => {
-    if (pageIndex > 0 && pageIndex <= Math.ceil(pagination.totalCount / pagination.pageSize)) {
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex,
-      }));
-    }
+  const handlePageChange = (event, value) => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: value,
+    }));
   };
 
   return (
@@ -138,89 +101,194 @@ function CommentList({ discussionId, refresh }) {
           </div>
 
           {/* Pagination */}
-          {!loading && pagination.totalCount > 0 && (
-            <div className="pagination">
-              {/* Previous Button */}
-              <button
-                onClick={() => handlePageChange(pagination.pageIndex - 1)}
-                disabled={pagination.pageIndex === 1}
-                className={`page-item ${pagination.pageIndex === 1 ? 'disabled' : ''}`}
-              >
-                &lt;
-              </button>
-
-              {/* Page Number Buttons */}
-              {renderPaginationButtons().map((page, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => page !== "..." && handlePageChange(page)}
-                  className={`page-item ${pagination.pageIndex === page ? 'active' : ''} ${page === "..." ? 'dots' : ''}`}
-                  disabled={page === "..." || pagination.pageIndex === page}
-                >
-                  {page}
-                </button>
-              ))}
-
-              {/* Next Button */}
-              <button
-                onClick={() => handlePageChange(pagination.pageIndex + 1)}
-                disabled={pagination.pageIndex * pagination.pageSize >= pagination.totalCount}
-                className={`page-item ${pagination.pageIndex * pagination.pageSize >= pagination.totalCount ? 'disabled' : ''}`}
-              >
-                &gt;
-              </button>
-            </div>
-          )}
+          <div className="comment-list__pagination">
+            <Stack spacing={2}>
+              <Pagination
+                count={Math.ceil(pagination.totalCount / pagination.pageSize)}
+                page={pagination.pageIndex}
+                onChange={handlePageChange}
+                shape="rounded"
+                variant="outlined"
+                className="pagination-buttons" // Thêm class này để dễ dàng định dạng
+              />
+            </Stack>
+          </div>
         </div>
       )}
 
       <style jsx>{`
-        .pagination {
-          display: flex;
-          justify-content: center;
-          align-items: center;
+        .comment-list {
+          background-color: #fff;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .comment-list__error-wrapper {
+          text-align: center;
           margin-top: 20px;
         }
 
-        .page-item {
-          text-align: center;
+        .comment-list__loader-wrapper {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 60px;
+        }
+
+        .comment-list__loader {
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #1e334a;
+          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+        .comment-list__error-message {
+          font-size: 16px;
+          color: red;
+        }
+
+        .comment-list__content {
+          margin-top: 20px;
+        }
+
+        .comment-list__header {
+          margin-bottom: 20px;
+        }
+
+        .comment-list__title {
+          font-size: 24px;
+          font-weight: bold;
+          color: #333;
+        }
+
+        .comment-list__body {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .comment-list__item {
+          padding: 15px;
+          background-color: #f9f9f9;
+          border-radius: 8px;
+          box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .comment-list__item-header {
           display: flex;
           align-items: center;
-          justify-content: center;
-          padding: 10px 12px;
-          font-size: 12px;
-          color: #1e334a;
-          background: #f9f9f9;
-          border: 0.2px solid #e0e0e0;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: all 0.3s ease-in-out;
-          margin: 0 5px;
+          gap: 10px;
+          margin-bottom: 10px;
         }
 
-        .page-item:hover {
-          color: #fff;
-          background: #1e334a;
-          border-color: #1e334a;
+        .comment-list__avatar {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          object-fit: cover;
         }
 
-        .page-item.active {
-          background-color: #1e334a;
-          color: #fff;
-          font-weight: bold;
-        }
-
-        .page-item.disabled {
-          cursor: not-allowed;
-          background-color: #f8f9fa;
-          color: #adb5bd;
-        }
-
-        .page-item.dots {
+        .comment-list__username {
           font-size: 16px;
-          color: #6c757d;
-          cursor: not-allowed;
+          font-weight: bold;
+          color: #333;
         }
+
+        .comment-list__content {
+          font-size: 14px;
+          color: #555;
+          line-height: 1.5;
+        }
+
+        .comment-list__no-comments {
+          font-size: 14px;
+          color: #777;
+          text-align: center;
+        }
+
+    /* Căn giữa phần pagination */
+.comment-list__pagination {
+  display: flex;
+  justify-content: center; /* Căn giữa các phần tử theo chiều ngang */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  width: 100%; /* Đảm bảo phần pagination chiếm toàn bộ chiều rộng */
+  margin-top: 30px; /* Tùy chọn thêm khoảng cách phía trên */
+}
+
+/* Nút pagination không được chọn */
+.comment-list__pagination .MuiPaginationItem-root {
+  text-align: center;
+  display: flex;
+  align-items: center; /* Căn giữa theo chiều dọc */
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  max-width: 45px; /* Kích thước tối đa nhỏ hơn */
+  min-width: 35px;  /* Kích thước tối thiểu nhỏ hơn */
+  padding: 6px 10px; /* Kích thước nút nhỏ hơn */
+  font-size: 10px;   /* Font chữ nhỏ hơn */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: bold;
+  color: #14212b;    /* Màu chữ khi nút không được chọn */
+  background: #ffffff;  /* Màu nền nút không được chọn */
+  border-radius: 8px; /* Bo tròn nhẹ cho nút */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hiệu ứng hover cho pagination item */
+.comment-list__pagination .MuiPaginationItem-root:hover {
+  background: #14212b; /* Màu nền khi hover (màu tối) */
+  color: #ffffff;  /* Màu chữ khi hover */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px); /* Nhấn nổi nhẹ khi hover */
+}
+
+/* Nút đang active (chọn) */
+.comment-list__pagination .MuiPaginationItem-root.Mui-selected {
+  background: #14212b; /* Màu nền khi nút được chọn */
+  color: #ffffff; /* Màu chữ trắng khi chọn */
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+  transform: translateY(0); /* Không thay đổi vị trí khi active */
+}
+
+/* Hiệu ứng ánh sáng cho pagination */
+.comment-list__pagination .MuiPaginationItem-root::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -25%;
+  width: 150%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: skewX(-45deg);
+  transition: left 0.3s ease-in-out;
+}
+
+.comment-list__pagination .MuiPaginationItem-root:hover::before {
+  left: 100%;
+}
+
+/* Khi pagination bị disabled */
+.comment-list__pagination .MuiPaginationItem-root.Mui-disabled {
+  background: #9ca3af;
+  color: #e5e7eb;
+  cursor: not-allowed;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
       `}</style>
     </div>
   );

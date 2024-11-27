@@ -62,7 +62,10 @@ function PostList({ categoryId }) {
     setOrderBy(filter);
     setPageIndex(1);
   };
-
+  const handleNewButtonClick = () => {
+    // Kiểm tra đường dẫn có đúng không
+    navigate('/discussions/creatediscussion');
+  };
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString("en-US", {
       weekday: "short",
@@ -128,9 +131,9 @@ function PostList({ categoryId }) {
             className="search-input"
           />
 
-          <button className="new-button" onClick={() => navigate("/createpost")}>
-            New +
-          </button>
+        <button className="new-button" onClick={handleNewButtonClick}>
+        New +
+      </button>
         </div>
       </div>
 

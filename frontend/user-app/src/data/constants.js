@@ -13,7 +13,8 @@ export const AUTHENTICATION_ROUTERS = {
   CODE: '/code',
   CALLBACK: '/callback',
   DISCUSS: '/discussions/discuss',
-  DISCUSSIONDETAIL: '/discussion/:id'
+  DISCUSSIONDETAIL: '/discussion/:id',
+  CREATEDISCUSSION:'/discussions/creatediscussion'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

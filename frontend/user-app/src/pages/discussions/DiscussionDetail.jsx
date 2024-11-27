@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faEye, faChevronUp, faBookmark, faShareFromSquare, faBell, faBellSlash, faEdit, faRemove, faDeleteLeft, faTrash, faComment, faCommentAlt, faVoteYea, faChevronDown, faCommentDots, faCommentMedical, faCommentSlash, faComputerMouse, faCommentNodes } from "@fortawesome/free-solid-svg-icons";
 import CommentList from "../../components/discussions/CommentList";
 import { marked } from 'marked'; // Import marked library
-
+import ReactHtmlParser from 'html-to-react';
 function DiscussionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ function DiscussionDetail() {
   const [refreshComments, setRefreshComments] = useState(false);
   const [transitioning, setTransitioning] = useState(false); // Trạng thái chuyển tiếp
   const textAreaRef = useRef(null);
-
+  const htmlToReactParser = new ReactHtmlParser.Parser();
   useEffect(() => {
     const fetchDiscussion = async () => {
       setLoading(true);
@@ -189,7 +189,7 @@ function DiscussionDetail() {
                 ))}
               </div>
               <div className="discussion-description">
-                <p>{discussion?.description}</p>
+                <p>{htmlToReactParser.parse(discussion?.description)}</p>
               </div>
               <div className="discussion-image">
                 {discussion?.imageUrl && (

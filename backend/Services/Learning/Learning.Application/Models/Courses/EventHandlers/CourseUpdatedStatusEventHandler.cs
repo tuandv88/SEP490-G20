@@ -2,9 +2,11 @@
 using BuildingBlocks.Messaging.Events.Learnings;
 using Learning.Domain.Events;
 using MassTransit;
+using File = BuildingBlocks.Messaging.Events.Learnings.File;
 
 namespace Learning.Application.Models.Courses.EventHandlers;
-public class CourseUpdatedStatusEventHandler(IPublishEndpoint publishEndpoint, IMessageScheduler scheduler, ICacheService cacheService) : INotificationHandler<CourseUpdatedStatusEvent> {
+public class CourseUpdatedStatusEventHandler(IPublishEndpoint publishEndpoint, IMessageScheduler scheduler, 
+    ICacheService cacheService, IFileRepository fileRepository) : INotificationHandler<CourseUpdatedStatusEvent> {
     public async Task Handle(CourseUpdatedStatusEvent notification, CancellationToken cancellationToken) {
         //publish event ra ở đây
         var course = notification.Course;
@@ -16,9 +18,9 @@ public class CourseUpdatedStatusEventHandler(IPublishEndpoint publishEndpoint, I
                 break;
             case CourseStatus.Scheduled:
                 if (scheduleTime.HasValue) {
-                   var message =  await scheduler.SchedulePublish(scheduleTime.Value, new CourseScheduledEvent(notification.Course.Id.Value), cancellationToken);
-                   var key = string.Format(RedisRepoKey.CourseTokenId, course.Id.Value);
-                   await cacheService.SetAsync(key, message.TokenId, scheduleTime.Value - DateTime.UtcNow);
+                    var message = await scheduler.SchedulePublish(scheduleTime.Value, new CourseScheduledEvent(notification.Course.Id.Value), cancellationToken);
+                    var key = string.Format(RedisRepoKey.CourseTokenId, course.Id.Value);
+                    await cacheService.SetAsync(key, message.TokenId, scheduleTime.Value - DateTime.UtcNow);
                 }
                 await publishEndpoint.Publish(new CourseRevokedEvent(notification.Course.Id.Value), cancellationToken);
                 break;
@@ -53,16 +55,27 @@ public class CourseUpdatedStatusEventHandler(IPublishEndpoint publishEndpoint, I
             Description = chapter.Description,
             TimeEstimation = chapter.TimeEstimation,
             OrderIndex = chapter.OrderIndex,
-            Lectures = chapter.Lectures.Select(lecture => new LectureData() {
-                Id = lecture.Id.Value,
-                ChapterId = chapter.Id.Value,
-                Title = lecture.Title,
-                Summary = lecture.Summary,
-                TimeEstimation = lecture.TimeEstimation,
-                LectureType = lecture.LectureType.ToString(),
-                OrderIndex = lecture.OrderIndex,
-                Point = lecture.Point,
-                IsFree = lecture.IsFree
+            Lectures = chapter.Lectures.Select(lecture => {
+                var files = fileRepository.GetDocumentByLectureId(lecture.Id) ;
+
+                return new LectureData() {
+                    Id = lecture.Id.Value,
+                    ChapterId = chapter.Id.Value,
+                    Title = lecture.Title,
+                    Summary = lecture.Summary,
+                    TimeEstimation = lecture.TimeEstimation,
+                    LectureType = lecture.LectureType.ToString(),
+                    OrderIndex = lecture.OrderIndex,
+                    Point = lecture.Point,
+                    IsFree = lecture.IsFree,
+                    Files = files.Select(f => new File() {
+                        Id = f.Id.Value,
+                        FileName = f.FileName,
+                        FileSize = f.FileSize,
+                        Url = f.Url,
+                        Format = f.Format
+                    }).ToList()
+                };
             }).ToList()
         }).ToList();
 

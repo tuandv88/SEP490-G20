@@ -14,6 +14,8 @@ export const AUTHENTICATION_ROUTERS = {
   CALLBACK: '/callback',
   SURVEY: '/survey',
   COURSEDETAILS: '/course-details'
+  DISCUSS: '/discussions/discuss',
+  DISCUSSIONDETAIL: '/discussion/:id'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

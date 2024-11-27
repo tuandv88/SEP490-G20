@@ -3,6 +3,7 @@
 namespace Community.Application.Models.NotificationHistories.Commands.CreateNotificationHistory;
 
 public record CreateNotificationHistoryResult(Guid? Id, bool IsSuccess);
+[Authorize]
 
 public record CreateNotificationHistoryCommand(CreateNotificationHistoryDto CreateNotificationHistoryDto) : ICommand<CreateNotificationHistoryResult>;
 

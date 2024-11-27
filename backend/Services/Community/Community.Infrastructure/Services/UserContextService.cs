@@ -20,27 +20,56 @@ public class UserContextService : IUserContextService
 
     public IUserContext User => new UserContext
     {
-        Id = Guid.TryParse(GetUserId(), out var id) ? id : null,
-        UserName = GetUserName()
+        Id = GetUserId(),
+        UserName = GetUserName(),
+        Email = GetEmail(),
+        FirstName = GetFirstName(),
+        LastName = GetLastName(),
+        Role = GetRole(),
     };
 
     private string GetUserName()
     {
         var context = _httpContextAccessor.HttpContext;
         return context?.User?.Identity != null && context.User.Identity.IsAuthenticated
-            ? context.User.Identity.Name ?? "system"
-            : "system";
+            ? _httpContextAccessor.HttpContext?.User.FindFirst("username")?.Value!
+            : null!;
     }
 
-    private string GetUserId()
+    private Guid GetUserId()
     {
-        return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-               ?? _httpContextAccessor.HttpContext?.User.FindFirst("sub")?.Value ?? "system";
+        var userIdString = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                           ?? _httpContextAccessor.HttpContext?.User.FindFirst("sub")?.Value!;
+        return Guid.TryParse(userIdString, out var id) ? id : Guid.Empty;
+    }
+
+    private string GetEmail()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindFirst("email")?.Value!;
+    }
+
+    private string GetFirstName()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindFirst("firstName")?.Value!;
+    }
+
+    private string GetLastName()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindFirst("lastName")?.Value!;
+    }
+    private string GetRole()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value
+               ?? _httpContextAccessor.HttpContext?.User.FindFirst(c => c.Type == ClaimTypes.Role)?.Value!;
     }
 
     private class UserContext : IUserContext
     {
-        public Guid? Id { get; set; } = default;
+        public Guid Id { get; set; } = default;
         public string UserName { get; set; } = default!;
+        public string Email { get; set; } = default!;
+        public string FirstName { get; set; } = default!;
+        public string LastName { get; set; } = default!;
+        public string Role { get; set; } = default!;
     }
 }

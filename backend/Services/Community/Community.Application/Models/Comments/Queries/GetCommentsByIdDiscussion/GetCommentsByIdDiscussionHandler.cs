@@ -27,7 +27,8 @@ public class GetCommentsByIdDiscussionHandler : IQueryHandler<GetCommentsByIdDis
 
         var totalCount = allData.Count;
 
-        var comments = allData.Skip(pageSize * (pageIndex - 1))
+        var comments = allData.OrderByDescending(c => c.DateCreated)
+                              .Skip(pageSize * (pageIndex - 1))
                               .Take(pageSize)
                               .ToList();
 

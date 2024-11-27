@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using User.Domain.Models;
 
@@ -36,6 +37,10 @@ namespace User.Infrastructure.Data
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(builder);
+
+            builder.AddInboxStateEntity();
+            builder.AddOutboxMessageEntity();
+            builder.AddOutboxStateEntity();
         }
     }
 }

@@ -3,7 +3,7 @@
 namespace Community.Application.Models.Comments.Commands.CreateComment;
 
 public record CreateCommentResult(Guid? Id, bool IsSuccess);
-
+[Authorize($"{PoliciesType.Administrator},{PoliciesType.Moderator},{PoliciesType.Learner}")]
 public record CreateCommentCommand(CreateCommentDto CreateCommentDto) : ICommand<CreateCommentResult>;
 
 public class CreateCommentCommandValidator : AbstractValidator<CreateCommentCommand>

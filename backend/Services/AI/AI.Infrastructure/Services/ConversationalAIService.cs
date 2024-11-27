@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AI.Application.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.KernelMemory;
@@ -47,6 +48,33 @@ public class ConversationalAIService(
             messageAnswer.Answer = fullMessage.ToString() ?? _config.EmptyAnswer;
         }
         return messageAnswer;
+    }
+
+    public async Task<PathwayAnswer> GenerateAnswer(string prompt, IMessageContext? context, CancellationToken token = default) {
+        int maxTokens = context.GetCustomRagMaxTokensOrDefault(_config.AnswerTokens);
+        double temperature = context.GetCustomRagTemperatureOrDefault(_config.Temperature);
+        double nucleusSampling = context.GetCustomRagNucleusSamplingOrDefault(_config.TopP);
+
+        AzureOpenAIPromptExecutionSettings settings = new() {
+            ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
+            MaxTokens = maxTokens,
+            Temperature = temperature,
+            TopP = nucleusSampling,
+            PresencePenalty = _config.PresencePenalty,
+            FrequencyPenalty = _config.FrequencyPenalty,
+            StopSequences = _config.StopSequences,
+        };
+        var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+        var result = await chatCompletionService.GetChatMessageContentAsync(prompt, settings, kernel, token);
+        PathwayAnswer answers = new PathwayAnswer();
+        try {
+            answers = JsonConvert.DeserializeObject<PathwayAnswer>(result.Content!)!;
+        } catch (Exception ex) {
+            logger.LogError(ex.Message);
+            answers.Reason = result.Content!;
+
+        }
+        return answers;
     }
 
     private async Task<ChatHistory> GetRecentChatHistory(Guid conversationId) {

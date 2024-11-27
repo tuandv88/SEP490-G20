@@ -8,7 +8,7 @@ namespace User.Domain.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public LearningPathStatus Status { get; set; } // Enum từ User.Domain.Enums
-        public virtual ICollection<PathStep> PathSteps { get; set; } = new List<PathStep>();
+        public List<PathStep> PathSteps { get; set; } = new List<PathStep>();
 
         // Phương thức khởi tạo tĩnh (static factory method)
         public static LearningPath Create(LearningPathId learningPathId, UserId userId, string pathName, DateTime startDate, DateTime endDate, LearningPathStatus status)
@@ -22,6 +22,9 @@ namespace User.Domain.Models
                 EndDate = endDate,
                 Status = status
             };
+        }
+        public void AddPathSteps(List<PathStep> pathSteps) {
+            PathSteps.AddRange(pathSteps);
         }
     }
 }

@@ -4,5 +4,6 @@ public record ProblemListDto(
     string Status,
     string Title,
     string Difficulty,
-    float Acceptance
+    float Acceptance,
+    bool IsActive
 );

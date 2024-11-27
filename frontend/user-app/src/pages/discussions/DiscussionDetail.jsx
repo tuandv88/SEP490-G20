@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"; 
 import { faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import CommentList from "../../components/discussions/CommentList"; 
+import ReactHtmlParser from 'html-to-react';
 
 function DiscussionDetail() {
   const { id } = useParams();
@@ -16,7 +17,7 @@ function DiscussionDetail() {
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [refreshComments, setRefreshComments] = useState(false); // Thêm state để trigger lại việc tải comment
-
+  const htmlToReactParser = new ReactHtmlParser.Parser();
   // Fetch discussion details on component mount
   useEffect(() => {
     const fetchDiscussion = async () => {
@@ -263,7 +264,7 @@ function DiscussionDetail() {
         </div>
 
         <h1 style={styles.title}>{discussion?.title}</h1>
-        <p style={styles.description}>{discussion?.description}</p>
+        <p style={styles.description}>{htmlToReactParser.parse(discussion?.description)}</p>
 
         {discussion?.imageUrl && (
           <img src={discussion?.imageUrl} alt="Post" style={styles.image} />

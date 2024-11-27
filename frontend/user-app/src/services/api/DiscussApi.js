@@ -29,7 +29,6 @@ export const DiscussApi = {
 
         // Lấy các userId từ các thảo luận
         const userIds = discussions.map(discussion => discussion.userId);
-        console.log(userIds);
 
         // Gọi API fetchUsers chỉ khi có thảo luận
         const users = await fetchUsers(userIds);
@@ -138,9 +137,6 @@ export const DiscussApi = {
       const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/comments`, {
         params: { PageIndex: pageIndex, PageSize: pageSize }
       });
-
-      console.log("API Response:", response); // Xem dữ liệu trả về từ API
-
       // Kiểm tra và xử lý dữ liệu trả về
       if (response && response.data && response.data.commentDtos) {
         const comments = response.data.commentDtos.data;
@@ -169,7 +165,9 @@ export const DiscussApi = {
         });
         // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang
 
-        return { updatedComments, pagination };
+        console.log(pagination.totalCount);
+
+        return { updatedComments, pagination, totalComments: pagination.totalCount };
       } else {
         console.error("Dữ liệu trả về không hợp lệ:", response);
         throw new Error("Dữ liệu trả về không hợp lệ từ API.");
@@ -185,7 +183,6 @@ export const DiscussApi = {
 // API thứ hai: Lấy thông tin chi tiết của UserIds
 async function fetchUsers(userIds) {
   try {
-    console.log(userIds);
     const response = await axios.post(`https://localhost:6005/users/getusers`, { UserIds: userIds });
     if (response && response.data) {
       return response.data;

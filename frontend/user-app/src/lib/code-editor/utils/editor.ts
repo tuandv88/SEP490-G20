@@ -42,12 +42,15 @@ export class JavaMonacoEditor {
   langConfig: LanguageConfig;
   containerId: string;
   model!: monaco.editor.ITextModel;
+  //moi them
+  didUnmount: boolean = false;
 
   constructor({
     connectConfig,
     containerId,
     langConfig,
   }: JavaMonacoEditorParams) {
+    this.didUnmount = false;
     this.containerId = containerId;
     this.connectConfig = connectConfig;
     this.langConfig = langConfig;
@@ -89,12 +92,19 @@ export class JavaMonacoEditor {
   }
 
   async initializeJavaLanguageServer() {
+    if(this.connectConfig.url === null) {
+      return
+    }
     const retryInterval = 5000;
     const keepAliveInterval = 30000; 
     let keepAliveTimer: NodeJS.Timeout;
 
     const connect = () => {
         return new Promise<void>((resolve, reject) => {
+            //moi them
+            if(this.connectConfig.url === null) {
+                reject()
+            }
             const webSocket = new WebSocket(this.connectConfig.url);
 
             webSocket.onopen = async () => {
@@ -125,7 +135,7 @@ export class JavaMonacoEditor {
 
             webSocket.onerror = () => {
                 clearInterval(keepAliveTimer);
-                console.error(`WebSocket connection failed: ${this.connectConfig.url}`);
+                //console.error(`WebSocket connection failed: ${this.connectConfig.url}`);
                 setTimeout(connect, retryInterval); 
                 reject();
             };
@@ -155,6 +165,9 @@ export class JavaMonacoEditor {
           error: () => ({ action: ErrorAction.Continue }),
           closed: () => ({ action: CloseAction.DoNotRestart }),
         },
+        middleware: {
+          handleDiagnostics(uri, diagnostics, next) {},
+        }
       },
       // create a language client connection from the JSON RPC connection on demand
       connectionProvider: {
@@ -164,6 +177,11 @@ export class JavaMonacoEditor {
 
     // Khởi động language client
     await this.languageClient.start();
+
+    //moi them
+    if(this.didUnmount) {
+      this.dispose();
+    }
   }
 
   // API để tương tác với editor
@@ -176,15 +194,29 @@ export class JavaMonacoEditor {
   }
 
   // Cleanup
+  // dispose() {
+  //   if (this.languageClient) {
+  //     this.languageClient.dispose();
+  //   }
+  //   if (this.editor) {
+  //     this.editor.dispose();
+  //   }
+  //   if (this.model) {
+  //     this.model.dispose();
+  //   }
+  // }
   dispose() {
+    this.didUnmount = true
     if (this.languageClient) {
-      this.languageClient.dispose();
-    }
-    if (this.editor) {
-      this.editor.dispose();
+      this.languageClient.stop().then(() => {
+        this.languageClient.dispose()
+      })
     }
     if (this.model) {
-      this.model.dispose();
+      this.model.dispose()
+    }
+    if (this.editor) {
+      this.editor.dispose()
     }
   }
 }

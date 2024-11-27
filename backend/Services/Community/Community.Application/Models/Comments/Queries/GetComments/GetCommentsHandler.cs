@@ -22,7 +22,7 @@ public class GetCommentsPagingHandler : IQueryHandler<GetCommentsPagingQuery, Ge
 
         var totalCount = allData.Count();
 
-        var comments = allData.OrderBy(c => c.DateCreated)
+        var comments = allData.OrderByDescending(c => c.DateCreated)
                             .Skip(pageSize * (pageIndex - 1))
                             .Take(pageSize)
                             .ToList();

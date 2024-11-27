@@ -4,7 +4,6 @@
 import React from 'react'
 
 const HeaderTab = ({ activeTab, setActiveTab, isNormalLecture }) => {
-
   console.log(activeTab)
 
   return (
@@ -12,20 +11,36 @@ const HeaderTab = ({ activeTab, setActiveTab, isNormalLecture }) => {
       <nav className='flex space-x-4'>
         {isNormalLecture && (
           <button
-          className={`px-3 py-2 rounded-full text-sm font-medium ${activeTab === 'curriculum' || activeTab === 'default' ? 'border border-white border-solid' : ' bg-gray-900 hover:bg-gray-700'}`}
-          onClick={() => setActiveTab('curriculum')}
-        >
-          Curriculum
-        </button>
+            className={`px-3 py-2 rounded-full text-sm font-medium ${activeTab === 'curriculum' || activeTab === 'default' ? 'border border-white border-solid' : ' bg-gray-900 hover:bg-gray-700'}`}
+            onClick={() => setActiveTab('curriculum')}
+          >
+            Curriculum
+          </button>
         )}
-        
+
         {!isNormalLecture && (
-          <button
-          className={`px-2 py-1 rounded-full text-[13px] font-medium ${activeTab === 'descriptions' || activeTab === 'default' || !isNormalLecture ? 'border border-white border-solid' : 'bg-gray-900 hover:bg-gray-700'}`}
-          onClick={() => setActiveTab('descriptions')}
-        >
-          Descriptions
-        </button>
+          <>
+            <button
+              className={`px-2 py-1 rounded-full text-[13px] font-medium ${activeTab === 'descriptions' || activeTab === 'default' || !isNormalLecture ? 'border border-white border-solid' : 'bg-gray-900 hover:bg-gray-700'}`}
+              onClick={() => setActiveTab('descriptions')}
+            >
+              Descriptions
+            </button>
+
+            <button
+              className={`px-2 py-1 rounded-full text-[13px] font-medium ${activeTab === 'submission' || activeTab === 'default' || !isNormalLecture ? 'border border-white border-solid' : 'bg-gray-900 hover:bg-gray-700'}`}
+              onClick={() => setActiveTab('submission')}
+            >
+              Submission
+            </button>
+
+            <button
+              className={`px-2 py-1 rounded-full text-[13px] font-medium ${activeTab === 'submissionResult' || activeTab === 'default' || !isNormalLecture ? 'border border-white border-solid' : 'bg-gray-900 hover:bg-gray-700'}`}
+                onClick={() => setActiveTab('submissionResult')}
+            >
+              Result Code
+            </button>
+          </>
         )}
 
         <button
@@ -33,7 +48,7 @@ const HeaderTab = ({ activeTab, setActiveTab, isNormalLecture }) => {
           onClick={() => setActiveTab('comments')}
         >
           Comments
-        </button>       
+        </button>
       </nav>
     </div>
   )

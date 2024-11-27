@@ -1,7 +1,7 @@
 ﻿using Community.Application.Models.UserDiscussions.Dtos;
 
 namespace Community.Application.Models.UserDiscussions.Commands.CreateUserDiscussion;
-
+[Authorize]
 public record CreateUserDiscussionCommand(CreateUserDiscussionDto CreateUserDiscussionDto) : ICommand<CreateUserDiscussionResult>;
 
 public record CreateUserDiscussionResult(Guid Id, bool IsSuccess);

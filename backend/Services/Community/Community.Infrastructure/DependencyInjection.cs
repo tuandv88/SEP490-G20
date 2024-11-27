@@ -69,6 +69,5 @@ public static class DependencyInjection
         services.AddScoped<INotificationHistoryRepository, NotificationHistoryRepository>();
 
         services.AddScoped<IUserNotificationSettingRepository, UserNotificationSettingRepository>();
-
     }
 }

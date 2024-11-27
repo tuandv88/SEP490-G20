@@ -11,7 +11,8 @@ import {
   User,
   Map,
   PieChart,
-  Settings2
+  Settings2,
+  Code
 } from 'lucide-react'
 import { NavMain } from '@/components/nav-main'
 import { NavProjects } from '@/components/nav-projects'
@@ -66,6 +67,21 @@ const data = {
         {
           title: 'Create Course',
           url: '/create-course'
+        }
+      ]
+    },
+    {
+      title: 'Problem',
+      url: '/problem-table',
+      icon: Code,
+      items: [
+        {
+          title: 'Problem List',
+          url: '/problem-table'
+        },
+        {
+          title: 'Create Problem',
+          url: '/create-problem'
         }
       ]
     },

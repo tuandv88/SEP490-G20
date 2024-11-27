@@ -1,4 +1,5 @@
-﻿using Community.Application.Models.Comments.Dtos;
+﻿using Community.Application.Interfaces;
+using Community.Application.Models.Comments.Dtos;
 using Community.Domain.ValueObjects;
 
 namespace Community.Application.Models.Comments.Commands.CreateComment;
@@ -6,10 +7,12 @@ namespace Community.Application.Models.Comments.Commands.CreateComment;
 public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, CreateCommentResult>
 {
     private readonly ICommentRepository _commentRepository;
+    private readonly IUserContextService _userContextService;
 
-    public CreateCommentHandler(ICommentRepository commentRepository)
+    public CreateCommentHandler(ICommentRepository commentRepository, IUserContextService userContextService)
     {
         _commentRepository = commentRepository;
+        _userContextService = userContextService;
     }
 
     public async Task<CreateCommentResult> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
@@ -32,24 +35,24 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Create
     private async Task<Comment> CreateNewComment(CreateCommentDto createCommentDto)
     {
         // Dữ liệu test UserId
-        var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
+        //var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
 
-        if (!Guid.TryParse(userContextTest, out var currentUserIdTest))
-        {
-            throw new UnauthorizedAccessException("Invalid user ID.");
-        }
-
-        var userId = UserId.Of(currentUserIdTest);
-
-        // Lấy UserId từ UserContextService
-        //var currentUserId = _userContextService.User.Id;
-
-        //if (currentUserId == null)
+        //if (!Guid.TryParse(userContextTest, out var currentUserIdTest))
         //{
-        //    throw new UnauthorizedAccessException("User is not authenticated.");
+        //    throw new UnauthorizedAccessException("Invalid user ID.");
         //}
 
-        //var userId = UserId.Of(currentUserId.Value);
+        //var userId = UserId.Of(currentUserIdTest);
+
+        // Lấy UserId từ UserContextService
+        var currentUserId = _userContextService.User.Id;
+
+        if (currentUserId == null)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        }
+
+        var userId = UserId.Of(currentUserId);
 
         var discussionId = DiscussionId.Of(createCommentDto.DiscussionId);
         var parentCommentId = createCommentDto.ParentCommentId.HasValue ? CommentId.Of(createCommentDto.ParentCommentId.Value) : null;

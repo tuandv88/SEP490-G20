@@ -3,9 +3,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react'
-import { AlarmClock, CloudUpload, Play, Send } from 'lucide-react'
+import { AlarmClock, CloudUpload, Loader2, Play, Send } from 'lucide-react'
 import styled, { keyframes } from 'styled-components'
 import useStore from '../../data/store'
+import Popup from '../ui/popup'
+import { Button } from '../ui/button'
+import { LearningAPI } from '@/services/api/learningApi'
 
 // Định nghĩa animation xoay
 const spinnerAnimation = keyframes`
@@ -52,13 +55,38 @@ const LoadingButton = styled.div`
   }
 `
 
-const PreferenceNav = ({ onSubmit, loading }) => {
+const PreferenceNav = ({ onSubmit, loading, problemId, setActiveTab, setResultCodeSubmit, setCurrentCode }) => {
   const codeRun = useStore((state) => state.codeRun)
+  const [isSubmit, setIsSubmit] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
-  const handleFetchData = () => {
-    alert(`Dữ liệu từ Component Test: ${codeRun}`)
+  console.log(problemId)
+
+  const handleFetchData = async () => {
+    const submissionData = {
+      submission: {
+        languageCode: 'Java',
+        solutionCode: codeRun
+      }
+    }
+
+
+    setIsSubmit(true)
+
+    try {
+      const response = await LearningAPI.submitCode(problemId, submissionData)
+      console.log(response)
+      setResultCodeSubmit(response.submissionResponse)
+      setCurrentCode(submissionData.submission.solutionCode)
+      setActiveTab('submissionResult')
+      setIsSubmit(false)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      setIsOpen(true)
+    } finally {
+      setIsSubmit(false)
+    }
   }
-
 
   return (
     <div>
@@ -79,46 +107,20 @@ const PreferenceNav = ({ onSubmit, loading }) => {
             <option>Python</option>
           </select>
         </div>
-        {/* <div className='flex items-center space-x-2'>
-          <button
-            onClick={onSubmit}
-            className='bg-blue-500 flex items-center text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 transition-colors'
-          >
-            {loading ? (
-              <>
-                <LoadingButton loading={loading.toString()} disabled={loading} />
-                <span style={{ marginLeft: '5px' }}>Running...</span>
-              </>
-            ) : (
-              <>
-                <Play className='w-4 h-4 mr-2 text-gray-600 dark:text-gray-300' />
-                Run
-              </>
-            )}
-          </button>
-          <button
-            onClick={handleFetchData}
-            className='bg-gray-700 flex items-center text-white px-3 py-1 rounded-md text-sm hover:bg-gray-600 transition-colors'
-          >
-            <Send size={18} className='mr-2 inline-block' />
-            Submit
-          </button>
-        </div> */}
         <div className='flex items-center space-x-2 mr-5'>
-        <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-            <AlarmClock className='w-5 h-5' color='white'/>
+          <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
+            <AlarmClock className='w-5 h-5' color='white' />
           </button>
           <button
             onClick={onSubmit}
             className='flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600'
           >
-            {/* <Play className='w-4 h-4 mr-2 text-gray-600 dark:text-gray-300' />
-            <span className='text-sm font-medium'>Run</span> */}
-
             {loading ? (
               <>
                 <LoadingButton loading={loading.toString()} disabled={loading} />
-                <span className='font-medium' style={{ marginLeft: '5px' }}>Running...</span>
+                <span className='font-medium' style={{ marginLeft: '5px' }}>
+                  Running...
+                </span>
               </>
             ) : (
               <>
@@ -126,15 +128,31 @@ const PreferenceNav = ({ onSubmit, loading }) => {
                 <span className='text-sm font-medium'>Run</span>
               </>
             )}
-
           </button>
-          <button onClick={handleFetchData} className='flex items-center px-3 py-1.5 bg-green-100 dark:bg-green-700 rounded-md hover:bg-green-200 dark:hover:bg-green-600 text-green-700 dark:text-green-100'>
-            <CloudUpload className='w-4 h-4 mr-2' />
-            <span className='text-sm font-medium'>Submit</span>
-          </button>
-          
+          <Button
+            // disabled={!isSuccessCode || isSubmit}
+            onClick={handleFetchData}
+            className='flex items-center bg-green-100 dark:bg-green-700 rounded-md hover:bg-green-200 dark:hover:bg-green-600 text-green-700 dark:text-green-100'
+          >
+            {isSubmit ? (
+              <>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <CloudUpload className='w-4 h-4 mr-2' />
+                <span className='text-sm font-medium'>Submit</span>
+              </>
+            )}
+          </Button>
         </div>
       </div>
+      <Popup
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        message='Have an error when submit code. Please try again.'
+      />
     </div>
   )
 }

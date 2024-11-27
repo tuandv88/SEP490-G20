@@ -7,8 +7,7 @@ namespace AuthServer.Config
         public static IEnumerable<ApiScope> GetApiScopes =>
         new List<ApiScope>
         {
-                new ApiScope("api.WebApp", "WebApp API"),
-                new ApiScope("moviesApi", "Access to Movies API")
+                new ApiScope("testApi", "Access to Test API")
         };
     }
 }

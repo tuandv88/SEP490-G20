@@ -1,0 +1,23 @@
+import axios from 'axios'
+import Cookies from 'js-cookie'
+
+const API_BASE_URL = import.meta.env.VITE_API_URL
+
+export const ProblemAPI = {
+  getProblem: async (problemId) => {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/problems/${problemId}`, {
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  },
+  getSubmissionHistory: async (problemId) => {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/problems/${problemId}/submissions`, {
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  }
+}

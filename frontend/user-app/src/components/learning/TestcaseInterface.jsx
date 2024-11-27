@@ -53,7 +53,7 @@ const LoadingButton = styled.div`
   }
 `
 
-const TestcaseInterface = ({ response, loading, testCase }) => {
+const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) => {
   const [activeTab, setActiveTab] = useState('Testcase')
   const [activeTestCase, setActiveTestCase] = useState(0)
   const [activeTestResult, setActiveTestResult] = useState(0)
@@ -67,6 +67,11 @@ const TestcaseInterface = ({ response, loading, testCase }) => {
       setTestCases(testCase)
     }
   }, [testCase])
+
+  useEffect(() => {
+    const allPassed = response?.codeExecuteDto?.testResults?.every((result) => result.isPass !== false)
+    setIsSuccessCode(allPassed)
+  }, [response, activeTestResult, setIsSuccessCode])
 
   const handleAddTestCase = () => {
     const newId = Object.keys(testCases).length.toString()

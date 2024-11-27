@@ -1,30 +1,31 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import {
-  AlarmClock,
   ArrowRight,
   Bell,
   BotMessageSquare,
   ChevronLeft,
   ChevronRight,
-  CloudUpload,
   Indent,
-  NotebookPen,
-  Play,
-  Settings,
-  Tag,
-  X
+  Settings
 } from 'lucide-react'
 import React, { useState } from 'react'
 
-const HeaderCode = ({ onButtonClick, onChatClick }) => {
+const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef }) => {
   const [isRunning, setIsRunning] = useState(false)
-  const [time, setTime] = useState('00:00:00')
 
+  const triggerPreviousLecture = () => {
+    if (toggleCurriculumRef.current) {
+      toggleCurriculumRef.current.handlePreviousLecture();
+    }
+  };
 
-  const toggleTimer = () => {
-    setIsRunning(!isRunning)
-  }
+  const triggerNextLecture = () => {
+    if (toggleCurriculumRef.current) {
+      toggleCurriculumRef.current.handleNextLecture();
+    }
+  };
+
 
   return (
     <div>
@@ -50,11 +51,11 @@ const HeaderCode = ({ onButtonClick, onChatClick }) => {
                   <span className='text-sm font-medium truncate max-w-[170px]'>Chapter List</span>
                 </div>
                 <div className='h-7 w-px bg-gray-300 dark:bg-gray-600'></div>
-                <button className='p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600'>
+                <button className='p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600' onClick={triggerPreviousLecture}>
                   <ChevronLeft className='w-5 h-5 ' />
                 </button>
                 <div className='h-7 w-px bg-gray-300 dark:bg-gray-600'></div>
-                <button className='p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600'>
+                <button className='p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600' onClick={triggerNextLecture}>
                   <ChevronRight className='w-5 h-5 ' />
                 </button>
                 <div className='h-7 w-px bg-gray-300 dark:bg-gray-600'></div>

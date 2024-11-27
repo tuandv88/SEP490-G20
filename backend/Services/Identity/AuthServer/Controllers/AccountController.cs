@@ -1,28 +1,19 @@
 ﻿using AuthServer.Models;
 using AuthServer.Models.AccountViewModel;
 using IdentityServer4.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.DataProtection;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
-using MailKit;
-using IdentityServer4.Extensions;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Org.BouncyCastle.Bcpg.Sig;
-using Microsoft.AspNetCore.Authorization;
 using BuildingBlocks.Email.Interfaces;
 using BuildingBlocks.Email.Models;
 using BuildingBlocks.Email.Helpers;
 using BuidingBlocks.Storage;
+using BuildingBlocks.Email.Constants;
+using Microsoft.VisualBasic;
 
 namespace AuthServer.Controllers
 {
@@ -34,9 +25,10 @@ namespace AuthServer.Controllers
         private readonly UserManager<Users> _userManager;
         private readonly IEmailService _emailService;
         private readonly UrlEncoder _urlEncoder;
+        private readonly IIdentityServerInteractionService _interaction;
         public AccountController(IIdentityServerInteractionService interactionService, IDataProtectionProvider provider,
                                   SignInManager<Users> signInManager, UserManager<Users> userManager, 
-                                  IEmailService emailService, UrlEncoder urlEncoder)
+                                  IEmailService emailService, UrlEncoder urlEncoder, IIdentityServerInteractionService interaction)
         {
             _interactionService = interactionService;
             _protector = provider.CreateProtector("AuthServer.Cookies");
@@ -48,6 +40,7 @@ namespace AuthServer.Controllers
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
 
             _urlEncoder = urlEncoder;
+            _interaction = interaction;
         }
 
         public IActionResult Index()
@@ -139,7 +132,7 @@ namespace AuthServer.Controllers
                             body: emailBody
                         );
 
-                        await _emailService.SendAndSave(emailMetadata);
+                        await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
 
                         TempData["ConfirmEmailSuccessMessage"] = "Registration successful! Please check your email and confirm your account.";
 
@@ -382,7 +375,14 @@ namespace AuthServer.Controllers
 
             if (result.Succeeded)
             {
-                
+                var existingClaims = await _userManager.GetClaimsAsync(user);
+                var isSurveyClaim = existingClaims.FirstOrDefault(c => c.Type == "issurvey");
+
+                if (isSurveyClaim == null)
+                {
+                    await _userManager.AddClaimAsync(user, new Claim("issurvey", "false"));
+                }
+
                 if (model.RememberMe)
                 {
                     var cookieOptions = new CookieOptions
@@ -549,7 +549,7 @@ namespace AuthServer.Controllers
             );
 
             // Gửi email xác nhận
-            await _emailService.SendAndSave(emailMetadata);
+            await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
         }
 
         private async Task HandleLockedOutUser(Users user)
@@ -625,6 +625,15 @@ namespace AuthServer.Controllers
 
                 if (signInResult.Succeeded)
                 {
+
+                    var existingClaims = await _userManager.GetClaimsAsync(user);
+                    var isSurveyClaim = existingClaims.FirstOrDefault(c => c.Type == "issurvey");
+
+                    if (isSurveyClaim == null)
+                    {
+                        await _userManager.AddClaimAsync(user, new Claim("issurvey", "false"));
+                    }
+
                     // Đăng nhập thành công, chuyển đến trang tiếp theo
                     return RedirectToAction("Index", "Profile");
                 }
@@ -781,7 +790,7 @@ namespace AuthServer.Controllers
                     );
 
                     // Gửi email xác nhận
-                    await _emailService.SendAndSave(emailMetadata);
+                    await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
                 }
 
                 // Sau khi gửi email thành công
@@ -934,14 +943,38 @@ namespace AuthServer.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(string logoutId)
         {
-            // Xóa cookie khi đăng xuất
-            //Response.Cookies.Delete("Username");
-            //Response.Cookies.Delete("Password");
+            // Xóa session của người dùng tại server
+            await _signInManager.SignOutAsync();
 
-            await _signInManager.SignOutAsync(); // Xóa cookie xác thực
-            return RedirectToAction("Login", "Account"); // Chuyển hướng về trang đăng nhập
+            // Lấy thông tin context logout từ IdentityServer
+            var logoutContext = await _interaction.GetLogoutContextAsync(logoutId);
+
+            // Gọi front_channel_logout_uri nếu có
+            //if (!string.IsNullOrEmpty(logoutContext?.SignOutIFrameUrl))
+            //{
+            //    // Trả về một View chứa iframe để gọi front_channel_logout_uri
+            //    TempData["SignOutIFrameUrl"] = logoutContext.SignOutIFrameUrl;
+            //    return RedirectToAction("LoggedOut", "Account"); // View này sẽ render iframe
+            //}
+
+            // Nếu có PostLogoutRedirectUri, redirect về client
+            if (!string.IsNullOrEmpty(logoutContext?.PostLogoutRedirectUri))
+            {
+                return Redirect(logoutContext.PostLogoutRedirectUri);
+            }
+
+            // Nếu không có PostLogoutRedirectUri, về trang mặc định
+            return RedirectToAction("Login", "Account");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> AccessDenied()
+        {
+            // Hiển thị trang AccessDenied
+            return View();
+        }
+
     }
 }

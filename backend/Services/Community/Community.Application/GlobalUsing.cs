@@ -12,3 +12,5 @@ global using FluentValidation;
 global using Community.Domain.Models;
 global using Community.Application.Data.Repositories;
 global using Community.Domain.Enums;
+global using Microsoft.AspNetCore.Authorization;
+global using Community.Application.Commons;

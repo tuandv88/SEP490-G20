@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Payment.Application.Interfaces;
-using Payment.Domain.Abstractions;
-namespace Payment.Infrastructure.Data.Interceptors;
+﻿namespace Payment.Infrastructure.Data.Interceptors;
 public class AuditableEntityInterceptor(IUserContextService userContextService) : SaveChangesInterceptor {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result) {
         UpdateEntities(eventData.Context);

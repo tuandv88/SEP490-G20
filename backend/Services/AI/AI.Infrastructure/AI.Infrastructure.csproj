@@ -9,8 +9,13 @@
   <ItemGroup>
     <None Remove="Services\Kernels\Prompts\answer-with-facts.txt" />
     <None Remove="Services\Kernels\Prompts\pathway.txt" />
+    <None Remove="Services\Kernels\Prompts\raw.txt" />
     <None Remove="Services\Kernels\Prompts\suggestion.txt" />
     <None Remove="Services\Kernels\Prompts\summarize.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Services\Kernels\Prompts\raw.txt" />
   </ItemGroup>
 
   <ItemGroup>

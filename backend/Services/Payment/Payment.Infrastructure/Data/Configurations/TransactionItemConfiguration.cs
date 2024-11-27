@@ -1,10 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Payment.Domain.Enums;
-using Payment.Domain.Models;
-using Payment.Domain.ValueObjects;
-
-namespace Payment.Infrastructure.Data.Configurations;
+﻿namespace Payment.Infrastructure.Data.Configurations;
 public class TransactionItemConfiguration : IEntityTypeConfiguration<TransactionItem> {
     public void Configure(EntityTypeBuilder<TransactionItem> builder) {
         builder.HasKey(t => t.Id);

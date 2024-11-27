@@ -87,175 +87,213 @@ function DiscussionDetail() {
     }
   };
 
-
   // Điều chỉnh chiều cao textarea mỗi khi nội dung thay đổi
   useEffect(() => {
     adjustHeight();
   }, [newComment]);
 
-  return (
-    <Layout>
-      {loading || !transitioning ? (
+  if (loading || !transitioning) {
+    return (
+      <>
         <div className="loader-container">
           <div className="loader"></div>
         </div>
-      ) : error ? (
-        <div className="error-container">
-          <p className="error-message">{error}</p>
+        <style jsx={true}>{`
+          /* Loader */
+          .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed; /* Đảm bảo loader ở vị trí cố định trên trang */
+            top: 50%; /* Căn giữa theo chiều dọc */
+            left: 50%; /* Căn giữa theo chiều ngang */
+            transform: translate(-50%, -50%); /* Đảm bảo căn chính xác ở giữa màn hình */
+            z-index: 9999; /* Đảm bảo loader nằm trên các phần tử khác */
+          }
+  
+          .loader {
+            border: 4px solid #f3f3f3; /* Màu viền ngoài */
+            border-top: 4px solid #1e334a; /* Màu viền trên */
+            border-radius: 50%; /* Tạo hình tròn */
+            width: 30px; /* Đường kính loader */
+            height: 30px; /* Đường kính loader */
+            animation: spin 1s linear infinite; /* Hiệu ứng quay */
+          }
+  
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <p className="error-message">{error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <Layout>
+      <div className="discussion-container">
+        {/* Header Section */}
+        <div className="discussion-header">
+          <div className="back-button">
+            <button onClick={() => navigate("/discussions/discuss")}>
+              <FontAwesomeIcon icon={faChevronLeft} className="back-icon" /> Back
+            </button>
+          </div>
+          <span class="separator">|</span>
+          <div className="discussion-title">
+            <h5>{discussion?.title}</h5>
+          </div>
+
+          <div className="share-button">
+            <button className="icon-button">
+              <FontAwesomeIcon icon={faShareFromSquare} />
+            </button>
+          </div>
+
+          <div className="sub-notification-button">
+            {discussion.enableNotification ? (
+              <button className="icon-button-on">
+                <FontAwesomeIcon icon={faBell} />
+              </button>
+            ) : (
+              <button className="icon-button-off">
+                <FontAwesomeIcon icon={faBellSlash} />
+              </button>
+            )}
+          </div>
+
+          <div className="edit-button">
+            <button className="icon-button-edit">
+              <FontAwesomeIcon icon={faEdit} />
+            </button>
+          </div>
+
+          <div className="remove-button">
+            <button className="icon-button-remove">
+              <FontAwesomeIcon icon={faTrash} />
+            </button>
+          </div>
+
+          <div className="bookmark-button">
+            <button className="icon-button-bookmark">
+              <FontAwesomeIcon icon={faBookmark} />
+            </button>
+          </div>
+
+          <div className="redirect-comment-button">
+            <button className="icon-button-redirect-comment">
+              <FontAwesomeIcon icon={faComment} />
+            </button>
+          </div>
         </div>
-      ) : (
-        <div className="discussion-container">
-          {/* Header Section */}
-          <div className="discussion-header">
-            <div className="back-button">
-              <button onClick={() => navigate("/discussions/discuss")}>
-                <FontAwesomeIcon icon={faChevronLeft} className="back-icon" /> Back
-              </button>
-            </div>
-            <span class="separator">|</span>
-            <div className="discussion-title">
-              <h5>{discussion?.title}</h5>
-            </div>
 
-            <div className="share-button">
-              <button className="icon-button">
-                <FontAwesomeIcon icon={faShareFromSquare} />
-              </button>
-            </div>
+        {/* Content Section */}
+        <div className="discussion-content">
+          <div className="discussion-votes">
+            <button><FontAwesomeIcon icon={faChevronUp} /></button>
+            <p>{discussion?.voteCount}</p>
+            <button><FontAwesomeIcon icon={faChevronDown} /></button>
+          </div>
 
-            <div className="sub-notification-button">
-              {discussion.enableNotification ? (
-                <button className="icon-button-on">
-                  <FontAwesomeIcon icon={faBell} />
-                </button>
-              ) : (
-                <button className="icon-button-off">
-                  <FontAwesomeIcon icon={faBellSlash} />
-                </button>
+          <div className="discussion-main">
+            <div className="discussion-user">
+              <img
+                src={discussion?.urlProfilePicture || "default-avatar.png"}
+                alt="User Avatar"
+                className="user-avatar"
+              />
+              <div className="user-info">
+                <p className="user-name">{discussion?.firstName} {discussion?.lastName}</p>
+                <p className="view-count"><FontAwesomeIcon icon={faEye} className="icon" /> {discussion?.viewCount}</p>
+              </div>
+            </div>
+            <div className="discussion-createdate">
+              <p>Created on: {formatDate(discussion?.dateCreated)}</p>
+            </div>
+            <div className="discussion-tags">
+              {discussion?.tags?.map((tag, idx) => (
+                <span key={idx} className="tag">#{tag}</span>
+              ))}
+            </div>
+            <div className="discussion-description">
+              <p>{htmlToReactParser.parse(discussion?.description)}</p>
+            </div>
+            <div className="discussion-image">
+              {discussion?.imageUrl && (
+                <img src={discussion?.imageUrl} alt="Post" className="discussion-image" />
               )}
             </div>
-
-            <div className="edit-button">
-              <button className="icon-button-edit">
-                <FontAwesomeIcon icon={faEdit} />
-              </button>
-            </div>
-
-            <div className="remove-button">
-              <button className="icon-button-remove">
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-            </div>
-
-            <div className="bookmark-button">
-              <button className="icon-button-bookmark">
-                <FontAwesomeIcon icon={faBookmark} />
-              </button>
-            </div>
-
-            <div className="redirect-comment-button">
-              <button className="icon-button-redirect-comment">
-                <FontAwesomeIcon icon={faComment} />
-              </button>
-            </div>
-          </div>
-
-          {/* Content Section */}
-          <div className="discussion-content">
-            <div className="discussion-votes">
-              <button><FontAwesomeIcon icon={faChevronUp} /></button>
-              <p>{discussion?.voteCount}</p>
-              <button><FontAwesomeIcon icon={faChevronDown} /></button>
-            </div>
-
-            <div className="discussion-main">
-              <div className="discussion-user">
-                <img
-                  src={discussion?.urlProfilePicture || "default-avatar.png"}
-                  alt="User Avatar"
-                  className="user-avatar"
-                />
-                <div className="user-info">
-                  <p className="user-name">{discussion?.firstName} {discussion?.lastName}</p>
-                  <p className="view-count"><FontAwesomeIcon icon={faEye} className="icon" /> {discussion?.viewCount}</p>
-                </div>
-              </div>
-              <div className="discussion-createdate">
-                <p>Created on: {formatDate(discussion?.dateCreated)}</p>
-              </div>
-              <div className="discussion-tags">
-                {discussion?.tags?.map((tag, idx) => (
-                  <span key={idx} className="tag">#{tag}</span>
-                ))}
-              </div>
-              <div className="discussion-description">
-                <p>{htmlToReactParser.parse(discussion?.description)}</p>
-              </div>
-              <div className="discussion-image">
-                {discussion?.imageUrl && (
-                  <img src={discussion?.imageUrl} alt="Post" className="discussion-image" />
-                )}
-              </div>
-            </div>
-          </div>
-
-
-          {/* Navbar Section */}
-          <div className="discussion-navbar-extension">
-            <div className="count-comment">
-              <FontAwesomeIcon icon={faCommentAlt} />
-              <p>Comments:</p>
-              <p>{discussion?.commentCount}</p>
-            </div>
-          </div>
-
-          {/* Comment Section */}
-          <div className="discussion-comments">
-            {/* Write Mode */}
-            {!isPreview ? (
-              <textarea
-                ref={textAreaRef}
-                className="comment-input"
-                placeholder="Write your comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onInput={adjustHeight} // Điều chỉnh chiều cao khi người dùng nhập
-              />
-            ) : (
-              <div
-                className="comment-preview"
-                dangerouslySetInnerHTML={{
-                  __html: marked(newComment), // Use marked to convert markdown to HTML
-                }}
-              />
-            )}
-
-            <div className="buttons-container">
-              <button
-                className="toggle-preview-button"
-                onClick={() => setIsPreview(!isPreview)}
-                disabled={submitting}
-              >
-                {isPreview ? "Write" : "Preview"}
-              </button>
-
-              <button
-                className="comment-button"
-                onClick={handleAddComment}
-                disabled={!newComment.trim() || submitting} // Disable Post button if no content
-              >
-                {submitting ? "Submitting..." : "Post Comment"}
-              </button>
-
-            </div>
-          </div>
-
-          {/* Comments List Section */}
-          <div className="comment-section">
-            <CommentList discussionId={id} refresh={refreshComments} />
           </div>
         </div>
-      )}
+
+
+        {/* Navbar Section */}
+        <div className="discussion-navbar-extension">
+          <div className="count-comment">
+            <FontAwesomeIcon icon={faCommentAlt} />
+            <p>Comments:</p>
+            <p>{discussion?.commentCount}</p>
+          </div>
+        </div>
+
+        {/* Comment Section */}
+        <div className="discussion-comments">
+          {/* Write Mode */}
+          {!isPreview ? (
+            <textarea
+              ref={textAreaRef}
+              className="comment-input"
+              placeholder="Write your comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onInput={adjustHeight} // Điều chỉnh chiều cao khi người dùng nhập
+            />
+          ) : (
+            <div
+              className="comment-preview"
+              dangerouslySetInnerHTML={{
+                __html: marked(newComment), // Use marked to convert markdown to HTML
+              }}
+            />
+          )}
+
+          <div className="buttons-container">
+            <button
+              className="toggle-preview-button"
+              onClick={() => setIsPreview(!isPreview)}
+              disabled={submitting}
+            >
+              {isPreview ? "Write" : "Preview"}
+            </button>
+
+            <button
+              className="comment-button"
+              onClick={handleAddComment}
+              disabled={!newComment.trim() || submitting} // Disable Post button if no content
+            >
+              {submitting ? "Submitting..." : "Post Comment"}
+            </button>
+
+          </div>
+        </div>
+
+        {/* Comments List Section */}
+        <div className="comment-section">
+          <CommentList discussionId={id} refresh={refreshComments} />
+        </div>
+      </div>
       <style jsx={true}>{`
 /* Container chính */
 .discussion-container {
@@ -502,7 +540,6 @@ function DiscussionDetail() {
   background-color: #bbdefb;
 }
 
-
 /* Description Section */
 .discussion-description {
   font-size: 16px;
@@ -716,36 +753,6 @@ function DiscussionDetail() {
   height: 100vh; /* Chiều cao toàn bộ viewport */
   width: 100vw; /* Chiều rộng toàn bộ viewport */
   z-index: 9999; /* Đảm bảo loader ở trên các phần tử khác */
-}
-
-/* Loader */
-.loader-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed; /* Đảm bảo loader ở vị trí cố định trên trang */
-  top: 50%; /* Căn giữa theo chiều dọc */
-  left: 50%; /* Căn giữa theo chiều ngang */
-  transform: translate(-50%, -50%); /* Đảm bảo căn chính xác ở giữa màn hình */
-  z-index: 9999; /* Đảm bảo loader nằm trên các phần tử khác */
-}
-
-.loader {
-  border: 4px solid #f3f3f3; /* Màu viền ngoài */
-  border-top: 4px solid #1e334a; /* Màu viền trên */
-  border-radius: 50%; /* Tạo hình tròn */
-  width: 30px; /* Đường kính loader */
-  height: 30px; /* Đường kính loader */
-  animation: spin 1s linear infinite; /* Hiệu ứng quay */
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
       `}</style>

@@ -93,7 +93,6 @@ export const DiscussApi = {
           discussion.lastName = user.lastName;
         }
 
-        console.log(discussion, 12345)
         return discussion;
       } else {
         console.error("Dữ liệu trả về không hợp lệ:", response);
@@ -169,9 +168,6 @@ export const DiscussApi = {
           };
         });
         // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang
-
-        console.log(updatedComments, 54321);
-        console.log(pagination, 53211);
 
         return { updatedComments, pagination };
       } else {

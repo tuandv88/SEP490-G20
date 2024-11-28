@@ -23,6 +23,10 @@ function CourseList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [courses])
+
   // Filter courses based on search term, level, and category
   // useEffect(() => {
   //   let filteredCourses = courses.filter(

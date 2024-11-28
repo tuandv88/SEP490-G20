@@ -73,7 +73,6 @@ const CodeEditor = ({
       console.log('data', data)
     } catch (error) {
       console.error('Error submitting code:', error)
-      alert('Error occurred while submitting code')
     } finally {
       setLoading(false)
     }

@@ -18,6 +18,7 @@ import AssessmentPrompt from '@/components/surrvey/AssessmentPromptProps'
 import QuizModal from '@/components/surrvey/QuizModal'
 import QuizPopup from '@/components/quiz/QuizPopup'
 import { QuizAPI } from '@/services/api/quizApi'
+import { UserAPI } from '@/services/api/userApi'
 
 export const algorithms = [
   {
@@ -98,7 +99,8 @@ function HomePage() {
           if (user.profile.issurvey === 'false') {
             setTimeout(() => {
               setIsSurveyOpen(true)
-            }, 3000) // 3000 milliseconds = 3 seconds
+              // updateSurveyStatus()
+            }, 3000)
           }
         }
       } catch (error) {
@@ -109,7 +111,13 @@ function HomePage() {
     fetchUserInfo()
   }, [])
 
-  console.log()
+  async function updateSurveyStatus() {
+    try {
+      await UserAPI.changeSurveyStatus(userInfo.id)
+    } catch (error) {
+      console.error('Error updating survey status:', error)
+    }
+  }
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
@@ -208,7 +216,7 @@ function HomePage() {
               <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Featured Courses</h2>
               {loading ? <CourseLoading></CourseLoading> : <CourseCarousel courses={courses} />}
               <div className='mt-8 text-center md:mt-10'>
-                <Button className='border border-green-500 hover:bg-blue-50'>
+                <Button onClick={() => navigate(AUTHENTICATION_ROUTERS.COURSELIST)} className='border border-green-500 hover:bg-blue-50'>
                   View All Courses
                   <ChevronRight className='inline-block ml-2' />
                 </Button>

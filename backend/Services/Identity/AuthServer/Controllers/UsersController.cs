@@ -17,13 +17,15 @@ namespace AuthServer.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly UserManager<Users> _userManager;
+        private readonly UserManager<Users> _userManager; 
+        private readonly RoleManager<Roles> _roleManager;
         private readonly IFilesService _filesService;
         private readonly IBase64Converter _base64Converter;
 
-        public UsersController(UserManager<Users> userManager, IBase64Converter base64Converter, IFilesService filesService)
+        public UsersController(UserManager<Users> userManager, RoleManager<Roles> roleManager, IBase64Converter base64Converter, IFilesService filesService)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _filesService = filesService;
             _base64Converter = base64Converter;
         }
@@ -122,7 +124,7 @@ namespace AuthServer.Controllers
         {
             var userCurrent = await _userManager.FindByIdAsync(updateImageDto.UserId.ToString());
 
-            if (userCurrent == null) 
+            if (userCurrent == null)
             {
                 return BadRequest($"Can not find user!");
             }
@@ -140,7 +142,7 @@ namespace AuthServer.Controllers
 
             userCurrent.ProfilePicture = profileUrlImageNew;
 
-            if(profileUrlImageOld != "backend/imageidentity/avatardefault.jpg")
+            if (profileUrlImageOld != "backend/imageidentity/avatardefault.jpg")
             {
                 await _filesService.DeleteFileAsync(bucket, profileUrlImageOld);
             }
@@ -152,7 +154,7 @@ namespace AuthServer.Controllers
 
             if (result.Succeeded)
             {
-                return Ok($"Update Successfully - urlUserImage: {urlProfileImagePresigned}" );
+                return Ok($"Update Successfully - urlUserImage: {urlProfileImagePresigned}");
             }
             else
             {
@@ -190,5 +192,66 @@ namespace AuthServer.Controllers
             return Ok(new { message = "Survey status updated successfully." });
         }
 
+
+        [HttpPut("lockaccount")]
+        public async Task<IActionResult> LockAccountById([FromBody] LockAccountRequestDto request)
+        {
+            // Kiểm tra xem dữ liệu đầu vào có hợp lệ không
+            if (request.LockoutTimeUtc == default)
+            {
+                return BadRequest("Invalid lockout time.");
+            }
+
+            // Tìm người dùng theo ID
+            var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Kiểm tra xem tài khoản có đang bị khóa hay không
+            if (user.LockoutEnabled && user.LockoutEnd > DateTime.UtcNow)
+            {
+                return BadRequest("User account is already locked.");
+            }
+
+            // Cập nhật trạng thái khóa tài khoản
+            user.LockoutEnabled = true;  // Bật tính năng khóa tài khoản
+            user.LockoutEnd = request.LockoutTimeUtc; // Đặt thời gian khóa tài khoản theo UTC
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                // Chuyển đổi thời gian UTC sang giờ Việt Nam (UTC + 7)
+                var vietnamTime = request.LockoutTimeUtc.AddHours(7);  // Thêm 7 giờ để chuyển đổi từ UTC sang GMT+7
+
+                // Trả về thông báo với giờ Việt Nam
+                return Ok($"Account has been locked successfully until: {vietnamTime.ToString("yyyy-MM-dd HH:mm:ss")}");
+            }
+
+            // Nếu có lỗi trong quá trình cập nhật
+            return BadRequest("Failed to lock account.");
+        }
+
+        [HttpGet("alldetails")]
+        public async Task<IActionResult> GetAllUsersDetail()
+        {
+            var users = await _userManager.Users.ToListAsync();
+
+            if (users == null || !users.Any())
+            {
+                return NotFound(new { message = "No users found." });
+            }
+
+            // Sử dụng phương thức mở rộng để chuyển đổi danh sách Users thành danh sách UserDetailDto
+            var userDetailDtos = await users.ToUserDetailDtoListAsync(_filesService, _userManager);
+
+            return Ok(userDetailDtos);
+        }
+
+    
     }
 }

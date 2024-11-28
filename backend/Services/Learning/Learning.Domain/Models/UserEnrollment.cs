@@ -22,5 +22,9 @@ public class UserEnrollment : Aggregate<UserEnrollmentId> {
         LectureProgress.Add(progress);
         // thêm event vào đây
     }
+    public void AddReview(int rating, string feedback) {
+        Rating = rating;
+        Feedback = feedback;
+    }
 }
 

@@ -61,7 +61,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Commands
             // Kiểm tra xem chapter có được cập nhật đúng hay không
             Assert.That(existingChapter.Title, Is.EqualTo(command.UpdateChapterDto.Title));
             Assert.That(existingChapter.Description, Is.EqualTo(command.UpdateChapterDto.Description));
-            Assert.That(existingChapter.TimeEstimation, Is.EqualTo(command.UpdateChapterDto.TimeEstimation));
             Assert.That(existingChapter.IsActive, Is.EqualTo(command.UpdateChapterDto.IsActive));
         }
 
@@ -144,7 +143,7 @@ namespace Learning.Application.UnitTests.Models.Chapters.Commands
             var command = new UpdateChapterCommand(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                new UpdateChapterDto("", null, -5, true)
+                new UpdateChapterDto("", null, true)
             );
 
             // Act & Assert

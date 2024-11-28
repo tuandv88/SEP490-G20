@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using User.Application.Data.Repositories;
+﻿using User.Application.Data.Repositories;
 using User.Application.Models.LearningPaths.Dtos;
 using User.Application.Models.PathSteps.Dtos;
 using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions;
-using System.Linq;
 
 namespace User.Application.Models.LearningPaths.Queries.GetLearningPathByUserId
 {

@@ -11,7 +11,7 @@ public class GetDocumentHandler(IDocumentRepository repository, IDocumentService
         var pageSize = query.PaginationRequest.PageSize;
 
         var totalCount = allData.Count();
-        var documents = allData.OrderBy(c => c.CreatedAt)
+        var documents = allData.OrderByDescending(c => c.CreatedAt)
                             .Skip(pageSize * (pageIndex - 1))
                             .Take(pageSize)
                             .ToList();

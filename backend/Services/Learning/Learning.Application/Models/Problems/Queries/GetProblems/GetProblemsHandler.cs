@@ -1,6 +1,5 @@
 ﻿using Amazon.S3.Model;
 using Learning.Application.Models.Problems.Dtos;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Learning.Application.Models.Problems.Queries.GetProblems;
 public class GetProblemsHandler(IProblemRepository problemRepository, IProblemSubmissionRepository problemSubmissionRepository
@@ -16,13 +15,11 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IProblemSu
 
         var filter = request.Filter;
         var titleSearch = filter.SearchString ?? "";
-        // Lọc dữ liệu: Chỉ admin mới thấy được các problem chưa active
 
-        var filteredProblems = isAdmin
-            ? allDataProblem // Admin có quyền thấy tất cả
-            : allDataProblem.Where(p => p.IsActive &&// Người dùng cơ bản chỉ thấy những problem đã active
-            p.ProblemType == ProblemType.Challenge && 
-            p.Title.ToLower().Contains(titleSearch.ToLower())); 
+        // Lọc dữ liệu: Chỉ admin mới thấy được các problem chưa active
+        var filteredProblems = allDataProblem.Where(p =>
+                (isAdmin || (p.IsActive && p.ProblemType == ProblemType.Challenge)) &&
+                p.Title.ToLower().Contains(titleSearch.ToLower())); 
 
         //Phân trang
         var pageIndex = request.PaginationRequest.PageIndex;
@@ -37,36 +34,6 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IProblemSu
                             .ToList();
 
         var problemListDtos = problems.Select(p => p.ToProblemListDto(userId));
-
-        if (!string.IsNullOrEmpty(filter?.SortType)) {
-            switch (filter.SortType.ToLower()) {
-                case "title":
-                    problemListDtos = filter.SortDescending
-                        ? problemListDtos.OrderByDescending(p => p.Title)
-                        : problemListDtos.OrderBy(p => p.Title);
-                    break;
-
-                case "difficulty":
-                    problemListDtos = filter.SortDescending
-                        ? problemListDtos.OrderByDescending(p => p.Difficulty)
-                        : problemListDtos.OrderBy(p => p.Difficulty);
-                    break;
-
-                case "acceptance":
-                    problemListDtos = filter.SortDescending
-                        ? problemListDtos.OrderByDescending(p => p.Acceptance)
-                        : problemListDtos.OrderBy(p => p.Acceptance);
-                    break;
-
-                case "status":
-                    problemListDtos = filter.SortDescending
-                        ? problemListDtos.OrderByDescending(p => p.Status)
-                        : problemListDtos.OrderBy(p => p.Status);
-                    break;
-            }
-        }
-
-
         return new GetProblemsResult(
              new PaginatedResult<ProblemListDto>(pageIndex, pageSize, totalCount, problemListDtos.ToList()));
     }

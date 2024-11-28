@@ -34,7 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IBase64Converter, Base64Converter>();
 
         //Caching
-        services.AddConfigureCaching(configuration);
+        //services.AddConfigureCaching(configuration);
 
         services.AddHttpContextAccessor();
 
@@ -51,10 +51,10 @@ public static class DependencyInjection
     private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.Decorate<ICategoryRepository, CachedCategoryRepository>();
+        //services.Decorate<ICategoryRepository, CachedCategoryRepository>();
 
         services.AddScoped<IDiscussionRepository, DiscussionRepository>();
-        services.Decorate<IDiscussionRepository, CachedDiscussionRepository>();
+        //services.Decorate<IDiscussionRepository, CachedDiscussionRepository>();
 
         services.AddScoped<IVoteRepository, VoteRepository>();
 

@@ -12,6 +12,7 @@ function DiscussionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [discussion, setDiscussion] = useState(null);
+  const [currentView, setCurrentView] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [transitioning, setTransitioning] = useState(false); // Trạng thái chuyển tiếp
@@ -22,10 +23,13 @@ function DiscussionDetail() {
       setError(null);
       try {
         const data = await DiscussApi.getDiscussionDetails(id);
+        const currentViewTmp = await DiscussApi.updateViewDiscussion({ discussionId: id });
         if (!data) {
           throw new Error("Discussion not found.");
         }
         setDiscussion(data);
+        setCurrentView(currentViewTmp.currentTotalView);
+
       } catch (err) {
         setError(err.message || "Failed to fetch discussion details.");
       } finally {
@@ -176,7 +180,7 @@ function DiscussionDetail() {
               />
               <div className="user-info">
                 <p className="user-name">{discussion?.firstName} {discussion?.lastName}</p>
-                <p className="view-count"><FontAwesomeIcon icon={faEye} className="icon" /> {discussion?.viewCount}</p>
+                <p className="view-count"><FontAwesomeIcon icon={faEye} className="icon" /> {currentView}</p>
               </div>
             </div>
             <div className="discussion-createdate">

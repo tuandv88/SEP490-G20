@@ -71,18 +71,22 @@ public static class DiscussionExtensions
     }
 
     public static async Task<List<DiscussionsTopDto>> ToDiscussionsTopDtoListAsync(
-            this List<Discussion> discussions,
-            IFilesService filesService) // Thêm CategoryRepository để truy vấn Category
+    this List<Discussion> discussions,
+    IFilesService filesService) // Thêm CategoryRepository để truy vấn Category
     {
         var tasks = discussions.Select(async d =>
         {
             var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, d.ImageUrl, 60);
+
+            // Cắt Description nếu nó dài hơn 50 ký tự
+            var shortDescription = d.Description.Length > 50 ? d.Description.Substring(0, 50) + "...." : d.Description;
+
             return new DiscussionsTopDto(
                 CategoryId: d.CategoryId.Value,
                 UserId: d.UserId.Value,
                 Id: d.Id.Value,
                 Title: d.Title,
-                Description: d.Description,
+                Description: shortDescription,  // Gán description đã được cắt
                 ImageUrl: imageUrl.PresignedUrl!,
                 DateCreated: d.DateCreated,
                 DateUpdated: d.DateUpdated,

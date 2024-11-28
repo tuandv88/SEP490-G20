@@ -62,7 +62,6 @@ export const DiscussApi = {
     }
   },
 
-
   // API: Lấy danh sách các categories
   getCategories: async () => {
     try {
@@ -91,6 +90,8 @@ export const DiscussApi = {
           discussion.firstName = user.firstName;
           discussion.lastName = user.lastName;
         }
+
+
 
         return discussion;
       } else {
@@ -176,6 +177,18 @@ export const DiscussApi = {
     }
   },
 
+  updateViewDiscussion: async ({ discussionId }) => {
+    try {
+      console.log("Discussion ID:", discussionId); // Log để kiểm tra giá trị
+      const response = await axios.put(`${API_BASE_URL}/community-service/discussion/${discussionId}/updateview`);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating comment:", error.message);
+      throw error;
+    }
+  },
+
+
 };
 
 // API thứ hai: Lấy thông tin chi tiết của UserIds
@@ -193,3 +206,23 @@ async function fetchUsers(userIds) {
     throw error;
   }
 }
+
+async function fetchUser(userId) {
+  try {
+
+    // Append the userIds directly to the URL
+    const response = await axios.get(`https://localhost:6005/users/getusers?UserIds=${userId}`);
+
+    if (response && response.data) {
+      return response.data;
+    } else {
+      console.error("Dữ liệu trả về từ API users không hợp lệ.");
+      throw new Error("Dữ liệu trả về từ API users không hợp lệ.");
+    }
+  } catch (error) {
+    console.error("Lỗi khi gọi API users:", error.message);
+    throw error;
+  }
+}
+
+

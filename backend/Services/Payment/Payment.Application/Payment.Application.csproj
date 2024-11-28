@@ -13,4 +13,8 @@
     <ProjectReference Include="..\Payment.Domain\Payment.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Transactions\Queries\" />
+  </ItemGroup>
+
 </Project>

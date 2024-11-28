@@ -51,8 +51,8 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
         var prompt = promptProvider.ReadPrompt(PromptType.Pathway.ToStringValue());
         var answers = context.GetCustomPathwayAnswersOrDefault("");
 
-        prompt = prompt.Replace("{{$facts}}", facts.Trim(), StringComparison.OrdinalIgnoreCase);
-        prompt = prompt.Replace("{{answers}}", answers.Trim(), StringComparison.OrdinalIgnoreCase);
+        prompt = prompt.Replace("{{$course}}", facts.Trim(), StringComparison.OrdinalIgnoreCase);
+        prompt = prompt.Replace("{{$assessment}}", answers.Trim(), StringComparison.OrdinalIgnoreCase);
         return prompt;
     }
 

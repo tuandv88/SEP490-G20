@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using BuildingBlocks.CQRS;
+using System.Linq;
 
 namespace Learning.Infrastructure.Data.Repositories.ProblemSubmissions;
 public class ProblemSubmissionRepository : Repository<ProblemSubmission>, IProblemSubmissionRepository {
@@ -14,6 +15,9 @@ public class ProblemSubmissionRepository : Repository<ProblemSubmission>, IProbl
         }
     }
 
+    public IQueryable<ProblemSubmission> GetAllAsQueryAble() {
+        return _dbContext.ProblemSubmissions.AsQueryable();
+    }
 
     public async override Task<ProblemSubmission?> GetByIdAsync(Guid id) {
         var problemSubmission = await  _dbContext.ProblemSubmissions

@@ -35,7 +35,8 @@ namespace User.Application.Models.LearningPaths.Commands.CreateLeaningPath
                 pathName: learningPathDto.PathName,
                 startDate: learningPathDto.StartDate,
                 endDate: learningPathDto.EndDate,
-                status: learningPathDto.Status
+                status: learningPathDto.Status,
+                reason: learningPathDto.Reason
             );
         }
     }

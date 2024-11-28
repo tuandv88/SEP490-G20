@@ -16,7 +16,8 @@ export const AUTHENTICATION_ROUTERS = {
   DISCUSS: '/discussions/discuss',
   DISCUSSIONDETAIL: '/discussion/:id',
   CREATEDISCUSSION:'/discussions/creatediscussion',
-  USERPROFILE: '/user-profile'
+  USERPROFILE: '/user-profile',
+  PROBLEMSPACE: '/problem-solve/:problemId'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

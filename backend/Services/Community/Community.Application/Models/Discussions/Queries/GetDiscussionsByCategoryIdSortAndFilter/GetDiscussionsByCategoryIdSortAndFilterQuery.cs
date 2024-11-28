@@ -17,7 +17,6 @@ public class GetDiscussionsByCategoryIdSortAndFilterHandler : IQueryHandler<GetD
 
     public async Task<GetDiscussionsByCategoryIdSortAndFilterResult> Handle(GetDiscussionsByCategoryIdSortAndFilterQuery query, CancellationToken cancellationToken)
     {
-
         var allData = await _repository.GetByCategoryIdIsActiveAsync(query.CategoryId);
 
         // Tách chuỗi tags thành List<string> nếu nó được truyền dưới dạng chuỗi

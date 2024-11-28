@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { addMinutes } from 'date-fns'
+import { addMinutes, format } from 'date-fns'
+import { useToast } from '@/hooks/use-toast'
 
 export default function SchedulePublishDialog({ open, onOpenChange, onConfirm }) {
+  const { toast } = useToast()
   const [selectedDate, setSelectedDate] = useState(() => {
     const date = new Date()
     return addMinutes(date, 15)
@@ -17,6 +19,15 @@ export default function SchedulePublishDialog({ open, onOpenChange, onConfirm })
     }
   }, [open])
 
+  const handleDateSelect = (date) => {
+    if (date) {
+      const newDate = new Date(date)
+      newDate.setHours(selectedDate.getHours())
+      newDate.setMinutes(selectedDate.getMinutes())
+      setSelectedDate(newDate)
+    }
+  }
+
   const handleTimeChange = (e) => {
     const [hours, minutes] = e.target.value.split(':')
     const newDate = new Date(selectedDate)
@@ -25,13 +36,38 @@ export default function SchedulePublishDialog({ open, onOpenChange, onConfirm })
     setSelectedDate(newDate)
   }
 
-  const handleConfirm = () => {
-    onConfirm(selectedDate)
+  const showErrorToast = (message) => {
+    toast({
+      title: 'Error',
+      description: message,
+      variant: 'destructive',
+      duration: 3000
+    })
   }
 
-  const timeValue = selectedDate
-    ? `${String(selectedDate.getHours()).padStart(2, '0')}:${String(selectedDate.getMinutes()).padStart(2, '0')}`
-    : ''
+  const handleConfirm = () => {
+    if (selectedDate instanceof Date && !isNaN(selectedDate)) {
+      const currentDateTime = new Date()
+      const minimumDateTime = addMinutes(currentDateTime, 15)
+
+      if (selectedDate < minimumDateTime) {
+        showErrorToast('Please select a date and time at least 15 minutes in the future.')
+        return
+      }
+
+      const utc7Date = new Date(selectedDate.getTime() + 7 * 60 * 60 * 1000)
+      onConfirm(utc7Date.toISOString())
+      console.log('Confirmed UTC+7 date and time:', utc7Date.toISOString())
+      onOpenChange(false)
+    } else {
+      showErrorToast('Invalid date selected. Please try again.')
+    }
+  }
+
+  const timeValue =
+    selectedDate instanceof Date && !isNaN(selectedDate)
+      ? `${String(selectedDate.getHours()).padStart(2, '0')}:${String(selectedDate.getMinutes()).padStart(2, '0')}`
+      : ''
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -40,25 +76,22 @@ export default function SchedulePublishDialog({ open, onOpenChange, onConfirm })
           <DialogTitle>Schedule Course Publication</DialogTitle>
         </DialogHeader>
         <div className='grid gap-4 py-4'>
-          <Calendar
-            mode='single'
-            selected={selectedDate}
-            onSelect={(date) => {
-              if (date) {
-                const newDate = new Date(date)
-                newDate.setHours(selectedDate.getHours())
-                newDate.setMinutes(selectedDate.getMinutes())
-                setSelectedDate(newDate)
-              }
-            }}
-            initialFocus
-            disabled={(date) => date < new Date()}
-          />
+          <Calendar mode='single' selected={selectedDate} onSelect={handleDateSelect} initialFocus />
           <div className='grid grid-cols-4 items-center gap-4'>
             <label htmlFor='time' className='text-right'>
               Time
             </label>
-            <input id='time' type='time' className='col-span-3' value={timeValue} onChange={handleTimeChange} />
+            <input
+              id='time'
+              type='time'
+              className='col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+              value={timeValue}
+              onChange={handleTimeChange}
+            />
+          </div>
+          <div className='text-sm text-muted-foreground'>
+            Selected:{' '}
+            {selectedDate instanceof Date && !isNaN(selectedDate) ? format(selectedDate, 'PPpp') : 'Invalid date'}
           </div>
         </div>
         <DialogFooter>

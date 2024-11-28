@@ -64,6 +64,7 @@ export default function CourseCreator() {
         ...data
       }
     }
+    console.log('courseCreate', courseCreate)
     try {
       const response = await createCourse(courseCreate)
       console.log('Course created successfully:', response)

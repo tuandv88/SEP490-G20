@@ -3,12 +3,11 @@ import { User, UserCircle, Compass, FileText, BookOpen, Code } from 'lucide-reac
 
 export function ProfileTabs({ activeTab, setActiveTab }) {
   const tabs = [
-    { id: 'account', label: 'Thông tin tài khoản', icon: User },
-    { id: 'personal', label: 'Thông tin cá nhân', icon: UserCircle },
-    { id: 'roadmap', label: 'Gợi ý lộ trình', icon: Compass },
-    { id: 'learning', label: 'Khóa học của tôi', icon: BookOpen },
-    { id: 'algorithm', label: 'Giải thuật', icon: Code },
-    { id: 'posts', label: 'Bài viết của tôi', icon: FileText },
+    { id: 'account', label: 'Account Information', icon: User },
+    { id: 'roadmap', label: 'Roadmap', icon: Compass },
+    { id: 'learning', label: 'Learning', icon: BookOpen },
+    { id: 'algorithm', label: 'Algorithm', icon: Code },
+    { id: 'posts', label: 'Posts', icon: FileText },
   ];
 
   return (

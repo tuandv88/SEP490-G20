@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef, useContext } from 'react'
-import { Bell, /*User*/ Menu, X } from 'lucide-react'
+import React, { useState, useEffect, useCallback, useRef, useContext } from 'react'
+import { Bell, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS as AR } from '@/data/constants'
@@ -10,16 +10,13 @@ import AuthService from '@/oidc/AuthService'
 import { UserContext } from '@/contexts/UserContext'
 
 export default function Header() {
-  const [isLoggedIn /*setIsLoggedIn*/] = useState(false) // Set to true for demonstration
+  const { user, updateUser } = useContext(UserContext)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
   const [lastScrollTop, setLastScrollTop] = useState(0)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  // const [user, setUser] = useState(null)
 
   const dropdownRef = useRef(null)
-
-  const user = useContext(UserContext)
 
   // Handle scroll hide/show
   const handleScroll = useCallback(() => {
@@ -30,7 +27,7 @@ export default function Header() {
       setIsHidden(false)
     }
     setLastScrollTop(currentScrollTop)
-  }, [lastScrollTop, setIsHidden, setLastScrollTop])
+  }, [lastScrollTop])
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll)
@@ -38,6 +35,7 @@ export default function Header() {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [handleScroll])
+
   // Close dropdown when clicking outside
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen)
 
@@ -53,8 +51,35 @@ export default function Header() {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
 
+  // const handleLogin = async () => {
+  //   await AuthService.login()
+  //   const user = await AuthService.getUser()
+  //   updateUser(user)
+  // }
+
+  useEffect(() => {
+    // Lấy lại thông tin người dùng khi component được mount hoặc user thay đổi
+    if (!user) {
+      AuthService.getUser().then((userData) => {
+        if (userData) {
+          updateUser(userData);
+        }
+      });
+    }
+  }, [user, updateUser]);
+
+  const handleLogin = async () => {
+    await AuthService.login()
+    const userData = await AuthService.getUser()
+
+    // Kiểm tra dữ liệu người dùng trước khi cập nhật
+    if (userData) {
+      updateUser(userData)
+    }
+  }
 
   return (
     <header
@@ -120,25 +145,17 @@ export default function Header() {
               </div>
             ) : (
               <div className='hidden md:block'>
-                {user ? (
-                  <Button variant='outline' className='mr-2' onClick={() => AuthService.logout()}>
-                    Logout
-                  </Button>
-                ) : (
-                  <Button variant='outline' className='mr-2' onClick={() => AuthService.login()}>
-                    Login
-                  </Button>
-                )}
+                <Button variant='outline' className='mr-2' onClick={handleLogin}>
+                  Login
+                </Button>
               </div>
             )}
-            {/* Add the ModeToggle button here */}
             <ModeToggle />
             <Button variant='ghost' size='icon' className='md:hidden' onClick={toggleMobileMenu}>
               {isMobileMenuOpen ? <X className='w-6 h-6' /> : <Menu className='w-6 h-6' />}
             </Button>
           </div>
         </div>
-        {/* Mobile menu */}
         {isMobileMenuOpen && (
           <nav className='mt-4 md:hidden'>
             <ul className='flex flex-col space-y-2'>
@@ -167,10 +184,10 @@ export default function Header() {
                   AboutUs
                 </Link>
               </li>
-              {!isLoggedIn && (
+              {!user && (
                 <>
                   <li>
-                    <Button variant='outline' className='w-full'>
+                    <Button variant='outline' className='w-full' onClick={handleLogin}>
                       Login
                     </Button>
                   </li>

@@ -11,18 +11,16 @@ function PostList({ categoryId }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [totalCount, setTotalCount] = useState(0); // Tổng số bài viết
   const [pageIndex, setPageIndex] = useState(1);
   const [totalPages, setTotalPages] = useState(0); // Tổng số bài viết
   const [orderBy, setOrderBy] = useState("hot");
   const [tags, setTags] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 1,
-    pageSize: 2,
+    pageSize: 5,
     totalCount: 0,
   });
   const navigate = useNavigate();
-  const pageSize = 5;
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -31,8 +29,8 @@ function PostList({ categoryId }) {
       try {
         const data = await DiscussApi.getDiscussionOptions({
           discussionId: categoryId,
-          pageIndex,
-          pageSize,
+          pageIndex: pagination.pageIndex,
+          pageSize: pagination.pageSize,
           orderBy,
           tags,
         });
@@ -40,8 +38,7 @@ function PostList({ categoryId }) {
         if (data && data.updatedDiscussions) {
           setPosts(data.updatedDiscussions);
           setPagination(data.pagination);
-          setTotalCount(data.pagination.totalCount);
-          setTotalPages(Math.ceil(data.pagination.totalCount / pageSize)); // Tính tổng số trang
+          setTotalPages(Math.ceil(data.pagination.totalCount / pagination.pageSize)); // Tính tổng số trang
         }
 
       } catch (err) {
@@ -55,7 +52,7 @@ function PostList({ categoryId }) {
     if (categoryId) {
       fetchPosts();
     }
-  }, [categoryId, pageIndex, orderBy, tags]);
+  }, [categoryId, pagination.pageIndex, orderBy, tags]);
 
   const handlePostClick = (postId) => {
     navigate(`/discussion/${postId}`);
@@ -71,9 +68,11 @@ function PostList({ categoryId }) {
   };
 
   const handlePageChange = (event, value) => {
-    setPageIndex((value));
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: value,
+    }));
   };
-
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString("en-US", {
@@ -331,7 +330,7 @@ function PostList({ categoryId }) {
   font-weight: bold; /* Font chữ đậm để nổi bật */
   color: #ffffff; /* Màu chữ trắng */
   border: none; /* Loại bỏ viền */
-  background: #; /* Nền màu xanh than đậm */
+  background: #1e334a; /* Nền màu xanh than đậm */
   border-radius: 8px; /* Bo góc vừa phải */
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn để tạo chiều sâu */
   cursor: pointer;

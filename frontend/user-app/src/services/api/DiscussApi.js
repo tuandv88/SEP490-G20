@@ -29,7 +29,6 @@ export const DiscussApi = {
 
         // Lấy các userId từ các thảo luận
         const userIds = discussions.map(discussion => discussion.userId);
-        console.log(userIds);
 
         // Gọi API fetchUsers chỉ khi có thảo luận
         const users = await fetchUsers(userIds);
@@ -93,7 +92,6 @@ export const DiscussApi = {
           discussion.lastName = user.lastName;
         }
 
-        console.log(discussion, 12345)
         return discussion;
       } else {
         console.error("Dữ liệu trả về không hợp lệ:", response);
@@ -139,9 +137,6 @@ export const DiscussApi = {
       const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/comments`, {
         params: { PageIndex: pageIndex, PageSize: pageSize }
       });
-
-      console.log("API Response:", response); // Xem dữ liệu trả về từ API
-
       // Kiểm tra và xử lý dữ liệu trả về
       if (response && response.data && response.data.commentDtos) {
         const comments = response.data.commentDtos.data;
@@ -164,16 +159,13 @@ export const DiscussApi = {
             ...comment,
             userName: commentUser ? commentUser.userName : "Unknown",
             urlProfilePicture: commentUser ? commentUser.urlProfilePicture : "default-avatar.png",
-            firstName: commentUser ? commentUser.firstName : "xxx",
+            firstName: commentUser ? commentUser.firstName : "Anonymous",
             lastName: commentUser ? commentUser.lastName : "xxx",
           };
         });
         // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang
 
-        console.log(updatedComments, 54321);
-        console.log(pagination, 53211);
-
-        return { updatedComments, pagination };
+        return { updatedComments, pagination, totalComments: pagination.totalCount };
       } else {
         console.error("Dữ liệu trả về không hợp lệ:", response);
         throw new Error("Dữ liệu trả về không hợp lệ từ API.");
@@ -189,7 +181,6 @@ export const DiscussApi = {
 // API thứ hai: Lấy thông tin chi tiết của UserIds
 async function fetchUsers(userIds) {
   try {
-    console.log(userIds);
     const response = await axios.post(`https://localhost:6005/users/getusers`, { UserIds: userIds });
     if (response && response.data) {
       return response.data;

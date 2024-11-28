@@ -5,7 +5,7 @@ namespace Learning.Application.Extensions;
 public static class CourseExtensions {
     public static async Task<List<CourseDto>> ToCourseDtoListAsync(this List<Course> courses, IFilesService filesService) {
         var tasks = courses.Select(async c => {
-            var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, c.ImageUrl, 60);
+            var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, c.ImageUrl, 60*24);
             return c.ToCourseDto(imageUrl.PresignedUrl!);
         });
 
@@ -41,11 +41,11 @@ public static class CourseExtensions {
         return courseDetail;
     }
 
-    public static UserEnrollmentDto ToUserEnrollmentDto(this UserCourse userCourse) {
+    public static UserEnrollmentDto ToUserEnrollmentDto(this UserEnrollment userCourse) {
         return new UserEnrollmentDto(
                 userCourse.EnrollmentDate,
                 userCourse.CompletionDate,
-                userCourse.UserCourseStatus.ToString(),
+                userCourse.UserEnrollmentStatus.ToString(),
                 userCourse.Rating,
                 userCourse.Feedback
             );
@@ -57,17 +57,15 @@ public static class CourseExtensions {
             Title: course.Title,
             Description: course.Description,
             Headline: course.Headline,
-            CourseStatus: course.CourseStatus.ToString(),
             TimeEstimation: course.TimeEstimation,
             Prerequisites: course.Prerequisites,
             Objectives: course.Objectives,
             TargetAudiences: course.TargetAudiences,
-            ScheduledPublishDate: course.ScheduledPublishDate,
             ImageUrl: imageUrl,
-            OrderIndex: course.OrderIndex,
             CourseLevel: course.CourseLevel.ToString(),
             Price: course.Price,
-            Chapters: chapters
+            Chapters: chapters,
+            LastModified: course.LastModified!.Value
             );
     }
 }

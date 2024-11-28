@@ -1,5 +1,6 @@
 ﻿
 
+
 namespace Learning.Infrastructure.Data.Repositories.Courses;
 public class CourseRepository : Repository<Course>, ICourseRepository {
     private readonly IApplicationDbContext _dbContext;
@@ -17,6 +18,10 @@ public class CourseRepository : Repository<Course>, ICourseRepository {
         if (course != null) {
             _dbContext.Courses.Remove(course);
         }
+    }
+
+    public IQueryable<Course> GetAllAsQueryable() {
+        return _dbContext.Courses.AsQueryable();
     }
 
     public async Task<List<Course>> GetByCourseLevelAsync(CourseLevel courseLevel) {

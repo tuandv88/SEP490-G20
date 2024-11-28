@@ -1,0 +1,9 @@
+﻿global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Payment.Domain.Enums;
+global using Payment.Domain.Models;
+global using Payment.Domain.ValueObjects;
+global using Microsoft.EntityFrameworkCore.ChangeTracking;
+global using Microsoft.EntityFrameworkCore.Diagnostics;
+global using Payment.Application.Interfaces;
+global using Payment.Domain.Abstractions;

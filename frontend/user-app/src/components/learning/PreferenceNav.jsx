@@ -60,8 +60,6 @@ const PreferenceNav = ({ onSubmit, loading, problemId, setActiveTab, setResultCo
   const [isSubmit, setIsSubmit] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
-  console.log(problemId)
-
   const handleFetchData = async () => {
     const submissionData = {
       submission: {

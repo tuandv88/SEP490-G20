@@ -21,7 +21,8 @@ public class PathwayGeneratedEventHandler(ILearningPathRepository pathRepository
                 @event.PathwayName,
                 DateTime.UtcNow,
                 DateTime.UtcNow + @event.EstimatedCompletionTime,
-                LearningPathStatus.NotStarted
+                LearningPathStatus.NotStarted,
+                @event.Reason
             );
 
         var listPathSteps = new List<PathStep>();

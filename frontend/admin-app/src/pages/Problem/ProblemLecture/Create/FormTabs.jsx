@@ -1,5 +1,5 @@
 import React from 'react'
-import BasicInfoStep from '@/components/CreateCourse/CreateCodeProblem/basic-info-step'
+import BasicInfoStep from '@/pages/Problem/ProblemLecture/Create/basic-info-step'
 import CodeEditor from '@/pages/Problem/ProblemLecture/Create/CodeEditor'
 import Template from '@/pages/Problem/ProblemLecture/Create/Template';
 

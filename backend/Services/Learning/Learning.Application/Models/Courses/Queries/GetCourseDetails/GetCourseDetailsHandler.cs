@@ -1,5 +1,5 @@
 ﻿namespace Learning.Application.Models.Courses.Queries.GetCourseDetails;
-public class GetCourseDetailsHandler(ICourseRepository courseRepository, IFilesService filesService, IUserContextService userContext, IUserCourseRepository userCourseRepository)
+public class GetCourseDetailsHandler(ICourseRepository courseRepository, IFilesService filesService, IUserContextService userContext, IUserEnrollmentRepository userCourseRepository)
     : IQueryHandler<GetCourseDetailsQuery, GetCourseDetailsResult> {
     public async Task<GetCourseDetailsResult> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken) {
         var userRole = userContext.User.Role;

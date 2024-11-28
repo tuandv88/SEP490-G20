@@ -13,6 +13,7 @@ import { createLecture } from '@/services/api/lectureApi'
 
 const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
   console.log(chapter)
+  const [isUpdate, setIsUpdate] = useState(false)
   const [curriculum, setCurriculum] = useState([])
   const [isAddChapterOpen, setIsAddChapterOpen] = useState(false)
   const [editingChapterIndex, setEditingChapterIndex] = useState(null)
@@ -35,8 +36,9 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
     return () => {
       restoreScroll()
     }
-  }, [isAddChapterOpen, editingChapterIndex, isAddLectureOpen, editingLecture])
+  }, [isAddChapterOpen, editingChapterIndex, isAddLectureOpen, editingLecture, isUpdate])
 
+  
   const handleFileUpload = (file, chapterIndex, lectureIndex) => {
     const newCurriculum = [...curriculum]
     if (!newCurriculum[chapterIndex].lectures[lectureIndex].files) {
@@ -192,6 +194,8 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         </DialogContent>
       </Dialog>
       <ChapterList
+        setIsUpdate={setIsUpdate}
+        isUpdate={isUpdate}
         curriculum={chapter}
         onEditChapter={(index) => setEditingChapterIndex(index)}
         onDeleteChapter={deleteChapter}
@@ -207,6 +211,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         onVideoUpload={handleVideoUpload}
         onFileRemove={handleFileRemove}
         onVideoRemove={handleVideoRemove}
+        courseId={courseId}
       />
 
       <AddLectureDialog

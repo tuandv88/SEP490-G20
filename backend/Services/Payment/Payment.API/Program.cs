@@ -1,24 +1,36 @@
+using BuildingBlocks.Logging;
+using Serilog;
+using Payment.Application;
+using Payment.Infrastructure;
+using Microsoft.OpenApi.Models;
+using Payment.API;
+using Elastic.CommonSchema;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+////Logging
+//builder.Host.UseSerilog(SeriLogger.Configure)
+//    .ConfigureServices(services => {
+//        //Add Service
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//    });
+
+builder.Services
+            .AddApplicationServices(builder.Configuration)
+            .AddInfrastructureServices(builder.Configuration)
+            .AddApiServices(builder.Configuration);
+
+//Docs API
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+builder.Services.AddSwaggerGen(options => {
+    options.EnableAnnotations();
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Learning API", Version = "v1" });
+});
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+app.UseApiServices();
 
 app.Run();

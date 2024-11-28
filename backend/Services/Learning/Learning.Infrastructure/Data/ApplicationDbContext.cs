@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 using System.Reflection;
-
+using Learning.Application.Data;
 namespace Learning.Infrastructure.Data;
 public class ApplicationDbContext : DbContext, IApplicationDbContext {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -25,7 +25,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext {
 
     public DbSet<ProblemSolution> ProblemSolutions => Set<ProblemSolution>();
 
-    public DbSet<UserCourse> UserCourses => Set<UserCourse>();
+    public DbSet<UserEnrollment> UserEnrollments => Set<UserEnrollment>();
 
     public DbSet<LectureProgress> LecturesProgress => Set<LectureProgress>();
 

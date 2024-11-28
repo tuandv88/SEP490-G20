@@ -45,16 +45,17 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
     };
   }, [onTimeUpdate]);
 
+
+  
   
 
 
-
   return (
-    <div>
-      {loading ? (
+    <div >
+      {loading || !videoSrc ? (
         <DescriptionLoading />
       ) : (
-        <div className='bg-bGprimary text-gray-300 p-6 mx-auto font-sans'>
+        <div className='bg-bGprimary text-gray-300 p-6 mx-auto font-sans h-full'>
           {videoSrc && (
             <div className='relative pb-[56.25%] h-0'>
               <video           
@@ -62,7 +63,8 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
               className='absolute top-0 left-0 w-full h-full'
               controls
               src={videoSrc}
-              title='Lecture Video'             
+              title='Lecture Video'  
+              preload='auto'           
             >
               Your browser does not support the video tag.
               </video>

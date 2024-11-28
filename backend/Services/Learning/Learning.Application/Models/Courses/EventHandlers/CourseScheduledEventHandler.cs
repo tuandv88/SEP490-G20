@@ -8,7 +8,7 @@ public class CourseScheduledEventHandler(ICourseRepository courseRepository) : I
         if(course == null) {
             return;
         }
-        if(course.CourseStatus == CourseStatus.Scheduled) {
+        if(course.CourseStatus == CourseStatus.Scheduled && course.ScheduledPublishDate !=null) {
             course.UpdateStatus(CourseStatus.Published);
             await courseRepository.UpdateAsync(course);
             await courseRepository.SaveChangesAsync();

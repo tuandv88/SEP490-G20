@@ -22,7 +22,6 @@ public class UpdateCourseHandler(ICourseRepository repository) : ICommandHandler
             title: updateCourseDto.Title,
             description: updateCourseDto.Description,
             headline: updateCourseDto.Headline,
-            timeEstimation: updateCourseDto.TimeEstimation,
             prerequisites: updateCourseDto.Prerequisites,
             objectives: updateCourseDto.Objectives,
             targetAudiences: updateCourseDto.TargetAudiences,

@@ -20,7 +20,7 @@
             builder.Property(lp => lp.StartDate).IsRequired();
             builder.Property(lp => lp.EndDate).IsRequired();
             builder.Property(lp => lp.Status).IsRequired();
-
+            builder.Property(lp => lp.Reason);
             builder.HasMany(lp => lp.PathSteps)
                 .WithOne()
                 .HasForeignKey(ps => ps.LearningPathId);

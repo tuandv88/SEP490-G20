@@ -27,6 +27,7 @@ function DiscussionDetail() {
   const [enableNotification, setEnableNotification] = useState(false);
   const [tooltipContent, setTooltipContent] = useState('Share');
   const [clicked, setClicked] = useState(false); // State để theo dõi trạng thái click
+  const [voteCount, setVoteCount] = useState(0);
 
   useEffect(() => {
     const fetchDiscussion = async () => {
@@ -45,13 +46,15 @@ function DiscussionDetail() {
 
         setDiscussion(data);
         setCurrentView(currentViewTmp.currentTotalView);
+        setVoteCount(data.voteCount);
 
-        const currentUserId = userTmp.profile.sub;
-
-        if (currentUserId === data.userId) {
-          setOwnerDiscussion(true);
-        } else {
-          setOwnerDiscussion(false);
+        if (userTmp) {
+          const currentUserId = userTmp.profile.sub;
+          if (currentUserId === data.userId) {
+            setOwnerDiscussion(true);
+          } else {
+            setOwnerDiscussion(false);
+          }
         }
 
       } catch (err) {
@@ -159,6 +162,26 @@ function DiscussionDetail() {
       });
     }
   };
+
+
+  const handleVote = async (voteType) => {
+    try {
+      const response = await DiscussApi.createVoteDiscussion({
+        discussionId: discussion.id, // Tham số này lấy từ thông tin thảo luận
+        commentId: null,
+        voteType: voteType, // 'Like' hoặc 'Dislike'
+        isActive: true, // Chỉ định vote có hiệu lực
+      });
+
+      if (response) {
+        // Cập nhật lại số lượng vote sau khi thực hiện hành động
+        setVoteCount(prevCount => voteType === 'Like' ? prevCount + 1 : prevCount - 1);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   if (loading || !transitioning) {
     return (
@@ -297,10 +320,15 @@ function DiscussionDetail() {
 
         {/* Content Section */}
         <div className="discussion-content">
+
           <div className="discussion-votes">
-            <button><FontAwesomeIcon icon={faChevronUp} /></button>
-            <p>{discussion?.voteCount}</p>
-            <button><FontAwesomeIcon icon={faChevronDown} /></button>
+            <button onClick={() => handleVote('Like')}>
+              <FontAwesomeIcon icon={faChevronUp} />
+            </button>
+            <p>{voteCount}</p>
+            <button onClick={() => handleVote('Dislike')}>
+              <FontAwesomeIcon icon={faChevronDown} />
+            </button>
           </div>
 
           <div className="discussion-main">

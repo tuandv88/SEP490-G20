@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const getAuthHeaders = () => {
-  console.log(Cookies.get('authToken'));
+  //console.log(Cookies.get('authToken'));
   return {
     headers: {
       'Authorization': `Bearer ${Cookies.get('authToken')}`, // Thêm token vào header
@@ -137,23 +137,29 @@ export const DiscussApi = {
       const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/comments`, {
         params: { PageIndex: pageIndex, PageSize: pageSize }
       });
+
+
       // Kiểm tra và xử lý dữ liệu trả về
-      if (response && response.data && response.data.commentDtos) {
-        const comments = response.data.commentDtos.data;
+      if (response && response.data && response.data.commentsDetailDtos) {
+        const comments = response.data.commentsDetailDtos.data;
         const pagination = {
-          pageIndex: response.data.commentDtos.pageIndex,
-          pageSize: response.data.commentDtos.pageSize,
-          totalCount: response.data.commentDtos.count,
+          pageIndex: response.data.commentsDetailDtos.pageIndex,
+          pageSize: response.data.commentsDetailDtos.pageSize,
+          totalCount: response.data.commentsDetailDtos.count,
         };
 
         // Lấy danh sách userId từ các bình luận
         const commentUserIds = comments.map(comment => comment.userId);
 
+        if (commentUserIds.length === 0) {
+          throw new Error("Không có người dùng nào trong bình luận này.");
+        }
         // Fetch thông tin người dùng cho tất cả các comment
         const users = await fetchUsers(commentUserIds);
 
         // Cập nhật thông tin người dùng cho từng bình luận
         const updatedComments = comments.map(comment => {
+
           const commentUser = users.find(user => user.id === comment.userId);
           return {
             ...comment,
@@ -167,11 +173,9 @@ export const DiscussApi = {
 
         return { updatedComments, pagination, totalComments: pagination.totalCount };
       } else {
-        console.error("Dữ liệu trả về không hợp lệ:", response);
         throw new Error("Dữ liệu trả về không hợp lệ từ API.");
       }
     } catch (error) {
-      console.error("Lỗi khi gọi API getCommentsByDiscussionId:", error.message);
       throw error;
     }
   },
@@ -227,8 +231,65 @@ export const DiscussApi = {
       console.error("Error Update Status Notification Discussion:", error.message);
       throw error;
     }
+  },
+
+  createVoteDiscussion: async ({ discussionId, commentId, voteType, isActive }) => {
+    try {
+      // Gửi yêu cầu POST tới API với header Authorization
+      const response = await axios.post(
+        `${API_BASE_URL}/community-service/votes/create`,
+        {
+          DiscussionId: discussionId,
+          CommentId: commentId,
+          VoteType: voteType,
+          IsActive: isActive,
+        },
+        getAuthHeaders()  // Thêm headers với token
+      );
+
+      // Kiểm tra nếu yêu cầu thành công
+      if (response && response.data) {
+        //console.log('Vote created successfully:', response.data);
+        return response.data;
+      } else {
+        throw new Error('Failed to create vote');
+      }
+    } catch (error) {
+      //console.error('Error creating vote:', error);
+      throw error;
+    }
+  },
+
+  createVoteComment: async ({ discussionId, commentId, voteType, isActive }) => {
+    try {
+      // Gửi yêu cầu POST tới API với header Authorization
+      const response = await axios.post(
+        `${API_BASE_URL}/community-service/votes/create`,
+        {
+          DiscussionId: discussionId,
+          CommentId: commentId,
+          VoteType: voteType,
+          IsActive: isActive,
+        },
+        getAuthHeaders()  // Thêm headers với token
+      );
+
+      // Kiểm tra nếu yêu cầu thành công
+      if (response && response.data) {
+        //console.log('Vote created successfully:', response.data);
+        return response.data;
+      } else {
+        throw new Error('Failed to create vote');
+      }
+    } catch (error) {
+      //console.error('Error creating vote:', error);
+      throw error;
+    }
   }
+
 };
+
+
 
 // API thứ hai: Lấy thông tin chi tiết của UserIds
 async function fetchUsers(userIds) {

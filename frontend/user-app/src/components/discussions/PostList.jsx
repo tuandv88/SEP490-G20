@@ -139,7 +139,7 @@ function PostList({ categoryId }) {
             className="search-input"
           />
 
-          <button className="new-button" onClick={() => navigate("/createpost")}>
+          <button className="new-button" onClick={() => navigate("/discussions/creatediscussion")}>
             New +
           </button>
         </div>

@@ -33,9 +33,9 @@ public class GetCommentsByIdDiscussionHandler : IQueryHandler<GetCommentsByIdDis
                               .ToList();
 
         // Chuyển đổi sang DTO
-        var commentDtos = comments.Select(c => c.ToCommentDto()).ToList();
+        var commentDtos = comments.Select(c => c.ToCommentsDetailDto()).ToList();
 
-        var commentsPaginateData = new PaginatedResult<CommentDto>(pageIndex, pageSize, totalCount, commentDtos);
+        var commentsPaginateData = new PaginatedResult<CommentsDetailDto>(pageIndex, pageSize, totalCount, commentDtos);
 
         return new GetCommentsByIdDiscussionResult(commentsPaginateData);
     }

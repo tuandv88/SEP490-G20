@@ -3,7 +3,7 @@ using Community.Application.Models.Comments.Queries.GetCommentsByIdDiscussion;
 
 namespace Community.API.Endpoints.Comments;
 
-public record GetCommentsByIdDiscussionResponse(PaginatedResult<CommentDto> CommentDtos);
+public record GetCommentsByIdDiscussionResponse(PaginatedResult<CommentsDetailDto> CommentsDetailDtos);
 
 public class GetCommentsByIdDiscussionEndpoint : ICarterModule
 {

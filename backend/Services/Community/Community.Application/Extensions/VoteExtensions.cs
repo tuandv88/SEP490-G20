@@ -72,6 +72,12 @@ namespace Community.Application.Extensions
             return discussion.Votes.Where(v => v.IsActive).Sum(v => v.VoteType == VoteType.Like ? 1 : -1);
         }
 
+        public static int CalculateTotalVotes(Comment comment)
+        {
+            // Tính tổng số votes từ danh sách phiếu bầu
+            return comment.Votes.Where(v => v.IsActive).Sum(v => v.VoteType == VoteType.Like ? 1 : -1);
+        }
+
     }
 
 }

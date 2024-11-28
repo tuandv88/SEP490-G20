@@ -116,7 +116,6 @@ const mainRouteTree = rootRoute.addChildren([
   createCourseRoute,
   createCodeProblemRoute,
   createProblemLectureRoute,
-  callbackRoute,
   quizManagementRoute,
   testRoute,
   createAgProblemRoute,
@@ -124,7 +123,6 @@ const mainRouteTree = rootRoute.addChildren([
   editCurriculumCourseRoute,
   editBasicCourseRoute,
   callbackRoute,
-  quizManagementRoute,
   problemTableRoute
 ])
 

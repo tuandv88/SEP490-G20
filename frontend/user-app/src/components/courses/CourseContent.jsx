@@ -48,7 +48,8 @@ const courseData = [
   }
 ];
 
-export function CourseContent() {
+export function CourseContent({ chapters }) {
+
   const [expandedChapters, setExpandedChapters] = useState([1]);
   const [activeVideo, setActiveVideo] = useState(null);
 
@@ -62,45 +63,43 @@ export function CourseContent() {
 
   return (
     <div className="mt-8">
-      <h2 className="text-2xl font-bold text-primary-text mb-4">Course Content</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Course Content</h2>
       <div className="space-y-2">
-        {courseData.map(chapter => (
-          <div key={chapter.id} className="border border-primary-dark rounded-lg overflow-hidden bg-primary-light">
+        {chapters.map(chapter => (
+          <div key={chapter.id} className="border rounded-lg overflow-hidden">
             <button
-              className="w-full px-4 py-3 hover:bg-primary flex items-center justify-between transition-colors"
+              className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 flex items-center justify-between"
               onClick={() => toggleChapter(chapter.id)}
             >
-              <span className="font-medium text-primary-text">{chapter.title}</span>
+              <span className="font-medium text-gray-900">{chapter.title}</span>
               {expandedChapters.includes(chapter.id) ? (
-                <ChevronUp className="w-5 h-5 text-primary-muted" />
+                <ChevronUp className="w-5 h-5 text-gray-500" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-primary-muted" />
+                <ChevronDown className="w-5 h-5 text-gray-500" />
               )}
             </button>
             
             {expandedChapters.includes(chapter.id) && (
-              <div className="divide-y divide-primary-dark">
-                {chapter.lessons.map(lesson => (
+              <div className="divide-y">
+                {chapter.lectures.map(lecture => (
                   <div
-                    key={lesson.id}
-                    className="px-4 py-3 flex items-center justify-between hover:bg-primary transition-colors"
+                    key={lecture.id}
+                    className="px-4 py-3 flex items-center justify-between hover:bg-gray-50"
                   >
                     <div className="flex items-center gap-3">
-                      {lesson.isCompleted ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : lesson.isPreviewable ? (
+                      { lecture.isFree === true ? (
                         <button
-                          onClick={() => setActiveVideo(lesson?.videoUrl)}
-                          className="text-primary-text hover:text-primary-muted transition-colors"
+                          onClick={() => setActiveVideo(lecture?.videoUrl)}
+                          className="text-blue-500 hover:text-blue-600"
                         >
                           <Play className="w-5 h-5" />
                         </button>
                       ) : (
-                        <Lock className="w-5 h-5 text-primary-muted" />
+                        <Lock className="w-5 h-5 text-gray-400" />
                       )}
-                      <span className="text-primary-text">{lesson.title}</span>
+                      <span className="text-gray-700">{lecture.title}</span>
                     </div>
-                    <span className="text-sm text-primary-muted">{lesson.duration}</span>
+                    {/* <span className="text-sm text-gray-500">{lecture.duration}</span> */}
                   </div>
                 ))}
               </div>
@@ -118,3 +117,17 @@ export function CourseContent() {
     </div>
   );
 }
+
+
+// {lecture.isCompleted ? (
+//   <CheckCircle className="w-5 h-5 text-green-500" />
+// ) : lecture.isPreviewable ? (
+//   <button
+//     onClick={() => setActiveVideo(lecture?.videoUrl)}
+//     className="text-blue-500 hover:text-blue-600"
+//   >
+//     <Play className="w-5 h-5" />
+//   </button>
+// ) : (
+//   <Lock className="w-5 h-5 text-gray-400" />
+// )}

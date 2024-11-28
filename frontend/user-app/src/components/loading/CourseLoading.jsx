@@ -3,9 +3,9 @@ import React from 'react'
 import { Skeleton } from '../ui/skeleton'
 
 const CourseLoading = () => {
-  const items = Array(3).fill(0)
+  const items = Array(4).fill(0)
   return (
-    <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+    <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
       {items.map((_, index) => (
         <div
           key={index}

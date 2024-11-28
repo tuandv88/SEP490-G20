@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { HubConnectionBuilder } from '@microsoft/signalr'
 import useStore from '@/data/store'
+import Cookies from 'js-cookie'
 
 export const useSignalRConnection = (url) => {
   const [connection, setConnection] = useState(null)
@@ -17,7 +18,9 @@ export const useSignalRConnection = (url) => {
   useEffect(() => {
     const connect = async () => {
       const newConnection = new HubConnectionBuilder()
-        .withUrl(url)
+        .withUrl(url, {
+          accessTokenFactory: () => Cookies.get('authToken')
+        })
         .withAutomaticReconnect()
         .build()
 

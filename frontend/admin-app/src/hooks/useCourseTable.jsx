@@ -125,7 +125,7 @@ export default function useCourseTable() {
       const courseDetails = await getCourseDetails(courseId)
       const { chapterDetailsDtos } = courseDetails.courseDetailsDto
 
-      if (chapterDetailsDtos.length < 3 || chapterDetailsDtos.some((chapter) => chapter.lectureDtos.length < 3)) {
+      if (chapterDetailsDtos.length < 3 || chapterDetailsDtos.some((chapter) => chapter.lectureDtos.length < 2)) {
         toast({
           title: 'Cannot change status',
           description: 'The course must have at least 3 chapters, and each chapter must have at least 3 lectures.',

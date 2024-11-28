@@ -9,11 +9,14 @@ import Quiz1 from './Quiz1'
 import { QuizAPI } from '@/services/api/quizApi'
 import QuizPopup from '../quiz/QuizPopup'
 import { QuizSubmissionHistory } from '../quiz/QuizSubmissionHistory'
+import { LearningAPI } from '@/services/api/learningApi'
 
-export default function QuizComponent({ quiz }) {
-  const [isQuizStarted, setIsQuizStarted] = useState(false)
-  const [quizData, setQuizData] = useState(null)
-  const [quizSubmission, setQuizSubmission] = useState(null)
+export default function QuizComponent({ quiz, lectureId }) {
+  const [isQuizStarted, setIsQuizStarted] = useState(false) // Trạng thái quiz đã bắt đầu hay chưa
+  const [quizData, setQuizData] = useState(null) // Dữ liệu chi tiết của quiz
+  const [quizSubmission, setQuizSubmission] = useState(null) // Dữ liệu submission của quiz
+
+  // Lấy dữ liệu quiz submission (dùng lectureId để đảm bảo luôn lấy dữ liệu mới nhất)
   useEffect(() => {
     const fetchQuizSubmission = async () => {
       try {
@@ -24,27 +27,62 @@ export default function QuizComponent({ quiz }) {
         console.error('Error fetching quiz submission:', error)
       }
     }
-    fetchQuizSubmission()
-  }, [quizData])
 
+    fetchQuizSubmission() // Gọi khi quiz.id có giá trị
+  }, [quiz.id]) // Theo dõi `quiz.id` để gọi lại khi quiz thay đổi
+
+  // Lấy dữ liệu quiz detail bằng lectureId (chỉ khi quiz đã bắt đầu)
+  useEffect(() => {
+    if (!isQuizStarted) return // Chỉ chạy khi quiz đã bắt đầu
+
+    const fetchQuizDetails = async () => {
+      try {
+        const lectureDetail = await LearningAPI.getLectureDetails(lectureId)
+        console.log('Lecture Detail: ', lectureDetail)
+
+        // Cập nhật quiz data từ lecture detail
+        setQuizData(lectureDetail.lectureDetailsDto)
+        console.log('Quiz Data: ', lectureDetail.lectureDetailsDto)
+      } catch (error) {
+        console.error('Error fetching quiz details:', error)
+      }
+    }
+
+    fetchQuizDetails()
+  }, [isQuizStarted, lectureId]) // Theo dõi `isQuizStarted` và `lectureId`
+
+  // Hàm bắt đầu quiz
   const startQuiz = async () => {
-    setIsQuizStarted(true)
-    handleStartQuiz()
     try {
-      const quizDetails = await QuizAPI.getQuizDetails(quiz.id)
-
-      setQuizData(quizDetails)
+      await handleStartQuiz() // Bắt đầu quiz
+      setIsQuizStarted(true) // Cập nhật trạng thái quiz đã bắt đầu
     } catch (error) {
-      console.error('Error fetching quiz details:', error)
+      console.error('Error starting quiz:', error)
     }
   }
 
+  // Hàm gọi API bắt đầu quiz
   const handleStartQuiz = async () => {
     try {
       const response = await QuizAPI.startQuiz(quiz.id)
       console.log('Quiz Started: ', response)
     } catch (error) {
       console.error('Error starting quiz:', error)
+      throw error // Đảm bảo lỗi được xử lý ở cấp trên
+    }
+  }
+
+  // Hàm đóng quiz (lấy dữ liệu mới nhất của quiz bằng lectureId)
+  const handleCloseQuiz = async () => {
+    setIsQuizStarted(false) // Đặt trạng thái quiz chưa bắt đầu
+    try {
+      const lectureDetail = await LearningAPI.getLectureDetails(lectureId)
+      console.log('Lecture Detail: ', lectureDetail)
+
+      // Cập nhật quiz data từ lecture detail
+      setQuizData(lectureDetail.lectureDetailsDto.quiz)
+    } catch (error) {
+      console.error('Error fetching updated quiz details:', error)
     }
   }
 
@@ -82,7 +120,7 @@ export default function QuizComponent({ quiz }) {
       </div>
 
       {isQuizStarted && quizData && (
-        <QuizPopup quiz={quizData.quiz} answer={quizData.answer} onClose={() => setIsQuizStarted(false)} />
+        <QuizPopup quiz={quizData.quiz} answer={quizData.answer} onClose={() => handleCloseQuiz()} />
       )}
     </div>
   )

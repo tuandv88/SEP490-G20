@@ -1,5 +1,4 @@
 // src/router/AppRouter.jsx
-import CourseDetail from '@/components/course/CourseDetail'
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import { HomePage, About, NotFound, CourseList } from '../pages'
 import Discuss from "@/pages/discussions/Discuss";
@@ -11,8 +10,8 @@ import ErrorPage from '@/pages/ErrorPage'
 import Problem from '@/pages/Problem'
 import { lazy, Suspense } from 'react'
 import Callback from '@/oidc/Callback'
-import { SurrveyFirstLogin } from '@/components/surrvey/SurrveyFirstLogin'
-import CourseDetails from '@/pages/CourseDetails'
+import CourseDetail from '@/pages/CourseDetail';
+import ProblemSpace from '@/components/problem/SolveChallenge/ProblemSpace';
 const Code = lazy(() => import('@/pages/Code'))
 
 export const AppRouter = () => {
@@ -45,14 +44,6 @@ export const AppRouter = () => {
       path: AUTHENTICATION_ROUTERS.CALLBACK,
       element: <Callback />
     },
-    {
-      path: AUTHENTICATION_ROUTERS.SURVEY,
-      element: <SurrveyFirstLogin />
-    },
-    {
-      path: AUTHENTICATION_ROUTERS.COURSEDETAILS,
-      element: <CourseDetails />
-    },
     { path: AUTHENTICATION_ROUTERS.NOTFOUND, element: <NotFound /> },
     { path: AUTHENTICATION_ROUTERS.ERROR, element: <ErrorPage /> },
     {
@@ -62,6 +53,10 @@ export const AppRouter = () => {
     {
       path: AUTHENTICATION_ROUTERS.DISCUSSIONDETAIL,
       element: <DiscussionDetail />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.PROBLEM_SPACE,
+      element: <ProblemSpace />
     }
   ])
   return <RouterProvider router={router} />

@@ -38,9 +38,9 @@ export default function ChapterList({
           onVideoUpload={(file, lectureIndex) => onVideoUpload(file, chapterIndex, lectureIndex)}
           onFileRemove={(lectureIndex) => onFileRemove(chapterIndex, lectureIndex)}
           onVideoRemove={(lectureIndex) => onVideoRemove(chapterIndex, lectureIndex)}
-          courseId={courseId}
           setIsUpdate={setIsUpdate}
           isUpdate={isUpdate}
+          courseId={courseId}
         />  
       </div>
     </Card>

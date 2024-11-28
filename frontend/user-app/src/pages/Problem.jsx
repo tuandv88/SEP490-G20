@@ -5,79 +5,111 @@ import ProblemTable from '../components/problem/ProblemTable'
 import Layout from '@/layouts/layout'
 import ProblemPanelBot from '../components/problem/ProblemPanelBot'
 import ProblemPanelTop from '../components/problem/ProblemPanelTop'
+import { useEffect } from 'react'
+import { ProblemAPI } from '@/services/api/problemApi'
+import { Loading } from '@/components/ui/overlay'
+import { ProblemSkeleton } from '@/components/loading/ProblemSkeleton'
 
-const problems = [
-  {
-    id: 999,
-    title: '1. Largest Combination With Bitwise AND',
-    acceptance: '78.2%',
-    difficulty: 'Medium',
-    frequency: '',
-    solved: true,
-    tags: ['Array', 'String']
-  },
-  { id: 1, title: 'Two Sum', acceptance: '54.1%', difficulty: 'Easy', frequency: '', solved: true, tags: ['Array'] },
-  {
-    id: 2,
-    title: '2. Add Two Numbers',
-    acceptance: '44.5%',
-    difficulty: 'Medium',
-    frequency: '',
-    solved: false,
-    tags: ['String']
-  },
-  {
-    id: 3,
-    title: '3. Longest Substring Without Repeating Characters',
-    acceptance: '35.7%',
-    difficulty: 'Medium',
-    frequency: '',
-    solved: false,
-    tags: ['String']
-  },
-  {
-    id: 4,
-    title: '4. Median of Two Sorted Arrays',
-    acceptance: '41.9%',
-    difficulty: 'Hard',
-    frequency: '',
-    solved: false,
-    tags: ['Array']
-  },
-  {
-    id: 5,
-    title: '5. Longest Palindromic Substring',
-    acceptance: '34.7%',
-    difficulty: 'Medium',
-    frequency: '',
-    solved: false,
-    tags: ['String']
-  },
-  {
-    id: 6,
-    title: '6. Zigzag Conversion',
-    acceptance: '49.7%',
-    difficulty: 'Medium',
-    frequency: '',
-    solved: false,
-    tags: ['String']
-  },
-  {
-    id: 7,
-    title: '7. Reverse Integer',
-    acceptance: '29.4%',
-    difficulty: 'Medium',
-    frequency: '',
-    solved: false,
-    tags: ['Array']
-  }
-]
+// const problems = [
+//   {
+//     id: 999,
+//     title: '1. Largest Combination With Bitwise AND',
+//     acceptance: '78.2%',
+//     difficulty: 'Medium',
+//     frequency: '',
+//     solved: true,
+//     tags: ['Array', 'String']
+//   },
+//   { id: 1, title: 'Two Sum', acceptance: '54.1%', difficulty: 'Easy', frequency: '', solved: true, tags: ['Array'] },
+//   {
+//     id: 2,
+//     title: '2. Add Two Numbers',
+//     acceptance: '44.5%',
+//     difficulty: 'Medium',
+//     frequency: '',
+//     solved: false,
+//     tags: ['String']
+//   },
+//   {
+//     id: 3,
+//     title: '3. Longest Substring Without Repeating Characters',
+//     acceptance: '35.7%',
+//     difficulty: 'Medium',
+//     frequency: '',
+//     solved: false,
+//     tags: ['String']
+//   },
+//   {
+//     id: 4,
+//     title: '4. Median of Two Sorted Arrays',
+//     acceptance: '41.9%',
+//     difficulty: 'Hard',
+//     frequency: '',
+//     solved: false,
+//     tags: ['Array']
+//   },
+//   {
+//     id: 5,
+//     title: '5. Longest Palindromic Substring',
+//     acceptance: '34.7%',
+//     difficulty: 'Medium',
+//     frequency: '',
+//     solved: false,
+//     tags: ['String']
+//   },
+//   {
+//     id: 6,
+//     title: '6. Zigzag Conversion',
+//     acceptance: '49.7%',
+//     difficulty: 'Medium',
+//     frequency: '',
+//     solved: false,
+//     tags: ['String']
+//   },
+//   {
+//     id: 7,
+//     title: '7. Reverse Integer',
+//     acceptance: '29.4%',
+//     difficulty: 'Medium',
+//     frequency: '',
+//     solved: false,
+//     tags: ['Array']
+//   }
+// ]
 
 const availableTags = ['Array', 'String', 'Dynamic Programming', 'Math', 'Tree']
 
 const ITEMS_PER_PAGE = 5
 
 function Problem() {
+  const [loading, setLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const [problems, setProblems] = useState([])
+  const [totalPages, setTotalPages] = useState(1)
+  const pageSize = 3
+
+  useEffect(() => {
+    const fetchProblems = async () => {
+      setLoading(true)
+      try {
+        const response = await ProblemAPI.getAllProblems(currentPage, pageSize)
+        const { data, count } = response.problems
+        setProblems(data)
+        setTotalPages(Math.ceil(count / pageSize)) // Tính tổng số trang
+      } catch (error) {
+        console.error('Error fetching problems:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProblems()
+  }, [currentPage])
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
   const [filters, setFilters] = useState({
     lists: '',
     difficulty: '',
@@ -94,7 +126,6 @@ function Problem() {
     totalMedium: 1750,
     totalHard: 761
   }
-  const [currentPage, setCurrentPage] = useState(1)
 
   const handleRemoveFilter = (type, value) => {
     setFilters((prev) => {
@@ -129,12 +160,6 @@ function Problem() {
     })
   }
 
-  // Calculate total pages
-  const totalPages = Math.ceil(problems.length / ITEMS_PER_PAGE)
-
-  // Get current page items
-  const currentItems = problems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
-
   return (
     <Layout>
       <div className='min-h-screen bg-background text-foreground p-6 mt-[100px]'>
@@ -149,12 +174,16 @@ function Problem() {
                 handleTagToggle={handleTagToggle}
               />
               <ActiveFilters filters={filters} handleRemoveFilter={handleRemoveFilter} handleReset={handleReset} /> */}
-              <ProblemTable
-                problems={currentItems}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
+              {loading ? (
+                <ProblemSkeleton />
+              ) : (
+                <ProblemTable
+                  problems={problems}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              )}
             </div>
 
             {/* <div className='w-80 space-y-6'>

@@ -4,7 +4,7 @@ import Comments from '@/components/learning/Comment'
 import Description from '@/components/learning/Description'
 import HeaderTab from '@/components/learning/HeaderTab'
 import { LearningAPI } from '@/services/api/learningApi'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ErrorPage from './ErrorPage'
 import NotFound from './NotFound'
@@ -22,6 +22,8 @@ import Quiz2 from '@/components/learning/Quiz2'
 import SubmissionHistory from '@/components/learning/submission/SubmissionHistory'
 import { ProblemAPI } from '@/services/api/problemApi'
 import SubmissionResult from '@/components/learning/submission/SubmissionResult'
+
+
 
 const LearningSpace = () => {
   const navigate = useNavigate()
@@ -42,15 +44,16 @@ const LearningSpace = () => {
   const [problemSubmission, setProblemSubmission] = useState(null)
   const [resultCodeSubmit, setResultCodeSubmit] = useState(null)
   const [currentCode, setCurrentCode] = useState(null)
+  const [mainLoading, setMainLoading] = useState(false)
   //courseId
   const { id, lectureId } = useParams()
   const toggleProblemList = () => {
     setIsProblemListOpen(!isProblemListOpen)
   }
 
-  const handleVideoTimeUpdate = (time) => {
+  const handleVideoTimeUpdate = useCallback((time) => {
     videoTimeRef.current = time
-  }
+  }, [])
 
   const togglePanelLayout = () => {
     setIsThreePanels(!isThreePanels)
@@ -93,6 +96,7 @@ const LearningSpace = () => {
           //console.log(firstLectureId)
           const data = await LearningAPI.getLectureDetails(lectureId)
           setLectureDetail(data)
+          console.log(data)
 
           //Gọi API để lấy ra file của lecutre đó.
           const lectureFiles = data?.lectureDetailsDto?.files || []
@@ -125,13 +129,12 @@ const LearningSpace = () => {
 
           // Kiểm tra nếu problem tồn tại
           const problemId = data?.lectureDetailsDto?.problem?.id
-          console.log(problemId)
           if (problemId) {
             fetchSubmissionHistory(problemId)
           }
         } catch (error) {
           console.error('Error fetching chapter detail:', error)
-        }
+        } 
       }
 
       const fetchSubmissionHistory = async (problemId) => {
@@ -141,7 +144,7 @@ const LearningSpace = () => {
           console.log(response)
         } catch (error) {
           console.error('Error fetching submission history:', error)
-        }
+        } 
       }
 
       fetchLectureDetail()
@@ -158,6 +161,10 @@ const LearningSpace = () => {
     )
   }
 
+  // if (mainLoading) {
+  //   return <Loading />
+  // }
+
   return (
     <div>
       <div>
@@ -165,6 +172,7 @@ const LearningSpace = () => {
           onButtonClick={toggleProblemList}
           onChatClick={togglePanelLayout}
           toggleCurriculumRef={toggleCurriculumRef}
+          header='Chapter List'
         />
       </div>
       {lectureDetail?.lectureDetailsDto?.problem && (
@@ -178,7 +186,7 @@ const LearningSpace = () => {
               {loading && <ChapterLoading />}
               {(activeTab === 'descriptions' || activeTab === 'default' || activeTab === 'curriculum') && !loading && (
                 <Description
-                  description={lectureDetail?.lectureDetailsDto?.problem?.description}
+                  description={lectureDetail?.lectureDetailsDto?.summary}
                   videoSrc={videoBlobUrl}
                   loading={loading}
                   titleProblem={lectureDetail?.lectureDetailsDto?.problem?.title}
@@ -186,8 +194,10 @@ const LearningSpace = () => {
                   onTimeUpdate={handleVideoTimeUpdate}
                 />
               )}
-              {activeTab === 'submissionResult' && !loading && <SubmissionResult currentCode={currentCode} resultCodeSubmit={resultCodeSubmit}/>}
-              {activeTab === 'submission' && !loading && <SubmissionHistory submissions={problemSubmission}/>}
+              {activeTab === 'submissionResult' && !loading && (
+                <SubmissionResult currentCode={currentCode} resultCodeSubmit={resultCodeSubmit} />
+              )}
+              {activeTab === 'submission' && !loading && <SubmissionHistory submissions={problemSubmission} />}
               {activeTab === 'comments' && !loading && <Comments />}
             </div>
           </ResizablePanel>
@@ -227,7 +237,8 @@ const LearningSpace = () => {
             <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={true} />
             {loading && <ChapterLoading />}
             {(activeTab === 'curriculum' || activeTab === 'default') && !loading && (
-              <Curriculum chapters={chapters} setSelectedLectureId={setSelectedLectureId} title={title} />
+             <Curriculum courseId={id} chapters={chapters} setSelectedLectureId={setSelectedLectureId} title={title} />
+             //<Curriculum3 />
             )}
             {activeTab === 'comments' && !loading && <Comments />}
           </ResizablePanel>
@@ -259,7 +270,7 @@ const LearningSpace = () => {
 
       {lectureDetail?.lectureDetailsDto?.quiz && (
         <div className='h-[94vh] w-full bg-bGprimary scroll-container'>
-          <Quiz2 quiz={lectureDetail?.lectureDetailsDto?.quiz} />
+          <Quiz2 quiz={lectureDetail?.lectureDetailsDto?.quiz} lectureId={lectureId} />
         </div>
       )}
 

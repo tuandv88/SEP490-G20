@@ -50,6 +50,7 @@ const CodeEditor = ({
     setTestCase(dictionary)
   }
 
+
   const handleRunCode = async () => {
     if (!code || isEmpty(code)) {
       setIsOpen(true)

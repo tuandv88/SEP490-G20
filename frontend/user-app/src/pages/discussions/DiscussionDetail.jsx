@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom"; 
+import { useParams, useNavigate } from "react-router-dom";
 import { DiscussApi } from "@/services/api/DiscussApi";
-import Layout from "@/layouts/layout"; 
+import Layout from "@/layouts/layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"; 
-import { faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons";
-import CommentList from "../../components/discussions/CommentList"; 
+import { faChevronLeft, faEye, faChevronUp, faBookmark, faShareFromSquare, faBell, faBellSlash, faEdit, faTrash, faComment, faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import CommentList from "../../components/discussions/CommentList";
+import ReactHtmlParser from 'html-to-react';
+import { marked } from 'marked'; // Import marked library
 
 function DiscussionDetail() {
   const { id } = useParams();
@@ -13,60 +14,32 @@ function DiscussionDetail() {
   const [discussion, setDiscussion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [newComment, setNewComment] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [refreshComments, setRefreshComments] = useState(false); // Thêm state để trigger lại việc tải comment
-
-  // Fetch discussion details on component mount
+  const [transitioning, setTransitioning] = useState(false); // Trạng thái chuyển tiếp
+  const htmlToReactParser = new ReactHtmlParser.Parser();
   useEffect(() => {
     const fetchDiscussion = async () => {
       setLoading(true);
       setError(null);
       try {
         const data = await DiscussApi.getDiscussionDetails(id);
+        if (!data) {
+          throw new Error("Discussion not found.");
+        }
         setDiscussion(data);
       } catch (err) {
-        setError("Failed to fetch discussion details.");
+        setError(err.message || "Failed to fetch discussion details.");
       } finally {
-        setLoading(false);
+        // Delay thêm 500ms trước khi chuyển
+        setTimeout(() => {
+          setLoading(false);
+          setTransitioning(true); // Chuyển trạng thái để kích hoạt chuyển cảnh
+        }, 200);
       }
     };
 
     fetchDiscussion();
   }, [id]);
 
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return;  // Ensure comment is not empty
-    setSubmitting(true);
-    try {
-      const commentData = {
-        discussionId: id,
-        content: newComment,
-        dateCreated: new Date().toISOString(),
-        parentCommentId: null,
-        depth: 1,
-        isActive: true,
-      };
-  
-      // Call the API to create the comment
-      await DiscussApi.createComment(commentData);
-  
-      // Toggle the refreshComments state to trigger CommentList to reload comments
-      setRefreshComments((prev) => !prev);
-  
-      setNewComment("");  // Reset the comment input field
-    } catch (err) {
-      console.error("Failed to add comment:", err);
-      alert("Error adding comment. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-  
-  
-
-  if (loading) return <p>Loading discussion details...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString("en-US", {
@@ -79,224 +52,459 @@ function DiscussionDetail() {
     });
   };
 
-  const styles = {
-    container: {
-      margin: "50px auto",
-      maxWidth: "1000px",
-      fontFamily: "'Arial', sans-serif",
-      padding: "20px",
-      backgroundColor: "#ffffff",
-      borderRadius: "12px",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      lineHeight: "1.6",
-      position: "relative",
-    },
-    backButton: {
-      display: "inline-flex",
-      alignItems: "center",
-      marginBottom: "20px",
-      marginTop: "10px",
-      padding: "10px 20px",
-      fontSize: "14px",
-      fontWeight: "bold",
-      color: "#007bff",
-      backgroundColor: "#f5f5f5",
-      border: "1px solid #ddd",
-      borderRadius: "8px",
-      cursor: "pointer",
-      textDecoration: "none",
-      transition: "background-color 0.3s",
-    },
-    backButtonIcon: {
-      marginRight: "8px",
-    },
-    header: {
-      display: "flex",
-      alignItems: "center",
-      gap: "15px",
-      marginBottom: "30px",
-    },
-    avatar: {
-      width: "60px",
-      height: "60px",
-      borderRadius: "50%",
-      objectFit: "cover",
-      border: "2px solid #f0f0f0",
-    },
-    title: {
-      fontSize: "30px",
-      fontWeight: "bold",
-      color: "#333",
-      lineHeight: "1.3",
-    },
-    description: {
-      fontSize: "16px",
-      color: "#444",
-      marginBottom: "20px",
-      textAlign: "justify",
-    },
-    image: {
-      width: "100%",
-      maxHeight: "350px",
-      objectFit: "contain",
-      borderRadius: "12px",
-      marginBottom: "20px",
-    },
-    tags: {
-      display: "flex",
-      gap: "15px",
-      flexWrap: "wrap",
-      marginBottom: "30px",
-    },
-    tag: {
-      backgroundColor: "#f4f4f4",
-      color: "#007bff",
-      padding: "8px 16px",
-      borderRadius: "25px",
-      fontSize: "14px",
-      cursor: "pointer",
-    },
-    info: {
-      fontSize: "12px", // Smaller font size
-      color: "#888", // Light gray color
-      marginBottom: "15px",
-      display: "flex", // Align the items horizontally
-      gap: "15px", // Space between items
-      flexWrap: "wrap", // Allow items to wrap if necessary
-    },
-    commentInputContainer: {
-      marginBottom: "40px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "15px",
-    },
-    commentInput: {
-      width: "100%",
-      padding: "12px",
-      fontSize: "16px",
-      borderRadius: "8px",
-      border: "1px solid #ddd",
-      boxShadow: "inset 0 2px 4px rgba(0, 0, 0, 0.1)",
-    },
-    commentButton: {
-      alignSelf: "flex-end",
-      padding: "12px 20px",
-      fontSize: "16px",
-      fontWeight: "bold",
-      color: "#fff",
-      backgroundColor: submitting ? "#ccc" : "#007bff",
-      border: "none",
-      borderRadius: "8px",
-      cursor: submitting ? "not-allowed" : "pointer",
-      transition: "background-color 0.3s",
-    },
-    comments: {
-      marginTop: "30px",
-    },
-    comment: {
-      marginBottom: "15px",
-      padding: "15px",
-      backgroundColor: "#f9f9f9",
-      borderRadius: "8px",
-      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.05)",
-      fontSize: "16px",
-    },
-    commentUserContainer: {
-      display: "flex",
-      alignItems: "center",
-      gap: "10px",
-    },
-    commentUserAvatar: {
-      width: "40px",
-      height: "40px",
-      borderRadius: "50%",
-      objectFit: "cover",
-      border: "2px solid #f0f0f0",
-    },
-    commentUserName: {
-      fontWeight: "bold",
-      fontSize: "14px",
-      color: "#333",
-    },
-    commentContent: {
-      fontSize: "14px",
-      color: "#555",
-    },
-    noComments: {
-      fontSize: "14px",
-      color: "#999",
-      textAlign: "center",
-    },
-  };
+  if (loading || !transitioning) {
+    return (
+      <>
+        <div className="loader-container">
+          <div className="loader"></div>
+        </div>
+        <style jsx={true}>{`
+          /* Loader */
+          .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed; /* Đảm bảo loader ở vị trí cố định trên trang */
+            top: 50%; /* Căn giữa theo chiều dọc */
+            left: 50%; /* Căn giữa theo chiều ngang */
+            transform: translate(-50%, -50%); /* Đảm bảo căn chính xác ở giữa màn hình */
+            z-index: 9999; /* Đảm bảo loader nằm trên các phần tử khác */
+          }
+  
+          .loader {
+            border: 4px solid #f3f3f3; /* Màu viền ngoài */
+            border-top: 4px solid #1e334a; /* Màu viền trên */
+            border-radius: 50%; /* Tạo hình tròn */
+            width: 30px; /* Đường kính loader */
+            height: 30px; /* Đường kính loader */
+            animation: spin 1s linear infinite; /* Hiệu ứng quay */
+          }
+  
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}</style>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <p className="error-message">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <Layout>
-      <div style={styles.container}>
-        <button
-          style={styles.backButton}
-          onClick={() => navigate("/discussions/discuss")}
-        >
-          <FontAwesomeIcon icon={faArrowLeft} style={styles.backButtonIcon} />
-          Back
-        </button>
+      <div className="discussion-container">
+        {/* Header Section */}
+        <div className="discussion-header">
+          <div className="back-button">
+            <button onClick={() => navigate("/discussions/discuss")}>
+              <FontAwesomeIcon icon={faChevronLeft} className="back-icon" /> Back
+            </button>
+          </div>
+          <span class="separator">|</span>
+          <div className="discussion-title">
+            <h5>{discussion?.title}</h5>
+          </div>
 
-        <div style={styles.header}>
-          <img
-            src={discussion?.urlProfilePicture || "default-avatar.png"}
-            alt="User Avatar"
-            style={styles.avatar}
-          />
-          <div>
-            <p style={styles.userName}>{discussion?.userName}</p>
+          <div className="share-button">
+            <button className="icon-button">
+              <FontAwesomeIcon icon={faShareFromSquare} />
+            </button>
+          </div>
+
+          <div className="sub-notification-button">
+            {discussion.enableNotification ? (
+              <button className="icon-button-on">
+                <FontAwesomeIcon icon={faBell} />
+              </button>
+            ) : (
+              <button className="icon-button-off">
+                <FontAwesomeIcon icon={faBellSlash} />
+              </button>
+            )}
+          </div>
+
+          <div className="edit-button">
+            <button className="icon-button-edit">
+              <FontAwesomeIcon icon={faEdit} />
+            </button>
+          </div>
+
+          <div className="remove-button">
+            <button className="icon-button-remove">
+              <FontAwesomeIcon icon={faTrash} />
+            </button>
+          </div>
+
+          <div className="bookmark-button">
+            <button className="icon-button-bookmark">
+              <FontAwesomeIcon icon={faBookmark} />
+            </button>
+          </div>
+
+          <div className="redirect-comment-button">
+            <button className="icon-button-redirect-comment">
+              <FontAwesomeIcon icon={faComment} />
+            </button>
           </div>
         </div>
 
-        <div style={styles.info}>
-          <p>Created on: {formatDate(discussion?.dateCreated)}</p>
-          <p>Last updated: {formatDate(discussion?.dateUpdated)}</p>
-          <p>
-            <FontAwesomeIcon icon={faChevronUp} className="icon" /> {discussion?.viewCount}
-          </p>
-          <p>
-            <FontAwesomeIcon icon={faEye} className="icon" /> {discussion?.voteCount}
-          </p>
+        {/* Content Section */}
+        <div className="discussion-content">
+          <div className="discussion-votes">
+            <button><FontAwesomeIcon icon={faChevronUp} /></button>
+            <p>{discussion?.voteCount}</p>
+            <button><FontAwesomeIcon icon={faChevronDown} /></button>
+          </div>
+
+          <div className="discussion-main">
+            <div className="discussion-user">
+              <img
+                src={discussion?.urlProfilePicture || "default-avatar.png"}
+                alt="User Avatar"
+                className="user-avatar"
+              />
+              <div className="user-info">
+                <p className="user-name">{discussion?.firstName} {discussion?.lastName}</p>
+                <p className="view-count"><FontAwesomeIcon icon={faEye} className="icon" /> {discussion?.viewCount}</p>
+              </div>
+            </div>
+            <div className="discussion-createdate">
+              <p>Created on: {formatDate(discussion?.dateCreated)}</p>
+            </div>
+            <div className="discussion-tags">
+              {discussion?.tags?.map((tag, idx) => (
+                <span key={idx} className="tag">#{tag}</span>
+              ))}
+            </div>
+
+            <div className="discussion-description" dangerouslySetInnerHTML={{ __html: marked(discussion?.description), }} />
+
+            <div className="discussion-image">
+              {discussion?.imageUrl && (
+                <img src={discussion?.imageUrl} alt="Post" className="discussion-image" />
+              )}
+            </div>
+          </div>
         </div>
 
-        <h1 style={styles.title}>{discussion?.title}</h1>
-        <p style={styles.description}>{discussion?.description}</p>
-
-        {discussion?.imageUrl && (
-          <img src={discussion?.imageUrl} alt="Post" style={styles.image} />
-        )}
-
-        <div style={styles.tags}>
-          {discussion?.tags?.map((tag, idx) => (
-            <span key={idx} style={styles.tag}>
-              #{tag}
-            </span>
-          ))}
+        {/* Comments List Section */}
+        <div className="comment-section">
+          <CommentList discussionId={id} />
         </div>
-
-        {/* Comment Input */}
-        <div style={styles.commentInputContainer}>
-          <textarea
-            style={styles.commentInput}
-            placeholder="Write your comment..."
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-          />
-          <button
-            style={styles.commentButton}
-            onClick={handleAddComment}
-            disabled={submitting}
-          >
-            {submitting ? "Submitting..." : "Post Comment"}
-          </button>
-        </div>
-
-        {/* Pass comments to CommentList */}
-        <CommentList discussionId={id} refresh={refreshComments} />
       </div>
+      <style jsx={true}>{`
+/* Container chính */
+.discussion-container {
+  margin: 90px auto;
+  padding: 20px;
+  width: 100%;
+  max-width: 85%; /* Giảm chiều rộng container để không quá sát màn hình */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background-color: #f0f0f0; /* Màu nền sáng */
+  border-radius: 10px; /* Bo góc mềm mại */
+  border: 1px solid #e0e0e0; /* Viền nhẹ */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+}
+
+/* Tổng quan Header */
+.discussion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background-color: #ffffff; /* Màu nền trắng */
+  border-bottom: 1px solid #e0e0e0;
+  height: 70px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Nút Back */
+.back-button button {
+  background: none;
+  border: none;
+  color: #555555; /* Màu xanh đồng bộ */
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  transition: color 0.3s, transform 0.3s;
+}
+
+.back-button button:hover {
+  color: #1e334a; /* Màu xanh đậm khi hover */
+  text-decoration: none; /* Loại bỏ gạch chân */
+  transform: scale(1.1); /* Phóng to nhẹ */
+}
+
+.separator {
+  color: #777777; /* Màu xám nhạt cho thanh phân cách */
+  font-size: 16px; /* Kích thước phù hợp */
+  gap: 50px;
+  padding-left: 10px;
+}
+
+/* Tiêu đề */
+.discussion-title {
+  flex-grow: 1;
+  font-size: 20px;
+  font-weight: bold;
+  color: #1e334a; /* Màu chữ đậm hơn */
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.5px;
+  padding-left: 10px; /* Khoảng cách giữa tiêu đề và nút đầu tiên */
+}
+/* Style chung cho tất cả các button */
+.icon-button,
+.sub-notification-button .icon-button-on,
+.sub-notification-button .icon-button-off,
+.edit-button .icon-button-edit,
+.remove-button .icon-button-remove,
+.bookmark-button .icon-button-bookmark,
+.redirect-comment-button .icon-button-redirect-comment {
+  background-color: transparent;
+  border: none;
+  color: #626262;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-size: 15px; /* Kích thước font lớn hơn */
+  padding: 10px; /* Khoảng cách bên trong nút */
+  border-radius: 8px; /* Bo góc cho nút */
+}
+
+/* Hiệu ứng hover chung */
+.icon-button:hover,
+.sub-notification-button .icon-button-on:hover,
+.sub-notification-button .icon-button-off:hover,
+.edit-button .icon-button-edit:hover,
+.remove-button .icon-button-remove:hover,
+.bookmark-button .icon-button-bookmark:hover,
+.redirect-comment-button .icon-button-redirect-comment:hover {
+  color: #1e334a;
+  background-color: #f0f0f0; /* Màu nền nhạt khi hover */
+}
+
+/* Khoảng cách đều giữa các nút */
+.share-button,
+.sub-notification-button,
+.edit-button,
+.remove-button,
+.bookmark-button,
+.redirect-comment-button {
+  display: inline-block; /* Giữ các nút nằm cùng dòng */
+  margin: 10px; /* Khoảng cách giữa các nút */
+}
+
+/* Content Section */
+.discussion-content {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  margin-top: 6px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Vote slider */
+.discussion-votes {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 40px;
+}
+
+.discussion-votes button {
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #626262;
+  transition: color 0.3s ease;
+}
+
+.discussion-votes button:hover {
+  color: #1e334a;
+}
+
+.discussion-votes p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Main Content */
+.discussion-main {
+  margin-left: 60px; /* Dành không gian cho vote slider */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 90%;
+}
+
+/* Header Section */
+.discussion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+/* User Section */
+.discussion-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ccc;
+}
+
+/* User Info */
+.user-info {
+  display: flex; /* Chuyển sang flex để căn chỉnh ngang */
+  justify-content: space-between; /* Đẩy view-count sang phải */
+  align-items: center; /* Căn giữa theo chiều dọc */
+}
+
+/* Tên người dùng */
+.user-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  position: absolute; /* Đặt vị trí tuyệt đối */
+  top: 20px; /* Căn lên trên cùng */
+}
+
+/* View Count */
+.view-count {
+  margin: 0;
+  padding-left: 10px;
+  font-size: 15px;
+  color: #888;
+  white-space: nowrap; /* Đảm bảo view-count không xuống dòng */
+  position: absolute; /* Đặt vị trí tuyệt đối(Có thể điều chỉnh vị trí tùy ý theo pivot) */
+  top: 22px; /* Căn lên trên cùng */
+  left: 240px; /* Căn lên trên cùng */
+}
+
+/* Created Date */
+.discussion-createdate {
+  top: 100px; /* Căn lên trên cùng */
+  font-size: 14px;
+  color: #888;
+  white-space: nowrap;
+  position: absolute; /* Đặt vị trí tuyệt đối */
+  top: 50px; /* Căn lên trên cùng */
+  left: 138px; /* Căn lên trên cùng */
+}
+/* Tags Section */
+.discussion-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  background-color: #e3f2fd;
+  color: #1e334a;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tag:hover {
+  background-color: #bbdefb;
+}
+
+/* Description Section */
+.discussion-description {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5;
+  margin-top: 12px;
+}
+
+/* Image Section */
+.discussion-image {
+  display: block; /* Chuyển ảnh thành block để căn giữa */
+  text-align: center; /* Căn giữa ảnh theo chiều ngang */
+  margin-bottom: 16px; /* Khoảng cách dưới ảnh */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng */
+  margin: 0 auto; /* Căn giữa ảnh ngang */
+  height: auto; /* Giữ tỷ lệ chiều cao ảnh */
+}
+
+/* Kiểm tra nếu các icon có kích thước quá lớn */
+.count-comment .fa-comment-alt {
+  font-size: 16px; /* Điều chỉnh kích thước icon */
+}
+
+/* Sorting Options */
+.sorting-options {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.sorting-options span {
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.sorting-options span:hover {
+  color: #007bff;
+}
+
+/* Loader Container */
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed; /* Dùng fixed để giữ vị trí luôn ở giữa trang */
+  top: 50%; /* Đặt phần tử vào giữa theo trục Y */
+  left: 50%; /* Đặt phần tử vào giữa theo trục X */
+  transform: translate(-50%, -50%); /* Dịch chuyển phần tử lên trên và sang trái để thực sự nằm giữa */
+  height: 100vh; /* Chiều cao toàn bộ viewport */
+  width: 100vw; /* Chiều rộng toàn bộ viewport */
+  z-index: 9999; /* Đảm bảo loader ở trên các phần tử khác */
+}
+      `}</style>
     </Layout>
   );
 }

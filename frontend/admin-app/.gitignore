@@ -25,6 +25,3 @@ dist-ssr
 
 
 # .gitignore
-.env
-.env.development
-.env.production

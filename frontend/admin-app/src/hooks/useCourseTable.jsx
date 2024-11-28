@@ -9,7 +9,19 @@ import {
 } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { MoreHorizontal, ArrowUpDown, Check, GraduationCap, Edit, Send, Clock, Archive, Copy, Eye } from 'lucide-react'
+import {
+  MoreHorizontal,
+  ArrowUpDown,
+  Check,
+  GraduationCap,
+  Edit,
+  Send,
+  Clock,
+  Archive,
+  Copy,
+  Eye,
+  Trash
+} from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import {
   DropdownMenu,
@@ -24,7 +36,13 @@ import {
 import { format, addMinutes, parseISO } from 'date-fns'
 import { formatDateTime } from '@/utils/format'
 import { convertLocalToUTC } from '@/utils/format'
-import { getCourses, changeCourseLevel, getCourseDetails, changeCourseStatus } from '@/services/api/courseApi'
+import {
+  getCourses,
+  changeCourseLevel,
+  getCourseDetails,
+  changeCourseStatus,
+  deleteCourse
+} from '@/services/api/courseApi'
 
 const statusOptions = [
   {
@@ -137,6 +155,10 @@ export default function useCourseTable() {
       })
       return false
     }
+  }
+  const handleDeleteCourse = async (courseId) => {
+    await deleteCourse(courseId)
+    await fetchCourses()
   }
 
   const handleStatusChange = async (courseId, newStatus, currentStatus) => {
@@ -499,6 +521,10 @@ export default function useCourseTable() {
                     >
                       <Edit className='mr-2 h-4 w-4' />
                       <span>Edit Basic course</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDeleteCourse(course.id)}>
+                      <Trash className='mr-2 h-4 w-4' />
+                      <span>Delete course</span>
                     </DropdownMenuItem>
                   </>
                 )}

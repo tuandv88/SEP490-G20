@@ -159,13 +159,11 @@ export const DiscussApi = {
             ...comment,
             userName: commentUser ? commentUser.userName : "Unknown",
             urlProfilePicture: commentUser ? commentUser.urlProfilePicture : "default-avatar.png",
-            firstName: commentUser ? commentUser.firstName : "xxx",
+            firstName: commentUser ? commentUser.firstName : "Anonymous",
             lastName: commentUser ? commentUser.lastName : "xxx",
           };
         });
         // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang
-
-        console.log(pagination.totalCount);
 
         return { updatedComments, pagination, totalComments: pagination.totalCount };
       } else {

@@ -69,4 +69,35 @@ public static class DiscussionExtensions
             UserDiscussions: discussion.UserDiscussions.Select(ud => ud.ToUserDiscussionDto()).ToList()
         );
     }
+
+    public static async Task<List<DiscussionsTopDto>> ToDiscussionsTopDtoListAsync(
+            this List<Discussion> discussions,
+            IFilesService filesService) // Thêm CategoryRepository để truy vấn Category
+    {
+        var tasks = discussions.Select(async d =>
+        {
+            var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, d.ImageUrl, 60);
+            return new DiscussionsTopDto(
+                CategoryId: d.CategoryId.Value,
+                UserId: d.UserId.Value,
+                Id: d.Id.Value,
+                Title: d.Title,
+                Description: d.Description,
+                ImageUrl: imageUrl.PresignedUrl!,
+                DateCreated: d.DateCreated,
+                DateUpdated: d.DateUpdated,
+                Tags: d.Tags,
+                Pinned: d.Pinned,
+                ViewCount: (long)d.ViewCount,
+                VoteCount: (long)d.Votes.Count,
+                CommentCount: (long)d.Comments.Count,
+                Closed: d.Closed,
+                EnableNotification: d.NotificationsEnabled,
+                IsActive: d.IsActive
+            );
+        });
+
+        var discussionDtos = await Task.WhenAll(tasks);
+        return discussionDtos.ToList();
+    }
 }

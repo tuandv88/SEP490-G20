@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { DiscussApi } from "@/services/api/DiscussApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCommentAlt } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faChevronUp, faCommentAlt, faComments, faEdit, faReply, faShareFromSquare, faThumbsDown, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import { marked } from 'marked'; // Import marked library
+import { formatDistanceToNow } from 'date-fns';
 
 function CommentList({ discussionId }) {
-  const [transitioning, setTransitioning] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
   const textAreaRef = useRef(null);
   const [newComment, setNewComment] = useState("");
@@ -48,10 +48,7 @@ function CommentList({ discussionId }) {
         console.error("Error fetching comments:", err);
         setError("Failed to load comments.");
       } finally {
-        setTimeout(() => {
-          setLoading(false);
-          setTransitioning(true);
-        }, 200);
+        setLoading(false);
       }
     };
 
@@ -78,7 +75,6 @@ function CommentList({ discussionId }) {
     }
   };
 
-
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     setSubmitting(true);
@@ -102,8 +98,39 @@ function CommentList({ discussionId }) {
     }
   };
 
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
-  if (loading || !transitioning) {
+  // Hàm định dạng thời gian, sử dụng formatDate nếu vượt quá 7 ngày
+  const formatRelativeDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+
+    // Tính số ngày đã qua kể từ ngày đăng
+    const diffInTime = now - date;
+    const diffInDays = Math.floor(diffInTime / (1000 * 60 * 60 * 24));
+
+    if (diffInDays >= 7) {
+      // Nếu đã qua 1 tuần, hiển thị theo định dạng ngày giờ đầy đủ
+      return formatDate(dateString);
+    }
+
+    // Nếu chưa qua 7 ngày, sử dụng formatDistanceToNow để hiển thị "x minutes ago", "x days ago", v.v.
+    const distance = formatDistanceToNow(date, { addSuffix: true });
+
+    return distance;
+  };
+
+
+  if (loading) {
     return (
       <>
         <div className="loader-container">
@@ -149,9 +176,11 @@ function CommentList({ discussionId }) {
 
   return (
     <div className="comment-list__content">
+
+      {/* Comment Navbar Counts*/}
       <div className="comment-list_navbar-extension">
         <div className="counts-comment">
-          <FontAwesomeIcon icon={faCommentAlt} />
+          <FontAwesomeIcon icon={faComments} />
           <p>Comments:</p>
           <p>{totalCommnents}</p>
         </div>
@@ -197,26 +226,58 @@ function CommentList({ discussionId }) {
         </div>
       </div>
 
-      <div className="comment-list__header">
-        <h3 className="comment-list__title">Comments</h3>
-      </div>
-
       <div className="comment-list__body">
         {comments.length > 0 ? (
           comments.map((comment) => (
-            <div key={comment.id} className="comment-item">
-              <div className="comment-item__header">
-                <img
-                  src={comment.urlProfilePicture || "default-avatar.png"}
-                  alt="User Avatar"
-                  className="comment-item__avatar"
-                />
-                <p className="comment-item__username">{comment.userName}</p>
-                <p className="comment-item__timestamp">{new Date(comment.dateCreated).toLocaleString()}</p>
+            comment.isActive && (
+              <div key={comment.id} className="comment-item">
+                <div className="comment-item__header">
+                  <img
+                    src={comment.urlProfilePicture || "default-avatar.png"}
+                    alt="User Avatar"
+                    className="comment-item__avatar"
+                  />
+                  <p className="comment-item__username">{comment.userName}</p>
+                  <p className="comment-item__timestamp">
+                    Created at:  {formatRelativeDate(comment.dateCreated)}
+                  </p>
+
+                  {/* Vote Edited */}
+                  {comment.isEdited && <span className="comment-item__edited">Edited</span>}
+                </div>
+
+                {/* Vote Content */}
+                <div className="comment-item__content" dangerouslySetInnerHTML={{ __html: marked(comment.content), }} />
+
+                {/* Vote Section */}
+                <div className="comment-item__vote">
+                  <button className="vote-icon">
+                    <FontAwesomeIcon icon={faChevronUp} />
+                  </button>
+                  <span className="comment-item__vote-count">1111</span>
+                  <button className="vote-icon">
+                    <FontAwesomeIcon icon={faChevronDown} />
+                  </button>
+                </div>
+
+                {/* Action buttons */}
+                <div className="comment-item__actions">
+                  {/* Other action buttons */}
+                  <button className="comment-item__edit">
+                    <FontAwesomeIcon icon={faEdit} /> Edit
+                  </button>
+                  <button className="comment-item__delete">
+                    <FontAwesomeIcon icon={faTrash} /> Delete
+                  </button>
+                  <button className="comment-item__share">
+                    <FontAwesomeIcon icon={faShareFromSquare} /> Share
+                  </button>
+                  <button className="comment-item__reply">
+                    <FontAwesomeIcon icon={faReply} /> Reply
+                  </button>
+                </div>
               </div>
-              <p className="comment-item__content">{comment.content}</p>
-              {comment.isEdited && <span className="comment-item__edited">Edited</span>}
-            </div>
+            )
           ))
         ) : (
           <div className="comment-list__no-comments">
@@ -462,70 +523,187 @@ function CommentList({ discussionId }) {
           box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
         }
 
+/* List comments */
+.comment-list__content {
+  margin-top: 20px;
+}
 
-         /* list comments */
-        .comment-list__content {
-          margin-top: 20px;
-        }
+.comment-list__body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 15px;
+}
 
-        .comment-list__header {
-          margin-bottom: 20px;
-        }
+/* Comment item */
+.comment-item {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px; /* Tăng độ bo góc */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
-        .comment-list__title {
-          font-size: 24px;
-          font-weight: bold;
-          color: #333;
-        }
+.comment-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+}
 
-        .comment-list__body {
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-        }
+/* Header section */
+.comment-item__header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
 
-        .comment-item {
-          padding: 15px;
-          background-color: #f9f9f9;
-          border-radius: 8px;
-          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-        }
+.comment-item__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #53585c; /* Viền xung quanh ảnh */
+}
 
-        .comment-item__header {
-          display: flex;
-          gap: 12px;
-          align-items: center;
-        }
+.comment-item__username {
+  font-weight: bold;
+  color: #1e334a;
+  font-size: 18px; /* Đổi kích thước font */
+}
 
-        .comment-item__avatar {
-          width: 35px;
-          height: 35px;
-          border-radius: 50%;
-          object-fit: cover;
-        }
-
-        .comment-item__username {
-          font-weight: bold;
-          color: #555;
-        }
-
-        .comment-item__timestamp {
-          color: #777;
-          font-size: 12px;
-        }
-
-        .comment-item__content {
-          margin-top: 10px;
-          font-size: 14px;
-          line-height: 1.6;
-        }
-
-        .comment-item__edited {
-          color: #888;
-          font-size: 12px;
-        }
+/* Content section */
+.comment-item__content {
+  margin-top: 10px;
+  font-size: 16px; /* Tăng kích thước chữ */
+  line-height: 1.7;
+  color: #1e334a;
+  margin-bottom: 15px; /* Đảm bảo có khoảng cách dưới cho nội dung */
+  max-width: 90%; /* Giới hạn chiều rộng tối đa */
+  word-wrap: break-word; /* Tự động xuống dòng nếu nội dung quá dài */
+  white-space: normal; /* Cho phép xuống dòng */
+  margin-left: 60px;
+}
 
 
+/* Edited label & timestamp */
+.comment-item__edited, .comment-item__timestamp {
+  color: #888;
+  font-size: 14px;
+  font-style: italic;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.comment-item__timestamp {
+  font-style: normal;
+}
+
+/* Action buttons container */
+.comment-item__actions {
+  gap: 20px;
+  position: absolute;
+  right: 20px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+/* Nút Reply luôn hiển thị khi không hover vào bình luận */
+.comment-item__reply {
+  display: inline-flex;
+  color: #1e334a;
+  cursor: pointer;
+  font-size: 15px;
+  transition: color 0.2s ease;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: rgba(0, 123, 255, 0.1); /* Màu nền khi hover vào nút */
+}
+
+/* Hiển thị tất cả các nút hành động khi hover vào bình luận */
+.comment-item:hover .comment-item__actions {
+  display: flex;
+}
+
+/* Style cho các nút hành động */
+.comment-item__reply,
+.comment-item__edit,
+.comment-item__delete,
+.comment-item__share {
+  background: none;
+  border: none;
+  color: #1e334a;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+/* Hiển thị màu sắc khi hover vào các nút */
+.comment-item__reply:hover,
+.comment-item__edit:hover,
+.comment-item__delete:hover,
+.comment-item__share:hover {
+  color: #1e334a;
+  background-color: rgba(0, 123, 255, 0.1); /* Màu nền khi hover vào các nút action */
+}
+
+/* Ẩn các nút Edit, Delete, Share khi không hover vào bình luận */
+.comment-item__edit,
+.comment-item__delete,
+.comment-item__share {
+  display: none;
+}
+
+/* Hiển thị các nút Edit, Delete, Share khi hover vào bình luận */
+.comment-item:hover .comment-item__edit,
+.comment-item:hover .comment-item__delete,
+.comment-item:hover .comment-item__share {
+  display: inline-flex;
+}
+
+/* Các nút Vote */
+.comment-item__vote {
+  display: flex;
+  align-items: center;
+  color: #53585c; /* Màu mặc định */
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Biểu tượng mũi tên và số lượng vote gần nhau */
+.comment-item__vote-count {
+  font-size: 16px;
+  color: #1e334a; /* Màu số lượng vote */
+  font-weight: bold; 
+  margin: 0 8px;
+  text-align: center;
+  width: 40px; /* Kích thước cố định cho số lượng vote */
+  display: inline-block;
+}
+
+/* Biểu tượng mũi tên */
+.vote-icon {
+  background: none;
+  border: none;
+  color: #53585c; /* Màu mặc định cho mũi tên */
+  font-size: 18px; /* Kích thước mũi tên */
+  cursor: pointer;
+  transition: color 0.2s ease; /* Hiệu ứng chuyển màu */
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Cải thiện hiệu ứng hover cho mũi tên */
+.vote-icon:hover {
+  color: #1e334a; /* Màu thay đổi khi hover */
+  background-color: rgba(0, 123, 255, 0.1); /* Màu nền khi hover vào các nút mũi tên */
+  border-radius: 5px; /* Bo góc nhẹ khi hover */
+}
       `}</style>
     </div>
   );

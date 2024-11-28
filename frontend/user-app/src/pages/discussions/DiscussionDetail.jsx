@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DiscussApi } from "@/services/api/DiscussApi";
 import Layout from "@/layouts/layout";
@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faEye, faChevronUp, faBookmark, faShareFromSquare, faBell, faBellSlash, faEdit, faTrash, faComment, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import CommentList from "../../components/discussions/CommentList";
 import ReactHtmlParser from 'html-to-react';
+import { marked } from 'marked'; // Import marked library
 
 function DiscussionDetail() {
   const { id } = useParams();
@@ -186,9 +187,9 @@ function DiscussionDetail() {
                 <span key={idx} className="tag">#{tag}</span>
               ))}
             </div>
-            <div className="discussion-description">
-              <p>{htmlToReactParser.parse(discussion?.description)}</p>
-            </div>
+
+            <div className="discussion-description" dangerouslySetInnerHTML={{ __html: marked(discussion?.description), }} />
+
             <div className="discussion-image">
               {discussion?.imageUrl && (
                 <img src={discussion?.imageUrl} alt="Post" className="discussion-image" />

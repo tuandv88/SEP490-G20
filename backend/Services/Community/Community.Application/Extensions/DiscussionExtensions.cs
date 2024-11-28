@@ -1,4 +1,5 @@
 ﻿using Community.Application.Models.Discussions.Dtos;
+using Community.Domain.Models;
 
 namespace Community.Application.Extensions;
 
@@ -31,7 +32,7 @@ public static class DiscussionExtensions
             DateUpdated: discussion.DateUpdated,
             Tags: discussion.Tags,
             ViewCount: (long)discussion.ViewCount,
-            VoteCount: (long)discussion.Votes.Count,
+            VoteCount: (long) VoteExtensions.CalculateTotalVotes(discussion),
             CommentCount: discussion.Comments.Count,
             Pinned: discussion.Pinned,
             Closed: discussion.Closed,
@@ -57,7 +58,7 @@ public static class DiscussionExtensions
             DateUpdated: discussion.DateUpdated,
             Tags: discussion.Tags,
             ViewCount: (long)discussion.ViewCount,
-            VoteCount: (long)discussion.Votes.Count,
+            VoteCount: (long)VoteExtensions.CalculateTotalVotes(discussion),
             CommentCount: (long)discussion.Comments.Count,
             Pinned: discussion.Pinned,
             Closed: discussion.Closed,
@@ -93,7 +94,7 @@ public static class DiscussionExtensions
                 Tags: d.Tags,
                 Pinned: d.Pinned,
                 ViewCount: (long)d.ViewCount,
-                VoteCount: (long)d.Votes.Count,
+                VoteCount: (long)VoteExtensions.CalculateTotalVotes(d),
                 CommentCount: (long)d.Comments.Count,
                 Closed: d.Closed,
                 EnableNotification: d.NotificationsEnabled,

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { Bell, /*User*/ Menu, X } from 'lucide-react'
+import React, { useState, useEffect, useCallback, useRef, useContext } from 'react'
+import { Bell, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS as AR } from '@/data/constants'
@@ -7,14 +7,14 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import DropdownMenuUser from '@/components/ui/userdropdown'
 import { ModeToggle } from '@/components/mode-toggle'
 import AuthService from '@/oidc/AuthService'
+import { UserContext } from '@/contexts/UserContext'
 
 export default function Header() {
-  const [isLoggedIn /*setIsLoggedIn*/] = useState(false) // Set to true for demonstration
+  const { user, updateUser } = useContext(UserContext)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
   const [lastScrollTop, setLastScrollTop] = useState(0)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [user, setUser] = useState(null);
 
   const dropdownRef = useRef(null)
 
@@ -27,7 +27,7 @@ export default function Header() {
       setIsHidden(false)
     }
     setLastScrollTop(currentScrollTop)
-  }, [lastScrollTop, setIsHidden, setLastScrollTop])
+  }, [lastScrollTop])
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll)
@@ -35,6 +35,7 @@ export default function Header() {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [handleScroll])
+
   // Close dropdown when clicking outside
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen)
 
@@ -50,15 +51,35 @@ export default function Header() {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
 
+  // const handleLogin = async () => {
+  //   await AuthService.login()
+  //   const user = await AuthService.getUser()
+  //   updateUser(user)
+  // }
 
   useEffect(() => {
-    AuthService.getUser().then((user) => {
-      setUser(user);
-      // console.log(user.profile);
-    });
-  }, []);
+    // Lấy lại thông tin người dùng khi component được mount hoặc user thay đổi
+    if (!user) {
+      AuthService.getUser().then((userData) => {
+        if (userData) {
+          updateUser(userData);
+        }
+      });
+    }
+  }, [user, updateUser]);
+
+  const handleLogin = async () => {
+    await AuthService.login()
+    const userData = await AuthService.getUser()
+
+    // Kiểm tra dữ liệu người dùng trước khi cập nhật
+    if (userData) {
+      updateUser(userData)
+    }
+  }
 
   return (
     <header
@@ -76,19 +97,9 @@ export default function Header() {
                   HomePage
                 </Link>
               </li>
-              {/* <li>
-                <Link to={AR.CODE} className='text-lg hover:text-primary hover:font-bold'>
-                  Code
-                </Link>
-              </li> */}
               <li>
                 <Link to={AR.COURSELIST} className='text-lg hover:text-primary hover:font-bold'>
                   Course
-                </Link>
-              </li>
-              <li>
-                <Link href='/contests' className='text-lg hover:text-primary hover:font-bold'>
-                  Competition
                 </Link>
               </li>
               <li>
@@ -109,7 +120,7 @@ export default function Header() {
             </ul>
           </nav>
           <div className='flex items-center space-x-4'>
-            {isLoggedIn ? (
+            {user ? (
               <div className='flex items-center space-x-3'>
                 <Button variant='ghost' size='icon' className='hidden md:inline-flex'>
                   <Bell className='w-5 h-5' />
@@ -117,10 +128,7 @@ export default function Header() {
                 <div className='relative flex items-center' ref={dropdownRef}>
                   <div onClick={toggleDropdown} className='cursor-pointer'>
                     <Avatar>
-                      <AvatarImage
-                        src='https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?height=32&width=32'
-                        alt='User Avatar'
-                      />
+                      <AvatarImage src={user.profile.urlImagePresigned} alt='User Avatar' />
                       <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                   </div>
@@ -129,7 +137,7 @@ export default function Header() {
                       <DropdownMenuUser
                         isOpen={isDropdownOpen}
                         onClose={() => setIsDropdownOpen(false)}
-                        userName='Nguyen Bao Lam'
+                        userName={user.profile.firstName + ' ' + user.profile.lastName}
                       />
                     </div>
                   )}
@@ -137,21 +145,17 @@ export default function Header() {
               </div>
             ) : (
               <div className='hidden md:block'>
-                { user ? (<Button variant='outline' className='mr-2' onClick={() => AuthService.logout()}>
-                  Logout
-                </Button>) : (<Button variant='outline' className='mr-2' onClick={() => AuthService.login()}>
+                <Button variant='outline' className='mr-2' onClick={handleLogin}>
                   Login
-                </Button>) }                            
+                </Button>
               </div>
             )}
-            {/* Add the ModeToggle button here */}
             <ModeToggle />
             <Button variant='ghost' size='icon' className='md:hidden' onClick={toggleMobileMenu}>
               {isMobileMenuOpen ? <X className='w-6 h-6' /> : <Menu className='w-6 h-6' />}
             </Button>
           </div>
         </div>
-        {/* Mobile menu */}
         {isMobileMenuOpen && (
           <nav className='mt-4 md:hidden'>
             <ul className='flex flex-col space-y-2'>
@@ -180,16 +184,16 @@ export default function Header() {
                   AboutUs
                 </Link>
               </li>
-              {!isLoggedIn && (
+              {!user && (
                 <>
                   <li>
-                    <Button variant='outline' className='w-full'>
+                    <Button variant='outline' className='w-full' onClick={handleLogin}>
                       Login
                     </Button>
                   </li>
                   <li>
                     <Button className='w-full'>Register</Button>
-                  </li>                                  
+                  </li>
                 </>
               )}
             </ul>

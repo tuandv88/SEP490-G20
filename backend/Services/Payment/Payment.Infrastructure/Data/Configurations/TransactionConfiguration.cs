@@ -1,11 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Payment.Domain.Enums;
-using Payment.Domain.Models;
-using Payment.Domain.ValueObjects;
-
-
-namespace Payment.Infrastructure.Data.Configurations;
+﻿namespace Payment.Infrastructure.Data.Configurations;
 public class TransactionConfiguration : IEntityTypeConfiguration<Transaction> {
     public void Configure(EntityTypeBuilder<Transaction> builder) {
         builder.HasKey(t => t.Id);
@@ -38,6 +31,10 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction> {
         builder.Property(t => t.PayerId);
         builder.Property(t => t.PayerEmail);
         builder.Property(t => t.PayerPhone);
+
+        builder.HasMany(t => t.Items)
+            .WithOne()
+            .HasForeignKey(t => t.TransactionId);
 
     }
 }

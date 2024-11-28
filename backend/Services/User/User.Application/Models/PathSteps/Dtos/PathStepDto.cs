@@ -8,7 +8,7 @@ namespace User.Application.Models.PathSteps.Dtos
         Guid CourseId,
         int StepOrder,
         PathStepStatus Status, // Có thể map với enum Status nếu có
-        DateTime EnrollmentDate,
+        DateTime? EnrollmentDate,
         DateTime? CompletionDate,
         DateTime ExpectedCompletionDate
 

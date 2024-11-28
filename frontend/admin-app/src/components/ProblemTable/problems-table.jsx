@@ -23,7 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton'
 
 import { columns } from './columns'
-import { getProblems } from '@/services/api/problemApi'
+import { getProblemAg, getProblems } from '@/services/api/problemApi'
 
 export default function ProblemsTable() {
   const search = useSearch({ from: '/problem-table' })
@@ -54,7 +54,7 @@ export default function ProblemsTable() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const response = await getProblems(pagination.pageIndex + 1, pagination.pageSize)
+        const response = await getProblemAg(pagination.pageIndex + 1, pagination.pageSize)
         console.log(response)
         setData(response.problems.data)
         setTotalCount(response.problems.count)
@@ -82,7 +82,7 @@ export default function ProblemsTable() {
   }, [pagination.pageIndex, navigate])
 
   const handleAddNewProblem = () => {
-    console.log('Add new problem clicked')
+    navigate({ to: '/create-problem' })
   }
 
   const table = useReactTable({

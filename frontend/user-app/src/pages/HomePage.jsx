@@ -3,30 +3,71 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import Layout from '@/layouts/layout'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Star, Clock, Users, Trophy, ChevronRight, Cookie } from 'lucide-react'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
-import CourseItem from '@/components/course/CourseItem'
+import CourseLoading from '@/components/loading/CourseLoading'
+import CourseItem from '@/components/courses/CourseItem'
+import { LearningAPI } from '@/services/api/learningApi'
+import { AlgorithmCard } from '@/components/problem/AlgorithmCard'
+import { ProblemSection } from '@/components/problem/ProblemSection'
+import { CourseCarousel } from '@/components/courses/CourseCarousel'
+import authServiceInstance from '@/oidc/AuthService'
+import SurveyModal from '@/components/surrvey/SurveyModal'
+import AssessmentPrompt from '@/components/surrvey/AssessmentPromptProps'
+import QuizModal from '@/components/surrvey/QuizModal'
+import QuizPopup from '@/components/quiz/QuizPopup'
+import { QuizAPI } from '@/services/api/quizApi'
 
-// Giả lập các component UI
+export const algorithms = [
+  {
+    id: '1',
+    title: 'Two Sum',
+    description: 'Find two numbers in an array that add up to a target sum',
+    difficulty: 'Easy',
+    category: 'Arrays & Hashing',
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
+    likes: 452,
+    submissions: 1250,
+    successRate: 85
+  },
+  {
+    id: '2',
+    title: 'Binary Tree Level Order Traversal',
+    description: 'Traverse a binary tree in level order (breadth-first search)',
+    difficulty: 'Medium',
+    category: 'Trees',
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
+    likes: 328,
+    submissions: 850,
+    successRate: 72
+  },
+  {
+    id: '3',
+    title: 'Merge K Sorted Lists',
+    description: 'Merge k sorted linked lists into one sorted linked list',
+    difficulty: 'Hard',
+    category: 'Linked Lists',
+    timeComplexity: 'O(n log k)',
+    spaceComplexity: 'O(n)',
+    likes: 275,
+    submissions: 620,
+    successRate: 65
+  }
+]
+
 const Button = ({ children, className, ...props }) => (
   <button className={`px-4 py-2 rounded ${className}`} {...props}>
     {children}
   </button>
 )
 
-const Input = ({ className, ...props }) => <input className={`px-3 py-2 border rounded ${className}`} {...props} />
-
 const Card = ({ children, className, ...props }) => (
   <div className={`bg-white shadow-md rounded-lg ${className}`} {...props}>
     {children}
   </div>
-)
-
-const Badge = ({ children, className, ...props }) => (
-  <span className={`px-2 py-1 text-sm rounded-full bg-blue-100 text-green-800 ${className}`} {...props}>
-    {children}
-  </span>
 )
 
 const Avatar = ({ src, alt, className, ...props }) => (
@@ -35,19 +76,102 @@ const Avatar = ({ src, alt, className, ...props }) => (
 
 function HomePage() {
   const [email, setEmail] = useState('')
+  const [courses, setCourses] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
+  const [userInfo, setUserInfo] = useState(null)
+
+  const [isSurveyOpen, setIsSurveyOpen] = useState(false)
+  const [isAssessmentPromptOpen, setIsAssessmentPromptOpen] = useState(false)
+  const [isQuizOpen, setIsQuizOpen] = useState(false)
+  const [quizAssessment, setQuizAssessment] = useState(null)
 
   const navigate = useNavigate()
 
-  // eslint-disable-next-line no-unused-vars
-  const handleViewDetail = (courseId) => {
-    navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', courseId))
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const user = await authServiceInstance.getUser()
+        if (user) {
+          setUserInfo(user.profile)
+          // Kiểm tra điều kiện để hiển thị survey
+          if (user.profile.issurvey === 'false') {
+            setTimeout(() => {
+              setIsSurveyOpen(true)
+            }, 3000) // 3000 milliseconds = 3 seconds
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error)
+      }
+    }
+
+    fetchUserInfo()
+  }, [])
+
+  console.log()
+
+  useEffect(() => {
+    const fetchCourseDetail = async () => {
+      setLoading(true)
+      setError(false)
+      try {
+        const data = await LearningAPI.getCourseList(1, 20)
+        setCourses(data?.courseDtos?.data)
+      } catch (error) {
+        console.error('Error fetching course detail:', error)
+        if (error.response) {
+          if (error.response.status >= 500) {
+            setError(true)
+          } else if (error.response.status === 404) {
+            setCourses(null)
+          }
+        } else {
+          setError(true)
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCourseDetail()
+  }, [])
+
+  useEffect(() => {
+    const fetchQuizAssessment = async () => {
+      try {
+        const data = await QuizAPI.getQuizAssessment()
+        setQuizAssessment(data.quiz)
+      } catch (error) {
+        console.error('Error fetching quiz assessment:', error)
+      }
+    }
+
+    fetchQuizAssessment()
+  }, [])
+
+  const handleSurveySubmit = (data) => {
+    // console.log('Survey submitted:', data)
+    setIsSurveyOpen(false)
+    setIsAssessmentPromptOpen(true)
   }
 
-  const handleSubscribe = (e) => {
-    e.preventDefault()
-    console.log('Subscribed with email:', email)
-    setEmail('')
+  const handleAssessmentAccept = () => {
+    setIsAssessmentPromptOpen(false)
+    setIsQuizOpen(true)
   }
+
+  const handleAssessmentDecline = () => {
+    setIsAssessmentPromptOpen(false)
+    //updateUserFirstLogin()
+  }
+
+  const handleQuizComplete = (score) => {
+    console.log('Quiz completed with score:', score)
+    setIsQuizOpen(false)
+    //updateUserFirstLogin()
+  }
+
   return (
     <>
       <Layout>
@@ -81,82 +205,20 @@ function HomePage() {
           {/* Featured Courses Section */}
           <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Khóa học nổi bật</h2>
-              {/* <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 md:gap-8'>
-                {[1, 2, 3].map((course) => (
-                  <Card key={course} className='flex flex-col'>
-                    <img
-                      src={`https://viettuts.vn/images/java/java-la-gi.png?height=200&width=400&text=Course+${course}`}
-                      alt={`Course ${course}`}
-                      className='object-cover w-full h-48 rounded-t-lg'
-                    />
-                    <div className='flex-grow p-4'>
-                      <Badge className='mb-2'>Mới</Badge>
-                      <h3 className='mb-2 text-xl font-semibold'>Khóa học {course}</h3>
-                      <p className='mb-4 text-gray-600'>Mô tả ngắn về khóa học và những gì học viên sẽ học được.</p>
-                    </div>
-                    <div className='flex items-center justify-between p-4 border-t'>
-                      <div className='flex items-center'>
-                        <Star className='w-5 h-5 mr-1 text-yellow-400' />
-                        <span className='text-sm'>4.8 (120 đánh giá)</span>
-                      </div>
-                      <Button
-                        onClick={() => handleViewDetail('6773706d-dae4-42f8-b58e-5551fa6ebaca')}
-                        className='text-white bg-green-500 hover:bg-green-600'
-                      >
-                        Xem chi tiết
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </div> */}
-              <CourseItem/>
+              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Featured Courses</h2>
+              {loading ? <CourseLoading></CourseLoading> : <CourseCarousel courses={courses} />}
               <div className='mt-8 text-center md:mt-10'>
-                <Button className='text-green-500 border border-green-500 hover:bg-blue-50'>
-                  Xem tất cả khóa học
+                <Button className='border border-green-500 hover:bg-blue-50'>
+                  View All Courses
                   <ChevronRight className='inline-block ml-2' />
                 </Button>
               </div>
             </div>
           </section>
 
-          {/* Upcoming Contests Section */}
-          <section className='py-12 bg-gray-100 md:py-20'>
+          <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Cuộc thi sắp diễn ra</h2>
-              <Carousel className='w-full max-w-xs mx-auto sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl'>
-                <CarouselContent>
-                  {[1, 2, 3, 4, 5].map((contest) => (
-                    <CarouselItem key={contest}>
-                      <Card className='flex flex-col h-full'>
-                        <div className='flex-grow p-4'>
-                          <h3 className='mb-2 text-xl font-semibold'>Cuộc thi Lập trình {contest}</h3>
-                          <p className='mb-4 text-gray-600'>Thử thách kỹ năng lập trình của bạn</p>
-                          <div className='flex items-center mb-2'>
-                            <Clock className='w-5 h-5 mr-2' />
-                            <span className='text-sm'>Ngày 15 tháng 5, 2024</span>
-                          </div>
-                          <div className='flex items-center mb-2'>
-                            <Users className='w-5 h-5 mr-2' />
-                            <span className='text-sm'>500 người tham gia</span>
-                          </div>
-                          <div className='flex items-center mb-4'>
-                            <Trophy className='w-5 h-5 mr-2' />
-                            <span className='text-sm'>Giải thưởng: $1000</span>
-                          </div>
-                        </div>
-                        <div className='p-4 border-t'>
-                          <Button className='w-full text-white bg-green-400 hover:bg-green-600'>
-                            Đăng ký tham gia
-                          </Button>
-                        </div>
-                      </Card>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
+              <ProblemSection />
             </div>
           </section>
 
@@ -187,144 +249,39 @@ function HomePage() {
               </div>
             </div>
           </section>
-
-          {/* Call-to-Action Section */}
-          <section className='py-12 text-white bg-green-500 md:py-20'>
-            <div className='container px-4 mx-auto text-center'>
-              <h2 className='mb-4 text-2xl font-bold md:text-3xl'>Sẵn sàng bắt đầu hành trình học tập của bạn?</h2>
-              <p className='mb-8 text-lg md:text-xl'>
-                Đăng ký ngay để nhận thông tin về các khóa học mới và cuộc thi hấp dẫn!
-              </p>
-              <form
-                onSubmit={handleSubscribe}
-                className='flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4'
-              >
-                <Input
-                  type='email'
-                  placeholder='Nhập địa chỉ email của bạn'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className='w-full text-black bg-white sm:w-64'
-                  required
-                />
-                <Button type='submit' className='w-full text-blue-500 bg-white sm:w-auto hover:bg-blue-100'>
-                  Đăng ký ngay
-                </Button>
-              </form>
-            </div>
-          </section>
-
-          {/* Why Choose Us Section */}
-          <section className='py-12 md:py-20'>
-            <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Tại sao chọn chúng tôi?</h2>
-              <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 md:gap-8'>
-                {[
-                  {
-                    icon: '🎓',
-                    title: 'Chất lượng đào tạo',
-                    description: 'Các khóa học được thiết kế và giảng dạy bởi các chuyên gia hàng đầu trong ngành.'
-                  },
-                  {
-                    icon: '🏆',
-                    title: 'Cơ hội thực hành',
-                    description: 'Tham gia các cuộc thi để áp dụng kiến thức và nâng cao kỹ năng thực tế.'
-                  },
-                  {
-                    icon: '🌐',
-                    title: 'Cộng đồng học tập',
-                    description: 'Kết nối với hàng nghìn học viên khác để chia sẻ kinh nghiệm và học hỏi lẫn nhau.'
-                  },
-                  {
-                    icon: '📈',
-                    title: 'Linh hoạt học tập',
-                    description: 'Học bất cứ lúc nào, bất cứ nơi đâu với nền tảng học tập trực tuyến tiên tiến.'
-                  },
-                  {
-                    icon: '🎯',
-                    title: 'Chứng chỉ có giá trị',
-                    description: 'Nhận chứng chỉ được công nhận rộng rãi sau khi hoàn thành khóa học.'
-                  },
-                  {
-                    icon: '💼',
-                    title: 'Cơ hội nghề nghiệp',
-                    description: 'Tiếp cận các cơ hội việc làm thông qua mạng lưới đối tác của chúng tôi.'
-                  }
-                ].map((feature, index) => (
-                  <Card key={index} className='p-6'>
-                    <div className='mb-2 text-4xl'>{feature.icon}</div>
-                    <h3 className='mb-2 text-xl font-semibold'>{feature.title}</h3>
-                    <p className='text-sm md:text-base'>{feature.description}</p>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Partners Section */}
-          <section className='py-12 bg-gray-100 md:py-20'>
-            <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Đối tác của chúng tôi</h2>
-              <div className='flex flex-wrap items-center justify-center gap-4 md:gap-8'>
-                {[1, 2, 3, 4, 5, 6].map((partner) => (
-                  <div
-                    key={partner}
-                    className='flex items-center justify-center w-24 h-24 bg-white rounded-lg shadow-md md:w-32 md:h-32'
-                  >
-                    <img
-                      src={`https://cmctelecom.vn/wp-content/uploads/2017/02/microsoft-logo-microsoft-icon-transparent-free-png.png?height=60&width=60&text=Partner+${partner}`}
-                      alt={`Partner ${partner}`}
-                      className='w-16 h-16 md:w-20 md:h-20'
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* FAQ Section */}
-          <section className='py-12 md:py-20'>
-            <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Câu hỏi thường gặp</h2>
-              <div className='grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8'>
-                {[
-                  {
-                    question: 'Làm thế nào để bắt đầu một khóa học?',
-                    answer:
-                      'Để bắt đầu một khóa học, bạn chỉ cần đăng ký tài khoản, chọn khóa học mong muốn và thanh toán. Sau đó, bạn có thể truy cập nội dung khóa học ngay lập tức.'
-                  },
-                  {
-                    question: 'Các khóa học có chứng chỉ không?',
-                    answer:
-                      'Có, sau khi hoàn thành khóa học, bạn sẽ nhận được chứng chỉ điện tử có thể chia sẻ trên các nền tảng mạng xã hội chuyên nghiệp.'
-                  },
-                  {
-                    question: 'Tôi có thể học thử miễn phí không?',
-                    answer:
-                      'Có, chúng tôi cung cấp một số bài học miễn phí cho mỗi khóa học để bạn có thể trải nghiệm trước khi quyết định đăng ký.'
-                  },
-                  {
-                    question: 'Làm thế nào để tham gia một cuộc thi?',
-                    answer:
-                      'Để tham gia cuộc thi, bạn cần có tài khoản trên nền tảng của chúng tôi. Sau đó, bạn có thể duyệt qua danh sách các cuộc thi sắp diễn ra và đăng ký tham gia.'
-                  }
-                ].map((faq, index) => (
-                  <Card key={index} className='p-6'>
-                    <h3 className='mb-2 text-lg font-semibold md:text-xl'>{faq.question}</h3>
-                    <p className='text-sm md:text-base'>{faq.answer}</p>
-                  </Card>
-                ))}
-              </div>
-              <div className='mt-8 text-center md:mt-10'>
-                <Button className='text-blue-500 border border-blue-500 hover:bg-blue-50'>
-                  Xem tất cả câu hỏi
-                  <ChevronRight className='inline-block ml-2' />
-                </Button>
-              </div>
-            </div>
-          </section>
         </div>
         <Link to={AUTHENTICATION_ROUTERS.HOME}></Link>
+
+        <SurveyModal
+          isOpen={isSurveyOpen}
+          onClose={() => {
+            setIsSurveyOpen(false)
+            // updateUserFirstLogin()
+          }}
+          onSubmit={handleSurveySubmit}
+        />
+
+        <AssessmentPrompt
+          isOpen={isAssessmentPromptOpen}
+          onClose={() => {
+            setIsAssessmentPromptOpen(false)
+            // updateUserFirstLogin()
+          }}
+          onAccept={handleAssessmentAccept}
+          onDecline={handleAssessmentDecline}
+        />
+
+        <QuizModal
+          isOpen={isQuizOpen}
+          onClose={() => {
+            setIsQuizOpen(false)
+            // updateUserFirstLogin()
+          }}
+          onComplete={handleQuizComplete}
+          quiz={quizAssessment}
+        />
+
+        {/* <QuizPopup quiz={quizData.quiz} answer={quizData.answer} onComplete={() => handleQuizComplete()} /> */}
       </Layout>
     </>
   )

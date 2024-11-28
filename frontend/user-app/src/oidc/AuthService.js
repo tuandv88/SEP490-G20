@@ -15,7 +15,7 @@ class AuthService {
     })
 
     this.userManager.events.addUserUnloaded(() => {
-      console.log('User logged out')      
+      console.log('User logged out')
     })
 
     // Xử lý gia hạn token tự động
@@ -33,8 +33,10 @@ class AuthService {
     })
   }
 
-  login() {
-    return this.userManager.signinRedirect()
+  async login() {
+    await this.userManager.signinRedirect()
+    const user = await this.userManager.getUser()
+    return user
   }
 
   logout() {

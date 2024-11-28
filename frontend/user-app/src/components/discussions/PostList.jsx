@@ -4,19 +4,23 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbtack, faEye, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { formatDistanceToNow } from 'date-fns';
 import { DiscussApi } from "@/services/api/DiscussApi";
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
 function PostList({ categoryId }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [totalCount, setTotalCount] = useState(0); // Tổng số bài viết
   const [pageIndex, setPageIndex] = useState(1);
   const [totalPages, setTotalPages] = useState(0); // Tổng số bài viết
   const [orderBy, setOrderBy] = useState("hot");
   const [tags, setTags] = useState("");
-
+  const [pagination, setPagination] = useState({
+    pageIndex: 1,
+    pageSize: 5,
+    totalCount: 0,
+  });
   const navigate = useNavigate();
-  const pageSize = 3;
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -25,18 +29,18 @@ function PostList({ categoryId }) {
       try {
         const data = await DiscussApi.getDiscussionOptions({
           discussionId: categoryId,
-          pageIndex,
-          pageSize,
+          pageIndex: pagination.pageIndex,
+          pageSize: pagination.pageSize,
           orderBy,
           tags,
         });
+
         if (data && data.updatedDiscussions) {
           setPosts(data.updatedDiscussions);
-          setTotalCount(data.dataDiscussionDtos.count);
-          setTotalPages(Math.ceil(data.dataDiscussionDtos.count / pageSize)); // Tính tổng số trang
+          setPagination(data.pagination);
+          setTotalPages(Math.ceil(data.pagination.totalCount / pagination.pageSize)); // Tính tổng số trang
         }
 
-        console.log(data.updatedDiscussions);
       } catch (err) {
         setError("Failed to fetch posts");
         setLoading(true);
@@ -48,7 +52,7 @@ function PostList({ categoryId }) {
     if (categoryId) {
       fetchPosts();
     }
-  }, [categoryId, pageIndex, orderBy, tags]);
+  }, [categoryId, pagination.pageIndex, orderBy, tags]);
 
   const handlePostClick = (postId) => {
     navigate(`/discussion/${postId}`);
@@ -60,7 +64,14 @@ function PostList({ categoryId }) {
 
   const handleFilterClick = (filter) => {
     setOrderBy(filter);
-    setPageIndex(1);
+    handlePageChange(1);
+  };
+
+  const handlePageChange = (event, value) => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: value,
+    }));
   };
 
   const formatDate = (dateString) => {
@@ -203,61 +214,19 @@ function PostList({ categoryId }) {
       )}
 
       {/* Pagination */}
+
       {!loading && totalPages > 0 && (
-        <div className="pagination">
-          {/* Nút Previous */}
-          <button
-            className={`page-item ${pageIndex === 1 ? "disabled" : ""}`}
-            onClick={() => setPageIndex(pageIndex - 1)}
-            disabled={pageIndex === 1}
-          >
-            &lt;
-          </button>
-
-          {/* Hiển thị số trang */}
-          {totalPages <= 5
-            ? // Nếu tổng số trang <= 5, hiển thị tất cả các trang
-            Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                className={`page-item ${pageIndex === page ? "active" : ""}`}
-                onClick={() => setPageIndex(page)}
-              >
-                {page}
-              </button>
-            ))
-            : // Nếu tổng số trang > 5, hiển thị giới hạn
-            [
-              // Trang đầu tiên
-              1,
-              // Hiển thị dấu "..." nếu không phải trang đầu và trang gần nhất
-              ...(pageIndex > 3 ? ["..."] : []),
-              // Hiển thị các trang xung quanh trang hiện tại
-              ...Array.from(
-                { length: Math.min(5, totalPages - 1) },
-                (_, i) => Math.max(2, Math.min(totalPages - 1, pageIndex - 2 + i))
-              ),
-              // Trang cuối cùng nếu có đủ số trang
-              ...(pageIndex < totalPages - 2 ? ["..."] : []),
-              totalPages,
-            ].map((page, idx) => (
-              <button
-                key={idx}
-                className={`page-item ${pageIndex === page ? "active" : ""}`}
-                onClick={() => setPageIndex(page)}
-              >
-                {page}
-              </button>
-            ))}
-
-          {/* Nút Next */}
-          <button
-            className={`page-item ${pageIndex === totalPages ? "disabled" : ""}`}
-            onClick={() => setPageIndex(pageIndex + 1)}
-            disabled={pageIndex === totalPages}
-          >
-            &gt;
-          </button>
+        <div className="comment-list__pagination">
+          <Stack spacing={2}>
+            <Pagination
+              count={totalPages}
+              page={pagination.pageIndex}
+              onChange={handlePageChange}
+              shape="rounded"
+              variant="outlined"
+              className="pagination-buttons" // Thêm class này để dễ dàng định dạng
+            />
+          </Stack>
         </div>
       )}
 
@@ -557,68 +526,76 @@ function PostList({ categoryId }) {
   color: #2563eb;
 }
 
-/* Phân trang */
-.pagination {
+/* Căn giữa phần pagination */
+.comment-list__pagination {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
+  justify-content: center; /* Căn giữa các phần tử theo chiều ngang */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  width: 100%; /* Đảm bảo phần pagination chiếm toàn bộ chiều rộng */
+  margin-top: 30px; /* Tùy chọn thêm khoảng cách phía trên */
 }
 
-.page-item {
+/* Nút pagination không được chọn */
+.comment-list__pagination .MuiPaginationItem-root {
   text-align: center;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 12px; /* Đặt padding hợp lý để các nút không quá to hoặc quá nhỏ */
-  font-size: 12px; /* Font chữ dễ đọc */
-  color: #1e334a; /* Màu chữ giống với nút filter */
-  background: #f9f9f9; /* Nền trắng như filter */
-  border: 0.2px solid #e0e0e0; /* Viền mỏng tinh tế */
-  border-radius: 6px; /* Bo góc nhẹ */
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  max-width: 45px; /* Kích thước tối đa nhỏ hơn */
+  min-width: 35px;  /* Kích thước tối thiểu nhỏ hơn */
+  padding: 6px 10px; /* Kích thước nút nhỏ hơn */
+  font-size: 10px;   /* Font chữ nhỏ hơn */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: bold;
+  color: #14212b;    /* Màu chữ khi nút không được chọn */
+  background: #ffffff;  /* Màu nền nút không được chọn */
+  border-radius: 8px; /* Bo tròn nhẹ cho nút */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   position: relative;
   overflow: hidden;
-  margin: 0 5px; /* Khoảng cách giữa các nút */
 }
 
-/* Hiệu ứng hover */
-.page-item:hover {
-  color: #ffffff; /* Màu chữ trắng khi hover */
-  background: #1e334a; /* Nền xanh đậm khi hover */
-  border-color: #1e334a; /* Viền xanh khi hover */
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+/* Hiệu ứng hover cho pagination item */
+.comment-list__pagination .MuiPaginationItem-root:hover {
+  background: #14212b; /* Màu nền khi hover (màu tối) */
+  color: #ffffff;  /* Màu chữ khi hover */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px); /* Nhấn nổi nhẹ khi hover */
 }
 
-/* Nút đang active */
-.page-item.active {
-  color: #ffffff; /* Chữ trắng khi active */
-  background: #1e334a; /* Nền xanh đậm khi active */
-  font-weight: bold;
-  border-color: #1e334a; /* Viền xanh khi active */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn khi active */
-  transform: scale(1.05); /* Phóng to nhẹ khi active */
+/* Nút đang active (chọn) */
+.comment-list__pagination .MuiPaginationItem-root.Mui-selected {
+  background: #14212b; /* Màu nền khi nút được chọn */
+  color: #ffffff; /* Màu chữ trắng khi chọn */
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+  transform: translateY(0); /* Không thay đổi vị trí khi active */
 }
 
-/* Nút Next/Previous khi disabled */
-.page-item.disabled {
+/* Hiệu ứng ánh sáng cho pagination */
+.comment-list__pagination .MuiPaginationItem-root::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -25%;
+  width: 150%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: skewX(-45deg);
+  transition: left 0.3s ease-in-out;
+}
+
+.comment-list__pagination .MuiPaginationItem-root:hover::before {
+  left: 100%;
+}
+
+/* Khi pagination bị disabled */
+.comment-list__pagination .MuiPaginationItem-root.Mui-disabled {
+  background: #9ca3af;
+  color: #e5e7eb;
   cursor: not-allowed;
-  background-color: #f8f9fa; /* Nền xám khi disabled */
-  color: #adb5bd; /* Màu chữ xám khi disabled */
-}
-
-.page-item.disabled:hover {
-  background-color: #f8f9fa;
-  color: #adb5bd;
-}
-
-/* Dấu ba chấm */
-.dots {
-  margin: 0 10px;
-  font-size: 16px;
-  color: #6c757d; /* Màu xám của dấu ba chấm */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
 }
 
     .loader-container {

@@ -7,6 +7,9 @@ import { useToast } from '@/hooks/use-toast'
 import FormTabs from './FormTabs'
 import { getProblemDetail, updateProblemAg } from '@/services/api/problemApi'
 import { ToastAction } from '@/components/ui/toast'
+import { useMatch, useNavigate } from '@tanstack/react-router'
+import { updateAgProblemRoute } from '@/routers/router'
+import { Loading } from '@/components/ui/overlay'
 const UpdateProblemAg = ({}) => {
   const [activeTab, setActiveTab] = useState('basic')
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
@@ -14,6 +17,12 @@ const UpdateProblemAg = ({}) => {
   const [isRunSuccess, setIsRunSuccess] = useState(false)
   const [problemDetail, setProblemDetail] = useState(null)
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
+
+  const { params } = useMatch(updateAgProblemRoute.id);
+  const { problemId } = params
+
+  const navigate = useNavigate()
 
   const form = useForm({
     defaultValues: {
@@ -37,7 +46,7 @@ const UpdateProblemAg = ({}) => {
   useEffect(() => {
     const fetchProblemDetail = async () => {
       try {
-        const response = await getProblemDetail('4e3538a1-843b-4d36-8f2a-1fac561384b0');
+        const response = await getProblemDetail(problemId);
         setProblemDetail(response.problemDetailsDto);
         setIsLoading(false);
       } catch (error) {
@@ -70,7 +79,7 @@ const UpdateProblemAg = ({}) => {
   }, [problemDetail, form]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
 
@@ -86,14 +95,15 @@ const UpdateProblemAg = ({}) => {
       problem: updatedData
     }
 
-
+    setIsLoadingSubmit(true)
     try {
-      const response = await updateProblemAg(problemData, '4e3538a1-843b-4d36-8f2a-1fac561384b0')
+      const response = await updateProblemAg(problemData, problemId)
       toast({
         variant: 'success',
-        title: 'Create problem successfully',
-        description: 'Create problem successfully'
+        title: 'Update problem successfully',
+        description: 'Update problem successfully'
       })
+      navigate({ to: '/problem-table' })
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -101,7 +111,9 @@ const UpdateProblemAg = ({}) => {
         description: 'Please try again!',
         action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
       })
-      console.error('Error creating problem:', error)
+      console.error('Error updating problem:', error)
+    } finally {
+      setIsLoadingSubmit(false)
     }
   }
 
@@ -123,6 +135,7 @@ const UpdateProblemAg = ({}) => {
             setActiveTab={setActiveTab}
             isSaveTemplate={isSaveTemplate}
             isRunSuccess={isRunSuccess}
+            isLoadingSubmit={isLoadingSubmit}
           />
         </form>
       </FormProvider>

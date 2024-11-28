@@ -6,5 +6,6 @@ public interface ICourseRepository : IRepository<Course> {
     Task<Course?> GetCourseByChapterIdAsync(Guid chapterId);
     Task<List<Course>> GetByCourseLevelAsync(CourseLevel courseLevel);
     void Update(params Course[] courses);
+    IQueryable<Course> GetAllAsQueryable();
 }
 

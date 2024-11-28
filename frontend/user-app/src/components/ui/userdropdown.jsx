@@ -1,19 +1,37 @@
-// eslint-disable-next-line react/prop-types, no-unused-vars
-export default function DropdownMenuUser({ isOpen, userName }) {
-  const menuItems = [
-    { icon: '📋', label: 'My Lists' },
-    { icon: '📓', label: 'Notebook' },
-    { icon: '❓', label: 'Submissions' },
-    { icon: '📊', label: 'Progress' },
-    { icon: '🪙', label: 'Points' }
-  ]
+import { UserContext } from '@/contexts/UserContext'
+import { AUTHENTICATION_ROUTERS } from '@/data/constants'
+import authServiceInstance from '@/oidc/AuthService'
+import { useContext, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-  const additionalItems = ['My Profile', 'Settings', 'Sign out']
+export default function DropdownMenuUser({ isOpen, userName, onClose }) {
+  const { user } = useContext(UserContext)
+  const navigate = useNavigate()
+  const dropdownRef = useRef(null)
 
-  if (!isOpen) return null
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        onClose()
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen, onClose])
+
+  if (!isOpen || !user || !user.profile) return null
 
   return (
     <div
+      ref={dropdownRef}
       className='absolute right-0 mt-6 origin-top-left bg-white divide-y divide-gray-100 rounded-md shadow-lg w-72 ring-1 ring-black ring-opacity-5 focus:outline-none'
       role='menu'
       aria-orientation='vertical'
@@ -23,7 +41,7 @@ export default function DropdownMenuUser({ isOpen, userName }) {
         <div className='flex items-center'>
           <img
             className='w-10 h-10 mr-3 rounded-full'
-            src='https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?height=40&width=40'
+            src={user.profile.urlImagePresigned}
             alt=''
           />
           <div>
@@ -32,31 +50,35 @@ export default function DropdownMenuUser({ isOpen, userName }) {
         </div>
       </div>
 
-      <div className='py-2'>
-        <div className='grid grid-cols-3 gap-2 px-2'>
-          {menuItems.map((item, index) => (
-            <button
-              key={index}
-              className='flex flex-col items-center justify-center p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:bg-gray-100'
-              role='menuitem'
-            >
-              <span className='mb-1 text-2xl'>{item.icon}</span>
-              <span className='text-xs'>{item.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className='py-1'>
-        {additionalItems.map((item, index) => (
-          <button
-            key={index}
-            className='block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
-            role='menuitem'
-          >
-            {item}
-          </button>
-        ))}
+        <button
+          onClick={() => {
+            navigate(AUTHENTICATION_ROUTERS.USERPROFILE)
+            onClose()
+          }}
+          className='block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
+          role='menuitem'
+        >
+          My Profile
+        </button>
+
+        <button
+          className='block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
+          role='menuitem'
+        >
+          Settings
+        </button>
+
+        <button
+          onClick={() => {
+            authServiceInstance.logout()
+            onClose()
+          }}
+          className='block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
+          role='menuitem'
+        >
+          Sign out
+        </button>
       </div>
     </div>
   )

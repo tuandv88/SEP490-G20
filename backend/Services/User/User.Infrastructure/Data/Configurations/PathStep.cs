@@ -19,7 +19,7 @@ namespace User.Infrastructure.Data.Configurations
 
             builder.Property(ps => ps.StepOrder).IsRequired();
             builder.Property(ps => ps.Status).IsRequired();
-            builder.Property(ps => ps.EnrollmentDate).IsRequired();
+            builder.Property(ps => ps.EnrollmentDate);
             builder.Property(ps => ps.CompletionDate);
             builder.Property(ps => ps.ExpectedCompletionDate).IsRequired();
         }

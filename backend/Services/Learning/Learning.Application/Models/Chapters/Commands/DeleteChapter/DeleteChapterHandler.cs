@@ -33,6 +33,7 @@ public class DeleteChapterHandler(ICourseRepository courseRepository, IChapterRe
         await chapterRepository.DeleteAsync(chapter);
 
         await chapterRepository.SaveChangesAsync(cancellationToken);
+        await chapterRepository.SaveChangesAsync(cancellationToken);
         return Unit.Value;
 
     }

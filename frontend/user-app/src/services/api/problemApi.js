@@ -19,5 +19,18 @@ export const ProblemAPI = {
       }
     })
     return response.data
+  },
+  getAllProblems: async (pageIndex, pageSize) => {
+    
+    const response = await axios.get(`${API_BASE_URL}/learning-service/problems?PageIndex=${pageIndex}&PageSize=${pageSize}`)
+    return response.data
+  },
+  getProblemDetails: async (problemId) => {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/problems/${problemId}`, {
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
   }
 }

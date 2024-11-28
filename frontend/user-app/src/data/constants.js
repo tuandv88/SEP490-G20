@@ -7,15 +7,17 @@ export const AUTHENTICATION_ROUTERS = {
   ERROR: '/error',
   THEME: '/themes',
   COURSELIST: '/courseList',
-  COURSEDETAIL: '/courseDetail/:id',
+  COURSEDETAIL: '/course-detail/:id',
   LEARNINGSPACE: '/learning-space/:id/lecture/:lectureId?',
   PROBLEMS: '/problems',
   CODE: '/code',
   CALLBACK: '/callback',
   SURVEY: '/survey',
-  COURSEDETAILS: '/course-details'
   DISCUSS: '/discussions/discuss',
-  DISCUSSIONDETAIL: '/discussion/:id'
+  DISCUSSIONDETAIL: '/discussion/:id',
+  CREATEDISCUSSION:'/discussions/creatediscussion',
+  USERPROFILE: '/user-profile',
+  PROBLEMSPACE: '/problem-solve/:problemId'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

@@ -49,16 +49,16 @@ export function CourseEvaluate() {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-primary-text">Student Reviews & Testimonials</h2>
+      <h2 className="text-2xl font-bold text-gray-900">Student Reviews & Testimonials</h2>
 
-      <div className="bg-primary-light rounded-lg p-6 border border-primary-dark">
+      <div className="bg-white rounded-lg p-6 border">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Rating Summary */}
           <div className="space-y-4">
             <div className="text-center md:text-left">
-              <div className="text-7xl font-bold text-primary-text">{averageRating}</div>
+              <div className="text-7xl font-bold text-gray-900">{averageRating}</div>
               <RatingStars rating={5} />
-              <div className="text-primary-muted mt-2">Total {totalReviews} Reviews</div>
+              <div className="text-gray-600 mt-2">Total {totalReviews} Reviews</div>
             </div>
           </div>
 
@@ -66,16 +66,16 @@ export function CourseEvaluate() {
           <div className="space-y-3">
             {ratingStats.map(({ stars, count }) => (
               <div key={stars} className="flex items-center gap-2">
-                <div className="w-12 text-sm text-primary-muted">{stars} stars</div>
-                <div className="flex-1 h-2 bg-primary rounded-full overflow-hidden">
+                <div className="w-12 text-sm text-gray-600">{stars} stars</div>
+                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-primary-text rounded-full"
+                    className="h-full bg-yellow-400 rounded-full"
                     style={{
                       width: `${(count / totalReviews) * 100}%`
                     }}
                   />
                 </div>
-                <div className="w-20 text-sm text-primary-muted">{count} reviews</div>
+                <div className="w-20 text-sm text-gray-600">{count} reviews</div>
               </div>
             ))}
           </div>
@@ -85,20 +85,20 @@ export function CourseEvaluate() {
       {/* Reviews List */}
       <div className="space-y-6">
         {reviews.map((review) => (
-          <div key={review.id} className="bg-primary-light rounded-lg p-6 border border-primary-dark">
+          <div key={review.id} className="bg-white rounded-lg p-6 border">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-text font-semibold">
+              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white font-semibold">
                 {review.avatar}
               </div>
               <div className="flex-1">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-primary-text">{review.author}</h3>
-                    <div className="text-sm text-primary-muted">{review.timeAgo}</div>
+                    <h3 className="font-semibold text-gray-900">{review.author}</h3>
+                    <div className="text-sm text-gray-500">{review.timeAgo}</div>
                   </div>
                   <RatingStars rating={review.rating} />
                 </div>
-                <p className="mt-3 text-primary-muted">{review.content}</p>
+                <p className="mt-3 text-gray-700">{review.content}</p>
               </div>
             </div>
           </div>

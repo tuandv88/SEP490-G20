@@ -8,6 +8,7 @@ import FormTabs from './FormTabs';
 import { createProblemLecture } from '@/services/api/problemApi'
 import { useMatch, useNavigate } from '@tanstack/react-router';
 import { createProblemLectureRoute } from '@/routers/router';
+import { ToastAction } from '@/components/ui/toast';
 
 
 const CreateProblemLecture = ({ }) => {
@@ -24,6 +25,7 @@ const CreateProblemLecture = ({ }) => {
   const { toast } = useToast();
   const [isRunSuccess, setIsRunSuccess] = useState(false)
   const [hasLecture, setHasLecture] = useState(false)
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
 
   //new
   useEffect(() => {
@@ -67,6 +69,7 @@ const CreateProblemLecture = ({ }) => {
 
     console.log(problemData)
 
+    setIsLoadingSubmit(true)
     try {
       const response = await createProblemLecture(problemData, lectureId)
       toast({
@@ -74,7 +77,7 @@ const CreateProblemLecture = ({ }) => {
         title: 'Create problem successfully',
         description: 'Create problem successfully'
       })
-      navigate({ to: `/edit-course/${courseId}` })
+      navigate({ to: `/edit-curriculum-course/${courseId}` })
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -83,6 +86,8 @@ const CreateProblemLecture = ({ }) => {
         action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
       })
       console.error('Error creating problem:', error)
+    } finally {
+      setIsLoadingSubmit(false)
     }
   
   };
@@ -105,6 +110,7 @@ const CreateProblemLecture = ({ }) => {
           setActiveTab={setActiveTab}
           isSaveTemplate={isSaveTemplate}
           isRunSuccess={isRunSuccess}
+          isLoadingSubmit={isLoadingSubmit}
         />
         </form>
       </FormProvider>

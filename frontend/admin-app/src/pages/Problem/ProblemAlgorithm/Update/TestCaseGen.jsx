@@ -90,6 +90,11 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
   }, [testCases, params])
 
 
+  const createTestCaseNoParam = () => {
+    setTestCases([...testCases, { expectedOutput: '', isHidden: false }])
+  }
+
+
   return (
     <Card className='w-full mx-auto'>
       <div className='flex justify-center'>
@@ -191,6 +196,9 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
               <CardFooter>
                 <Button type='button' onClick={createTestCase} disabled={params.length === 0} className='w-fit'>
                   Create Test Case
+                </Button>
+                <Button type='button' onClick={createTestCaseNoParam} className='w-fit ml-2'>
+                  Create No Parameters
                 </Button>
               </CardFooter>
             </Card>

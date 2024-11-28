@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import React, { useState } from 'react'
 
-const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef }) => {
+const HeaderCode = ({ onButtonClick, toggleCurriculumRef, header }) => {
   const [isRunning, setIsRunning] = useState(false)
 
   const triggerPreviousLecture = () => {
@@ -48,7 +48,7 @@ const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef }) => {
               <div className='flex items-center overflow-hidden rounded hover:bg-gray-100 dark:hover:bg-gray-700'>
                 <div className='group flex items-center h-8 px-2 cursor-pointer' onClick={onButtonClick}>
                   <Indent className='w-5 h-5 mr-2 text-gray-500' />
-                  <span className='text-sm font-medium truncate max-w-[170px]'>Chapter List</span>
+                  <span className='text-sm font-medium truncate max-w-[170px]'>{header}</span>
                 </div>
                 <div className='h-7 w-px bg-gray-300 dark:bg-gray-600'></div>
                 <button className='p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600' onClick={triggerPreviousLecture}>
@@ -58,16 +58,9 @@ const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef }) => {
                 <button className='p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600' onClick={triggerNextLecture}>
                   <ChevronRight className='w-5 h-5 ' />
                 </button>
-                <div className='h-7 w-px bg-gray-300 dark:bg-gray-600'></div>
-                <button className='p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600'>
-                  <ArrowRight className='w-5 h-5 ' />
-                </button>
               </div>
             </div>
-            <div className='flex items-center space-x-2 mr-4'>
-              <button onClick={onChatClick} className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-                <BotMessageSquare className='w-5 h-5' />
-              </button>
+            <div className='flex items-center space-x-2 mr-4'>            
               <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
                 <Settings className='w-5 h-5' />
               </button>
@@ -83,12 +76,6 @@ const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef }) => {
                   />
                 </button>
               </div>
-              <a
-                href='/subscribe'
-                className='hidden lg:inline-block h-8 w-[84px] rounded-lg bg-orange-100 text-center leading-8 text-orange-500 hover:bg-orange-200'
-              >
-                Premium
-              </a>
             </div>
           </div>
         </div>

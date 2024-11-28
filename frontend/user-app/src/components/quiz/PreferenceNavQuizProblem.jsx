@@ -100,12 +100,7 @@ const PreferenceNavQuizProblem = ({ onSubmit, loading }) => {
               </>
             )}
 
-          </button>
-          <button onClick={handleFetchData} className='flex items-center px-3 py-1.5 bg-green-100 dark:bg-green-700 rounded-md hover:bg-green-200 dark:hover:bg-green-600 text-green-700 dark:text-green-100'>
-            <CloudUpload className='w-4 h-4 mr-2' />
-            <span className='text-sm font-medium'>Submit</span>
-          </button>
-          
+          </button>               
         </div>
       </div>
     </div>

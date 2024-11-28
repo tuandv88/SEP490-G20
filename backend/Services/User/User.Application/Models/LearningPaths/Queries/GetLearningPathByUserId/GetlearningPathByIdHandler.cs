@@ -1,29 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using User.Application.Data.Repositories;
+﻿using User.Application.Data.Repositories;
 using User.Application.Models.LearningPaths.Dtos;
 using User.Application.Models.PathSteps.Dtos;
 using BuildingBlocks.CQRS;
-using BuildingBlocks.Exceptions;
-using System.Linq;
+using User.Application.Interfaces;
 
-namespace User.Application.Models.LearningPaths.Queries.GetLearningPathByUserId
-{
-    public class GetLearningPathByUserIdHandler : IQueryHandler<GetLearningPathByUserIdQuery, GetLearningPathByUserIdResult>
-    {
+namespace User.Application.Models.LearningPaths.Queries.GetLearningPathByUserId {
+    public class GetLearningPathByUserIdHandler : IQueryHandler<GetLearningPathByUserIdQuery, GetLearningPathByUserIdResult> {
         private readonly ILearningPathRepository _learningPathRepository;
-
-        public GetLearningPathByUserIdHandler(ILearningPathRepository learningPathRepository)
-        {
+        private readonly IUserContextService _userContext;
+        public GetLearningPathByUserIdHandler(ILearningPathRepository learningPathRepository, IUserContextService userContext) {
             _learningPathRepository = learningPathRepository;
+            _userContext = userContext;
+
         }
 
-        public async Task<GetLearningPathByUserIdResult> Handle(GetLearningPathByUserIdQuery request, CancellationToken cancellationToken)
-        {
+        public async Task<GetLearningPathByUserIdResult> Handle(GetLearningPathByUserIdQuery request, CancellationToken cancellationToken) {
             // Lấy danh sách LearningPaths từ repository bằng UserId, bao gồm cả PathSteps
-            var learningPaths = await _learningPathRepository.GetByUserIdAsync(request.UserId);
+            var learningPaths = await _learningPathRepository.GetByUserIdAsync(_userContext.User.Id);
 
             // Chuyển đổi danh sách LearningPaths và PathSteps thành LearningPathWithPathStepsDto
             var learningPathDtos = learningPaths.Select(lp => new LearningPathWithPathStepsDto(
@@ -42,7 +35,8 @@ namespace User.Application.Models.LearningPaths.Queries.GetLearningPathByUserId
                     ps.EnrollmentDate,
                     ps.CompletionDate,
                     ps.ExpectedCompletionDate
-                )).ToList()
+                )).ToList(),
+                lp.Reason
             )).ToList();
 
             return new GetLearningPathByUserIdResult(learningPathDtos);

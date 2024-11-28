@@ -280,7 +280,7 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
             </div>
           )}
 
-          {!loading && response?.codeExecuteDto?.status?.description === 'Accepted' && (
+          {/* {!loading && response?.codeExecuteDto?.status?.description === 'Accepted' && (
             <div>
               <h2 className='text-2xl font-bold text-green-500 mb-4'>Accepted</h2>
               <pre className='bg-green-100 p-4 rounded-md text-green-700 whitespace-pre-wrap'>
@@ -296,7 +296,7 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
                 {response.codeExecuteDto.status.description}
               </pre>
             </div>
-          )}
+          )} */}
 
           {!loading && response === null && (
             <div>

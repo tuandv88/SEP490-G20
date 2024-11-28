@@ -3,9 +3,12 @@ import { ChevronLeft, ChevronRight, Clock, ExternalLink, Star } from 'lucide-rea
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '../ui/card'
 import { CourseBadge } from './CourseBadge'
+import { useNavigate } from 'react-router-dom'
+import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 
 export function CourseCarousel({ courses }) {
   const carouselRef = useRef(null)
+  const navigate = useNavigate()
 
   const scroll = (direction) => {
     if (carouselRef.current) {
@@ -13,6 +16,10 @@ export function CourseCarousel({ courses }) {
       const scrollAmount = direction === 'left' ? -current.offsetWidth : current.offsetWidth
       current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
     }
+  }
+
+  const handleViewDetail = (courseId) => {
+    navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', courseId))
   }
 
   return (

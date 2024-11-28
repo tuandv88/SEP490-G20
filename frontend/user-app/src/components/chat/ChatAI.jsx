@@ -50,7 +50,7 @@ const ChatAI = ({ lectureId, problemId }) => {
     const fetchConversation = async () => {
       try {
         const data = await ChatAPI.getConversation()
-        setChatHistory(data.conversations.data)     
+        setChatHistory(data.conversations.data)    
       } catch (error) {
         console.error('Error fetching conversation:', error)
       }

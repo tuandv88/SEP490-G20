@@ -21,7 +21,7 @@ export function CourseSidebar({ enrolledCourses, firstLectureId }) {
     try {
       const data = await CourseAPI.enrollCourse(id)
       console.log(data)
-      //navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', id).replace(':lectureId', firstLectureId))
+      navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', id).replace(':lectureId', firstLectureId))
     } catch (error) {
       console.error('Error enrolling course:', error)
     }

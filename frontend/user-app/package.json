@@ -16,8 +16,8 @@
   "dependencies": {
     "@codingame/monaco-vscode-configuration-service-override": "11.0.1",
     "@codingame/monaco-vscode-editor-service-override": "11.0.1",
-    "@codingame/monaco-vscode-textmate-service-override": "^11.0.1",
-    "@codingame/monaco-vscode-theme-service-override": "^11.0.1",
+    "@codingame/monaco-vscode-textmate-service-override": "11.0.1",
+    "@codingame/monaco-vscode-theme-service-override": "11.0.1",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
     "@fortawesome/fontawesome-svg-core": "^6.7.1",

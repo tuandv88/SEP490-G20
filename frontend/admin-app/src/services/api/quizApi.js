@@ -29,3 +29,32 @@ export const deleteQuiz = async (quizId) => {
   }
 }
 
+export const getQuizAssessment = async () => {
+  try {
+    const response = await axiosInstance.get('/learning-service/quizs/assessment', {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return null
+    }
+    throw error
+  }
+}
+
+export const createQuizAssessment = async (quizData) => {
+  try {
+    const response = await axiosInstance.post(`/learning-service/quizs`, quizData, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error creating course:', error)
+    throw error
+  }
+}

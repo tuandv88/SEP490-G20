@@ -27,7 +27,7 @@ public class ChangeCourseStatusHandler(ICourseRepository repository) : ICommandH
             }
         }
         if (newStatus == CourseStatus.Scheduled) {
-            if (request.ScheduledPublishDate == null || request.ScheduledPublishDate.Value < DateTime.Now) {
+            if (request.ScheduledPublishDate == null || request.ScheduledPublishDate.Value < DateTime.UtcNow) {
                 return new ChangeCourseStatusResult(false, "ScheduledPublishDate is not valid.");
             }
             course.UpdateSchedule(request.ScheduledPublishDate.Value);

@@ -1,14 +1,12 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import LectureForm from './LectureForm'
+import { useToast } from '@/hooks/use-toast'
+import { updateLecture } from '@/services/api/lectureApi'
 
 export default function EditLectureDialog({ isOpen, onClose, lecture, onSave }) {
+  const { toast } = useToast()
   if (!isOpen || !lecture) return null
-
-  const handleSave = (updatedLecture) => {
-    onSave(updatedLecture)
-    onClose()
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -16,7 +14,7 @@ export default function EditLectureDialog({ isOpen, onClose, lecture, onSave }) 
         <DialogHeader>
           <DialogTitle>Edit Lecture</DialogTitle>
         </DialogHeader>
-        <LectureForm lecture={lecture} onSave={handleSave} onCancel={onClose} />
+        <LectureForm lecture={lecture} onSave={onSave} onCancel={onClose} />
       </DialogContent>
     </Dialog>
   )

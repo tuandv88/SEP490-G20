@@ -42,7 +42,7 @@ export default function LectureForm({ lecture, onSave, onCancel }) {
     <FormProvider {...methods}>
       <Form {...methods}>
         <form onSubmit={handleSubmit} className='space-y-8'>
-          <div className='pr-4 '>
+          <div className='pr-4'>
             <FormField
               control={methods.control}
               name='title'

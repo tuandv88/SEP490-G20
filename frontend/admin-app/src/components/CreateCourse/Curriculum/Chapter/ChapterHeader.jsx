@@ -14,17 +14,26 @@ import {
 } from '@/components/ui/alert-dialog'
 
 export default function ChapterHeader({ chapter, onEdit, onDelete }) {
+  const handleEditClick = () => {
+    if (chapter && chapter.id) {
+      onEdit(chapter.id)
+    } else {
+    }
+  }
+
   return (
     <div className='flex items-center justify-between'>
       <h4 className='text-lg font-semibold'>{chapter.title}</h4>
       <div className='flex items-center space-x-4'>
-        <Button variant='ghost' size='sm' onClick={onEdit}>
-          <Pencil1Icon />
+        <Button variant='ghost' size='sm' onClick={handleEditClick}>
+          <Pencil1Icon className='mr-2' />
+          Edit
         </Button>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant='ghost' size='sm'>
-              <Cross2Icon />
+              <Cross2Icon className='mr-2' />
+              Delete
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -36,13 +45,10 @@ export default function ChapterHeader({ chapter, onEdit, onDelete }) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+              <AlertDialogAction onClick={() => chapter.id && onDelete(chapter.id)}>Delete</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <span>
-          {chapter.timeEstimation} hour{chapter.timeEstimation !== 1 ? 's' : ''}
-        </span>
         <span
           className={`px-2 py-1 rounded ${
             chapter.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'

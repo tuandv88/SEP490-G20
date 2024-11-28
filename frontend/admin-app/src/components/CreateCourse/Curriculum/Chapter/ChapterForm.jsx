@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -11,10 +11,7 @@ import MarkdownFormField from '@/components/markdown-form-field'
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required').max(50, 'Title must not exceed 50 characters'),
   description: z.string().min(1, 'Description is required'),
-  timeEstimation: z
-    .number()
-    .min(0.1, 'Time estimation must be greater than 0')
-    .max(1000, 'Time estimation must not exceed 1000 hours'),
+
   isActive: z.boolean()
 })
 
@@ -24,13 +21,23 @@ export default function ChapterForm({ chapter, onSave, onCancel }) {
     defaultValues: chapter || {
       title: '',
       description: '',
-      timeEstimation: 1,
       isActive: true
     }
   })
 
+  useEffect(() => {
+    if (chapter) {
+      methods.reset({
+        title: chapter.title,
+        description: chapter.description,
+        timeEstimation: chapter.timeEstimation,
+        isActive: chapter.isActive
+      })
+    }
+  }, [chapter, methods])
+
   const handleSubmit = methods.handleSubmit((data) => {
-    onSave(data)
+    onSave(chapter ? { ...chapter, ...data } : data)
   })
 
   return (
@@ -57,24 +64,7 @@ export default function ChapterForm({ chapter, onSave, onCancel }) {
               label='Description'
               placeholder='Enter chapter description...'
             />
-            <FormField
-              control={methods.control}
-              name='timeEstimation'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Time Estimation (hours)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      step='0.1'
-                      {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <FormField
               control={methods.control}
               name='isActive'

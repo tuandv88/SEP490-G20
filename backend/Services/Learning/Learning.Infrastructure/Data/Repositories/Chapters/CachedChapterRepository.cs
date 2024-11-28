@@ -15,6 +15,14 @@ public class CachedChapterRepository(IChapterRepository repository, ICacheServic
         DeleteCached(string.Format(CacheKey.COURSES_DETAILS, entity.CourseId.Value));
     }
 
+    public async Task DeleteAsync(Chapter[] chapters) {
+        await repository.DeleteAsync(chapters);
+        var courseId = chapters.FirstOrDefault()?.CourseId;
+        if (courseId != null) {
+            DeleteCached(string.Format(CacheKey.COURSES_DETAILS, courseId.Value));
+        }
+    }
+
     public async Task DeleteByIdAsync(Guid id) {
         await repository.DeleteByIdAsync(id);
         var chapter = await GetByIdAsync(id);

@@ -1,4 +1,4 @@
-﻿using Learning.Application.Models.Courses.Commands.Deletecourse;
+﻿using Learning.Application.Models.Courses.Commands.DeleteCourse;
 using Learning.Tests.Application.UnitTest.Models.Courses.Helpers;
 
 namespace Learning.Tests.Application.UnitTest.Models.Courses.Commands;

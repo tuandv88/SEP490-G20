@@ -29,6 +29,24 @@ export const getLectureDetails = async (lectureId) => {
   }
 }
 
+export const updateLecture = async (chapterId, lectureId, lectureData) => {
+  try {
+    const response = await axiosInstance.put(
+      `/learning-service/chapters/${chapterId}/lectures/${lectureId}`,
+      { lecture: lectureData },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.error('Error updating lecture:', error)
+    throw error
+  }
+}
+
 export const deleteLecture = async (chapterId, lectureId) => {
   try {
     const response = await axiosInstance.delete(`/learning-service/chapters/${chapterId}/lectures/${lectureId}`, {

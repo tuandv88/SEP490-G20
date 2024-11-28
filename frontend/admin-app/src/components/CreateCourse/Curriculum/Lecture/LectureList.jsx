@@ -9,12 +9,8 @@ export default function LectureList({
   lectures,
   chapterIndex,
   onAddLecture,
-  onEditLecture,
+  onUpdateLecture,
   onDeleteLecture,
-  onFileUpload,
-  onVideoUpload,
-  onFileRemove,
-  onVideoRemove,
   courseId,
   setIsUpdate,
   isUpdate
@@ -33,12 +29,8 @@ export default function LectureList({
           chapterId={chapterId}
           key={lectureIndex}
           lecture={lecture}
-          onEdit={(updatedLecture) => onEditLecture(updatedLecture, lectureIndex)}
-          onDelete={() => onDeleteLecture(chapterId, lectureIndex)}
-          onFileUpload={(file) => onFileUpload(file, chapterIndex, lectureIndex)}
-          onVideoUpload={(file) => onVideoUpload(file, chapterIndex, lectureIndex)}
-          onFileRemove={(fileIndex) => onFileRemove(chapterIndex, lectureIndex, fileIndex)}
-          onVideoRemove={() => onVideoRemove(chapterIndex, lectureIndex)}
+          onUpdateLecture={onUpdateLecture}
+          onDeleteLecture={onDeleteLecture}
           courseId={courseId}
           setIsUpdateLecture={setIsUpdate}
           isUpdateLecture={isUpdate}

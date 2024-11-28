@@ -103,18 +103,22 @@ export const updateAgProblemRoute = createRoute({
   component: lazy(() => import('@/pages/Problem/ProblemAlgorithm/Update/UpdateProblemAg'))
 })
 
-
 export const updateLectureProblemRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/update-problem-lecture/course/$courseId/lecture/$lectureId/problem/$problemId',
   component: lazy(() => import('@/pages/Problem/ProblemLecture/Update/UpdateProblemLec'))
 })
 
-
-const mainTestRoute = createRoute({
+const documentAiTableRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/main-test',
-  component: lazy(() => import('@/pages/Test/MainTest'))
+  path: '/document-ai-table',
+  component: lazy(() => import('@/pages/Document/DocumentTable'))
+})
+
+const quizAssessmentRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/quiz-assessment',
+  component: lazy(() => import('@/pages/QuizAssessment/QuizAssessment'))
 })
 
 // Create the route trees
@@ -130,9 +134,10 @@ const mainRouteTree = rootRoute.addChildren([
   updateAgProblemRoute,
   editCurriculumCourseRoute,
   editBasicCourseRoute,
-  callbackRoute,
   problemTableRoute,
-  updateLectureProblemRoute
+  documentAiTableRoute,
+  quizAssessmentRoute,
+  callbackRoute
 ])
 
 const loginRouteTree = loginRootRoute.addChildren([loginRoute])

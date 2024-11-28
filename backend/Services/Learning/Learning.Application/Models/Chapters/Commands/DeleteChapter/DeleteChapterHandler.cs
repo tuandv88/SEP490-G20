@@ -1,16 +1,14 @@
-﻿using System.Transactions;
-
 namespace Learning.Application.Models.Chapters.Commands.DeleteChapter;
+
 public class DeleteChapterHandler(ICourseRepository courseRepository, IChapterRepository chapterRepository,
     IProblemRepository problemRepository, IQuizRepository quizRepository, ILectureRepository lectureRepository
     ) : ICommandHandler<DeleteChapterCommand, Unit> {
     public async Task<Unit> Handle(DeleteChapterCommand request, CancellationToken cancellationToken) {
         var course = await courseRepository.GetByIdDetailAsync(request.CourseId);
 
-        if(course == null) {
+        if (course == null) {
             throw new NotFoundException(nameof(Course), request.CourseId);
         }
-
         var chapter = course.DeleteChapter(ChapterId.Of(request.ChapterId));
         var lectures = chapter.DeleteLectures();
         foreach (var lecture in lectures) {
@@ -26,9 +24,9 @@ public class DeleteChapterHandler(ICourseRepository courseRepository, IChapterRe
         await lectureRepository.DeleteAsync(lectures.ToArray());
         await chapterRepository.DeleteAsync(chapter);
 
-        await chapterRepository.SaveChangesAsync(cancellationToken);
+        await chapterRepository.SaveChangesAsync(cancellationToken); 
         return Unit.Value;
-           
+
     }
 
 

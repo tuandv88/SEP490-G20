@@ -21,16 +21,9 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem
 } from '@/components/ui/dropdown-menu'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
-} from '@/components/ui/dialog'
-import { format, addMinutes } from 'date-fns'
-
+import { format, addMinutes, parseISO } from 'date-fns'
+import { formatDateTime } from '@/utils/format'
+import { convertLocalToUTC } from '@/utils/format'
 import { getCourses, changeCourseLevel, getCourseDetails, changeCourseStatus } from '@/services/api/courseApi'
 
 const statusOptions = [
@@ -82,7 +75,7 @@ export default function useCourseTable() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [pageIndex, setPageIndex] = useState(1)
-  const [pageSize, setPageSize] = useState(5)
+  const [pageSize, setPageSize] = useState(10)
   const [totalCount, setTotalCount] = useState(0)
 
   const [sorting, setSorting] = useState([])
@@ -93,7 +86,6 @@ export default function useCourseTable() {
   const [isStatusChangeDialogOpen, setIsStatusChangeDialogOpen] = useState(false)
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [newStatus, setNewStatus] = useState('')
-  const [scheduledDateTime, setScheduledDateTime] = useState(null)
 
   const fetchCourses = useCallback(async () => {
     setIsLoading(true)
@@ -150,7 +142,6 @@ export default function useCourseTable() {
   const handleStatusChange = async (courseId, newStatus, currentStatus) => {
     console.log(`Changing status for course ${courseId} from ${currentStatus} to ${newStatus}`)
 
-    // If the new status is the same as the current status, do nothing
     if (newStatus === currentStatus) {
       console.log('New status is the same as current status. No action needed.')
       return
@@ -162,18 +153,15 @@ export default function useCourseTable() {
     if (newStatus === 'Published' || newStatus === 'Scheduled') {
       const meetsRequirements = await checkCourseRequirements(courseId)
       if (!meetsRequirements) {
-        console.log('Course does not meet requirements for Publishing or Scheduling.')
         return
       }
     }
 
     if (newStatus === 'Scheduled') {
-      console.log('Opening scheduling dialog')
       setIsStatusChangeDialogOpen(true)
       return
     }
 
-    // For all status changes from Scheduled, we need to set scheduledPublishDate to null
     const scheduledDate = currentStatus === 'Scheduled' ? null : undefined
     console.log(`Setting scheduledDate to: ${scheduledDate}`)
 
@@ -181,15 +169,14 @@ export default function useCourseTable() {
   }
 
   const updateCourseStatus = async (courseId, status, scheduledPublishDate) => {
-    console.log(`Updating course ${courseId} status to ${status} with scheduledPublishDate: ${scheduledPublishDate}`)
+    console.log(
+      `Updating course ${courseId} status to ${status} with scheduledPublishDate: ${convertLocalToUTC(scheduledPublishDate)}`
+    )
+
     try {
       const payload = {
-        courseStatus: status
-      }
-
-      // Only include scheduledPublishDate in the payload if it's not undefined
-      if (scheduledPublishDate !== undefined) {
-        payload.scheduledPublishDate = scheduledPublishDate
+        courseStatus: status,
+        scheduledPublishDate: convertLocalToUTC(scheduledPublishDate)
       }
 
       console.log('Payload for API call:', payload)
@@ -213,34 +200,17 @@ export default function useCourseTable() {
     }
   }
 
-  const handleScheduledStatusConfirm = async () => {
-    if (!scheduledDateTime) {
-      toast({
-        title: 'Error',
-        description: 'Please select a scheduled publish date and time.',
-        variant: 'destructive',
-        duration: 1500
-      })
-      return
-    }
-
-    const currentDateTime = new Date()
-    const minimumDateTime = addMinutes(currentDateTime, 15)
-
-    if (scheduledDateTime < minimumDateTime) {
-      toast({
-        title: 'Error',
-        description: 'Please select a date and time at least 15 minutes in the future.',
-        variant: 'destructive',
-        duration: 1500
-      })
-      return
-    }
+  const handleScheduledStatusConfirm = async (scheduledDateTime) => {
+    const scheduledDate = new Date(scheduledDateTime)
 
     try {
-      await updateCourseStatus(selectedCourse, 'Scheduled', scheduledDateTime.toISOString())
+      console.log('Updating course status to Scheduled with scheduled date:', scheduledDateTime)
+      await updateCourseStatus(selectedCourse, 'Scheduled', scheduledDateTime)
       setIsStatusChangeDialogOpen(false)
-      setScheduledDateTime(null)
+      toast({
+        title: 'Course Scheduled',
+        description: `Course has been scheduled for publication on ${format(scheduledDate, 'PPpp')}.`
+      })
     } catch (error) {
       console.error('Error scheduling course:', error)
       toast({
@@ -251,10 +221,23 @@ export default function useCourseTable() {
       })
     }
   }
-  const handleLevelChange = async (courseId, newLevel) => {
+
+  const handleLevelChange = async (courseId, newLevel, currentLevel) => {
+    const payload = {
+      courseLevel: newLevel
+    }
+    if (newLevel === currentLevel) {
+      console.log('New level is the same as current level. No action needed.')
+      return
+    }
+
     try {
-      await changeCourseLevel(courseId, newLevel)
-      fetchCourses()
+      await changeCourseLevel(courseId, payload)
+      await fetchCourses()
+      toast({
+        title: 'Level updated',
+        description: `Course level has been changed to ${newLevel}.`
+      })
     } catch (error) {
       console.error('Error changing course level:', error)
       toast({
@@ -336,9 +319,7 @@ export default function useCourseTable() {
       ),
       cell: ({ row }) => {
         const date = row.getValue('scheduledPublishDate')
-        if (!date) return <div className='text-center'>No date</div>
-
-        return <div className='text-center'>{format(new Date(date), 'HH:mm - dd/MM/yyyy')}</div>
+        return <div className='text-center'>{formatDateTime(date)}</div>
       }
     },
     {
@@ -428,13 +409,14 @@ export default function useCourseTable() {
                 <DropdownMenuSeparator />
                 <DropdownMenuRadioGroup
                   value={level}
-                  onValueChange={(newLevel) => handleLevelChange(row.original.id, newLevel)}
+                  onValueChange={(newLevel) => handleLevelChange(row.original.id, newLevel, level)}
                 >
                   {levelOptions.map((option) => (
                     <DropdownMenuRadioItem
                       key={option.value}
                       value={option.value}
                       className={`flex items-center space-x-2 ${option.color} rounded-md transition-colors`}
+                      disabled={option.value === level}
                     >
                       <GraduationCap className='w-4 h-4' />
                       <span>{option.label}</span>
@@ -569,11 +551,11 @@ export default function useCourseTable() {
     totalCount,
     isStatusChangeDialogOpen,
     setIsStatusChangeDialogOpen,
-    scheduledDateTime,
-    setScheduledDateTime,
     handleScheduledStatusConfirm,
     handleStatusChange,
     selectedCourse,
-    newStatus
+    newStatus,
+    columns,
+    handleLevelChange
   }
 }

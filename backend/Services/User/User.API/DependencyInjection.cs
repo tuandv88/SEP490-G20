@@ -2,8 +2,6 @@
 using BuildingBlocks.Extensions;
 using User.API.Services;
 using User.Application.Interfaces;
-using User.Infrastructure.Extentions;
-using User.Application.Interfaces;
 namespace User.API;
 public static class DependencyInjection
 {

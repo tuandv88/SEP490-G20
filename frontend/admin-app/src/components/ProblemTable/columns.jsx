@@ -12,10 +12,9 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { useNavigate } from '@tanstack/react-router'
+import { deleteProblemAg } from '@/services/api/problemApi'
 
 const columnHelper = createColumnHelper()
-
-
 
 export const columns = [
   columnHelper.display({
@@ -97,8 +96,12 @@ export const columns = [
               Copy problem ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View problem details</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate({ to: '/update-problem/$problemId', params: { problemId: problem.problemsId } })}>Edit problem</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => navigate({ to: '/update-problem/$problemId', params: { problemId: problem.problemsId } })}
+            >
+              Edit problem
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => deleteProblemAg(problem.problemsId)}>Delete problem</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

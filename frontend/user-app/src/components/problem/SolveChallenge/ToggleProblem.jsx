@@ -26,7 +26,7 @@ const ToggleProblem = forwardRef(
 
     const navigateToProblem = (index) => {
       const problemId = problems[index].problemsId
-      navigate(`/problems/${problemId}`)
+      navigate(`/problem-solve/${problemId}`)
       if (isProblemListOpen) {
         toggleProblemList(false)
       }

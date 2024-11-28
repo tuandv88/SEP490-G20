@@ -296,7 +296,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
   }
 
   const getDisplayFields = (testCase) => {
-    return Object.keys(testCase).filter((key) => key !== 'expectedOutput' && key !== 'isHidden')
+    return Object.keys(testCase).filter((key) => key !== 'isHidden')
   }
 
   const currentSolutionResult = testResults && testResults[selectedSolutionIndex]

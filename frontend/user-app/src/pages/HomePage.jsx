@@ -96,7 +96,9 @@ function HomePage() {
           setUserInfo(user.profile)
           // Kiểm tra điều kiện để hiển thị survey
           if (user.profile.issurvey === 'false') {
-            setIsSurveyOpen(true)
+            setTimeout(() => {
+              setIsSurveyOpen(true)
+            }, 3000) // 3000 milliseconds = 3 seconds
           }
         }
       } catch (error) {
@@ -144,7 +146,6 @@ function HomePage() {
         console.error('Error fetching quiz assessment:', error)
       }
     }
-
 
     fetchQuizAssessment()
   }, [])

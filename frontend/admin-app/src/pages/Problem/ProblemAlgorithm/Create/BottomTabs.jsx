@@ -1,4 +1,4 @@
-import { FileText, Code, BookOpen, ArrowLeft, ArrowRight } from 'lucide-react'
+import { FileText, Code, BookOpen, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { ControlledAlertDialog } from '@/components/alert/ControlledAlertDialog'
@@ -9,7 +9,7 @@ const tabs = [
   { id: 'description', label: 'Template', icon: BookOpen }
 ]
 
-export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, isRunSuccess }) {
+export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, isRunSuccess, isLoadingSubmit }) {
   const currentTabIndex = tabs.findIndex((tab) => tab.id === activeTab)
   const isLastTab = currentTabIndex === tabs.length - 1
   const isFirstTab = currentTabIndex === 0
@@ -71,11 +71,27 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, is
             })}
           </div>
 
-          {isLastTab && 
-            <Button disabled={isSaveTemplate === false} type='submit' variant='default' className='flex items-center'>
-              Submit
-            </Button>
-          }
+          {isLastTab && (
+            <>
+              {isLoadingSubmit ? (
+                <>
+                  <Button type='button' disabled={isLoadingSubmit}>
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    Submitting...
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  disabled={isSaveTemplate === false}
+                  type='submit'
+                  variant='default'
+                  className='flex items-center'
+                >
+                  Submit
+                </Button>
+              )}
+            </>
+          )}
 
           {!isLastTab && (
             <Button type='button' variant='ghost' onClick={isRunSuccess === false && activeTab === 'code' ? openDialog : handleNext} className='flex items-center'>

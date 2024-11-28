@@ -39,7 +39,8 @@ function CourseTable() {
     handleScheduledStatusConfirm,
     handleStatusChange,
     selectedCourse,
-    newStatus
+    newStatus,
+    handleLevelChange
   } = useCourseTable()
 
   const handleNewCourse = () => {
@@ -225,10 +226,7 @@ center gap-4 py-4'
       <SchedulePublishDialog
         open={isStatusChangeDialogOpen}
         onOpenChange={setIsStatusChangeDialogOpen}
-        onConfirm={() => {
-          handleScheduledStatusConfirm(selectedCourse, newStatus, scheduledDateTime)
-          setIsStatusChangeDialogOpen(false)
-        }}
+        onConfirm={handleScheduledStatusConfirm}
       />
     </div>
   )

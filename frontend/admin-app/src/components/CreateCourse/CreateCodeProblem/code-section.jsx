@@ -38,7 +38,7 @@ const TestCaseGenerator = ({ testCases, setTestCases }) => {
       acc[param] = ''
       return acc
     }, {})
-    setTestCases([...testCases, { ...newTestCase, expectedOutput: 'N/A', isHidden: false  }])
+    setTestCases([...testCases, { ...newTestCase, expectedOutput: 'N/A', isHidden: false }])
   }
 
   const updateTestCaseValue = (testCaseIndex, param, value) => {
@@ -80,6 +80,9 @@ const TestCaseGenerator = ({ testCases, setTestCases }) => {
     setPreviewOutput(output)
   }, [testCases, params])
 
+  const createTestCaseNoParam = () => {
+    setTestCases([...testCases, { expectedOutput: '', isHidden: false }])
+  }
 
   return (
     <Card className='w-full mx-auto'>
@@ -90,14 +93,18 @@ const TestCaseGenerator = ({ testCases, setTestCases }) => {
       </div>
       <CardFooter className='flex flex-col items-stretch gap-4'>
         <div className='grid grid-cols-3 gap-4'>
-          <div className={`col-span-2 grid  ${testCases.length === 0 ? 'rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center' : 'grid-cols-2 gap-4'}`}>
-            {testCases.length === 0 && <p className='text-center text-gray-500 w-full font-semibold'>No test cases created yet.</p>}
+          <div
+            className={`col-span-2 grid  ${testCases.length === 0 ? 'rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center' : 'grid-cols-2 gap-4'}`}
+          >
+            {testCases.length === 0 && (
+              <p className='text-center text-gray-500 w-full font-semibold'>No test cases created yet.</p>
+            )}
             {testCases.map((testCase, testCaseIndex) => (
               <Card key={testCaseIndex} className='w-full mb-4'>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-semibold'>Test Case {testCaseIndex + 1}</CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-2">
+                  <div className='flex items-center space-x-2'>
+                    <div className='flex items-center space-x-2'>
                       <Label htmlFor={`hidden-toggle-${testCaseIndex}`}>Hidden</Label>
                       <Switch
                         id={`hidden-toggle-${testCaseIndex}`}
@@ -105,40 +112,42 @@ const TestCaseGenerator = ({ testCases, setTestCases }) => {
                         onCheckedChange={() => toggleTestCaseHidden(testCaseIndex)}
                       />
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeTestCase(testCaseIndex)}
-                    >
-                      <X className="h-4 w-4" />
+                    <Button variant='ghost' size='sm' onClick={() => removeTestCase(testCaseIndex)}>
+                      <X className='h-4 w-4' />
                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {Object.entries(testCase).map(([param, value]) => (
-                    param !== 'expectedOutput' && param !== 'isHidden' && (
-                      <div key={param} className="flex items-center gap-2 mb-2">
-                        <Label htmlFor={`${testCaseIndex}-${param}`} className="w-1/3">
-                          <Badge variant="outline" className="mr-2">{param}</Badge>
-                        </Label>
-                        <Input
-                          id={`${testCaseIndex}-${param}`}
-                          value={value}
-                          onChange={(e) => updateTestCaseValue(testCaseIndex, param, e.target.value)}
-                          className="w-2/3"
-                        />
-                      </div>
-                    )
-                  ))}
-                  <div className="flex items-center gap-2 mb-2">
-                    <Label htmlFor={`${testCaseIndex}-expectedOutput`} className="w-1/3">
-                      <Badge variant="outline" className="mr-2">Expected Output</Badge>
+                  {Object.entries(testCase).map(
+                    ([param, value]) =>
+                      param !== 'expectedOutput' &&
+                      param !== 'isHidden' && (
+                        <div key={param} className='flex items-center gap-2 mb-2'>
+                          <Label htmlFor={`${testCaseIndex}-${param}`} className='w-1/3'>
+                            <Badge variant='outline' className='mr-2'>
+                              {param}
+                            </Badge>
+                          </Label>
+                          <Input
+                            id={`${testCaseIndex}-${param}`}
+                            value={value}
+                            onChange={(e) => updateTestCaseValue(testCaseIndex, param, e.target.value)}
+                            className='w-2/3'
+                          />
+                        </div>
+                      )
+                  )}
+                  <div className='flex items-center gap-2 mb-2'>
+                    <Label htmlFor={`${testCaseIndex}-expectedOutput`} className='w-1/3'>
+                      <Badge variant='outline' className='mr-2'>
+                        Expected Output
+                      </Badge>
                     </Label>
                     <Input
                       id={`${testCaseIndex}-expectedOutput`}
                       value={testCase.expectedOutput}
                       onChange={(e) => updateExpectedOutput(testCaseIndex, e.target.value)}
-                      className="w-2/3"
+                      className='w-2/3'
                     />
                   </div>
                 </CardContent>
@@ -155,8 +164,8 @@ const TestCaseGenerator = ({ testCases, setTestCases }) => {
                     onChange={(e) => setNewParam(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        e.preventDefault();
-                        addParam(); 
+                        e.preventDefault()
+                        addParam()
                       }
                     }}
                   />
@@ -179,6 +188,9 @@ const TestCaseGenerator = ({ testCases, setTestCases }) => {
               <CardFooter>
                 <Button type='button' onClick={createTestCase} disabled={params.length === 0} className='w-fit'>
                   Create Test Case
+                </Button>
+                <Button type='button' onClick={createTestCaseNoParam} className='w-fit ml-2'>
+                  Create No Parameters
                 </Button>
               </CardFooter>
             </Card>

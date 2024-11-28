@@ -72,6 +72,7 @@ export const changeCourseLevel = async (courseId, level) => {
 }
 
 export const createCourse = async (courseData) => {
+  console.log(Cookies.get('authToken'))
   try {
     const response = await axiosInstance.post('/learning-service/courses', courseData, {
       headers: {

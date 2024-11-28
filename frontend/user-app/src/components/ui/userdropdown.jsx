@@ -1,40 +1,37 @@
-// // eslint-disable-next-line react/prop-types, no-unused-vars
 import { UserContext } from '@/contexts/UserContext'
-import { useContext } from 'react'
-export default function DropdownMenuUser({ isOpen, userName }) {
-  const menuItems = [
-    { icon: '📋', label: 'My Lists' },
-    { icon: '📓', label: 'Notebook' },
-    { icon: '❓', label: 'Submissions' },
-    { icon: '📊', label: 'Progress' },
-    { icon: '🪙', label: 'Points' }
-  ]
+import { AUTHENTICATION_ROUTERS } from '@/data/constants'
+import authServiceInstance from '@/oidc/AuthService'
+import { useContext, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-// import { UserContext } from '@/contexts/UserContext'
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuGroup,
-//   DropdownMenuItem,
-//   DropdownMenuLabel,
-//   DropdownMenuSeparator,
-//   DropdownMenuShortcut,
-//   DropdownMenuTrigger
-// } from './dropdown-menu'
-// import { Avatar, AvatarFallback, AvatarImage } from './avatar'
-// import { LogOut, Settings, User } from 'lucide-react'
+export default function DropdownMenuUser({ isOpen, userName, onClose }) {
+  const { user } = useContext(UserContext)
+  const navigate = useNavigate()
+  const dropdownRef = useRef(null)
 
-// import { Button } from './button'
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        onClose()
+      }
+    }
 
-  const additionalItems = ['My Profile', 'Settings', 'Sign out']
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
 
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen, onClose])
 
-  const user = useContext(UserContext)
-
-  if (!isOpen) return null
+  if (!isOpen || !user || !user.profile) return null
 
   return (
     <div
+      ref={dropdownRef}
       className='absolute right-0 mt-6 origin-top-left bg-white divide-y divide-gray-100 rounded-md shadow-lg w-72 ring-1 ring-black ring-opacity-5 focus:outline-none'
       role='menu'
       aria-orientation='vertical'
@@ -53,25 +50,11 @@ export default function DropdownMenuUser({ isOpen, userName }) {
         </div>
       </div>
 
-      {/* <div className='py-2'>
-        <div className='grid grid-cols-3 gap-2 px-2'>
-          {menuItems.map((item, index) => (
-            <button
-              key={index}
-              className='flex flex-col items-center justify-center p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:bg-gray-100'
-              role='menuitem'
-            >
-              <span className='mb-1 text-2xl'>{item.icon}</span>
-              <span className='text-xs'>{item.label}</span>
-            </button>
-          ))}
-        </div>
-      </div> */}
-
       <div className='py-1'>
         <button
           onClick={() => {
-            navigate(AR.PROFILE)
+            navigate(AUTHENTICATION_ROUTERS.USERPROFILE)
+            onClose()
           }}
           className='block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
           role='menuitem'
@@ -87,6 +70,10 @@ export default function DropdownMenuUser({ isOpen, userName }) {
         </button>
 
         <button
+          onClick={() => {
+            authServiceInstance.logout()
+            onClose()
+          }}
           className='block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
           role='menuitem'
         >
@@ -96,51 +83,3 @@ export default function DropdownMenuUser({ isOpen, userName }) {
     </div>
   )
 }
-
-// export function DropdownMenuUser({ isOpen }) {
-//   const user = useContext(UserContext)
-
-//   if (!isOpen) return null
-
-//   return (
-//     <DropdownMenu>
-//       <DropdownMenuTrigger asChild>
-//         <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
-//           <Avatar className='h-8 w-8'>
-//             <AvatarImage src={user.profile.urlImagePresigned} />
-//             <AvatarFallback>{user.profile.firstName.charAt(0)}</AvatarFallback>
-//           </Avatar>
-//         </Button>
-//       </DropdownMenuTrigger>
-//       <DropdownMenuContent className='w-56' align='end' forceMount>
-//         <DropdownMenuLabel className='font-normal'>
-//           <div className='flex flex-col space-y-1'>
-//             <p className='text-sm font-medium leading-none'>
-//               {user.profile.firstName + ' ' + user.profile.lastName}
-//             </p>
-//             <p className='text-xs leading-none text-muted-foreground'>{user.profile.email}</p>
-//           </div>
-//         </DropdownMenuLabel>
-//         <DropdownMenuSeparator />
-//         <DropdownMenuGroup>
-//           <DropdownMenuItem>
-//             <User className='mr-2 h-4 w-4' />
-//             <span>Profile</span>
-//             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-//           </DropdownMenuItem>
-//           <DropdownMenuItem>
-//             <Settings className='mr-2 h-4 w-4' />
-//             <span>Settings</span>
-//             <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-//           </DropdownMenuItem>
-//         </DropdownMenuGroup>
-//         <DropdownMenuSeparator />
-//         <DropdownMenuItem>
-//           <LogOut className='mr-2 h-4 w-4' />
-//           <span>Log out</span>
-//           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-//         </DropdownMenuItem>
-//       </DropdownMenuContent>
-//     </DropdownMenu>
-//   )
-// }

@@ -12,7 +12,8 @@ import {
   Map,
   PieChart,
   Settings2,
-  Code
+  Code,
+  CircleHelp
 } from 'lucide-react'
 import { NavMain } from '@/components/nav-main'
 import { NavProjects } from '@/components/nav-projects'
@@ -86,44 +87,24 @@ const data = {
       ]
     },
     {
-      title: 'Competitons',
+      title: 'Quiz',
       url: '#',
-      icon: Bot,
+      icon: CircleHelp,
       items: [
         {
-          title: 'Genesis',
-          url: '#'
-        },
-        {
-          title: 'Explorer',
-          url: '#'
-        },
-        {
-          title: 'Quantum',
-          url: '#'
+          title: 'Quiz Assessment',
+          url: '/quiz-assessment'
         }
       ]
     },
     {
-      title: 'Documentation',
+      title: 'Document',
       url: '#',
       icon: BookOpen,
       items: [
         {
-          title: 'Introduction',
-          url: '#'
-        },
-        {
-          title: 'Get Started',
-          url: '#'
-        },
-        {
-          title: 'Tutorials',
-          url: '#'
-        },
-        {
-          title: 'Changelog',
-          url: '#'
+          title: 'For AI',
+          url: '/document-ai-table'
         }
       ]
     },

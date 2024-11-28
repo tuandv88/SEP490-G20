@@ -41,6 +41,7 @@ export default function LectureList({
           onVideoRemove={() => onVideoRemove(chapterIndex, lectureIndex)}
           setIsUpdateLecture={setIsUpdate}
           isUpdateLecture={isUpdate}
+          courseId={courseId}
         />
       ))}
     </>

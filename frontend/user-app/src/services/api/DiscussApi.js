@@ -91,8 +91,6 @@ export const DiscussApi = {
           discussion.lastName = user.lastName;
         }
 
-
-
         return discussion;
       } else {
         console.error("Dữ liệu trả về không hợp lệ:", response);
@@ -188,6 +186,16 @@ export const DiscussApi = {
     }
   },
 
+  // API: Tạo comment mới
+  removeDiscussionById: async ({ discussionId }) => {
+    try {
+      const response = await axios.delete(`${API_BASE_URL}/community-service/discussions/${discussionId}/remove`, getAuthHeaders());
+      return response.data;
+    } catch (error) {
+      console.error("Error creating comment:", error.message);
+      throw error;
+    }
+  },
 
 };
 
@@ -207,22 +215,5 @@ async function fetchUsers(userIds) {
   }
 }
 
-async function fetchUser(userId) {
-  try {
-
-    // Append the userIds directly to the URL
-    const response = await axios.get(`https://localhost:6005/users/getusers?UserIds=${userId}`);
-
-    if (response && response.data) {
-      return response.data;
-    } else {
-      console.error("Dữ liệu trả về từ API users không hợp lệ.");
-      throw new Error("Dữ liệu trả về từ API users không hợp lệ.");
-    }
-  } catch (error) {
-    console.error("Lỗi khi gọi API users:", error.message);
-    throw error;
-  }
-}
 
 

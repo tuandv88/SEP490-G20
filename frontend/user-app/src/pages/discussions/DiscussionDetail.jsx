@@ -7,6 +7,8 @@ import { faChevronLeft, faEye, faChevronUp, faBookmark, faShareFromSquare, faBel
 import CommentList from "../../components/discussions/CommentList";
 import ReactHtmlParser from 'html-to-react';
 import { marked } from 'marked'; // Import marked library
+import AuthService from '../../oidc/AuthService';
+import Cookies from 'js-cookie';
 
 function DiscussionDetail() {
   const { id } = useParams();
@@ -17,18 +19,34 @@ function DiscussionDetail() {
   const [error, setError] = useState(null);
   const [transitioning, setTransitioning] = useState(false); // Trạng thái chuyển tiếp
   const htmlToReactParser = new ReactHtmlParser.Parser();
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isOwnerDiscussion, setOwnerDiscussion] = useState(null);
+
   useEffect(() => {
     const fetchDiscussion = async () => {
       setLoading(true);
       setError(null);
       try {
+
         const data = await DiscussApi.getDiscussionDetails(id);
         const currentViewTmp = await DiscussApi.updateViewDiscussion({ discussionId: id });
         if (!data) {
           throw new Error("Discussion not found.");
         }
+        const userTmp = await AuthService.getUser();
+        console.log(userTmp);
+        setCurrentUser(userTmp);
+
         setDiscussion(data);
         setCurrentView(currentViewTmp.currentTotalView);
+
+        const currentUserId = userTmp.profile.sub;
+
+        if (currentUserId === data.userId) {
+          setOwnerDiscussion(true);
+        } else {
+          setOwnerDiscussion(false);
+        }
 
       } catch (err) {
         setError(err.message || "Failed to fetch discussion details.");
@@ -54,6 +72,18 @@ function DiscussionDetail() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const handleRemoveDiscussion = async () => {
+    try {
+      setLoading(true);  // Bật trạng thái loading khi gọi API xóa
+      await DiscussApi.removeDiscussionById({ discussionId: id });  // Gọi API xóa thảo luận
+      navigate("/discussions/discuss");  // Sau khi xóa xong, điều hướng tới trang danh sách thảo luận
+    } catch (error) {
+      console.error("Error removing discussion:", error.message);
+    } finally {
+      setLoading(false);  // Tắt trạng thái loading
+    }
   };
 
   if (loading || !transitioning) {
@@ -144,11 +174,17 @@ function DiscussionDetail() {
             </button>
           </div>
 
-          <div className="remove-button">
-            <button className="icon-button-remove">
-              <FontAwesomeIcon icon={faTrash} />
-            </button>
-          </div>
+          {isOwnerDiscussion && (
+            <div className="remove-button">
+              <button
+                className="icon-button-remove"
+                onClick={handleRemoveDiscussion}  // Gọi hàm xử lý khi click
+                disabled={loading}  // Disable nút khi đang loading
+              >
+                <FontAwesomeIcon icon={faTrash} />
+              </button>
+            </div>
+          )}
 
           <div className="bookmark-button">
             <button className="icon-button-bookmark">

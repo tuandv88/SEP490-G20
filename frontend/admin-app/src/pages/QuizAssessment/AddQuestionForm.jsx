@@ -95,7 +95,6 @@ export function AddQuestionForm({ onClose, quizId, onQuestionAdded }) {
 
   const onSubmit = async (data) => {
     setShowErrors(true)
-    console.log('Form errors:', errors)
     if (Object.keys(errors).length > 0) {
       return
     }
@@ -121,9 +120,7 @@ export function AddQuestionForm({ onClose, quizId, onQuestionAdded }) {
       })
       onQuestionAdded() // Call this function to trigger a reload of QuizDetail
       onClose()
-    } catch (error) {
-      console.log('Error creating question:', error)
-    }
+    } catch (error) {}
   }
   return (
     <Dialog open={true} onOpenChange={onClose}>

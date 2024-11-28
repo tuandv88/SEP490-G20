@@ -8,7 +8,7 @@ import FormTabs from './FormTabs'
 import { getProblemDetail, updateProblemAg } from '@/services/api/problemApi'
 import { ToastAction } from '@/components/ui/toast'
 import { useMatch, useNavigate } from '@tanstack/react-router'
-import { updateAgProblemRoute } from '@/routers/router'
+import { updateLectureProblemRoute } from '@/routers/router'
 import { Loading } from '@/components/ui/overlay'
 const UpdateProblemAg = ({}) => {
   const [activeTab, setActiveTab] = useState('basic')
@@ -17,12 +17,14 @@ const UpdateProblemAg = ({}) => {
   const [isRunSuccess, setIsRunSuccess] = useState(false)
   const [problemDetail, setProblemDetail] = useState(null)
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
-
-  const { params } = useMatch(updateAgProblemRoute.id);
-  const { problemId } = params
-
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
   const navigate = useNavigate()
+
+  const { params } = useMatch(updateLectureProblemRoute.id);
+  const { problemId } = params
+  const { lectureId } = params
+  const { courseId } = params
+  console.log('problemId', problemId)
 
   const form = useForm({
     defaultValues: {
@@ -95,6 +97,7 @@ const UpdateProblemAg = ({}) => {
       problem: updatedData
     }
 
+
     setIsLoadingSubmit(true)
     try {
       const response = await updateProblemAg(problemData, problemId)
@@ -103,7 +106,7 @@ const UpdateProblemAg = ({}) => {
         title: 'Update problem successfully',
         description: 'Update problem successfully'
       })
-      navigate({ to: '/problem-table' })
+      navigate({ to: `/edit-curriculum-course/${courseId}` })
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -111,7 +114,7 @@ const UpdateProblemAg = ({}) => {
         description: 'Please try again!',
         action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
       })
-      console.error('Error updating problem:', error)
+      console.error('Error creating problem:', error)
     } finally {
       setIsLoadingSubmit(false)
     }
@@ -119,7 +122,7 @@ const UpdateProblemAg = ({}) => {
 
   return (
     <div className='min-h-screen bg-gray-50'>
-      <Header backTo='Back to Curriculum' />
+      <Header backTo='Back to Curriculum' courseId={courseId} />
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FormTabs

@@ -161,8 +161,8 @@ export default function LectureItem({
       setIsRunning2(false)
     }
   };
-  const handleEditCodeProblem = (problem) => {
-    navigate({ to: `/create-code-problem/${problem.id}` })
+  const handleEditCodeProblem = (problemId) => {
+    navigate({ to: `/update-problem-lecture/course/${courseId}/lecture/${lecture.id}/problem/${problemId}` })
   }
   const handleDeleteCodeProblem = async (problemId) => {
     try {
@@ -489,7 +489,7 @@ export default function LectureItem({
               <div key={codeProblem.id} className='flex items-center p-2 mt-2 bg-white rounded-md'>
                 <CodeIcon className='w-4 h-4 mr-2 text-blue-500' />
                 <span className='flex-grow text-sm truncate'>{codeProblem.title}</span>
-                <Button onClick={() => handleEditCodeProblem()} size='sm' variant='ghost' className='ml-2'>
+                <Button onClick={() => handleEditCodeProblem(codeProblem.id)} size='sm' variant='ghost' className='ml-2'>
                   <PencilIcon className='w-4 h-4 text-blue-500' />
                   <span className='sr-only'>Edit problem</span>
                 </Button>

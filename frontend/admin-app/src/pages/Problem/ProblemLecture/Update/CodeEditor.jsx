@@ -23,12 +23,12 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import TestCaseGenerator from '@/components/CreateCourse/CreateCodeProblem/code-section'
 import { useToast } from '@/hooks/use-toast'
 import { runCode } from '@/services/api/codeApi'
-import { transformTestCases, transformTestScript } from '@/lib/utils'
+import { reverseTransformTestScript, transformTestCases, transformTestCasesUpdate, transformTestScriptUpdate } from '@/lib/utils'
 import TestResultLoading from '@/components/loading/TestResultLoading'
 import { ToastAction } from '@/components/ui/toast'
+import TestCaseGen from './TestCaseGen'
 
 const TestCaseSelector = ({ testCases, selectedIndex, onSelect, failedTestCases = [] }) => (
   <div className='flex items-center gap-2 flex-wrap'>
@@ -121,8 +121,8 @@ const SolutionResult = ({ result }) => (
   </div>
 )
 
-const CodeEditor = ({ form, setIsRunSuccess }) => {
-  const [files, setFiles] = React.useState([{ name: 'Solution.java', content: '' }])
+const CodeEditor = ({ form, setIsRunSuccess, testCaseUpdate, solutionUpdate }) => {
+  const [files, setFiles] = React.useState([{id: null, name: 'Solution.java', content: '' }])
   const [activeFile, setActiveFile] = React.useState('Solution.java')
   const [testContent, setTestContent] = React.useState('')
   const [testCaseTab, setTestCaseTab] = React.useState('testcase')
@@ -133,10 +133,42 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
   const [testResults, setTestResults] = React.useState(null)
   const [isRunning, setIsRunning] = React.useState(false)
 
+
+
+  
+
   const { toast } = useToast()
   const { setValue } = form
 
-  console.log(testCases)
+  React.useEffect(() => {
+    if (testCaseUpdate) {
+      // Chuyển đổi ngược dữ liệu test case
+      const originalTestCases = reverseTransformTestScript(testCaseUpdate);
+      // Gán dữ liệu đã chuyển đổi ngược vào state
+      setTestCases(originalTestCases);
+    }
+  }, [testCaseUpdate]);
+
+
+
+
+  React.useEffect(() => {
+    if (solutionUpdate.solutions && solutionUpdate.solutions.length > 0) {
+      // Chuyển đổi dữ liệu solution từ API về định dạng cần thiết
+      const updatedFiles = solutionUpdate.solutions.map((solution, index) => ({       
+        id: solution.id,
+        name:  index === 0 ? 'Solution.java' : `Solution${index}.java`, // Đặt tên file theo định dạng Solution{index}.java
+        content: solution.solutionCode
+      }));
+      setFiles(updatedFiles);
+      setActiveFile(updatedFiles[0].name); // Đặt file đầu tiên làm file hoạt động
+    }
+
+    if (solutionUpdate.testCode) {
+      setTestContent(solutionUpdate.testCode);
+    }
+  }, [solutionUpdate]);
+
   const handleAddFile = () => {
     const lastFileNumber = Math.max(
       ...files.map((file) => {
@@ -145,7 +177,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
       })
     )
     const newFileName = `Solution${lastFileNumber + 1}.java`
-    setFiles((prev) => [...prev, { name: newFileName, content: '' }])
+    setFiles((prev) => [...prev, { id: null, name: newFileName, content: '' }])
     setActiveFile(newFileName)
     setIsRunSuccess(false)
   }
@@ -209,9 +241,9 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
       }
     }
 
-    console.log(resource)
 
-    const testCase = transformTestCases(testCases)
+    const testCase = transformTestCasesUpdate(testCases)
+
     const createCode = {
       batchCodeExecuteDto: {
         languageCode: 'Java',
@@ -222,7 +254,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
       resourceLimits: resource.resourceLimits
     }
 
-    const testScript = transformTestScript(testCases)
+    const testScript = transformTestScriptUpdate(testCases)
     setValue('testCases', testScript.testCases)
 
     const testScriptDto = [
@@ -233,6 +265,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
         description: '',
         languageCode: 'Java',
         solutions: files.map((file) => ({
+          id: file.id,
           fileName: 'Main.java',
           solutionCode: file.content,
           description: '',
@@ -242,7 +275,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
       }
     ]
 
-    setValue('createTestScriptDto', testScriptDto)
+    setValue('testcripts', testScriptDto)
 
     try {
       const response = await runCode(createCode)
@@ -265,7 +298,6 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
         dto.testResults.some(testResult => !testResult.isPass)
       );
   
-      console.log(response)
       if (hasFailedTestCase) {
         toast({
           variant: 'destructive',
@@ -296,7 +328,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
   }
 
   const getDisplayFields = (testCase) => {
-    return Object.keys(testCase).filter((key) => key !== 'isHidden')
+    return Object.keys(testCase).filter((key) => key !== 'expectedOutput' && key !== 'isHidden' && key !== 'id')
   }
 
   const currentSolutionResult = testResults && testResults[selectedSolutionIndex]
@@ -315,7 +347,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
 
   return (
     <div className='flex flex-col'>
-      <TestCaseGenerator testCases={testCases} setTestCases={setTestCases} />
+      <TestCaseGen testCases={testCases} setTestCases={setTestCases} />
 
       <div className='flex justify-center'>
         <CardHeader>

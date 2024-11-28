@@ -33,8 +33,10 @@ class AuthService {
     })
   }
 
-  login() {
-    return this.userManager.signinRedirect()
+  async login() {
+    await this.userManager.signinRedirect()
+    const user = await this.userManager.getUser()
+    return user
   }
 
   logout() {

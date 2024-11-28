@@ -1,5 +1,5 @@
-import { useNavigate } from "@tanstack/react-router"
 import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router'
 
 export default function Header({ courseId }) {
   const navigate = useNavigate()
@@ -9,7 +9,7 @@ export default function Header({ courseId }) {
         <div className="flex items-center space-x-4">
           <button className="text-black flex items-center hover:text-purple-700" onClick={() => navigate({ to: `/edit-curriculum-course/${courseId}` })}>
             <ArrowLeft className="h-5 w-5 mr-2" />
-            <span>Back to Curriculum</span>
+            <span>Back To Curriculum</span>
           </button>
         </div>       
       </div>

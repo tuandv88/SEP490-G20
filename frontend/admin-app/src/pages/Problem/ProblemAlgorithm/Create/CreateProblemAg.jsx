@@ -13,6 +13,7 @@ const CreateProblemAg = ({ }) => {
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
   const { toast } = useToast();
   const [isRunSuccess, setIsRunSuccess] = useState(false)
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
 
   console.log(isSaveTemplate)
   
@@ -51,6 +52,7 @@ const CreateProblemAg = ({ }) => {
 
     console.log(problemData)
 
+    setIsLoadingSubmit(true)
     try {
       const response = await createProblemAg(problemData)
       toast({
@@ -66,6 +68,8 @@ const CreateProblemAg = ({ }) => {
         action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
       })
       console.error('Error creating problem:', error)
+    } finally {
+      setIsLoadingSubmit(false)
     }
   
   };
@@ -81,6 +85,7 @@ const CreateProblemAg = ({ }) => {
           setActiveTab={setActiveTab}
           isSaveTemplate={isSaveTemplate}
           isRunSuccess={isRunSuccess}
+          isLoadingSubmit={isLoadingSubmit}
         />
         </form>
       </FormProvider>

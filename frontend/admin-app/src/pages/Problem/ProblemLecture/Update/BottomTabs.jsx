@@ -18,10 +18,9 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, is
 
   const openDialog = () => setIsDialogOpen(true)
   const closeDialog = () => setIsDialogOpen(false)
-  const handleConfirm = () => {  
+  const handleConfirm = () => {
     closeDialog()
   }
-
 
   const handlePrevious = () => {
     if (!isFirstTab) {
@@ -56,16 +55,14 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, is
               return (
                 <button
                   type='button'
-                  
                   key={tab.id}
-              
                   className={`
           flex flex-row items-center justify-center px-4 relative
           ${activeTab === tab.id ? 'text-purple-600' : 'text-gray-600 hover:text-gray-900'}
         `}
                 >
                   <Icon className='h-5 w-5 mr-2' />
-                  <span className='text-xs'>{tab.label}</span>                 
+                  <span className='text-xs'>{tab.label}</span>
                 </button>
               )
             })}
@@ -94,20 +91,25 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, is
           )}
 
           {!isLastTab && (
-            <Button type='button' variant='ghost' onClick={isRunSuccess === false && activeTab === 'code' ? openDialog : handleNext} className='flex items-center'>
-            Next
-            <ArrowRight className='h-4 w-4 ml-2' />
-          </Button>
+            <Button
+              type='button'
+              variant='ghost'
+              onClick={isRunSuccess === false && activeTab === 'code' ? openDialog : handleNext}
+              className='flex items-center'
+            >
+              Next
+              <ArrowRight className='h-4 w-4 ml-2' />
+            </Button>
           )}
         </div>
-      </div>   
+      </div>
       <ControlledAlertDialog
         isOpen={isDialogOpen}
         onClose={closeDialog}
         onConfirm={handleConfirm}
-        title="Check the code again!"
-        description="You need to run the code and test case successfully before coming to the next step."
-      />  
+        title='Check the code again!'
+        description='You need to run the code and test case successfully before coming to the next step.'
+      />
     </div>
   )
 }

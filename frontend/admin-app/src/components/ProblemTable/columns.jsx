@@ -11,8 +11,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
+import { useNavigate } from '@tanstack/react-router'
 
 const columnHelper = createColumnHelper()
+
+
 
 export const columns = [
   columnHelper.display({
@@ -79,7 +82,7 @@ export const columns = [
     id: 'actions',
     cell: ({ row }) => {
       const problem = row.original
-
+      const navigate = useNavigate()
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -95,7 +98,7 @@ export const columns = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View problem details</DropdownMenuItem>
-            <DropdownMenuItem>Edit problem</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate({ to: '/update-problem/$problemId', params: { problemId: problem.problemsId } })}>Edit problem</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

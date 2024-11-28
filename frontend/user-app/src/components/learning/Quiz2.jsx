@@ -14,8 +14,12 @@ export default function QuizComponent({ quiz }) {
   const [isQuizStarted, setIsQuizStarted] = useState(false)
   const [quizData, setQuizData] = useState(null)
   const [quizSubmission, setQuizSubmission] = useState(null)
+
+  console.log('q: ', quiz)
+
   useEffect(() => {
     const fetchQuizSubmission = async () => {
+      //if (!isQuizStarted) return // Chỉ gọi khi quiz đã bắt đầu
       try {
         const quizSubmission = await QuizAPI.getQuizSubmission(quiz.id)
         console.log('Quiz Submission: ', quizSubmission.quizSubmissions)
@@ -25,17 +29,18 @@ export default function QuizComponent({ quiz }) {
       }
     }
     fetchQuizSubmission()
-  }, [quizData])
+  }, [isQuizStarted]) // Chỉ chạy khi `isQuizStarted` thay đổi
 
   const startQuiz = async () => {
-    setIsQuizStarted(true)
-    handleStartQuiz()
     try {
-      const quizDetails = await QuizAPI.getQuizDetails(quiz.id)
+      // Bắt đầu quiz
+      await handleStartQuiz()
 
+      // Sau khi quiz được bắt đầu (isQuizStarted được cập nhật), lấy chi tiết quiz
+      const quizDetails = await QuizAPI.getQuizDetails(quiz.id)
       setQuizData(quizDetails)
     } catch (error) {
-      console.error('Error fetching quiz details:', error)
+      console.error('Error starting or fetching quiz details:', error)
     }
   }
 
@@ -43,9 +48,18 @@ export default function QuizComponent({ quiz }) {
     try {
       const response = await QuizAPI.startQuiz(quiz.id)
       console.log('Quiz Started: ', response)
+
+      // Đặt trạng thái quiz đã bắt đầu
+      setIsQuizStarted(true)
     } catch (error) {
       console.error('Error starting quiz:', error)
+      throw error // Đảm bảo lỗi được trả về để xử lý trong `startQuiz`
     }
+  }
+
+  const handleCloseQuiz = () => {
+    setIsQuizStarted(false)
+    // Không cần gọi fetchQuizSubmission ở đây nếu đã gọi trong startQuiz
   }
 
   return (
@@ -82,7 +96,7 @@ export default function QuizComponent({ quiz }) {
       </div>
 
       {isQuizStarted && quizData && (
-        <QuizPopup quiz={quizData.quiz} answer={quizData.answer} onClose={() => setIsQuizStarted(false)} />
+        <QuizPopup quiz={quizData.quiz} answer={quizData.answer} onClose={() => handleCloseQuiz()} />
       )}
     </div>
   )

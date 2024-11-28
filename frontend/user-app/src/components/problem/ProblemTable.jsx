@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { Check, Star } from 'lucide-react'
 import {
   Pagination,
@@ -11,9 +10,17 @@ import {
 } from '@/components/ui/pagination'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useNavigate } from 'react-router-dom'
 
 function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
-  // Pagination logic remains the same
+
+  const navigate = useNavigate()
+
+  const handleSolveChallenge = (problemId) => {
+    navigate(`/problems/${problemId}`)
+  }
+
+
   const renderPaginationItems = () => {
     const items = []
     const maxVisible = 5
@@ -90,16 +97,12 @@ function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
   return (
     <div className='space-y-4'>
       {problems.map((problem) => (
-        <div key={problem.id} className='flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm'>
+        <div key={problem.problemsId} className='flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm'>
           <div className='flex-1 space-y-1'>
             <div className='flex items-center gap-2'>
               <h3 className='font-semibold hover:text-blue-500'>
                 <a href='#'>{problem.title}</a>
               </h3>
-              {/* <Button variant='ghost' size='icon' className='h-8 w-8 text-muted-foreground hover:text-primary'>
-                <Star className='h-4 w-4' />
-                <span className='sr-only'>Favorite</span>
-              </Button> */}
             </div>
             <div className='flex items-center gap-2 text-sm'>
               <span
@@ -112,10 +115,8 @@ function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
               >
                 {problem.difficulty}
               </span>
-              {/* <span className='text-muted-foreground'>{problem.tags?.[0]}</span> */}
-              {/* {problem.tags?.[1] && <span className='text-muted-foreground'>({problem.tags[1]})</span>} */}
               <span className='text-muted-foreground'>Max Score: {problem.maxScore || 10}</span>
-              {/* <span className='text-muted-foreground'>Success Rate: {problem.acceptance}</span> */}
+              <span className='text-muted-foreground'>Acceptance: {problem.acceptance === -1 ? '0%' : `${problem.acceptance}%`}</span>
             </div>
           </div>
           <div className='flex items-center gap-4'>
@@ -124,7 +125,7 @@ function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
                 <Check className='h-5 w-5' />
               </div>
             )}
-            <Button className='h-9' variant='outline'>
+            <Button className='h-9' variant='outline' onClick={() => handleSolveChallenge(problem.problemsId)}>
               Solve Challenge
             </Button>
           </div>

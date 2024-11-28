@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useContext } from 'react'
 import { Bell, /*User*/ Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import DropdownMenuUser from '@/components/ui/userdropdown'
 import { ModeToggle } from '@/components/mode-toggle'
 import AuthService from '@/oidc/AuthService'
+import { UserContext } from '@/contexts/UserContext'
 
 export default function Header() {
   const [isLoggedIn /*setIsLoggedIn*/] = useState(false) // Set to true for demonstration
@@ -14,9 +15,11 @@ export default function Header() {
   const [isHidden, setIsHidden] = useState(false)
   const [lastScrollTop, setLastScrollTop] = useState(0)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null)
 
   const dropdownRef = useRef(null)
+
+  const user = useContext(UserContext)
 
   // Handle scroll hide/show
   const handleScroll = useCallback(() => {
@@ -53,13 +56,6 @@ export default function Header() {
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
 
 
-  useEffect(() => {
-    AuthService.getUser().then((user) => {
-      setUser(user);
-      // console.log(user.profile);
-    });
-  }, []);
-
   return (
     <header
       className={`bg-background text-foreground shadow-md fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isHidden ? 'hidden' : 'top-0'}`}
@@ -76,19 +72,9 @@ export default function Header() {
                   HomePage
                 </Link>
               </li>
-              {/* <li>
-                <Link to={AR.CODE} className='text-lg hover:text-primary hover:font-bold'>
-                  Code
-                </Link>
-              </li> */}
               <li>
                 <Link to={AR.COURSELIST} className='text-lg hover:text-primary hover:font-bold'>
                   Course
-                </Link>
-              </li>
-              <li>
-                <Link href='/contests' className='text-lg hover:text-primary hover:font-bold'>
-                  Competition
                 </Link>
               </li>
               <li>
@@ -109,7 +95,7 @@ export default function Header() {
             </ul>
           </nav>
           <div className='flex items-center space-x-4'>
-            {isLoggedIn ? (
+            {user ? (
               <div className='flex items-center space-x-3'>
                 <Button variant='ghost' size='icon' className='hidden md:inline-flex'>
                   <Bell className='w-5 h-5' />
@@ -117,10 +103,7 @@ export default function Header() {
                 <div className='relative flex items-center' ref={dropdownRef}>
                   <div onClick={toggleDropdown} className='cursor-pointer'>
                     <Avatar>
-                      <AvatarImage
-                        src='https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?height=32&width=32'
-                        alt='User Avatar'
-                      />
+                      <AvatarImage src={user.profile.urlImagePresigned} alt='User Avatar' />
                       <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                   </div>
@@ -129,7 +112,7 @@ export default function Header() {
                       <DropdownMenuUser
                         isOpen={isDropdownOpen}
                         onClose={() => setIsDropdownOpen(false)}
-                        userName='Nguyen Bao Lam'
+                        userName={user.profile.firstName + ' ' + user.profile.lastName}
                       />
                     </div>
                   )}
@@ -137,11 +120,15 @@ export default function Header() {
               </div>
             ) : (
               <div className='hidden md:block'>
-                { user ? (<Button variant='outline' className='mr-2' onClick={() => AuthService.logout()}>
-                  Logout
-                </Button>) : (<Button variant='outline' className='mr-2' onClick={() => AuthService.login()}>
-                  Login
-                </Button>) }                            
+                {user ? (
+                  <Button variant='outline' className='mr-2' onClick={() => AuthService.logout()}>
+                    Logout
+                  </Button>
+                ) : (
+                  <Button variant='outline' className='mr-2' onClick={() => AuthService.login()}>
+                    Login
+                  </Button>
+                )}
               </div>
             )}
             {/* Add the ModeToggle button here */}
@@ -189,7 +176,7 @@ export default function Header() {
                   </li>
                   <li>
                     <Button className='w-full'>Register</Button>
-                  </li>                                  
+                  </li>
                 </>
               )}
             </ul>

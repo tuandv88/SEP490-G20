@@ -71,5 +71,11 @@ export const QuizAPI = {
       headers: { Authorization: `Bearer ${Cookies.get('authToken')}` }
     })
     return response.data
+  },
+  getQuizAssessment: async () => {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/quizs/assessment`, {
+      headers: { Authorization: `Bearer ${Cookies.get('authToken')}` }
+    })
+    return response.data
   }
 }

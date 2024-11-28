@@ -4,6 +4,7 @@ using AI.Application.Models.Messages.Commands;
 using AI.Application.Models.Messages.Dtos;
 using Mapster;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace AI.API.Hubs;

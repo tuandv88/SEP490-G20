@@ -1,4 +1,5 @@
 ﻿using Community.Application.Models.Discussions.Dtos;
+using Community.Domain.Models;
 
 namespace Community.Application.Extensions;
 
@@ -31,7 +32,7 @@ public static class DiscussionExtensions
             DateUpdated: discussion.DateUpdated,
             Tags: discussion.Tags,
             ViewCount: (long)discussion.ViewCount,
-            VoteCount: (long)discussion.Votes.Count,
+            VoteCount: (long) VoteExtensions.CalculateTotalVotes(discussion),
             CommentCount: discussion.Comments.Count,
             Pinned: discussion.Pinned,
             Closed: discussion.Closed,
@@ -57,7 +58,7 @@ public static class DiscussionExtensions
             DateUpdated: discussion.DateUpdated,
             Tags: discussion.Tags,
             ViewCount: (long)discussion.ViewCount,
-            VoteCount: (long)discussion.Votes.Count,
+            VoteCount: (long)VoteExtensions.CalculateTotalVotes(discussion),
             CommentCount: (long)discussion.Comments.Count,
             Pinned: discussion.Pinned,
             Closed: discussion.Closed,
@@ -71,25 +72,29 @@ public static class DiscussionExtensions
     }
 
     public static async Task<List<DiscussionsTopDto>> ToDiscussionsTopDtoListAsync(
-            this List<Discussion> discussions,
-            IFilesService filesService) // Thêm CategoryRepository để truy vấn Category
+    this List<Discussion> discussions,
+    IFilesService filesService) // Thêm CategoryRepository để truy vấn Category
     {
         var tasks = discussions.Select(async d =>
         {
             var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, d.ImageUrl, 60);
+
+            // Cắt Description nếu nó dài hơn 50 ký tự
+            var shortDescription = d.Description.Length > 50 ? d.Description.Substring(0, 50) + "...." : d.Description;
+
             return new DiscussionsTopDto(
                 CategoryId: d.CategoryId.Value,
                 UserId: d.UserId.Value,
                 Id: d.Id.Value,
                 Title: d.Title,
-                Description: d.Description,
+                Description: shortDescription,  // Gán description đã được cắt
                 ImageUrl: imageUrl.PresignedUrl!,
                 DateCreated: d.DateCreated,
                 DateUpdated: d.DateUpdated,
                 Tags: d.Tags,
                 Pinned: d.Pinned,
                 ViewCount: (long)d.ViewCount,
-                VoteCount: (long)d.Votes.Count,
+                VoteCount: (long)VoteExtensions.CalculateTotalVotes(d),
                 CommentCount: (long)d.Comments.Count,
                 Closed: d.Closed,
                 EnableNotification: d.NotificationsEnabled,

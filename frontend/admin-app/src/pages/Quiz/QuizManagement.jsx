@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useMatch } from '@tanstack/react-router'
@@ -59,7 +57,7 @@ export default function QuizManagement() {
     }))
     setIsUpdate(!isUpdate)
   }
-  
+
   const handleDeleteQuestion = async (questionId) => {
     try {
       await deleteQuestion(quizId, questionId)
@@ -207,8 +205,12 @@ export default function QuizManagement() {
             </div>
           </CardContent>
         </Card>
-        <Button className="mt-4 w-full" onClick={() => setShowAddQuestionForm(true)}>Add Question Normal</Button>
-        <Button className="mt-4 w-full" onClick={() => setIsFullScreenPopupOpen(true)}>Create Problem Quiz</Button>
+        <Button className='mt-4 w-full' onClick={() => setShowAddQuestionForm(true)}>
+          Add Question Normal
+        </Button>
+        <Button className='mt-4 w-full' onClick={() => setIsFullScreenPopupOpen(true)}>
+          Create Problem Quiz
+        </Button>
 
         <Card className='md:col-span-2'>
           <CardHeader className='flex flex-row items-center justify-between'>

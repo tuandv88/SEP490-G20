@@ -3,12 +3,40 @@ import Cookies from 'js-cookie'
 
 export const getProblems = async (pageIndex, pageSize) => {
   try {
-    const response = await axiosInstance.post(
-      `/learning-service/problems?LectureId=${lectureId}`,
-      problemData,
+    const response = await axiosInstance.post(`/learning-service/problems?LectureId=${lectureId}`, problemData, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error create problem:', error)
+    throw error
+  }
+}
+
+export const deleteProblemAg = async (problemId) => {
+  try {
+    const response = await axiosInstance.delete(`/learning-service/problems/${problemId}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error delete problem:', error)
+    throw error
+  }
+}
+
+export const getProblemAg = async (pageIndex, pageSize) => {
+  try {
+    const response = await axiosInstance.get(
+      `/learning-service/problems?PageIndex=${pageIndex}&PageSize=${pageSize}`,
+      {},
       {
         headers: {
-          'Authorization': `Bearer ${Cookies.get('authToken')}`
+          Authorization: `Bearer ${Cookies.get('authToken')}`
         }
       }
     )
@@ -21,15 +49,11 @@ export const getProblems = async (pageIndex, pageSize) => {
 
 export const createProblemAg = async (problemData) => {
   try {
-    const response = await axiosInstance.post(
-      `/learning-service/problems`,
-      problemData,
-      {
-        headers: {
-          'Authorization': `Bearer ${Cookies.get('authToken')}`
-        }
+    const response = await axiosInstance.post(`/learning-service/problems`, problemData, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
-    )
+    })
     return response.data
   } catch (error) {
     console.error('Error create problem:', error)
@@ -37,18 +61,13 @@ export const createProblemAg = async (problemData) => {
   }
 }
 
-
 export const createProblemLecture = async (problemData, lectureId) => {
   try {
-    const response = await axiosInstance.post(
-      `/learning-service/problems?LectureId=${lectureId}`,
-      problemData,
-      {
-        headers: {
-          'Authorization': `Bearer ${Cookies.get('authToken')}`
-        }
+    const response = await axiosInstance.post(`/learning-service/problems?LectureId=${lectureId}`, problemData, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
-    )
+    })
     return response.data
   } catch (error) {
     console.error('Error create problem:', error)
@@ -60,7 +79,7 @@ export const getProblemDetail = async (problemId) => {
   try {
     const response = await axiosInstance.get(`/learning-service/problems/${problemId}/details`, {
       headers: {
-        'Authorization': `Bearer ${Cookies.get('authToken')}`
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
 
@@ -75,7 +94,7 @@ export const updateProblemAg = async (problemData, problemId) => {
   try {
     const response = await axiosInstance.put(`/learning-service/problems/${problemId}`, problemData, {
       headers: {
-        'Authorization': `Bearer ${Cookies.get('authToken')}`
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
     return response.data

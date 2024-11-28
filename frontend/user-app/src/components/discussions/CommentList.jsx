@@ -16,6 +16,7 @@ function CommentList({ discussionId }) {
   const [totalCommnents, setTotalComments] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [voteCount, setVoteCount] = useState(0);
   const [pagination, setPagination] = useState({
     pageIndex: 1,
     pageSize: 3,
@@ -41,6 +42,7 @@ function CommentList({ discussionId }) {
           setComments(updatedComments);
           setPagination(newPagination);
           setTotalComments(totalComments);
+
         } else {
           throw new Error("Invalid comments or pagination data.");
         }
@@ -129,42 +131,63 @@ function CommentList({ discussionId }) {
     return distance;
   };
 
+  const handleVote = async (voteType, commentId) => {
+    try {
 
-  if (loading) {
-    return (
-      <>
-        <div className="loader-container">
-          <div className="loader"></div>
-        </div>
-        <style jsx>{`
-          .loader-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 9999;
-          }
+      console.log(commentId);
+      // Gọi API để tạo phiếu bầu
+      const response = await DiscussApi.createVoteComment({
+        discussionId: null, // Thêm discussionId nếu cần
+        commentId: commentId,
+        voteType: voteType,
+        isActive: true, // Hoặc false nếu cần
+      });
 
-          .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1e334a;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-          }
+      if (response) {
+        // Cập nhật lại số lượng vote sau khi thực hiện hành động
+        setVoteCount(prevCount => voteType === 'Like' ? prevCount + 1 : prevCount - 1);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-      </>
-    );
-  }
+
+  // if (loading) {
+  //   return (
+  //     <>
+  //       <div className="loader-container">
+  //         <div className="loader"></div>
+  //       </div>
+  //       <style jsx>{`
+  //         .loader-container {
+  //           display: flex;
+  //           justify-content: center;
+  //           align-items: center;
+  //           position: fixed;
+  //           top: 50%;
+  //           left: 50%;
+  //           transform: translate(-50%, -50%);
+  //           z-index: 9999;
+  //         }
+
+  //         .loader {
+  //           border: 4px solid #f3f3f3;
+  //           border-top: 4px solid #1e334a;
+  //           border-radius: 50%;
+  //           width: 30px;
+  //           height: 30px;
+  //           animation: spin 1s linear infinite;
+  //         }
+
+  //         @keyframes spin {
+  //           0% { transform: rotate(0deg); }
+  //           100% { transform: rotate(360deg); }
+  //         }
+  //       `}</style>
+  //     </>
+  //   );
+  // }
 
   if (error) {
     return (
@@ -251,11 +274,19 @@ function CommentList({ discussionId }) {
 
                 {/* Vote Section */}
                 <div className="comment-item__vote">
-                  <button className="vote-icon">
+                  <button
+                    className="vote-icon"
+                    onClick={() => handleVote('Like', comment.id)} // Truyền comment.id vào
+                  >
                     <FontAwesomeIcon icon={faChevronUp} />
                   </button>
-                  <span className="comment-item__vote-count">1111</span>
-                  <button className="vote-icon">
+                  <span className="comment-item__vote-count">
+                    {comment.totalVote}
+                  </span>
+                  <button
+                    className="vote-icon"
+                    onClick={() => handleVote('Dislike', comment.id)} // Truyền comment.id vào
+                  >
                     <FontAwesomeIcon icon={faChevronDown} />
                   </button>
                 </div>

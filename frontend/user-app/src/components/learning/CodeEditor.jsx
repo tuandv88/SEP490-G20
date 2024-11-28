@@ -70,9 +70,9 @@ const CodeEditor = ({
       const data = await LearningAPI.excuteCode(problemId, submissionData)
       setResponse(data)
       setCodeResponse(data)
+      console.log('data', data)
     } catch (error) {
       console.error('Error submitting code:', error)
-      alert('Error occurred while submitting code')
     } finally {
       setLoading(false)
     }

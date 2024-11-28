@@ -64,7 +64,7 @@ function PostList({ categoryId }) {
 
   const handleFilterClick = (filter) => {
     setOrderBy(filter);
-    setPageIndex(1);
+    handlePageChange(1);
   };
 
   const handlePageChange = (event, value) => {
@@ -139,7 +139,7 @@ function PostList({ categoryId }) {
             className="search-input"
           />
 
-          <button className="new-button" onClick={() => navigate("/createpost")}>
+          <button className="new-button" onClick={() => navigate("/discussions/creatediscussion")}>
             New +
           </button>
         </div>

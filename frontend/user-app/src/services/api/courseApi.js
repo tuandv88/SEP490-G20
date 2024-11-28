@@ -5,6 +5,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL
 export const CourseAPI = {
   getEnrolledCourses: async (courseId) => {
     const response = await axios.get(`${API_BASE_URL}/learning-service/courses/${courseId}/enrollment/info`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${Cookies.get('authToken')}`

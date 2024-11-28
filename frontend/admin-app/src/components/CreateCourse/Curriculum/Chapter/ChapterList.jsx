@@ -9,39 +9,30 @@ export default function ChapterList({
   onEditChapter,
   onDeleteChapter,
   onAddLecture,
-  onEditLecture,
+  onUpdateLecture,
   onDeleteLecture,
-  onFileUpload,
-  onVideoUpload,
-  onFileRemove,
-  onVideoRemove,
   setIsUpdate,
   isUpdate
 }) {
-  console.log(curriculum)
   return curriculum.map((chapter, chapterIndex) => (
     <Card key={chapterIndex} className='w-full p-6 mb-6'>
       <div className='max-h-[300px] overflow-y-auto'>
         <ChapterHeader
           chapter={chapter.chapterDto}
-          onEdit={() => onEditChapter(chapterIndex)}
-          onDelete={() => onDeleteChapter(chapterIndex)}
+          onEdit={() => onEditChapter(chapter.chapterDto.id)}
+          onDelete={() => onDeleteChapter(chapter.chapterDto.id)}
         />
         <LectureList
           chapterId={chapter.chapterDto.id}
           lectures={chapter.lectureDtos}
           chapterIndex={chapterIndex}
           onAddLecture={() => onAddLecture(chapter.chapterDto.id)}
-          onEditLecture={(lecture, lectureIndex) => onEditLecture(lecture, chapterIndex, lectureIndex)}
-          onDeleteLecture={(lectureIndex) => onDeleteLecture(chapterIndex, lectureIndex)}
-          onFileUpload={(file, lectureIndex) => onFileUpload(file, chapterIndex, lectureIndex)}
-          onVideoUpload={(file, lectureIndex) => onVideoUpload(file, chapterIndex, lectureIndex)}
-          onFileRemove={(lectureIndex) => onFileRemove(chapterIndex, lectureIndex)}
-          onVideoRemove={(lectureIndex) => onVideoRemove(chapterIndex, lectureIndex)}
+          onUpdateLecture={onUpdateLecture}
+          onDeleteLecture={onDeleteLecture}
+          courseId={courseId}
           setIsUpdate={setIsUpdate}
           isUpdate={isUpdate}
-          courseId={courseId}
-        />  
+        />
       </div>
     </Card>
   ))

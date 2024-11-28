@@ -17,7 +17,7 @@ function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
   const navigate = useNavigate()
 
   const handleSolveChallenge = (problemId) => {
-    navigate(`/problems/${problemId}`)
+    navigate(`/problem-solve/${problemId}`)
   }
 
 

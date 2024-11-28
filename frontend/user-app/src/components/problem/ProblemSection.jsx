@@ -2,6 +2,8 @@ import { ProblemAPI } from '@/services/api/problemApi'
 import { AlgorithmList } from '../problem_discuss/AlgorithmList'
 import { DiscussionList } from '../problem_discuss/DiscussionList'
 import { Button } from '../ui/button'
+import { useNavigate } from 'react-router-dom'
+import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 
 export const algorithms = [
   {
@@ -86,7 +88,7 @@ export const discussions = [
 ]
 
 export function ProblemSection({}) {
-    
+  const navigate = useNavigate()
 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
@@ -94,7 +96,9 @@ export function ProblemSection({}) {
         <div className='rounded-lg shadow-sm p-6'>
           <div className='flex justify-between items-center mb-6'>
             <h2 className='text-2xl font-bold text-gray-900'>Practice Problems</h2>
-            <Button variant='outline'>View All Problems</Button>
+            <Button onClick={() => navigate(AUTHENTICATION_ROUTERS.PROBLEMS)} variant='outline'>
+              View All Problems
+            </Button>
           </div>
 
           <div className='flex gap-4 mt-2'>

@@ -54,7 +54,9 @@ public class Course : Aggregate<CourseId> {
     public void UpdateOrderIndex(int orderIndex) {
         OrderIndex = orderIndex;
     }
-
+    public void UpdateTimeEstimation(double timeEstimation) { 
+        TimeEstimation = timeEstimation;
+    }
     public void UpdateStatus(CourseStatus status) {
         if(CourseStatus == CourseStatus.Scheduled && status != CourseStatus.Scheduled) {
             //Hủy lập lịch nếu khóa đó đã được lập lịch

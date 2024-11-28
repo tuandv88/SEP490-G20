@@ -4,10 +4,8 @@ namespace Learning.Application.Models.Courses.Queries.GetCourses;
 public record GetCoursesQuery(PaginationRequest PaginationRequest, GetCourseFilter Filter) : IQuery<GetCoursesResult>;
 public record GetCoursesResult(PaginatedResult<CourseDto> CourseDtos);
 public record GetCourseFilter(string? SearchString);
-public class GetCoursesValidator : AbstractValidator<GetCoursesQuery>
-{
-    public GetCoursesValidator()
-    {
+public class GetCoursesValidator : AbstractValidator<GetCoursesQuery> {
+    public GetCoursesValidator() {
         RuleFor(x => x.PaginationRequest.PageIndex)
             .GreaterThanOrEqualTo(1)
             .WithMessage("PageIndex must be greater than or equal to 1.");

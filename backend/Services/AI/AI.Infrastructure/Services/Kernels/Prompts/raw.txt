@@ -1,4 +1,4 @@
-﻿Facts:
+Facts:
 {{$facts}}
 ======
 Attributes (use only if necessary):

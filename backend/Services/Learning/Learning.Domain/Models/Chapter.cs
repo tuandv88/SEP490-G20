@@ -1,4 +1,6 @@
 ﻿
+using Learning.Domain.Events;
+
 namespace Learning.Domain.Models;
 public class Chapter : Aggregate<ChapterId> {
     public List<Lecture> Lectures = new();
@@ -23,13 +25,18 @@ public class Chapter : Aggregate<ChapterId> {
 
     public void AddLecture(Lecture lecture) {
         Lectures.Add(lecture);
+        lecture.AddDomainEvent(new LectureUpdateTimeEstimationEvent(CourseId));
+        TimeEstimation += lecture.TimeEstimation;
     }
     public Lecture UpdateLecture(LectureId lectureId, string title, string summary, double timeEstimation, LectureType lectureType, int point, bool isFree) {
         var lecture = Lectures.FirstOrDefault(l => l.Id == lectureId);
         if (lecture == null) {
             throw new NotFoundException("Lecture not found", lectureId.Value);
         }
-
+        if(lecture.TimeEstimation != timeEstimation) {
+            lecture.AddDomainEvent(new LectureUpdateTimeEstimationEvent(CourseId));
+            TimeEstimation = TimeEstimation - lecture.TimeEstimation + timeEstimation;
+        }
         lecture.Title = title;
         lecture.Summary = summary;
         lecture.TimeEstimation = timeEstimation;
@@ -45,12 +52,16 @@ public class Chapter : Aggregate<ChapterId> {
             throw new NotFoundException("Lecture not found", lectureId.Value);
         }
         Lectures.Remove(lecture);
+        lecture.AddDomainEvent(new LectureUpdateTimeEstimationEvent(CourseId));
+        TimeEstimation -= lecture.TimeEstimation;
         return lecture;
     }
     public List<Lecture> DeleteLectures() {
         var deletedLectures = new List<Lecture>();
         Lectures.ForEach(lecture => {
             deletedLectures.Add(lecture);
+            lecture.AddDomainEvent(new LectureUpdateTimeEstimationEvent(CourseId));
+            TimeEstimation -= lecture.TimeEstimation;
         });
         Lectures.Clear();
         return deletedLectures;

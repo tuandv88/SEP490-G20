@@ -1,4 +1,5 @@
 ﻿
+
 namespace Learning.Infrastructure.Data.Repositories.Courses;
 public class CachedCourseRepository(ICourseRepository repository, ICacheService cacheService) : ICourseRepository {
     public async Task AddAsync(Course entity) {
@@ -23,6 +24,10 @@ public class CachedCourseRepository(ICourseRepository repository, ICacheService 
         //Xóa cached
         DeleteCached(CacheKey.COURSES);
         DeleteCached(string.Format(CacheKey.COURSES_DETAILS, id));
+    }
+
+    public IQueryable<Course> GetAllAsQueryable() {
+        return repository.GetAllAsQueryable();
     }
 
     public async Task<List<Course>> GetAllAsync() {

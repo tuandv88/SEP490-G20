@@ -59,22 +59,21 @@ public static class ProblemExtensions {
             .ToList();
 
         if (problemSubmisstionOfUser.Any()) {
-            if (problemSubmisstionOfUser.Any(submission =>
-                submission.TestResults.All(test => test.IsPass))) {
+            if (problemSubmisstionOfUser.Any(submission => submission.Status.Description == SubmissionConstant.Accepted)) {
                 status = ProblemListStatus.SOLVED;
             } else {
                 status = ProblemListStatus.ATTEMPTED;
             }
         }
 
-        float acceptance = -1f;
+        double acceptance = -1f;
 
         int totalSubmissions = problem.ProblemSubmissions.Count;
         int passedSubmissions = problem.ProblemSubmissions
-            .Count(submission => submission.TestResults.All(test => test.IsPass));
+            .Count(submission => submission.Status.Description == SubmissionConstant.Accepted);
 
         if (totalSubmissions > 0) {
-            acceptance = (float)passedSubmissions / totalSubmissions;
+            acceptance = Math.Round((float)passedSubmissions / totalSubmissions * 100, 2);
         }
 
         var problemListDto = new ProblemListDto(

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, DollarSign, ChevronRight, BookOpen, Target, X } from 'lucide-react';
 
 
-export default function CourseStep({ step, index }) {
+export default function CourseStep({ step, index, course }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -14,8 +14,8 @@ export default function CourseStep({ step, index }) {
         <div className="flex-1">
           <div className="flex justify-between items-start">
             <div>
-              <h4 className="font-semibold text-lg">{step.title}</h4>
-              <p className="text-gray-600 text-sm mb-2">{step.headline}</p>
+              <h4 className="font-semibold text-lg">{course?.title || 'Course Title'}</h4>
+              <p className="text-gray-600 text-sm mb-2">{course?.headline || 'Course Headline'}</p>
             </div>
             <button
               onClick={() => setIsModalOpen(true)}
@@ -27,11 +27,11 @@ export default function CourseStep({ step, index }) {
           <div className="flex gap-4 text-sm text-gray-500">
             <span className="flex items-center gap-1">
               <Clock size={16} />
-              {step.timeDuration}
+              {course?.timeEstimation || 'N/A'} hours
             </span>
             <span className="flex items-center gap-1">
               <DollarSign size={16} />
-              ${step.price}
+              ${course?.price || 'Free'}
             </span>
           </div>
         </div>
@@ -43,8 +43,8 @@ export default function CourseStep({ step, index }) {
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h3 className="text-2xl font-bold">{step.title}</h3>
-                  <p className="text-gray-600">{step.headline}</p>
+                  <h3 className="text-2xl font-bold">{course?.title || 'Course Title'}</h3>
+                  <p className="text-gray-600">{course?.headline || 'Course Headline'}</p>
                 </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
@@ -60,14 +60,14 @@ export default function CourseStep({ step, index }) {
                     <Clock size={18} />
                     Duration
                   </span>
-                  <p className="font-semibold">{step.timeDuration}</p>
+                  <p className="font-semibold">{course?.timeEstimation || 'N/A'} hours</p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <span className="flex items-center gap-2 text-gray-600 mb-2">
                     <DollarSign size={18} />
                     Price
                   </span>
-                  <p className="font-semibold">${step.price}</p>
+                  <p className="font-semibold">${course?.price || 'N/A'}</p>
                 </div>
               </div>
 
@@ -77,7 +77,7 @@ export default function CourseStep({ step, index }) {
                     <BookOpen size={18} className="text-red-500" />
                     Course Description
                   </h4>
-                  <p className="text-gray-600">{step.description}</p>
+                  <p className="text-gray-600">{course?.description || 'No description available.'}</p>
                 </div>
 
                 <div>
@@ -86,10 +86,10 @@ export default function CourseStep({ step, index }) {
                     Topics Covered
                   </h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {step.topics?.map((topic, i) => (
+                    {course?.chapters?.map((chapter, i) => (
                       <li key={i} className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />
-                        {topic}
+                        {chapter.title}
                       </li>
                     ))}
                   </ul>
@@ -98,12 +98,12 @@ export default function CourseStep({ step, index }) {
                 <div>
                   <h4 className="font-semibold mb-3">Skills You'll Gain</h4>
                   <div className="flex flex-wrap gap-2">
-                    {step.skills?.map((skill, i) => (
+                    {course?.objectives?.split('\n').map((objective, i) => (
                       <span
                         key={i}
                         className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-sm"
                       >
-                        {skill}
+                        {objective}
                       </span>
                     ))}
                   </div>

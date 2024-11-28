@@ -17,7 +17,6 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const dropdownRef = useRef(null)
-   console.log(user)
 
   // Handle scroll hide/show
   const handleScroll = useCallback(() => {

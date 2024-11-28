@@ -99,7 +99,7 @@ function HomePage() {
           if (user.profile.issurvey === 'false') {
             setTimeout(() => {
               setIsSurveyOpen(true)
-              // updateSurveyStatus()
+              updateSurveyStatus()
             }, 3000)
           }
         }
@@ -107,13 +107,17 @@ function HomePage() {
         console.error('Error fetching user info:', error)
       }
     }
-
+    
     fetchUserInfo()
   }, [])
 
+
+
   async function updateSurveyStatus() {
     try {
-      await UserAPI.changeSurveyStatus(userInfo.id)
+      console.log(userInfo.sub)
+      await UserAPI.changeSurveyStatus(userInfo.sub)
+      authServiceInstance.refreshToken()
     } catch (error) {
       console.error('Error updating survey status:', error)
     }

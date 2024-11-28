@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using User.Application.Commons;
 
 namespace Learning.Application;
 public static class DependencyInjection
@@ -13,7 +14,7 @@ public static class DependencyInjection
         //MediatR
         services.AddMediatR(config => {
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            config.AddOpenBehavior(typeof(AuthorizationBehaviour<,>));
+            config.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

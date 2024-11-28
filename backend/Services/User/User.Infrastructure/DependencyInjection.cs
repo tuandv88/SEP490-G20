@@ -11,13 +11,10 @@ using User.Infrastructure.Data.Repositories.PointHistories;
 using User.Infrastructure.Data.Repositories.UserGoals;
 using User.Infrastructure.Extentions;
 
-namespace User.Infrastructure
-{
-    public static class DependencyInjection
-    {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
-        {
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+namespace User.Infrastructure {
+    public static class DependencyInjection {
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration) {
+
             services.AddDbContext<ApplicationDbContext>((sp, options) => {
                 options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
@@ -44,8 +41,7 @@ namespace User.Infrastructure
 
             return services;
         }
-        private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration)
-        {
+        private static void ConfigureRepository(IServiceCollection services, IConfiguration configuration) {
             services.AddScoped<IPointHistoryRepository, PointHistoryRepository>();
 
             services.AddScoped<ILearningPathRepository, LearningPathRepository>();

@@ -1,5 +1,4 @@
 namespace Learning.Application.Models.Chapters.Commands.DeleteChapter;
-
 public class DeleteChapterHandler(ICourseRepository courseRepository, IChapterRepository chapterRepository,
     IProblemRepository problemRepository, IQuizRepository quizRepository, ILectureRepository lectureRepository
     ) : ICommandHandler<DeleteChapterCommand, Unit> {

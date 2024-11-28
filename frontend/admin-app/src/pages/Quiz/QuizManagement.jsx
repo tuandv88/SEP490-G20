@@ -59,6 +59,7 @@ export default function QuizManagement() {
     }))
     setIsUpdate(!isUpdate)
   }
+  
   const handleDeleteQuestion = async (questionId) => {
     try {
       await deleteQuestion(quizId, questionId)

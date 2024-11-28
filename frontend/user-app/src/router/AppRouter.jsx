@@ -13,6 +13,7 @@ import { lazy, Suspense } from 'react'
 import Callback from '@/oidc/Callback'
 import CourseDetail from '@/pages/CourseDetail';
 import ProblemSpace from '@/components/problem/SolveChallenge/ProblemSpace';
+import { UserProfile } from '@/pages/UserProfile';
 const Code = lazy(() => import('@/pages/Code'))
 
 export const AppRouter = () => {
@@ -58,6 +59,10 @@ export const AppRouter = () => {
     {
       path: AUTHENTICATION_ROUTERS.CREATEDISCUSSION,
       element: <CreateDiscussion />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.USERPROFILE,
+      element: <UserProfile />
     }
   ])
   return <RouterProvider router={router} />

@@ -12,6 +12,12 @@ import { LearningAPI } from '@/services/api/learningApi'
 import { AlgorithmCard } from '@/components/problem/AlgorithmCard'
 import { ProblemSection } from '@/components/problem/ProblemSection'
 import { CourseCarousel } from '@/components/courses/CourseCarousel'
+import authServiceInstance from '@/oidc/AuthService'
+import SurveyModal from '@/components/surrvey/SurveyModal'
+import AssessmentPrompt from '@/components/surrvey/AssessmentPromptProps'
+import QuizModal from '@/components/surrvey/QuizModal'
+import QuizPopup from '@/components/quiz/QuizPopup'
+import { QuizAPI } from '@/services/api/quizApi'
 
 export const algorithms = [
   {
@@ -58,18 +64,10 @@ const Button = ({ children, className, ...props }) => (
   </button>
 )
 
-const Input = ({ className, ...props }) => <input className={`px-3 py-2 border rounded ${className}`} {...props} />
-
 const Card = ({ children, className, ...props }) => (
   <div className={`bg-white shadow-md rounded-lg ${className}`} {...props}>
     {children}
   </div>
-)
-
-const Badge = ({ children, className, ...props }) => (
-  <span className={`px-2 py-1 text-sm rounded-full bg-blue-100 text-green-800 ${className}`} {...props}>
-    {children}
-  </span>
 )
 
 const Avatar = ({ src, alt, className, ...props }) => (
@@ -81,8 +79,35 @@ function HomePage() {
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
+  const [userInfo, setUserInfo] = useState(null)
+
+  const [isSurveyOpen, setIsSurveyOpen] = useState(false)
+  const [isAssessmentPromptOpen, setIsAssessmentPromptOpen] = useState(false)
+  const [isQuizOpen, setIsQuizOpen] = useState(false)
+  const [quizAssessment, setQuizAssessment] = useState(null)
 
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const user = await authServiceInstance.getUser()
+        if (user) {
+          setUserInfo(user.profile)
+          // Kiểm tra điều kiện để hiển thị survey
+          if (user.profile.issurvey === 'false') {
+            setIsSurveyOpen(true)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error)
+      }
+    }
+
+    fetchUserInfo()
+  }, [])
+
+  console.log()
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
@@ -110,11 +135,42 @@ function HomePage() {
     fetchCourseDetail()
   }, [])
 
-  const handleSubscribe = (e) => {
-    e.preventDefault()
-    console.log('Subscribed with email:', email)
-    setEmail('')
+  useEffect(() => {
+    const fetchQuizAssessment = async () => {
+      try {
+        const data = await QuizAPI.getQuizAssessment()
+        setQuizAssessment(data.quiz)
+      } catch (error) {
+        console.error('Error fetching quiz assessment:', error)
+      }
+    }
+
+
+    fetchQuizAssessment()
+  }, [])
+
+  const handleSurveySubmit = (data) => {
+    // console.log('Survey submitted:', data)
+    setIsSurveyOpen(false)
+    setIsAssessmentPromptOpen(true)
   }
+
+  const handleAssessmentAccept = () => {
+    setIsAssessmentPromptOpen(false)
+    setIsQuizOpen(true)
+  }
+
+  const handleAssessmentDecline = () => {
+    setIsAssessmentPromptOpen(false)
+    //updateUserFirstLogin()
+  }
+
+  const handleQuizComplete = (score) => {
+    console.log('Quiz completed with score:', score)
+    setIsQuizOpen(false)
+    //updateUserFirstLogin()
+  }
+
   return (
     <>
       <Layout>
@@ -149,34 +205,6 @@ function HomePage() {
           <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
               <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Featured Courses</h2>
-              {/* <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 md:gap-8'>
-                {[1, 2, 3].map((course) => (
-                  <Card key={course} className='flex flex-col'>
-                    <img
-                      src={`https://viettuts.vn/images/java/java-la-gi.png?height=200&width=400&text=Course+${course}`}
-                      alt={`Course ${course}`}
-                      className='object-cover w-full h-48 rounded-t-lg'
-                    />
-                    <div className='flex-grow p-4'>
-                      <Badge className='mb-2'>Mới</Badge>
-                      <h3 className='mb-2 text-xl font-semibold'>Khóa học {course}</h3>
-                      <p className='mb-4 text-gray-600'>Mô tả ngắn về khóa học và những gì học viên sẽ học được.</p>
-                    </div>
-                    <div className='flex items-center justify-between p-4 border-t'>
-                      <div className='flex items-center'>
-                        <Star className='w-5 h-5 mr-1 text-yellow-400' />
-                        <span className='text-sm'>4.8 (120 đánh giá)</span>
-                      </div>
-                      <Button
-                        onClick={() => handleViewDetail('6773706d-dae4-42f8-b58e-5551fa6ebaca')}
-                        className='text-white bg-green-500 hover:bg-green-600'
-                      >
-                        Xem chi tiết
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </div> */}
               {loading ? <CourseLoading></CourseLoading> : <CourseCarousel courses={courses} />}
               <div className='mt-8 text-center md:mt-10'>
                 <Button className='border border-green-500 hover:bg-blue-50'>
@@ -186,46 +214,6 @@ function HomePage() {
               </div>
             </div>
           </section>
-
-          {/* Upcoming Contests Section */}
-          {/* <section className='py-12 bg-gray-100 md:py-20'>
-            <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Cuộc thi sắp diễn ra</h2>
-              <Carousel className='w-full max-w-xs mx-auto sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl'>
-                <CarouselContent>
-                  {[1, 2, 3, 4, 5].map((contest) => (
-                    <CarouselItem key={contest}>
-                      <Card className='flex flex-col h-full'>
-                        <div className='flex-grow p-4'>
-                          <h3 className='mb-2 text-xl font-semibold'>Cuộc thi Lập trình {contest}</h3>
-                          <p className='mb-4 text-gray-600'>Thử thách kỹ năng lập trình của bạn</p>
-                          <div className='flex items-center mb-2'>
-                            <Clock className='w-5 h-5 mr-2' />
-                            <span className='text-sm'>Ngày 15 tháng 5, 2024</span>
-                          </div>
-                          <div className='flex items-center mb-2'>
-                            <Users className='w-5 h-5 mr-2' />
-                            <span className='text-sm'>500 người tham gia</span>
-                          </div>
-                          <div className='flex items-center mb-4'>
-                            <Trophy className='w-5 h-5 mr-2' />
-                            <span className='text-sm'>Giải thưởng: $1000</span>
-                          </div>
-                        </div>
-                        <div className='p-4 border-t'>
-                          <Button className='w-full text-white bg-green-400 hover:bg-green-600'>
-                            Đăng ký tham gia
-                          </Button>
-                        </div>
-                      </Card>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
-            </div>
-          </section>         */}
 
           <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
@@ -262,6 +250,37 @@ function HomePage() {
           </section>
         </div>
         <Link to={AUTHENTICATION_ROUTERS.HOME}></Link>
+
+        <SurveyModal
+          isOpen={isSurveyOpen}
+          onClose={() => {
+            setIsSurveyOpen(false)
+            // updateUserFirstLogin()
+          }}
+          onSubmit={handleSurveySubmit}
+        />
+
+        <AssessmentPrompt
+          isOpen={isAssessmentPromptOpen}
+          onClose={() => {
+            setIsAssessmentPromptOpen(false)
+            // updateUserFirstLogin()
+          }}
+          onAccept={handleAssessmentAccept}
+          onDecline={handleAssessmentDecline}
+        />
+
+        <QuizModal
+          isOpen={isQuizOpen}
+          onClose={() => {
+            setIsQuizOpen(false)
+            // updateUserFirstLogin()
+          }}
+          onComplete={handleQuizComplete}
+          quiz={quizAssessment}
+        />
+
+        {/* <QuizPopup quiz={quizData.quiz} answer={quizData.answer} onComplete={() => handleQuizComplete()} /> */}
       </Layout>
     </>
   )

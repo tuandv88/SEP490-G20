@@ -12,7 +12,8 @@ namespace User.Application.Extensions;
             PathName: learningPath.PathName,
             StartDate: learningPath.StartDate,
             EndDate: learningPath.EndDate,
-            Status: learningPath.Status
+            Status: learningPath.Status,
+            Reason: learningPath.Reason
             );
     }
     public static List<LearningPathDto> ToLearningPathDtoList(this List<LearningPath> learningPaths)

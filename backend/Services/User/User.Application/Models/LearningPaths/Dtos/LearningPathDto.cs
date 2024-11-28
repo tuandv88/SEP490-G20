@@ -9,7 +9,8 @@ namespace User.Application.Models.LearningPaths.Dtos
         string PathName,
         DateTime StartDate,
         DateTime EndDate,
-        LearningPathStatus Status
+        LearningPathStatus Status,
+        string Reason
     );
     public record LearningPathWithPathStepsDto(
          Guid Id,
@@ -18,7 +19,8 @@ namespace User.Application.Models.LearningPaths.Dtos
          DateTime StartDate,
          DateTime EndDate,
          string Status,
-         List<PathStepDto> PathSteps
+         List<PathStepDto> PathSteps,
+         string Reason
         );
 
 }

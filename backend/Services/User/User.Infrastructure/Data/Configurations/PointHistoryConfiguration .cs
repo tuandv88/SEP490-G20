@@ -23,7 +23,7 @@ namespace User.Infrastructure.Data.Configurations
 
             builder.Property(ph => ph.Point).IsRequired();
             builder.Property(ph => ph.ChangeType).IsRequired();
-            builder.Property(ph => ph.Source).HasMaxLength(500);
+            builder.Property(ph => ph.Source);
             builder.Property(ph => ph.DateReceived).IsRequired();
             builder.Property(ph => ph.LastUpdated).IsRequired();
         }

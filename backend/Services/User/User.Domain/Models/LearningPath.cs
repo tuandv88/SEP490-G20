@@ -9,9 +9,10 @@ namespace User.Domain.Models
         public DateTime EndDate { get; set; }
         public LearningPathStatus Status { get; set; } // Enum từ User.Domain.Enums
         public List<PathStep> PathSteps { get; set; } = new List<PathStep>();
+        public string Reason { get; set; } = string.Empty;
 
         // Phương thức khởi tạo tĩnh (static factory method)
-        public static LearningPath Create(LearningPathId learningPathId, UserId userId, string pathName, DateTime startDate, DateTime endDate, LearningPathStatus status)
+        public static LearningPath Create(LearningPathId learningPathId, UserId userId, string pathName, DateTime startDate, DateTime endDate, LearningPathStatus status, string reason)
         {
             return new LearningPath
             {
@@ -20,7 +21,8 @@ namespace User.Domain.Models
                 PathName = pathName,
                 StartDate = startDate,
                 EndDate = endDate,
-                Status = status
+                Status = status,
+                Reason = reason
             };
         }
         public void AddPathSteps(List<PathStep> pathSteps) {

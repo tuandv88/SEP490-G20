@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const getAuthHeaders = () => {
+  console.log(Cookies.get('authToken'));
   return {
     headers: {
       'Authorization': `Bearer ${Cookies.get('authToken')}`, // Thêm token vào header
@@ -177,7 +178,6 @@ export const DiscussApi = {
 
   updateViewDiscussion: async ({ discussionId }) => {
     try {
-      console.log("Discussion ID:", discussionId); // Log để kiểm tra giá trị
       const response = await axios.put(`${API_BASE_URL}/community-service/discussion/${discussionId}/updateview`);
       return response.data;
     } catch (error) {
@@ -192,11 +192,42 @@ export const DiscussApi = {
       const response = await axios.delete(`${API_BASE_URL}/community-service/discussions/${discussionId}/remove`, getAuthHeaders());
       return response.data;
     } catch (error) {
-      console.error("Error creating comment:", error.message);
+      console.error("Error Remove Discussion :", error.message);
       throw error;
     }
   },
 
+  // API: Cập nhật trạng thái thông báo
+  updateStatusNotificationDiscussionById: async ({ discussionId }) => {
+    try {
+      console.log("Updating notification status for discussionId:", discussionId);
+
+      // Đảm bảo URL được sử dụng đúng và hợp lệ
+      const url = `${API_BASE_URL}/community-service/discussion/${discussionId}/update-status-notification`;
+
+      // Gọi API cập nhật trạng thái thông báo
+      const response = await fetch(url, {
+        method: 'PUT', // Phương thức PUT
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('authToken')}`, // Lấy token từ cookies
+          'Content-Type': 'application/json' // Header yêu cầu Content-Type
+        },
+        body: JSON.stringify({}) // Chuyển body là một object nếu cần thiết
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Chuyển đổi phản hồi thành JSON và trả về dữ liệu
+      const data = await response.json();
+      return data;
+
+    } catch (error) {
+      console.error("Error Update Status Notification Discussion:", error.message);
+      throw error;
+    }
+  }
 };
 
 // API thứ hai: Lấy thông tin chi tiết của UserIds

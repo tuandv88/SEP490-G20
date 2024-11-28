@@ -2,6 +2,11 @@
 
 @model PersonalViewModel
 
+@{
+    var userUpdateImageUrl = ViewData["UserUpdateImageUrl"] as string;  // Lấy URL từ ViewData
+}
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1075,8 +1080,11 @@
                         ContentType: "image/jpeg" // MIME type của ảnh
                     };
 
+                    // Truyền giá trị URL vào JavaScript từ Razor
+                    var updateImageUrl = '@userUpdateImageUrl';  // Razor sẽ chuyển giá trị vào đây
+
                     // Gửi API qua fetch
-                    const response = await fetch("https://localhost:6005/users/updateimage", {
+                    const response = await fetch(updateImageUrl, {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json",

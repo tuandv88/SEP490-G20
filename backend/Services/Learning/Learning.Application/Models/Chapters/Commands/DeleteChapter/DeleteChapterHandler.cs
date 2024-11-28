@@ -11,26 +11,22 @@ public class DeleteChapterHandler(ICourseRepository courseRepository, IChapterRe
             throw new NotFoundException(nameof(Course), request.CourseId);
         }
 
-        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled)) {
-            var chapter = course.DeleteChapter(ChapterId.Of(request.ChapterId));
-            var lectures = chapter.DeleteLectures();
-            foreach( var lecture in lectures ) {
-                if (lecture.ProblemId != null) {
-                    //Cần gọi hàm thêm event nếu cần
-                    await problemRepository.DeleteByIdAsync(lecture.ProblemId.Value);
-                }
-                if (lecture.QuizId != null) {
-                    //Cần gọi hàm thêm event nếu cần
-                    await quizRepository.DeleteByIdAsync(lecture.QuizId.Value);
-                }
+        var chapter = course.DeleteChapter(ChapterId.Of(request.ChapterId));
+        var lectures = chapter.DeleteLectures();
+        foreach (var lecture in lectures) {
+            if (lecture.ProblemId != null) {
+                //Cần gọi hàm thêm event nếu cần
+                await problemRepository.DeleteByIdAsync(lecture.ProblemId.Value);
             }
-            await lectureRepository.DeleteAsync(lectures.ToArray());
-            await chapterRepository.DeleteAsync(chapter);
-
-            await chapterRepository.SaveChangesAsync(cancellationToken);
-
-            transaction.Complete();
+            if (lecture.QuizId != null) {
+                //Cần gọi hàm thêm event nếu cần
+                await quizRepository.DeleteByIdAsync(lecture.QuizId.Value);
+            }
         }
+        await lectureRepository.DeleteAsync(lectures.ToArray());
+        await chapterRepository.DeleteAsync(chapter);
+
+        await chapterRepository.SaveChangesAsync(cancellationToken);
         return Unit.Value;
            
     }

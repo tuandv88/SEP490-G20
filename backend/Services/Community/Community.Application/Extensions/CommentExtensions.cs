@@ -36,5 +36,21 @@ namespace Community.Application.Extensions
                 Votes: comment.Votes.Select(vote => vote.ToVoteDto()).ToList()
             );
         }
+
+        public static CommentsDetailDto ToCommentsDetailDto(this Comment comment)
+        {
+            return new CommentsDetailDto(
+                Id: comment.Id.Value,
+                UserId: comment.UserId.Value,
+                DiscussionId: comment.DiscussionId.Value,
+                Content: comment.Content,
+                ParentCommentId: comment.ParentCommentId?.Value,
+                DateCreated: comment.DateCreated,
+                IsEdited: comment.IsEdited,
+                Depth: comment.Depth,
+                IsActive: comment.IsActive,
+                TotalVote: VoteExtensions.CalculateTotalVotes(comment)
+            );
+        }
     }
 }

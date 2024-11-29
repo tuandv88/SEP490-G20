@@ -22,9 +22,10 @@ export function DataTable({ columns, data }) {
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
   const [rowSelection, setRowSelection] = useState({})
+  const [userData, setUserData] = useState(data)
 
   const table = useReactTable({
-    data,
+    data: userData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -41,6 +42,10 @@ export function DataTable({ columns, data }) {
       rowSelection
     }
   })
+
+  const handleDataChange = (updatedUser) => {
+    setUserData((prevData) => prevData.map((user) => (user.id === updatedUser.id ? updatedUser : user)))
+  }
 
   return (
     <div className='space-y-4'>
@@ -94,7 +99,12 @@ export function DataTable({ columns, data }) {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, {
+                        ...cell.getContext(),
+                        onDataChange: handleDataChange
+                      })}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))
@@ -109,10 +119,6 @@ export function DataTable({ columns, data }) {
         </Table>
       </div>
       <div className='flex items-center justify-end space-x-2'>
-        <div className='flex-1 text-sm text-muted-foreground'>
-          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
-          selected.
-        </div>
         <div className='space-x-2'>
           <Button
             variant='outline'

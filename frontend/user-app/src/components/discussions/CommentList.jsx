@@ -38,7 +38,7 @@ function CommentList({ discussionId }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [idCurrentUser, setIdCurrentUser] = useState(null);
 
-  const [openDialog, setOpenDialog] = useState(false);  // Trạng thái mở/đóng dialog
+  const [openRemoveDialog, setOpenRemoveDialog] = useState(false);  // Trạng thái mở/đóng dialog
   const [commentIdToDelete, setCommentIdToDelete] = useState(null); // Lưu ID comment cần xóa
 
   useEffect(() => {
@@ -202,14 +202,14 @@ function CommentList({ discussionId }) {
   };
 
   // Hàm mở dialog xác nhận xóa
-  const handleOpenDialog = (commentId) => {
+  const handleOpenRemoveDialog = (commentId) => {
     setCommentIdToDelete(commentId); // Lưu commentId cần xóa
-    setOpenDialog(true); // Mở dialog
+    setOpenRemoveDialog(true); // Mở dialog
   };
 
   // Hàm đóng dialog
-  const handleCloseDialog = () => {
-    setOpenDialog(false); // Đóng dialog
+  const handleCloseRemoveDialog = () => {
+    setOpenRemoveDialog(false); // Đóng dialog
     setCommentIdToDelete(null); // Reset ID comment
   };
 
@@ -220,14 +220,13 @@ function CommentList({ discussionId }) {
       const response = await DiscussApi.removeCommentById({ commentId: commentIdToDelete });
 
       if (response) {
-        console.log("Comment deleted successfully");
         // Gọi lại hàm refreshComments (truyền từ parent component) để làm mới danh sách comments
         setRefreshComments(prev => !prev);
       }
     } catch (error) {
       console.error("Error removing comment:", error.message);
     } finally {
-      handleCloseDialog(); // Đóng dialog sau khi xóa xong
+      handleCloseRemoveDialog(); // Đóng dialog sau khi xóa xong
     }
   };
 
@@ -389,27 +388,40 @@ function CommentList({ discussionId }) {
                       </button>
                       <button
                         className="comment-item__delete"
-                        onClick={() => handleOpenDialog(comment.id)}>
+                        onClick={() => handleOpenRemoveDialog(comment.id)}>
                         <FontAwesomeIcon icon={faTrash} /> Delete
                       </button>
                     </>
                   )}
 
                   {/* Dialog xác nhận xóa */}
-                  <Dialog open={openDialog} onClose={handleCloseDialog}>
-                    <DialogTitle>Are you sure you want to delete this comment?</DialogTitle>
-                    <DialogActions>
+                  <Dialog
+                    open={openRemoveDialog}
+                    onClose={handleCloseRemoveDialog}
+                    className="delete-dialog"
+                  >
+                    <DialogTitle className="delete-dialog__title">
+                      Are you sure you want to delete this comment?
+                    </DialogTitle>
+                    <DialogActions className="delete-dialog__actions">
                       {/* Nút "No" sẽ đóng dialog mà không làm gì */}
-                      <Button onClick={handleCloseDialog} color="primary">
+                      <Button
+                        onClick={handleCloseRemoveDialog}
+                        className="delete-dialog__btn delete-dialog__btn--no"
+                      >
                         No
                       </Button>
 
                       {/* Nút "Yes" sẽ gọi hàm xóa comment */}
-                      <Button onClick={handleRemoveComment} color="secondary">
+                      <Button
+                        onClick={handleRemoveComment}
+                        className="delete-dialog__btn delete-dialog__btn--yes"
+                      >
                         Yes
                       </Button>
                     </DialogActions>
                   </Dialog>
+
 
                   <button className="comment-item__reply">
                     <FontAwesomeIcon icon={faReply} /> Reply
@@ -866,6 +878,85 @@ function CommentList({ discussionId }) {
   background-color: rgba(0, 123, 255, 0.1); /* Màu nền khi hover vào các nút mũi tên */
   border-radius: 5px; /* Bo góc nhẹ khi hover */
 }
+
+/* Cấu hình chung cho dialog */
+.delete-dialog {
+  font-family: 'Roboto', sans-serif; /* Dùng font mặc định của MUI */
+  border-radius: 8px; /* Bo góc của dialog */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng cho dialog */
+}
+
+/* Cấu hình cho tiêu đề của dialog */
+.delete-dialog__title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  padding: 20px 24px;
+  margin: 0;
+}
+
+/* Cấu hình cho các nút hành động trong dialog */
+.delete-dialog__actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background-color: #f9f9f9; /* Màu nền của phần footer (nút) */
+  border-top: 1px solid #ddd; /* Đường viền phân cách giữa phần nội dung và nút */
+}
+
+/* Cấu hình cho nút "No" */
+.delete-dialog__btn--no {
+  background-color: #e0e0e0;
+  color: #333;
+  font-weight: 500;
+  padding: 6px 14px;
+  text-transform: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+/* Cấu hình cho nút "Yes" */
+.delete-dialog__btn--yes {
+  background-color: #1e334a; /* Màu đỏ */
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 14px;
+  text-transform: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+/* Hiệu ứng hover cho nút "No" */
+.delete-dialog__btn--no:hover {
+  background-color: #c0c0c0;
+  cursor: pointer;
+}
+
+/* Hiệu ứng hover cho nút "Yes" */
+.delete-dialog__btn--yes:hover {
+  background-color: #36495a;
+  cursor: pointer;
+}
+
+/* Thêm hiệu ứng chuyển động cho Dialog */
+.MuiDialog-root {
+  animation: slideIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+
       `}</style>
     </div>
   );

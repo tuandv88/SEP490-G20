@@ -247,7 +247,6 @@ export const DiscussApi = {
   // API: Remove comment mới
   removeCommentById: async ({ commentId }) => {
     try {
-      console.log(commentId);
       const response = await axios.delete(`${API_BASE_URL}/community-service/comments/${commentId}/remove`, getAuthHeaders());
       return response;
     } catch (error) {

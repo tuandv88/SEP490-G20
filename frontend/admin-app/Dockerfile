@@ -4,6 +4,17 @@ WORKDIR /app
 COPY package*.json ./
 RUN rm package-lock.json && npm install
 COPY . .
+
+# Nhận các biến môi trường tại thời gian xây dựng
+ARG VITE_BASE_URL
+ARG VITE_BASE_URL_AUTH
+ARG VITE_APP_TITLE
+
+# Thiết lập các biến môi trường cho Vite
+ENV VITE_BASE_URL=$VITE_BASE_URL \
+    VITE_BASE_URL_AUTH=$VITE_BASE_URL_AUTH \
+    VITE_APP_TITLE=$VITE_APP_TITLE
+
 RUN npm run build
 
 FROM nginx:stable-alpine

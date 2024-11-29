@@ -1,0 +1,6 @@
+﻿using Learning.Application.Models.Courses.Dtos;
+
+namespace Learning.Application.Models.Courses.Queries.GetStatistics.GetMostPopularCourseWithEnrollments;
+public record GetMostPopularCourseWithEnrollmentsQuery(PaginationRequest PaginationRequest) : IQuery<GetMostPopularCourseWithEnrollmentsResult>;
+public record GetMostPopularCourseWithEnrollmentsResult(PaginatedResult<CourseWithEnrollmentDto> Courses);
+

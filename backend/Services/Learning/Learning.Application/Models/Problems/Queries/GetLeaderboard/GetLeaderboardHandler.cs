@@ -8,7 +8,7 @@ public class GetLeaderboardHandler(IProblemRepository problemRepository, IProble
         var pageIndex = request.PaginationRequest.PageIndex;
         var pageSize = request.PaginationRequest.PageSize;
 
-        var problems = await problemRepository.GetAllAsQueryableAsync();
+        var problems = problemRepository.GetAllAsQueryable();
         var problemSubmissions = problemSubmissionRepository.GetAllAsQueryAble();
 
         var problemSubmissionsData = problemSubmissions

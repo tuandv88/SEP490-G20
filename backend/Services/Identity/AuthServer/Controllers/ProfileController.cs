@@ -18,22 +18,38 @@ namespace AuthServer.Controllers
         private readonly UserManager<Users> _userManager;
         private readonly UrlEncoder _urlEncoder;
         private readonly IFilesService _filesService;
-        public IActionResult Index()
-        {
-            return View();
-        }
-        public ProfileController(SignInManager<Users> signInManager, UserManager<Users> userManagerr, UrlEncoder urlEncoder, IFilesService filesService)
+        private readonly IConfiguration _configuration;
+
+        public ProfileController(SignInManager<Users> signInManager, UserManager<Users> userManagerr, UrlEncoder urlEncoder, IFilesService filesService, IConfiguration configuration)
         {
 
+            _configuration = configuration;
             _signInManager = signInManager;
             _userManager = userManagerr;
             _urlEncoder = urlEncoder;
             _filesService = filesService;
         }
 
+
+        public IActionResult Index()
+        {
+            // Sử dụng _apiSettings.UserImageUrl trong view hoặc logic ứng dụng
+            var userImageUrl = _configuration.GetValue<string>("ApiSettings:UserImageUrl");
+
+            // Truyền vào ViewData để sử dụng trong Razor view
+            ViewData["UserImageUrl"] = userImageUrl;
+
+            return View();
+        }
         [HttpGet]
         public async Task<IActionResult> Personal(string returnUrl = null)
         {
+            // Sử dụng _apiSettings.UserImageUrl trong view hoặc logic ứng dụng
+            var userUpdateImageUrl = _configuration.GetValue<string>("ApiSettings:UserUpdateImageUrl");
+
+            // Truyền vào ViewData để sử dụng trong Razor view
+            ViewData["UserUpdateImageUrl"] = userUpdateImageUrl;
+
             returnUrl = returnUrl ?? Url.Content("~/");
 
             ViewData["ReturnUrl"] = returnUrl;

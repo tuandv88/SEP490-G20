@@ -106,11 +106,76 @@ export const DiscussApi = {
   createDiscuss: async (discussionData) => {
     try {
       console.log(discussionData, getAuthHeaders());
-      const response = await axios.post(`${API_BASE_URL}/community-service/discussions`, discussionData, getAuthHeaders());
+      const response = await axios.post(`${API_BASE_URL}/community-service/discussions/create`, discussionData, getAuthHeaders());
       return response.data;
     } catch (error) {
       console.error("Error creating discussion:", error);
       throw error;
+    }
+  },
+
+  // API: Tạo mới một discussion
+  updateDiscuss: async (discussionData) => {
+    try {
+
+      // Bọc `discussionData` vào trong đối tượng `UpdateDiscussionRequest`
+      const requestBody = {
+        updateDiscussionDto: discussionData
+      };
+      console.log(requestBody);
+      const response = await fetch(`${API_BASE_URL}/community-service/discussions/update`, {
+        method: 'PUT', // Phương thức PUT để cập nhật dữ liệu
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('authToken')}`, // Lấy token từ cookies
+          'Content-Type': 'application/json' // Đảm bảo kiểu dữ liệu là JSON
+        },
+        body: JSON.stringify(requestBody) // Chuyển đổi đối tượng thành chuỗi JSON
+      });
+
+      if (!response.ok) {
+        // Nếu response không phải là mã 2xx (thành công), ném lỗi
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const data = await response.json(); // Parse dữ liệu trả về dưới dạng JSON
+      return data; // Trả về dữ liệu nhận được từ API
+    } catch (error) {
+      console.error("Error updating discussion:", error);
+      throw error; // Ném lại lỗi để xử lý ở nơi gọi hàm này
+    }
+  },
+
+  // API: Cập nhật hình ảnh cho một discussion
+  updateDiscussImage: async (idDiscussion, discussionImageData) => {
+    try {
+      // Bọc `discussionImageData` vào trong đối tượng `UpdateDiscussionRequest`
+      const requestBody = {
+        id: idDiscussion,  // ID của discussion cần cập nhật
+        imageDto: discussionImageData // Dữ liệu hình ảnh
+      };
+
+      console.log(requestBody);  // Kiểm tra request body
+
+      // Gửi yêu cầu PUT để cập nhật hình ảnh
+      const response = await fetch(`${API_BASE_URL}/community-service/discussions/updateimage`, {
+        method: 'PUT', // Phương thức PUT để cập nhật dữ liệu
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('authToken')}`, // Lấy token từ cookies
+          'Content-Type': 'application/json' // Đảm bảo kiểu dữ liệu là JSON
+        },
+        body: JSON.stringify(requestBody) // Chuyển đối tượng thành chuỗi JSON
+      });
+
+      if (!response.ok) {
+        // Nếu response không phải là mã 2xx (thành công), ném lỗi
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const data = await response.json(); // Parse dữ liệu trả về dưới dạng JSON
+      return data; // Trả về dữ liệu nhận được từ API
+    } catch (error) {
+      console.error("Error updating discussion:", error);
+      throw error; // Ném lại lỗi để xử lý ở nơi gọi hàm này
     }
   },
 
@@ -193,7 +258,7 @@ export const DiscussApi = {
   removeDiscussionById: async ({ discussionId }) => {
     try {
       const response = await axios.delete(`${API_BASE_URL}/community-service/discussions/${discussionId}/remove`, getAuthHeaders());
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Error Remove Discussion :", error.message);
       throw error;

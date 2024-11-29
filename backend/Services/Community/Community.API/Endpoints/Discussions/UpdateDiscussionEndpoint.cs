@@ -10,9 +10,11 @@ public class UpdateDiscussionEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/discussions", async (UpdateDiscussionRequest request, ISender sender) =>
+        app.MapPut("/discussions/update", async (UpdateDiscussionRequest request, ISender sender) =>
         {
             var command = request.Adapt<UpdateDiscussionCommand>();
+
+            Console.WriteLine(command);
 
             var result = await sender.Send(command);
 

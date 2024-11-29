@@ -12,12 +12,14 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { Select, MenuItem } from '@mui/material';
+import { Select, MenuItem, Typography } from '@mui/material';
 import MarkdownIt from "markdown-it";
 import MarkdownEditor from "react-markdown-editor-lite";  // Thư viện Markdown Editor
 import "react-markdown-editor-lite/lib/index.css";  // Style của editor
 import Alert from '@mui/material/Alert';
 import CheckIcon from '@mui/icons-material/Check';
+import EditIcon from '@mui/icons-material/Edit'; // Icon bút
+import InputLabel from '@mui/material/InputLabel';
 
 function PostList({ categoryId }) {
   const [posts, setPosts] = useState([]);
@@ -50,7 +52,9 @@ function PostList({ categoryId }) {
   const [reloadComponentCurrent, setReloadComponentCurrent] = useState(false);
   const [showAlert, setShowAlert] = useState(false); // State điều khiển thông báo
 
+
   useEffect(() => {
+
     const fetchPosts = async () => {
       setLoading(true);
       setError(null);
@@ -67,8 +71,21 @@ function PostList({ categoryId }) {
 
         if (data && data.updatedDiscussions) {
           setPosts(data.updatedDiscussions);
-          setPagination(data.pagination);
-          setTotalPages(Math.ceil(data.pagination.totalCount / pagination.pageSize)); // Tính tổng số trang
+
+          // Kiểm tra pagination trong dữ liệu trả về và đảm bảo giá trị hợp lệ
+          if (data.pagination && data.pagination.pageIndex) {
+            setPagination(data.pagination);
+            setTotalPages(Math.ceil(data.pagination.totalCount / pagination.pageSize)); // Tính tổng số trang
+          } else {
+            setPagination({
+              pageIndex: 1,
+              pageSize: 5,
+              totalCount: 0,
+            });
+            setTotalPages(0);
+          }
+        } else {
+          setPosts([]); // Nếu không có dữ liệu thảo luận, set posts là mảng rỗng
         }
 
         if (categories && categories.categoryDtos) {
@@ -246,6 +263,7 @@ function PostList({ categoryId }) {
   const handleEditorChange = ({ html, text }) => {
     setNewPost({ ...newPost, content: text });  // Lưu nội dung Markdown khi người dùng thay đổi
   };
+
   return (
     <div className="post-list-container">
       {/* Filters Section */}
@@ -281,7 +299,7 @@ function PostList({ categoryId }) {
           />
 
           <button className="new-button" onClick={() => setOpenDialog(true)}>
-            New +
+            New Post +
           </button>
         </div>
       </div>
@@ -403,7 +421,7 @@ function PostList({ categoryId }) {
           }}
         >
           <Alert severity="success">
-            Create New Post Success
+            Create New Post Successfully!
           </Alert>
         </Stack>
       )}
@@ -415,7 +433,27 @@ function PostList({ categoryId }) {
         </div>
       )}
       {error && <p className="error">{error}</p>}
-      {!loading && posts.length === 0 && <p>No posts available.</p>}
+      {/* Hiển thị thông báo nếu không có bài viết */}
+      {!loading && posts.length === 0 && (
+        <div className="post-list__empty">
+          <Typography variant="h6" color="textSecondary" align="center">
+            There aren't any discussion topics here yet!
+          </Typography>
+
+          {/* Nút tạo mới với logo bút */}
+          <Stack direction="row" justifyContent="center" spacing={2}>
+            <Button
+              className="post-list__create-btn"
+              variant="contained"
+              color="primary"
+              startIcon={<EditIcon />}
+              onClick={() => setOpenDialog(true)}
+            >
+              Create New Post
+            </Button>
+          </Stack>
+        </div>
+      )}
 
       {!loading && (
         <div className="posts">
@@ -1106,6 +1144,39 @@ function PostList({ categoryId }) {
 .dialog-submit-btn-cancel, .dialog-submit-btn-submit {
   min-width: 140px; /* Đảm bảo các nút có chiều rộng đủ */
 }
+
+/* CSS cho nút tạo mới và biểu tượng */
+.post-list__create-btn {
+  display: flex;
+  align-items: center;
+  background-color: #1e334a; /* Màu xanh cho nút */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 30px;
+}
+
+.post-list__create-btn .material-icons {
+  margin-right: 8px; /* Khoảng cách giữa icon và chữ */
+}
+
+.post-list__create-btn:hover {
+  background-color: #1e334a; /* Màu khi hover */
+}
+
+.post-list__no-posts {
+  font-size: 18px;
+  text-align: center;
+  color: #1e334a;
+}
+
+.post-list__empty {
+  text-align: center;
+  margin-top: 20px;
+}
+
 
 `}</style>
     </div >

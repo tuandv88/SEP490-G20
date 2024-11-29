@@ -5,7 +5,8 @@ import { faChevronDown, faChevronUp, faCommentAlt, faComments, faEdit, faReply, 
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import { marked } from 'marked'; // Import marked library
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns'
+import { Typography } from '@mui/material';;
 
 function CommentList({ discussionId }) {
   const [isPreview, setIsPreview] = useState(false);
@@ -325,7 +326,9 @@ function CommentList({ discussionId }) {
           ))
         ) : (
           <div className="comment-list__no-comments">
-            <p>Please write the first comment to the discussion.</p>
+            <Typography variant="h6" color="textSecondary" align="center">
+              There aren't any comment topics here yet!
+            </Typography>
           </div>
         )}
       </div>

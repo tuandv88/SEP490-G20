@@ -28,6 +28,7 @@ function DiscussionDetail() {
   const [tooltipContent, setTooltipContent] = useState('Share');
   const [clicked, setClicked] = useState(false); // State để theo dõi trạng thái click
   const [voteCount, setVoteCount] = useState(0);
+  const [loadingVoteComment, setloadingVoteComment] = useState(false);
 
   useEffect(() => {
     const fetchDiscussion = async () => {
@@ -166,6 +167,11 @@ function DiscussionDetail() {
 
   const handleVote = async (voteType) => {
     try {
+
+      // Nếu đang trong trạng thái loading thì không cho phép vote nữa
+      if (loadingVoteComment) return;
+      setloadingVoteComment(true); // Đặt loading là true khi bắt đầu gọi API
+
       const response = await DiscussApi.createVoteDiscussion({
         discussionId: discussion.id, // Tham số này lấy từ thông tin thảo luận
         commentId: null,
@@ -179,6 +185,8 @@ function DiscussionDetail() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setloadingVoteComment(false); // Tắt loading khi hoàn thành
     }
   };
 

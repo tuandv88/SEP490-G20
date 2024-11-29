@@ -6,10 +6,22 @@ import { formatDistanceToNow } from 'date-fns';
 import { DiscussApi } from "@/services/api/DiscussApi";
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { Select, MenuItem } from '@mui/material';
+import MarkdownIt from "markdown-it";
+import ReactMarkdown from "react-markdown";
+import MarkdownEditor from "react-markdown-editor-lite";  // Thư viện Markdown Editor
+import "react-markdown-editor-lite/lib/index.css";  // Style của editor
 
 function PostList({ categoryId }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
   const [pageIndex, setPageIndex] = useState(1);
   const [totalPages, setTotalPages] = useState(0); // Tổng số bài viết
@@ -20,7 +32,21 @@ function PostList({ categoryId }) {
     pageSize: 5,
     totalCount: 0,
   });
+  const [openDialog, setOpenDialog] = useState(false);  // Trạng thái mở dialog form tạo bài viết
+  const [openErrorDialog, setOpenErrorDialog] = useState(false);  // Dialog thông báo lỗi
+  const [errorMessage, setErrorMessage] = useState("");  // Lỗi cần thông báo
+  // Trạng thái ban đầu cho bài viết mới
+  const [newPost, setNewPost] = useState({
+    categoryId: "",  // Ban đầu để trống hoặc bạn có thể để "null"
+    title: "",
+    content: "",
+    tags: [],
+    image: { fileName: "", base64Image: "", contentType: "image/png" },
+    isActive: true
+  });
+
   const navigate = useNavigate();
+  const [reloadComponentCurrent, setReloadComponentCurrent] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -35,14 +61,21 @@ function PostList({ categoryId }) {
           tags,
         });
 
+        const categories = await DiscussApi.getCategories();
+
         if (data && data.updatedDiscussions) {
           setPosts(data.updatedDiscussions);
           setPagination(data.pagination);
           setTotalPages(Math.ceil(data.pagination.totalCount / pagination.pageSize)); // Tính tổng số trang
         }
 
+        if (categories && categories.categoryDtos) {
+          setCategories(categories.categoryDtos);
+        } else {
+          setCategories([]);
+        }
+
       } catch (err) {
-        setError("Failed to fetch posts");
         setLoading(true);
       } finally {
         setLoading(false);
@@ -52,7 +85,7 @@ function PostList({ categoryId }) {
     if (categoryId) {
       fetchPosts();
     }
-  }, [categoryId, pagination.pageIndex, orderBy, tags]);
+  }, [categoryId, pagination.pageIndex, orderBy, tags, reloadComponentCurrent]);
 
   const handlePostClick = (postId) => {
     navigate(`/discussion/${postId}`);
@@ -105,6 +138,103 @@ function PostList({ categoryId }) {
     return distance;
   };
 
+  // Hàm đóng dialog
+  const handleDialogClose = () => {
+    // Đặt lại nội dung form về giá trị mặc định
+
+    setOpenDialog(false);  // Đóng dialog
+  };
+
+  const handleDialogCancel = () => {
+    // Đặt lại nội dung form về giá trị mặc định
+    setNewPost({
+      categoryId: "",  // Reset categoryId
+      title: "",
+      content: "",
+      tags: [],
+      image: { fileName: "", base64Image: "", contentType: "image/png" },
+      isActive: true
+    });
+
+    setOpenDialog(false);  // Đóng dialog
+  };
+
+  // Dialog thông báo lỗi
+  const handleErrorDialogClose = () => {
+    setOpenErrorDialog(false);
+  };
+
+  const handlePostSubmit = async () => {
+    // Kiểm tra nếu tiêu đề và nội dung chưa được nhập
+    if (!newPost.categoryId || !newPost.title || !newPost.content || !newPost.tags) {
+      setErrorMessage("Please fill in both title, content, category, and tags.");
+      setOpenErrorDialog(true);  // Mở dialog thông báo lỗi
+
+      // Tự động đóng pop-up sau 3 giây (3000ms)
+      setTimeout(() => {
+        setOpenErrorDialog(false);  // Đóng dialog tự động
+      }, 3000);
+
+      return;
+    }
+
+    // Cập nhật dữ liệu API
+    const discussionData = {
+      categoryId: newPost.categoryId,  // Truyền categoryId là GUID
+      title: newPost.title,
+      description: newPost.content,  // Dữ liệu mô tả (content)
+      tags: newPost.tags,  // Danh sách tags
+      isActive: newPost.isActive,  // Trạng thái hoạt động
+    };
+
+    // Kiểm tra tất cả các trường ảnh trước khi gửi
+    if (newPost.image.fileName && newPost.image.base64Image && newPost.image.contentType) {
+      // Nếu tất cả các trường đều có giá trị hợp lệ, gửi thông tin ảnh
+      discussionData.image = {
+        fileName: newPost.image.fileName,
+        base64Image: newPost.image.base64Image,
+        contentType: newPost.image.contentType,
+      };
+    } else {
+      // Nếu thiếu bất kỳ trường nào trong 3 trường trên, không gửi thông tin ảnh
+      discussionData.image = null;
+    }
+
+    try {
+      // Gọi API createDiscuss để tạo bài viết mới
+      const response = await DiscussApi.createDiscuss(discussionData);
+
+      // Xử lý thành công khi tạo bài viết
+      console.log("Post created successfully:", response);
+      if (response) {
+
+        setNewPost({
+          categoryId: "",  // Reset categoryId
+          title: "",
+          content: "",
+          tags: [],
+          image: { fileName: "", base64Image: "", contentType: "image/png" },
+          isActive: true
+        });
+
+        // Optionally, refresh the posts list or navigate to the new post
+        handleDialogClose();  // Đóng dialog sau khi tạo thành công
+
+        // Gọi reloadComponent sau khi tạo bài viết thành công
+        reloadComponent();  // Trigger reload component
+      }
+    } catch (error) {
+      console.error("Error creating post:", error);
+    }
+  };
+
+  const reloadComponent = () => {
+    setReloadComponentCurrent(!reloadComponentCurrent); // Trigger lại re-fetch dữ liệu
+  };
+
+  const handleEditorChange = ({ html, text }) => {
+    setNewPost({ ...newPost, content: text });  // Lưu nội dung Markdown khi người dùng thay đổi
+  };
   return (
     <div className="post-list-container">
       {/* Filters Section */}
@@ -139,11 +269,107 @@ function PostList({ categoryId }) {
             className="search-input"
           />
 
-          <button className="new-button" onClick={() => navigate("/discussions/creatediscussion")}>
+          <button className="new-button" onClick={() => setOpenDialog(true)}>
             New +
           </button>
         </div>
       </div>
+
+      {/* Dialog Popup for Creating a New Post */}
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>Create New Post</DialogTitle>
+        <DialogContent>
+          {/* Category */}
+          <Select
+            label="Category"
+            fullWidth
+            value={newPost.categoryId || ""}  // Giá trị mặc định là ''
+            onChange={(e) => setNewPost({ ...newPost, categoryId: e.target.value })}  // Cập nhật khi chọn category mới
+            margin="normal"
+          >
+            <MenuItem value="">Select One Category</MenuItem>  {/* Tùy chọn mặc định khi chưa chọn category */}
+            {categories && Array.isArray(categories) && categories.filter(category => category.isActive).map((category) => (
+              <MenuItem key={category.id} value={category.id}>
+                {category.name}
+              </MenuItem>
+            ))}
+          </Select>
+
+          {/* Title */}
+          <TextField
+            label="Title"
+            fullWidth
+            value={newPost.title}
+            onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+            margin="normal"
+          />
+          {/* Tags */}
+          <TextField
+            label="Tags (comma separated)"
+            fullWidth
+            value={newPost.tags.join(", ")}
+            onChange={(e) => setNewPost({ ...newPost, tags: e.target.value.split(",").map(tag => tag.trim()) })}
+            margin="normal"
+          />
+
+
+          {/* Description (Content) - Markdown Editor */}
+          <MarkdownEditor
+            value={newPost.content}  // Giá trị nội dung của bài viết
+            style={{ height: "200px" }}  // Chỉnh độ cao của editor
+            onChange={handleEditorChange}  // Cập nhật giá trị khi người dùng thay đổi
+            renderHTML={(text) => {
+              const md = new MarkdownIt();
+              return md.render(text);  // Chuyển đổi Markdown sang HTML
+            }}
+          />
+
+          {/* Image Upload */}
+          <input
+            type="file"
+            accept="image/png, image/jpeg"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  const base64Image = reader.result.split(',')[1];  // Lấy phần base64
+                  setNewPost({
+                    ...newPost,
+                    image: {
+                      fileName: file.name,  // Lưu tên file
+                      base64Image,  // Lưu base64 đã xử lý
+                      contentType: file.type,  // Lưu content type
+                    },
+                  });
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handlePostSubmit} color="primary">
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Pop-up thông báo lỗi khi thiếu thông tin */}
+      <Dialog open={openErrorDialog} onClose={handleErrorDialogClose}>
+        <DialogTitle>Error</DialogTitle>
+        <DialogContent>
+          <p>{errorMessage}</p>  {/* Hiển thị thông báo lỗi */}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleErrorDialogClose} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Posts Section */}
       {loading && (

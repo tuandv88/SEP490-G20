@@ -25,6 +25,7 @@ function CommentList({ discussionId }) {
 
   // New state to handle the comment input
   const [submitting, setSubmitting] = useState(false);
+  const [loadingVoteComment, setloadingVoteComment] = useState(false);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -47,8 +48,7 @@ function CommentList({ discussionId }) {
           throw new Error("Invalid comments or pagination data.");
         }
       } catch (err) {
-        console.error("Error fetching comments:", err);
-        setError("Failed to load comments.");
+        console.error("Discussion No Any Comment.", err);
       } finally {
         setLoading(false);
       }
@@ -133,8 +133,10 @@ function CommentList({ discussionId }) {
 
   const handleVote = async (voteType, commentId) => {
     try {
+      // Nếu đang trong trạng thái loading thì không cho phép vote nữa
+      if (loadingVoteComment) return;
+      setloadingVoteComment(true); // Đặt loading là true khi bắt đầu gọi API
 
-      console.log(commentId);
       // Gọi API để tạo phiếu bầu
       const response = await DiscussApi.createVoteComment({
         discussionId: null, // Thêm discussionId nếu cần
@@ -145,10 +147,21 @@ function CommentList({ discussionId }) {
 
       if (response) {
         // Cập nhật lại số lượng vote sau khi thực hiện hành động
-        setVoteCount(prevCount => voteType === 'Like' ? prevCount + 1 : prevCount - 1);
+        setComments(prevComments =>
+          prevComments.map(comment =>
+            comment.id === commentId
+              ? {
+                ...comment,
+                totalVote: voteType === 'Like' ? comment.totalVote + 1 : comment.totalVote - 1,
+              }
+              : comment
+          )
+        );
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setloadingVoteComment(false); // Tắt loading khi hoàn thành
     }
   };
 
@@ -312,7 +325,7 @@ function CommentList({ discussionId }) {
           ))
         ) : (
           <div className="comment-list__no-comments">
-            <p>No comments available.</p>
+            <p>Please write the first comment to the discussion.</p>
           </div>
         )}
       </div>
@@ -615,6 +628,27 @@ function CommentList({ discussionId }) {
   margin-left: 60px;
 }
 
+/*No Comment*/
+.comment-list__no-comments {
+  display: flex;  /* Dùng Flexbox để căn giữa nội dung */
+  justify-content: center;  /* Căn ngang */
+  align-items: center;  /* Căn dọc */
+  height: 100%;  /* Đảm bảo chiều cao đầy đủ để căn giữa tốt */
+  text-align: center;  /* Căn giữa văn bản */
+  background-color: #f4f6f8;  /* Màu nền nhẹ nhàng */
+  padding: 20px;
+  border-radius: 10px;  /* Bo góc mềm mại */
+  border-radius: 12px; /* Tăng độ bo góc */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
+}
+
+.comment-list__no-comments p {
+  font-size: 18px;  /* Cỡ chữ hợp lý */
+  color: #1e334a;  /* Màu chữ chủ đề */
+  font-weight: 500;  /* Chữ in đậm nhẹ */
+  margin: 0;
+  padding: 0;
+}
 
 /* Edited label & timestamp */
 .comment-item__edited, .comment-item__timestamp {

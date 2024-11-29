@@ -7,7 +7,7 @@ public class RemoveCommentByIdEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/comments/{id:guid}", async (Guid id, ISender sender, CancellationToken cancellationToken) =>
+        app.MapDelete("/comments/{id:guid}/remove", async (Guid id, ISender sender, CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new RemoveCommentByIdCommand(id), cancellationToken);
 

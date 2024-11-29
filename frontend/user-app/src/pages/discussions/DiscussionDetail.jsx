@@ -82,9 +82,11 @@ function DiscussionDetail() {
         const data = await DiscussApi.getDiscussionDetails(id);
         const categories = await DiscussApi.getCategories();
         const currentViewTmp = await DiscussApi.updateViewDiscussion({ discussionId: id });
+
         if (!data) {
           throw new Error("Discussion not found.");
         }
+
         const userTmp = await AuthService.getUser();
         console.log(userTmp);
         setCurrentUser(userTmp);
@@ -167,7 +169,7 @@ function DiscussionDetail() {
       confirmButtonText: 'Yes',
       cancelButtonText: 'No',
       customClass: {
-        popup: 'swal-popup',                 // Lớp cho popup
+        popup: 'swal-popup',                // Lớp cho popup
         confirmButton: 'swal-btn-confirm',  // Lớp CSS cho nút "Yes"
         cancelButton: 'swal-btn-cancel'     // Lớp CSS cho nút "Cancel"
       }
@@ -930,13 +932,14 @@ function DiscussionDetail() {
 /* Image Section */
 .discussion-image {
   display: block; /* Chuyển ảnh thành block để căn giữa */
-  text-align: center; /* Căn giữa ảnh theo chiều ngang */
-  margin-bottom: 16px; /* Khoảng cách dưới ảnh */
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng */
   margin: 0 auto; /* Căn giữa ảnh ngang */
+  width: 100%; /* Đảm bảo ảnh có chiều rộng tối đa là 100% của phần tử chứa */
+  max-width: 60%; /* Giới hạn chiều rộng ảnh tối đa là 50% */
+  max-height: 500px; /* Giới hạn chiều cao ảnh tối đa */
   height: auto; /* Giữ tỷ lệ chiều cao ảnh */
 }
+
+
 
 /* Kiểm tra nếu các icon có kích thước quá lớn */
 .count-comment .fa-comment-alt {

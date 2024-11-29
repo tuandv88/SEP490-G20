@@ -7,6 +7,10 @@ import Stack from '@mui/material/Stack';
 import { marked } from 'marked'; // Import marked library
 import { formatDistanceToNow } from 'date-fns'
 import { Typography } from '@mui/material';;
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, CircularProgress } from "@mui/material";
+import AuthService from '../../oidc/AuthService'; // Import để lấy dữ liệu Auth...
 
 function CommentList({ discussionId }) {
   const [isPreview, setIsPreview] = useState(false);
@@ -15,6 +19,7 @@ function CommentList({ discussionId }) {
   const [refreshComments, setRefreshComments] = useState(false);
   const [comments, setComments] = useState([]);
   const [totalCommnents, setTotalComments] = useState(0);
+  const [loadingRemoveAPI, setLoadingRemoveAPI] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [voteCount, setVoteCount] = useState(0);
@@ -27,6 +32,14 @@ function CommentList({ discussionId }) {
   // New state to handle the comment input
   const [submitting, setSubmitting] = useState(false);
   const [loadingVoteComment, setloadingVoteComment] = useState(false);
+  const [tooltipContent, setTooltipContent] = useState('Share');
+  const [clicked, setClicked] = useState(false); // State để theo dõi trạng thái click
+
+  const [currentUser, setCurrentUser] = useState(null);
+  const [idCurrentUser, setIdCurrentUser] = useState(null);
+
+  const [openDialog, setOpenDialog] = useState(false);  // Trạng thái mở/đóng dialog
+  const [commentIdToDelete, setCommentIdToDelete] = useState(null); // Lưu ID comment cần xóa
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -44,10 +57,16 @@ function CommentList({ discussionId }) {
           setComments(updatedComments);
           setPagination(newPagination);
           setTotalComments(totalComments);
-
         } else {
           throw new Error("Invalid comments or pagination data.");
         }
+
+        const userTmp = await AuthService.getUser();
+        if (userTmp) {
+          setCurrentUser(userTmp);
+          setIdCurrentUser(userTmp.profile.sub);
+        }
+
       } catch (err) {
         console.error("Discussion No Any Comment.", err);
       } finally {
@@ -163,6 +182,52 @@ function CommentList({ discussionId }) {
       console.log(error);
     } finally {
       setloadingVoteComment(false); // Tắt loading khi hoàn thành
+    }
+  };
+
+  const currentUrl = window.location.href; // Hoặc URL bạn muốn sao chép
+
+  const copyToClipboard = () => {
+    // Giả sử bạn sao chép một đường link vào clipboard
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      setTooltipContent('Link Copied To Clipboard');  // Cập nhật tooltip sau khi sao chép
+      setClicked(true); // Đánh dấu là đã click
+
+      // Sau 2 giây, reset lại tooltip về trạng thái ban đầu
+      setTimeout(() => {
+        setTooltipContent('Share');
+        setClicked(false); // Đặt trạng thái clicked lại false
+      }, 2000);
+    });
+  };
+
+  // Hàm mở dialog xác nhận xóa
+  const handleOpenDialog = (commentId) => {
+    setCommentIdToDelete(commentId); // Lưu commentId cần xóa
+    setOpenDialog(true); // Mở dialog
+  };
+
+  // Hàm đóng dialog
+  const handleCloseDialog = () => {
+    setOpenDialog(false); // Đóng dialog
+    setCommentIdToDelete(null); // Reset ID comment
+  };
+
+  // Hàm xử lý xóa comment
+  const handleRemoveComment = async () => {
+    try {
+      // Gọi API xóa bình luận ngay khi người dùng nhấn Yes
+      const response = await DiscussApi.removeCommentById({ commentId: commentIdToDelete });
+
+      if (response) {
+        console.log("Comment deleted successfully");
+        // Gọi lại hàm refreshComments (truyền từ parent component) để làm mới danh sách comments
+        setRefreshComments(prev => !prev);
+      }
+    } catch (error) {
+      console.error("Error removing comment:", error.message);
+    } finally {
+      handleCloseDialog(); // Đóng dialog sau khi xóa xong
     }
   };
 
@@ -305,18 +370,47 @@ function CommentList({ discussionId }) {
                   </button>
                 </div>
 
+
                 {/* Action buttons */}
                 <div className="comment-item__actions">
                   {/* Other action buttons */}
-                  <button className="comment-item__edit">
-                    <FontAwesomeIcon icon={faEdit} /> Edit
+
+                  <button className={`comment-item__share ${clicked ? 'clicked' : ''}`}
+                    onClick={copyToClipboard}>
+                    <Tooltip title={tooltipContent} arrow>
+                      <FontAwesomeIcon icon={faShareFromSquare} /> Share
+                    </Tooltip>
                   </button>
-                  <button className="comment-item__delete">
-                    <FontAwesomeIcon icon={faTrash} /> Delete
-                  </button>
-                  <button className="comment-item__share">
-                    <FontAwesomeIcon icon={faShareFromSquare} /> Share
-                  </button>
+
+                  {comment.userId === idCurrentUser && (
+                    <>
+                      <button className="comment-item__edit">
+                        <FontAwesomeIcon icon={faEdit} /> Edit
+                      </button>
+                      <button
+                        className="comment-item__delete"
+                        onClick={() => handleOpenDialog(comment.id)}>
+                        <FontAwesomeIcon icon={faTrash} /> Delete
+                      </button>
+                    </>
+                  )}
+
+                  {/* Dialog xác nhận xóa */}
+                  <Dialog open={openDialog} onClose={handleCloseDialog}>
+                    <DialogTitle>Are you sure you want to delete this comment?</DialogTitle>
+                    <DialogActions>
+                      {/* Nút "No" sẽ đóng dialog mà không làm gì */}
+                      <Button onClick={handleCloseDialog} color="primary">
+                        No
+                      </Button>
+
+                      {/* Nút "Yes" sẽ gọi hàm xóa comment */}
+                      <Button onClick={handleRemoveComment} color="secondary">
+                        Yes
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+
                   <button className="comment-item__reply">
                     <FontAwesomeIcon icon={faReply} /> Reply
                   </button>

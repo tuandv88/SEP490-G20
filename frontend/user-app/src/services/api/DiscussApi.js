@@ -202,7 +202,6 @@ export const DiscussApi = {
         params: { PageIndex: pageIndex, PageSize: pageSize }
       });
 
-
       // Kiểm tra và xử lý dữ liệu trả về
       if (response && response.data && response.data.commentsDetailDtos) {
         const comments = response.data.commentsDetailDtos.data;
@@ -212,18 +211,19 @@ export const DiscussApi = {
           totalCount: response.data.commentsDetailDtos.count,
         };
 
+        // Nếu không có bình luận, trả về dữ liệu rỗng
+        if (!comments || comments.length === 0) {
+          return { updatedComments: [], pagination, totalComments: 0 };
+        }
+
         // Lấy danh sách userId từ các bình luận
         const commentUserIds = comments.map(comment => comment.userId);
 
-        if (commentUserIds.length === 0) {
-          throw new Error("Không có người dùng nào trong bình luận này.");
-        }
         // Fetch thông tin người dùng cho tất cả các comment
         const users = await fetchUsers(commentUserIds);
 
         // Cập nhật thông tin người dùng cho từng bình luận
         const updatedComments = comments.map(comment => {
-
           const commentUser = users.find(user => user.id === comment.userId);
           return {
             ...comment,
@@ -233,13 +233,25 @@ export const DiscussApi = {
             lastName: commentUser ? commentUser.lastName : "xxx",
           };
         });
-        // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang
 
+        // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang
         return { updatedComments, pagination, totalComments: pagination.totalCount };
       } else {
         throw new Error("Dữ liệu trả về không hợp lệ từ API.");
       }
     } catch (error) {
+      throw error;
+    }
+  },
+
+  // API: Remove comment mới
+  removeCommentById: async ({ commentId }) => {
+    try {
+      console.log(commentId);
+      const response = await axios.delete(`${API_BASE_URL}/community-service/comments/${commentId}/remove`, getAuthHeaders());
+      return response;
+    } catch (error) {
+      console.error("Error Remove Comment :", error.message);
       throw error;
     }
   },

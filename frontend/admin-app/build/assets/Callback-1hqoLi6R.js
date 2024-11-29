@@ -1,0 +1,2 @@
+import{p as o,r as t,R as r}from"./index-DoHIwt5e.js";import{a as c}from"./AuthService-T8M2Im9z.js";import{L as l}from"./overlay-DMhMuqms.js";import"./js.cookie-Cz0CWeBA.js";function m(){console.log("Callback method....");const e=o();return t.useEffect(()=>{c.handleCallback().then(()=>{console.log("Verify Auth Code - Get Access_Token & Save Storage.."),e({to:"/"})}).catch(a=>{console.error("Error handling callback:",a),console.error("Verify Auth Code Failed."),e({to:"/"})})},[e]),r.createElement(l)}export{m as default};
+//# sourceMappingURL=Callback-1hqoLi6R.js.map

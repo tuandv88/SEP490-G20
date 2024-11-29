@@ -47,7 +47,7 @@ const data = {
       items: [
         {
           title: 'User Management',
-          url: '/userList'
+          url: '/user-table'
         },
         {
           title: 'TestUser',

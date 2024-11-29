@@ -146,7 +146,6 @@ export default function useCourseTable() {
       }
       return true
     } catch (error) {
-      console.error('Error checking course details:', error)
       toast({
         title: 'Error',
         description: 'An error occurred while checking course details.',
@@ -157,15 +156,28 @@ export default function useCourseTable() {
     }
   }
   const handleDeleteCourse = async (courseId) => {
-    await deleteCourse(courseId)
-    await fetchCourses()
+    try {
+      await deleteCourse(courseId)
+      toast({
+        title: 'Course deleted',
+        description: 'The course has been deleted successfully.',
+        variant: 'default',
+        duration: 1500
+      })
+      await fetchCourses()
+    } catch (error) {
+      console.error('Error deleting course:', error)
+      toast({
+        title: 'Error',
+        description: 'An error occurred while deleting the course.',
+        variant: 'destructive',
+        duration: 1500
+      })
+    }
   }
 
   const handleStatusChange = async (courseId, newStatus, currentStatus) => {
-    console.log(`Changing status for course ${courseId} from ${currentStatus} to ${newStatus}`)
-
     if (newStatus === currentStatus) {
-      console.log('New status is the same as current status. No action needed.')
       return
     }
 
@@ -226,7 +238,6 @@ export default function useCourseTable() {
     const scheduledDate = new Date(scheduledDateTime)
 
     try {
-      console.log('Updating course status to Scheduled with scheduled date:', scheduledDateTime)
       await updateCourseStatus(selectedCourse, 'Scheduled', scheduledDateTime)
       setIsStatusChangeDialogOpen(false)
       toast({
@@ -234,7 +245,6 @@ export default function useCourseTable() {
         description: `Course has been scheduled for publication on ${format(scheduledDate, 'PPpp')}.`
       })
     } catch (error) {
-      console.error('Error scheduling course:', error)
       toast({
         title: 'Error',
         description: 'An error occurred while scheduling the course.',
@@ -249,7 +259,6 @@ export default function useCourseTable() {
       courseLevel: newLevel
     }
     if (newLevel === currentLevel) {
-      console.log('New level is the same as current level. No action needed.')
       return
     }
 

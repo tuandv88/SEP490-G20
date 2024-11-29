@@ -43,10 +43,7 @@ const EditCourse = () => {
     alert('Edit course info functionality to be implemented')
   }
 
-  if (!course)
-    return (
-      <Loading />
-    )
+  if (!course) return <Loading />
 
   return (
     <div className='flex flex-col lg:flex-row min-h-screen'>

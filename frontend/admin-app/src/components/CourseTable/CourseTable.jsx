@@ -15,6 +15,7 @@ import MultiSelect from './MultiSelect'
 import SelectedFilters from './SelectedFilters'
 import { TableRowSkeleton } from './TableRowSkeleton'
 import useCourseTable from '@/hooks/useCourseTable'
+
 import SchedulePublishDialog from '@/components/SchedulePublishDialog'
 
 function CourseTable() {

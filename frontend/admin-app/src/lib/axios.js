@@ -1,8 +1,9 @@
 import axios from 'axios'
+import Cookies from 'js-cookie'
 const API_BASE_URL = import.meta.env.VITE_BASE_URL
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL, // Thay thế bằng URL API thực tế của bạn
-  timeout: 40000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -16,5 +17,4 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-
 export default axiosInstance

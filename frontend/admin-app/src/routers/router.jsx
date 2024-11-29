@@ -8,7 +8,7 @@ const rootRoute = createRootRoute({
 
 // Define a separate root route for the login page without layout
 const loginRootRoute = createRootRoute({
-  component: lazy(() => import('@/pages/Login/login')) // Directly load the login component
+  component: lazy(() => import('@/pages/Login/Login')) // Directly load the login component
 })
 
 // Define other routes as children of the main root route

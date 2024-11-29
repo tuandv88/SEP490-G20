@@ -11,7 +11,7 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IProblemSu
         var isAdmin = userRole == PoliciesType.Administrator;
 
         // lấy ra toàn bộ data của problem
-        var allDataProblem = await problemRepository.GetAllAsQueryableAsync();
+        var allDataProblem = problemRepository.GetAllAsQueryable();
 
         var filter = request.Filter;
         var titleSearch = filter.SearchString ?? "";

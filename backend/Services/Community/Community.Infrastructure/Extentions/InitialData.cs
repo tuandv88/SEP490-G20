@@ -20,18 +20,19 @@ namespace Community.Infrastructure.Extensions
         // Danh sách Category mẫu với các GUID cố định
         public static readonly List<Category> Categories = new List<Category>
         {
-            new Category { Id = new CategoryId(new Guid("11111111-1111-1111-1111-111111111111")), Name = "Technology", Description = "Discussions about technology", IsActive = true },
-            new Category { Id = new CategoryId(new Guid("22222222-2222-2222-2222-222222222222")), Name = "Career", Description = "Career advice and guidance", IsActive = true },
-            new Category { Id = new CategoryId(new Guid("33333333-3333-3333-3333-333333333333")), Name = "Health", Description = "Health and wellness topics", IsActive = true },
-            new Category { Id = new CategoryId(new Guid("44444444-4444-4444-4444-444444444444")), Name = "Education", Description = "Educational discussions", IsActive = true },
-            new Category { Id = new CategoryId(new Guid("55555555-5555-5555-5555-555555555555")), Name = "Finance", Description = "Financial advice and news", IsActive = false }
+            new Category { Id = new CategoryId(new Guid("11111111-1111-1111-1111-111111111111")), Name = "Interview Question", Description = "Tech interview questions, coding challenges, and assessments.", IsActive = true },
+            new Category { Id = new CategoryId(new Guid("22222222-2222-2222-2222-222222222222")), Name = "Interview Experience", Description = "Share your job interview experiences and tips.", IsActive = true },
+            new Category { Id = new CategoryId(new Guid("33333333-3333-3333-3333-333333333333")), Name = "Compensation", Description = "Discuss salary, benefits, and compensation packages.", IsActive = true },
+            new Category { Id = new CategoryId(new Guid("44444444-4444-4444-4444-444444444444")), Name = "Career", Description = "Career growth, job search, and professional development.", IsActive = true },
+            new Category { Id = new CategoryId(new Guid("55555555-5555-5555-5555-555555555555")), Name = "Study Guide", Description = "Study resources, guides, and exam prep.", IsActive = true },
+            new Category { Id = new CategoryId(new Guid("66666666-6666-6666-6666-666666666666")), Name = "Support & Feedback", Description = "Financial advice and feedback on services.", IsActive = true }
         };
 
         // Danh sách Discussion mẫu
         public static readonly List<Discussion> Discussions = new List<Discussion>
         {
             new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[0].Id, CategoryId = Categories[0].Id,
-                Title = "Future of AI", Description = "The impact of AI on society", ViewCount = 100, IsActive = true,
+                Title = "Future of AI", Description = "The impact of AI on society", ViewCount = 100 , IsActive = true,
                 Tags = new List<string> { "AI", "Technology" }, DateCreated = DateTime.UtcNow.AddDays(-10), DateUpdated = DateTime.UtcNow,
                 Closed = false, Pinned = true, ImageUrl = "backend/imagediscussions/1748b3c7a1f469cb245df8613671fe70.jpg" , NotificationsEnabled = true},
 
@@ -46,7 +47,7 @@ namespace Community.Infrastructure.Extensions
                 Closed = false, Pinned = false, ImageUrl = "backend/imagediscussions/1748b3c7a1f469cb245df8613671fe70.jpg" , NotificationsEnabled = true},
 
             new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[3].Id, CategoryId = Categories[3].Id,
-                Title = "Best Learning Techniques", Description = "Effective learning techniques", ViewCount = 60, IsActive = true,
+                Title = "Best Learning Techniques", Description = "Effective learning techniques", ViewCount = 60,  IsActive = true,
                 Tags = new List<string> { "Education", "Learning" }, DateCreated = DateTime.UtcNow.AddDays(-5), DateUpdated = DateTime.UtcNow,
                 Closed = false, Pinned = false, ImageUrl = "backend/imagediscussions/1748b3c7a1f469cb245df8613671fe70.jpg" , NotificationsEnabled = true},
 
@@ -55,22 +56,22 @@ namespace Community.Infrastructure.Extensions
                 Tags = new List<string> { "Finance", "Retirement" }, DateCreated = DateTime.UtcNow.AddDays(-2), DateUpdated = DateTime.UtcNow,
                 Closed = true, Pinned = false, ImageUrl = "backend/imagediscussions/1748b3c7a1f469cb245df8613671fe70.jpg" , NotificationsEnabled = true},
 
-            new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[0].Id, CategoryId = Categories[0].Id,
-                Title = "Saving for Retirement 02", Description = "Financial planning for retirement 02", ViewCount = 30, IsActive = false,
+            new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[0].Id, CategoryId = Categories[5].Id,
+                Title = "Saving for Retirement 02", Description = "Financial planning for retirement 02", ViewCount = 30,  IsActive = false,
                 Tags = new List<string> { "Hanna", "Yakata" }, DateCreated = DateTime.UtcNow.AddDays(-2), DateUpdated = DateTime.UtcNow,
                 Closed = true, Pinned = false, ImageUrl = "backend/imagediscussions/1748b3c7a1f469cb245df8613671fe70.jpg" , NotificationsEnabled = true},
 
-            new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[0].Id, CategoryId = Categories[0].Id,
-                Title = "Saving for Retirement 03 ", Description = "Financial planning for retirement 03", ViewCount = 30, IsActive = true,
+            new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[0].Id, CategoryId = Categories[1].Id,
+                Title = "Saving for Retirement 03 ", Description = "Financial planning for retirement 03", ViewCount = 30,IsActive = true,
                 Tags = new List<string> { "AI", "Banana" }, DateCreated = DateTime.UtcNow.AddDays(-2), DateUpdated = DateTime.UtcNow,
                 Closed = true, Pinned = false, ImageUrl = "backend/imagediscussions/1748b3c7a1f469cb245df8613671fe70.jpg" , NotificationsEnabled = true},
 
-            new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[0].Id, CategoryId = Categories[0].Id,
+            new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[0].Id, CategoryId = Categories[2].Id,
                 Title = "Saving for Retirement 02", Description = "Financial planning for retirement 02", ViewCount = 30, IsActive = true,
                 Tags = new List<string> { "Tanakhan", "Yakata" }, DateCreated = DateTime.UtcNow.AddDays(-2), DateUpdated = DateTime.UtcNow,
                 Closed = true, Pinned = false, ImageUrl = "backend/imagediscussions/1748b3c7a1f469cb245df8613671fe70.jpg" , NotificationsEnabled = false},
 
-            new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[0].Id, CategoryId = Categories[0].Id,
+            new Discussion { Id = new DiscussionId(Guid.NewGuid()), UserId = Users[0].Id, CategoryId = Categories[3].Id,
                 Title = "Saving for Retirement 03 ", Description = "Financial planning for retirement 03", ViewCount = 30, IsActive = true,
                 Tags = new List<string> { "Kita", "Banana" }, DateCreated = DateTime.UtcNow.AddDays(-2), DateUpdated = DateTime.UtcNow,
                 Closed = true, Pinned = false, ImageUrl = "backend/imagediscussions/1748b3c7a1f469cb245df8613671fe70.jpg" , NotificationsEnabled = false}

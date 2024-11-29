@@ -16,6 +16,7 @@ using Microsoft.Extensions.Caching.StackExchangeRedis;
 using AuthServer.Repository.Services.Storage;
 using StackExchange.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AuthServer.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -136,18 +137,29 @@ builder.Services.AddAuthorization(options =>
 });
 
 
-// Thêm chính sách CORS
+// Đọc danh sách các URL từ appsettings.json
+// Lấy cấu hình từ appsettings.json (nếu bạn đang dùng appsettings)
+var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>();
+
+if (allowedOrigins == null || allowedOrigins.Length == 0)
+{
+    throw new ArgumentNullException("origins", "CORS origins cannot be null or empty.");
+}
+
+// Cấu hình CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // Địa chỉ được phép
-              .AllowAnyHeader()                    // Cho phép tất cả header
-              .AllowAnyMethod()                    // Cho phép tất cả HTTP method (GET, POST, PUT, DELETE, ...)
-              .AllowCredentials();                 // Cho phép gửi cookie hoặc xác thực
+        policy.WithOrigins(allowedOrigins)   // Truyền vào danh sách các nguồn gốc từ cấu hình
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
+// Đọc cấu hình từ appsettings.json
+builder.Configuration.GetSection("ApiSettings").Get<ApiSettings>();
 
 // Cấu hình SendMail - Nuget: FluentMail
 builder.Services.AddTransient<IEmailService, EmailService>();

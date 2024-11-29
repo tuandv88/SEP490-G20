@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 
 // Sửa API base URL cho đúng với backend
 const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_AUTHEN_URL = import.meta.env.VITE_AUTH_URL;
 
 const getAuthHeaders = () => {
   //console.log(Cookies.get('authToken'));
@@ -289,12 +290,12 @@ export const DiscussApi = {
 
 };
 
-
-
 // API thứ hai: Lấy thông tin chi tiết của UserIds
 async function fetchUsers(userIds) {
   try {
-    const response = await axios.post(`https://localhost:6005/users/getusers`, { UserIds: userIds });
+    const response = await axios.post(`${API_AUTHEN_URL}/users/getusers`, { UserIds: userIds });
+
+    console.log(response.data);
     if (response && response.data) {
       return response.data;
     } else {

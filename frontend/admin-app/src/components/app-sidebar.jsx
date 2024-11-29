@@ -28,7 +28,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar'
-import { ModeToggle } from './mode-toggle'
 
 // This is sample data.
 const data = {
@@ -151,9 +150,7 @@ export function AppSidebar({ ...props }) {
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <ModeToggle />
-          </SidebarMenuItem>
+          <SidebarMenuItem></SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>

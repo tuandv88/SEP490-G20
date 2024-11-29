@@ -20,32 +20,26 @@ function UsersPage() {
         setError(null)
         const data = await getAllUsersDetail(signal)
         if (!signal.aborted) {
-          // Kiểm tra xem request có bị hủy không
           setUsers(data)
         }
       } catch (error) {
-        // Không set error nếu request bị hủy
         if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
-          console.log('Request was canceled', error)
         } else {
-          setError(error.response?.data?.message || error.message || 'Có lỗi xảy ra, vui lòng thử lại')
+          setError(error.response?.data?.message || error.message || 'Have an error, please try again')
         }
       } finally {
         if (!signal.aborted) {
-          // Chỉ set loading false nếu request không bị hủy
           setLoading(false)
         }
       }
     }
-
     fetchUsers()
 
     return () => {
-      controller.abort() // Hủy request khi component unmount
+      controller.abort()
     }
   }, [])
 
-  // ... phần code render giữ nguyên
   if (loading) {
     return (
       <div className='flex justify-center items-center h-screen'>
@@ -64,8 +58,8 @@ function UsersPage() {
   }
 
   return (
-    <div className='container mx-auto py-10'>
-      <h1 className='text-3xl font-bold mb-5'>User Management</h1>
+    <div className='container mx-auto '>
+      <h1 className='text-2xl font-bold mb-5'>User Management</h1>
       <DataTable columns={columns} data={users} />
     </div>
   )

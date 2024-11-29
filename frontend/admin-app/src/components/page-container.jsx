@@ -18,20 +18,20 @@ export function PageContainer({
 
   return (
     <SidebarInset className={`flex flex-col h-full ${className}`}>
-      <header className='sticky top-0 z-10 flex items-center h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
-        <div className={`flex items-center gap-4 px-4 ${collapsed ? 'ml-0' : ''}`}>
-          <SidebarTrigger />
-          <Separator orientation='vertical' className='h-4' />
+      <header className='sticky top-0 z-10 flex items-center h-12 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+        <div className={`flex items-center gap-2 px-2 ${collapsed ? 'ml-0' : ''}`}>
+          <SidebarTrigger className='h-6 w-6' />
+          <Separator orientation='vertical' className='h-3' />
           <Breadcrumb>
             <BreadcrumbList>
               {breadcrumbs.map((crumb, index) => (
                 <BreadcrumbItem key={index}>
                   {index < breadcrumbs.length - 1 ? (
-                    <BreadcrumbLink href={crumb.href} className='text-base'>
+                    <BreadcrumbLink href={crumb.href} className='text-sm'>
                       {crumb.label}
                     </BreadcrumbLink>
                   ) : (
-                    <BreadcrumbPage className='text-base'>{crumb.label}</BreadcrumbPage>
+                    <BreadcrumbPage className='text-sm'>{crumb.label}</BreadcrumbPage>
                   )}
                   {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
                 </BreadcrumbItem>
@@ -40,8 +40,8 @@ export function PageContainer({
           </Breadcrumb>
         </div>
       </header>
-      <div className='flex-1 p-6 overflow-auto text-base'>
-        <div className='mx-auto max-w-[1600px]'>{children}</div>
+      <div className='flex-1 p-4 overflow-auto text-sm'>
+        <div className='mx-auto max-w-[1200px]'>{children}</div>
       </div>
     </SidebarInset>
   )

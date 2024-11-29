@@ -2,7 +2,7 @@
 using Community.Application.Models.Comments.Queries.GetCommentsPaging;
 
 namespace Community.Application.Models.Comments.Queries.GetCommentsByIdDiscussion;
-public record GetCommentsByIdDiscussionResult(PaginatedResult<CommentDto> CommentDtos);
+public record GetCommentsByIdDiscussionResult(PaginatedResult<CommentsDetailDto> CommentsDetailDtos);
 public record GetCommentsByIdDiscussionQuery(Guid DiscussionId, PaginationRequest PaginationRequest) : IQuery<GetCommentsByIdDiscussionResult>;
 public class GetCommentsByIdDiscussionValidator : AbstractValidator<GetCommentsByIdDiscussionQuery>
 {

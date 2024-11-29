@@ -4,6 +4,7 @@ import "react-quill/dist/quill.snow.css"; // Import style của react-quill
 import styled from "styled-components";
 import Layout from "@/layouts/layout";
 import { DiscussApi } from "@/services/api/DiscussApi";
+import { useNavigate } from "react-router-dom"; // Import hook useNavigate
 
 const CreateDiscussion = () => {
   const [title, setTitle] = useState("");
@@ -12,7 +13,7 @@ const CreateDiscussion = () => {
   const [category, setCategory] = useState(""); // Lưu giá trị của category
   const [image, setImage] = useState(null); // Lưu ảnh tải lên
   const [categories, setCategories] = useState([]); // Lưu danh sách categories
-
+  const navigate = useNavigate();  // Khai báo navigate
   // Gọi API để lấy danh sách categories khi component được load
   useEffect(() => {
     const fetchCategories = async () => {
@@ -70,7 +71,7 @@ const CreateDiscussion = () => {
   };
 
   return (
-    <Layout>  
+    <Layout>
       <Container>
         <form onSubmit={handleSubmit}>
           <FormGroup>
@@ -139,11 +140,14 @@ const CreateDiscussion = () => {
               style={{ height: "300px", marginBottom: "30px" }} // Thêm margin dưới
             />
           </FormGroup>
-          
+
           {/* Nút Post và Close */}
           <FormGroup>
             <ButtonContainer>
-              <PostButton type="submit">Post</PostButton>
+              <PostButton type="submit" onClick={() => navigate("/discussions/discuss")}>
+                Post
+              </PostButton>
+
               <CloseButton type="button" onClick={() => console.log("Close")}>Close</CloseButton>
             </ButtonContainer>
           </FormGroup>

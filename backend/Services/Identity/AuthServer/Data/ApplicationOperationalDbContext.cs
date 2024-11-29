@@ -40,7 +40,7 @@ namespace AuthServer.Data
                         {
                             property.SetValueConverter(new ValueConverter<DateTime?, DateTime?>(
                                 v => v.HasValue ? v.Value.ToUniversalTime() : (DateTime?)null, // Khi lưu, chuyển nullable DateTime? thành UTC (nếu có giá trị)
-                                v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null // Khi lấy dữ liệu, đặt DateTimeKind thành UTC cho DateTime?
+                                v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null // Khi lấy dữ liệu, đặt DateTimeKind thành UTC
                             ));
                         }
                     }

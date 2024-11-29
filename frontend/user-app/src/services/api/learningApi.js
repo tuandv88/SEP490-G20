@@ -60,5 +60,13 @@ export const LearningAPI = {
       }
     })
     return response.data
+  },
+  getLearningPath: async () => {
+    const response = await axios.get(`${API_BASE_URL}/user-service/users/learning-path`, {
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
   }
 }

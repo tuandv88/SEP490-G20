@@ -33,8 +33,10 @@ class AuthService {
     })
   }
 
-  login() {
-    return this.userManager.signinRedirect()
+  async login() {
+    await this.userManager.signinRedirect()
+    const user = await this.userManager.getUser()
+    return user
   }
 
   logout() {
@@ -48,6 +50,17 @@ class AuthService {
 
   handleCallback() {
     return this.userManager.signinRedirectCallback()
+  }
+
+  async refreshToken() {
+    try {
+      const user = await this.userManager.signinSilent();
+      Cookies.set('authToken', user.access_token, { expires: 7 });
+      return user;
+    } catch (err) {
+      console.error("Lỗi khi làm mới token:", err);
+      throw err;
+    }
   }
 
   callApi() {

@@ -9,18 +9,24 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const user = await AuthService.getUser()
-        setUser(user)
+        const userData = await AuthService.getUser();
+        if (userData) {
+          setUser(userData);
+        }
       } catch (error) {
-        console.error('Error fetching user:', error)
+        console.error('Error fetching user:', error);
       }
-    }
+    };
 
-    fetchUser()
-  }, [])
+    fetchUser();
+  }, []);
+
+  const updateUser = (userData) => {
+    setUser(userData);
+  };
 
   return (
-    <UserContext.Provider value={user}>
+    <UserContext.Provider value={{ user, updateUser }}>
       {children}
     </UserContext.Provider>
   )

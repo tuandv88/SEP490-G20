@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { PlusIcon } from '@radix-ui/react-icons'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -8,20 +8,18 @@ import ChapterList from './Curriculum/Chapter/ChapterList'
 import AddLectureDialog from './Curriculum/Lecture/AddLectureDialog'
 import EditChapterDialog from './Curriculum/Chapter/EditChapterDialog'
 import EditLectureDialog from './Curriculum/Lecture/EditLectureDialog'
-import { createChapter } from '@/services/api/chapterApi'
-import { createLecture } from '@/services/api/lectureApi'
+import { createChapter, updateChapter, deleteChapter } from '@/services/api/chapterApi'
+import { createLecture, updateLecture, deleteLecture } from '@/services/api/lectureApi'
 
 const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
-  console.log(chapter)
   const [isUpdate, setIsUpdate] = useState(false)
-  const [curriculum, setCurriculum] = useState([])
   const [isAddChapterOpen, setIsAddChapterOpen] = useState(false)
+  const [editingChapter, setEditingChapter] = useState(null)
   const [editingChapterIndex, setEditingChapterIndex] = useState(null)
   const [isAddLectureOpen, setIsAddLectureOpen] = useState(false)
   const [addingLectureToChapter, setAddingLectureToChapter] = useState(null)
   const [editingLecture, setEditingLecture] = useState(null)
   const { toast } = useToast()
-
   // Thêm useEffect để khôi phục trạng thái cuộn
   useEffect(() => {
     const restoreScroll = () => {
@@ -29,62 +27,100 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
       document.body.style.height = 'auto'
     }
 
-    if (!isAddChapterOpen && editingChapterIndex === null && !isAddLectureOpen && editingLecture === null) {
+    if (!isAddChapterOpen && editingChapter === null && !isAddLectureOpen && editingLecture === null) {
       restoreScroll()
     }
 
     return () => {
       restoreScroll()
     }
-  }, [isAddChapterOpen, editingChapterIndex, isAddLectureOpen, editingLecture, isUpdate])
+  }, [isAddChapterOpen, editingChapter, isAddLectureOpen, editingLecture, isUpdate])
 
-  
-  const handleFileUpload = (file, chapterIndex, lectureIndex) => {
-    const newCurriculum = [...curriculum]
-    if (!newCurriculum[chapterIndex].lectures[lectureIndex].files) {
-      newCurriculum[chapterIndex].lectures[lectureIndex].files = []
+  const handleEditChapter = (chapterId) => {
+    // Find the chapter in the array
+    const chapterToEdit = chapter.find((c) => {
+      return c.chapterDto && c.chapterDto.id === chapterId
+    })
+
+    if (chapterToEdit) {
+      setEditingChapter(chapterToEdit.chapterDto)
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Could not find chapter to edit',
+        variant: 'destructive'
+      })
     }
-    newCurriculum[chapterIndex].lectures[lectureIndex].files.push(file)
-    setCurriculum(newCurriculum)
-    toast({
-      title: 'File uploaded',
-      description: 'The file has been successfully uploaded.',
-      duration: 1500
-    })
   }
 
-  const handleVideoUpload = (file, chapterIndex, lectureIndex) => {
-    const newCurriculum = [...curriculum]
-    newCurriculum[chapterIndex].lectures[lectureIndex].video = file
-    setCurriculum(newCurriculum)
-    toast({
-      title: 'Video uploaded',
-      description: 'The video has been successfully uploaded.',
-      duration: 1500
-    })
+  const saveEditedChapter = async (updatedChapter) => {
+    try {
+      // Format the chapter data to match the API expectations
+      const formattedChapterData = {
+        chapter: {
+          title: updatedChapter.title,
+          description: updatedChapter.description,
+          isActive: updatedChapter.isActive
+        }
+      }
+
+      // Call the updateChapter API function
+      await updateChapter(formattedChapterData, courseId, updatedChapter.id)
+
+      handleUpdateChapter()
+      setEditingChapter(null)
+      toast({
+        title: 'Chapter updated successfully',
+        description: 'The chapter has been updated.'
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update the chapter. Please try again.',
+        variant: 'destructive'
+      })
+    }
   }
 
-  const handleFileRemove = (chapterIndex, lectureIndex, fileIndex) => {
-    const newCurriculum = [...curriculum]
-    newCurriculum[chapterIndex].lectures[lectureIndex].files.splice(fileIndex, 1)
-    setCurriculum(newCurriculum)
-    toast({
-      title: 'File removed',
-      description: 'The file has been successfully removed.',
-      duration: 1500
-    })
-  }
+  const handleUpdateLecture = useCallback(
+    async (chapterId, lectureId, updatedLecture) => {
+      try {
+        await updateLecture(chapterId, lectureId, updatedLecture)
+        handleUpdateChapter()
+        toast({
+          title: 'Lecture updated successfully',
+          description: 'The lecture has been updated.'
+        })
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to update the lecture. Please try again.',
+          variant: 'destructive'
+        })
+      }
+    },
+    [handleUpdateChapter, toast]
+  )
 
-  const handleVideoRemove = (chapterIndex, lectureIndex) => {
-    const newCurriculum = [...curriculum]
-    newCurriculum[chapterIndex].lectures[lectureIndex].video = null
-    setCurriculum(newCurriculum)
-    toast({
-      title: 'Video removed',
-      description: 'The video has been successfully removed.',
-      duration: 1500
-    })
-  }
+  const handleDeleteLecture = useCallback(
+    async (chapterId, lectureId) => {
+      try {
+        await deleteLecture(chapterId, lectureId)
+        handleUpdateChapter()
+        toast({
+          title: 'Lecture deleted successfully',
+          description: 'The lecture has been removed.'
+        })
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to delete the lecture. Please try again.',
+          variant: 'destructive'
+        })
+      }
+    },
+    [handleUpdateChapter, toast]
+  )
 
   const addChapter = async (newChapter, courseId) => {
     const chapterCreate = {
@@ -102,7 +138,6 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
       handleUpdateChapter()
       // Optionally, navigate to another page or show a success message
     } catch (error) {
-      console.error('Error creating course:', error)
       // Optionally, show an error message to the user
     }
   }
@@ -119,13 +154,21 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
     })
   }
 
-  const deleteChapter = (index) => {
-    const newCurriculum = curriculum.filter((_, i) => i !== index)
-    setCurriculum(newCurriculum)
-    toast({
-      title: 'Chapter deleted',
-      description: 'The chapter has been successfully removed.'
-    })
+  const handleDeleteChapter = async (chapterId) => {
+    try {
+      await deleteChapter(courseId, chapterId)
+      handleUpdateChapter()
+      toast({
+        title: 'Chapter deleted successfully',
+        description: 'The chapter has been removed.'
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete the chapter. Please try again.',
+        variant: 'destructive'
+      })
+    }
   }
 
   const addLecture = async (chapterId, newLecture) => {
@@ -144,7 +187,6 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
       handleUpdateChapter()
       // Optionally, navigate to another page or show a success message
     } catch (error) {
-      console.error('Error creating course:', error)
       // Optionally, show an error message to the user
     }
   }
@@ -161,16 +203,6 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
       title: 'Lecture updated',
       description: 'The lecture has been successfully updated.',
       duration: 1500
-    })
-  }
-
-  const deleteLecture = (chapterIndex, lectureIndex) => {
-    const newCurriculum = [...curriculum]
-    newCurriculum[chapterIndex].lectures = newCurriculum[chapterIndex].lectures.filter((_, i) => i !== lectureIndex)
-    setCurriculum(newCurriculum)
-    toast({
-      title: 'Lecture deleted',
-      description: 'The lecture has been successfully removed.'
     })
   }
 
@@ -197,20 +229,14 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         setIsUpdate={setIsUpdate}
         isUpdate={isUpdate}
         curriculum={chapter}
-        onEditChapter={(index) => setEditingChapterIndex(index)}
-        onDeleteChapter={deleteChapter}
-        onAddLecture={(index) => {
-          setAddingLectureToChapter(index)
+        onEditChapter={handleEditChapter}
+        onDeleteChapter={handleDeleteChapter}
+        onAddLecture={(chapterId) => {
+          setAddingLectureToChapter(chapterId)
           setIsAddLectureOpen(true)
         }}
-        onEditLecture={(lecture, chapterIndex, lectureIndex) => {
-          setEditingLecture({ lecture, chapterIndex, lectureIndex })
-        }}
-        onDeleteLecture={deleteLecture}
-        onFileUpload={handleFileUpload}
-        onVideoUpload={handleVideoUpload}
-        onFileRemove={handleFileRemove}
-        onVideoRemove={handleVideoRemove}
+        onUpdateLecture={handleUpdateLecture}
+        onDeleteLecture={handleDeleteLecture}
         courseId={courseId}
       />
 
@@ -219,12 +245,14 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         onClose={() => setIsAddLectureOpen(false)}
         onSave={(lecture) => addLecture(addingLectureToChapter, lecture)}
       />
-      <EditChapterDialog
-        isOpen={editingChapterIndex !== null}
-        onClose={() => setEditingChapterIndex(null)}
-        chapter={editingChapterIndex !== null ? curriculum[editingChapterIndex] : null}
-        onSave={(updatedChapter) => saveChapter(updatedChapter, editingChapterIndex)}
-      />
+      {editingChapter && (
+        <EditChapterDialog
+          isOpen={editingChapter !== null}
+          onClose={() => setEditingChapter(null)}
+          chapter={editingChapter}
+          onSave={saveEditedChapter}
+        />
+      )}
       <EditLectureDialog
         isOpen={editingLecture !== null}
         onClose={() => setEditingLecture(null)}

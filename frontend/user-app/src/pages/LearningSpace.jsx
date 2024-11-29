@@ -10,7 +10,6 @@ import ErrorPage from './ErrorPage'
 import NotFound from './NotFound'
 import ChapterLoading from '@/components/loading/ChapterLoading'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
-import HeaderCode from '@/layouts/learningheader'
 import ToggleCurriculum from '@/components/learning/ToggleCurriculum'
 import ChatAI from '@/components/chat/ChatAI'
 import Quiz from '@/components/learning/Quiz'
@@ -22,6 +21,7 @@ import Quiz2 from '@/components/learning/Quiz2'
 import SubmissionHistory from '@/components/learning/submission/SubmissionHistory'
 import { ProblemAPI } from '@/services/api/problemApi'
 import SubmissionResult from '@/components/learning/submission/SubmissionResult'
+import HeaderCode from '@/layouts/learningheaderLec'
 
 
 

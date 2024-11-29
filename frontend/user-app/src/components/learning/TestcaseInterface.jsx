@@ -62,6 +62,12 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
   const activeTabTestcase = useStore((state) => state.activeTabTestcase)
   const setActiveTabTestcase = useStore((state) => state.setActiveTabTestcase)
 
+  console.log('testCases', testCases)
+
+  if (testCase[0] === null) {
+    console.log('testCase[0] === null')
+  }
+
   useEffect(() => {
     if (testCase) {
       setTestCases(testCase)
@@ -127,7 +133,9 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
       <div className='flex mb-4 border-b border-gray-600'>
         <button
           className={`px-4 py-2 text-sm font-bold ${
-            activeTabTestcase === 'Testcase' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-gray-200'
+            activeTabTestcase === 'Testcase'
+              ? 'text-blue-400 border-b-2 border-blue-400'
+              : 'text-gray-400 hover:text-gray-200'
           }`}
           onClick={() => setActiveTabTestcase('Testcase')}
         >
@@ -271,6 +279,24 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
               </pre>
             </div>
           )}
+
+          {/* {!loading && response?.codeExecuteDto?.status?.description === 'Accepted' && (
+            <div>
+              <h2 className='text-2xl font-bold text-green-500 mb-4'>Accepted</h2>
+              <pre className='bg-green-100 p-4 rounded-md text-green-700 whitespace-pre-wrap'>
+                {response.codeExecuteDto.status.description}
+              </pre>
+            </div>
+          )}
+
+          {!loading && response?.codeExecuteDto?.status?.description !== 'Accepted' && (
+            <div>
+              <h2 className='text-2xl font-bold text-red-500 mb-4'>Failed</h2>
+              <pre className='bg-red-100 p-4 rounded-md text-red-700 whitespace-pre-wrap'>
+                {response.codeExecuteDto.status.description}
+              </pre>
+            </div>
+          )} */}
 
           {!loading && response === null && (
             <div>

@@ -63,6 +63,10 @@ export const AppRouter = () => {
     {
       path: AUTHENTICATION_ROUTERS.USERPROFILE,
       element: <UserProfile />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.PROBLEMSPACE,
+      element: <ProblemSpace />
     }
   ])
   return <RouterProvider router={router} />

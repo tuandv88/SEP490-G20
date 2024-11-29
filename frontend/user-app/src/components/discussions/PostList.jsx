@@ -14,9 +14,10 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { Select, MenuItem } from '@mui/material';
 import MarkdownIt from "markdown-it";
-import ReactMarkdown from "react-markdown";
 import MarkdownEditor from "react-markdown-editor-lite";  // Thư viện Markdown Editor
 import "react-markdown-editor-lite/lib/index.css";  // Style của editor
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
 
 function PostList({ categoryId }) {
   const [posts, setPosts] = useState([]);
@@ -47,6 +48,7 @@ function PostList({ categoryId }) {
 
   const navigate = useNavigate();
   const [reloadComponentCurrent, setReloadComponentCurrent] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); // State điều khiển thông báo
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -167,13 +169,13 @@ function PostList({ categoryId }) {
   const handlePostSubmit = async () => {
     // Kiểm tra nếu tiêu đề và nội dung chưa được nhập
     if (!newPost.categoryId || !newPost.title || !newPost.content || !newPost.tags) {
-      setErrorMessage("Please fill in both title, content, category, and tags.");
+      setErrorMessage("Please fill in all data: Category, Tag, Topic, Description post before submitting.");
       setOpenErrorDialog(true);  // Mở dialog thông báo lỗi
 
       // Tự động đóng pop-up sau 3 giây (3000ms)
       setTimeout(() => {
         setOpenErrorDialog(false);  // Đóng dialog tự động
-      }, 3000);
+      }, 30000);
 
       return;
     }
@@ -229,7 +231,16 @@ function PostList({ categoryId }) {
   };
 
   const reloadComponent = () => {
+
     setReloadComponentCurrent(!reloadComponentCurrent); // Trigger lại re-fetch dữ liệu
+
+    // Hiển thị thông báo thành công
+    setShowAlert(true);
+
+    // Tự động ẩn thông báo sau 3 giây
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 3000);
   };
 
   const handleEditorChange = ({ html, text }) => {
@@ -276,18 +287,20 @@ function PostList({ categoryId }) {
       </div>
 
       {/* Dialog Popup for Creating a New Post */}
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>Create New Post</DialogTitle>
-        <DialogContent>
+      <Dialog open={openDialog} onClose={handleDialogClose} fullWidth maxWidth="lg" className="dialog-submit-container">
+        <DialogTitle className="dialog-submit-title">Create New Post</DialogTitle>
+        <DialogContent className="dialog-submit-content">
           {/* Category */}
           <Select
             label="Category"
             fullWidth
-            value={newPost.categoryId || ""}  // Giá trị mặc định là ''
-            onChange={(e) => setNewPost({ ...newPost, categoryId: e.target.value })}  // Cập nhật khi chọn category mới
+            value={newPost.categoryId || ""}
+            onChange={(e) => setNewPost({ ...newPost, categoryId: e.target.value })}
             margin="normal"
+            variant="outlined"
+            className="dialog-submit-select"
           >
-            <MenuItem value="">Select One Category</MenuItem>  {/* Tùy chọn mặc định khi chưa chọn category */}
+            <MenuItem value="">Select One Category</MenuItem>
             {categories && Array.isArray(categories) && categories.filter(category => category.isActive).map((category) => (
               <MenuItem key={category.id} value={category.id}>
                 {category.name}
@@ -302,7 +315,10 @@ function PostList({ categoryId }) {
             value={newPost.title}
             onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
             margin="normal"
+            variant="outlined"
+            className="dialog-submit-textfield"
           />
+
           {/* Tags */}
           <TextField
             label="Tags (comma separated)"
@@ -310,17 +326,18 @@ function PostList({ categoryId }) {
             value={newPost.tags.join(", ")}
             onChange={(e) => setNewPost({ ...newPost, tags: e.target.value.split(",").map(tag => tag.trim()) })}
             margin="normal"
+            variant="outlined"
+            className="dialog-submit-textfield"
           />
-
 
           {/* Description (Content) - Markdown Editor */}
           <MarkdownEditor
-            value={newPost.content}  // Giá trị nội dung của bài viết
-            style={{ height: "200px" }}  // Chỉnh độ cao của editor
-            onChange={handleEditorChange}  // Cập nhật giá trị khi người dùng thay đổi
+            value={newPost.content}
+            style={{ height: "200px", marginTop: "16px" }}
+            onChange={handleEditorChange}
             renderHTML={(text) => {
               const md = new MarkdownIt();
-              return md.render(text);  // Chuyển đổi Markdown sang HTML
+              return md.render(text);
             }}
           />
 
@@ -333,36 +350,37 @@ function PostList({ categoryId }) {
               if (file) {
                 const reader = new FileReader();
                 reader.onloadend = () => {
-                  const base64Image = reader.result.split(',')[1];  // Lấy phần base64
+                  const base64Image = reader.result.split(',')[1];
                   setNewPost({
                     ...newPost,
                     image: {
-                      fileName: file.name,  // Lưu tên file
-                      base64Image,  // Lưu base64 đã xử lý
-                      contentType: file.type,  // Lưu content type
+                      fileName: file.name,
+                      base64Image,
+                      contentType: file.type,
                     },
                   });
                 };
                 reader.readAsDataURL(file);
               }
             }}
+            className="dialog-submit-file-input"
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogCancel} color="primary">
+        <DialogActions className="dialog-submit-actions">
+          <Button onClick={handleDialogCancel} color="secondary" className="dialog-submit-btn-cancel">
             Cancel
           </Button>
-          <Button onClick={handlePostSubmit} color="primary">
+          <Button onClick={handlePostSubmit} color="primary" variant="contained" className="dialog-submit-btn-submit">
             Submit
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Pop-up thông báo lỗi khi thiếu thông tin */}
-      <Dialog open={openErrorDialog} onClose={handleErrorDialogClose}>
-        <DialogTitle>Error</DialogTitle>
-        <DialogContent>
-          <p>{errorMessage}</p>  {/* Hiển thị thông báo lỗi */}
+      <Dialog open={openErrorDialog} onClose={handleErrorDialogClose} fullWidth maxWidth="sm" className="dialog-error-container">
+        <DialogTitle className="dialog-error-title">Error Creating Post</DialogTitle>
+        <DialogContent className="dialog-error-content">
+          <p>{errorMessage}</p>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleErrorDialogClose} color="primary">
@@ -370,6 +388,25 @@ function PostList({ categoryId }) {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Hiển thị thông báo khi post thành công */}
+      {showAlert && (
+        <Stack
+          sx={{
+            position: 'fixed',
+            top: 20, // Đặt cách từ đầu trang một chút
+            left: '50%', // Căn giữa theo chiều ngang
+            transform: 'translateX(-50%)', // Đảm bảo căn giữa tuyệt đối
+            zIndex: 9999, // Đảm bảo thông báo hiển thị trên tất cả các phần tử khác
+            width: 'auto', // Giới hạn chiều rộng thông báo
+            maxWidth: '500px', // Giới hạn chiều rộng tối đa cho thông báo
+          }}
+        >
+          <Alert severity="success">
+            Create New Post Success
+          </Alert>
+        </Stack>
+      )}
 
       {/* Posts Section */}
       {loading && (
@@ -621,7 +658,6 @@ function PostList({ categoryId }) {
 
 
 /* Danh sách bài viết */
-/* Từng bài viết */
 .post-item {
   display: flex;
   flex-direction: column;
@@ -746,7 +782,6 @@ function PostList({ categoryId }) {
   color: #1e334a;
 }
 
-
 /* Hiệu ứng hover tiêu đề */
 .post-item:hover .post-title {
   color: #2563eb;
@@ -848,6 +883,229 @@ function PostList({ categoryId }) {
       transform: rotate(360deg);
     }
   }
+
+/* General dialog styles */
+.dialog-submit-container {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dialog-submit-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.dialog-submit-content {
+  padding: 16px 24px;
+  background-color: #f9f9f9;
+}
+
+.dialog-submit-select, .dialog-submit-textfield {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  width: 100%; /* Đảm bảo các input, select chiếm 100% chiều rộng */
+}
+
+.dialog-submit-textfield input {
+  padding: 12px 14px;
+}
+
+.dialog-submit-select .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.dialog-submit-file-input {
+  width: auto; /* Đặt chiều rộng tự động thay vì 100% */
+  max-width: 500px; /* Giới hạn chiều rộng tối đa */
+  padding: 10px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  color: #1e334a;
+  background-color: #fff;
+  margin-top: 10px;
+  font-size: 14px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  transition: all 0.3s ease;
+  display: block; /* Đảm bảo nó hiển thị dạng block */
+}
+
+.dialog-submit-file-input:hover {
+  border-color: #1e334a;
+  background-color: #f5f7fa;
+}
+
+.dialog-submit-file-input:focus {
+  border-color: #1e334a;
+  background-color: #fafafa;
+  outline: none;
+}
+
+.dialog-submit-file-input::file-selector-button {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #ffffff;
+  background-color: #2e4156;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.dialog-submit-file-input::file-selector-button:hover {
+  background-color: #1e334a;
+}
+
+.dialog-submit-file-input::file-selector-button:active {
+  background-color: #1e334a;
+}
+
+
+
+
+.dialog-submit-actions {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+/* Nút Submit */
+.dialog-submit-btn-submit {
+  text-transform: none;
+  text-align: center; /* Đảm bảo chữ luôn căn giữa */
+  display: flex;
+  align-items: center; /* Căn giữa nội dung theo chiều dọc */
+  justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+  max-width: 130px; /* Giới hạn kích thước tối đa nhỏ hơn */
+  min-width: 100px; /* Giới hạn kích thước tối thiểu nhỏ hơn */
+  padding: 8px 12px; /* Giảm kích thước padding */
+  font-size: 12px; /* Font chữ nhỏ hơn */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: bold; /* Font chữ đậm để nổi bật */
+  color: #ffffff; /* Màu chữ trắng */
+  border: none; /* Loại bỏ viền */
+  background: #1e334a; /* Nền màu xanh than đậm */
+  border-radius: 8px; /* Bo góc vừa phải */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn để tạo chiều sâu */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative; /* Hiệu ứng ánh sáng cần position */
+  overflow: hidden;
+}
+
+/* Hiệu ứng hover cho nút Submit */
+.dialog-submit-btn-submit:hover {
+  background: #14212b; /* Nền tối hơn khi hover */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Đổ bóng mạnh hơn khi hover */
+  transform: translateY(-2px); /* Nhấn nổi */
+}
+
+/* Nút đang active */
+.dialog-submit-btn-submit:active {
+  transform: translateY(0); /* Không nổi khi active */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ hơn */
+}
+
+/* Hiệu ứng ánh sáng di chuyển qua nút Submit */
+.dialog-submit-btn-submit::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -25%;
+  width: 150%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: skewX(-45deg);
+  transition: left 0.3s ease-in-out;
+}
+
+.dialog-submit-btn-submit:hover::before {
+  left: 100%; /* Ánh sáng trượt qua nút khi hover */
+}
+
+/* Khi nút Submit bị disabled */
+.dialog-submit-btn-submit.disabled {
+  background: #9ca3af; /* Màu xám nhạt */
+  color: #e5e7eb; /* Chữ xám nhạt */
+  cursor: not-allowed; /* Không cho phép click */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Nút Cancel */
+.dialog-submit-btn-cancel {
+  text-transform: none;
+  text-align: center; /* Đảm bảo chữ luôn căn giữa */
+  display: flex;
+  align-items: center; /* Căn giữa nội dung theo chiều dọc */
+  justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+  max-width: 130px; /* Giới hạn kích thước tối đa nhỏ hơn */
+  min-width: 100px; /* Giới hạn kích thước tối thiểu nhỏ hơn */
+  padding: 8px 12px; /* Giảm kích thước padding */
+  font-size: 12px; /* Font chữ nhỏ hơn */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: bold; /* Font chữ đậm để nổi bật */
+  color: #000000; /* Màu chữ trắng */
+  border: none; /* Loại bỏ viền */
+  background: #aab0ad; /* Màu nền của nút Cancel */
+  border-radius: 8px; /* Bo góc vừa phải */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn để tạo chiều sâu */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative; /* Hiệu ứng ánh sáng cần position */
+  overflow: hidden;
+}
+
+/* Hiệu ứng hover cho nút Cancel */
+.dialog-submit-btn-cancel:hover {
+  background: #8f9795; /* Nền tối hơn khi hover */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Đổ bóng mạnh hơn khi hover */
+  transform: translateY(-2px); /* Nhấn nổi */
+}
+
+/* Nút đang active */
+.dialog-submit-btn-cancel:active {
+  transform: translateY(0); /* Không nổi khi active */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ hơn */
+}
+
+/* Hiệu ứng ánh sáng di chuyển qua nút Cancel */
+.dialog-submit-btn-cancel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -25%;
+  width: 150%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: skewX(-45deg);
+  transition: left 0.3s ease-in-out;
+}
+
+.dialog-submit-btn-cancel:hover::before {
+  left: 100%; /* Ánh sáng trượt qua nút khi hover */
+}
+
+/* Khi nút Cancel bị disabled */
+.dialog-submit-btn-cancel.disabled {
+  background: #9ca3af; /* Màu xám nhạt */
+  color: #e5e7eb; /* Chữ xám nhạt */
+  cursor: not-allowed; /* Không cho phép click */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dialog-error-title {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.dialog-error-content p {
+  color: #d32f2f;
+  font-size: 1rem;
+}
+
+.dialog-submit-btn-cancel, .dialog-submit-btn-submit {
+  min-width: 140px; /* Đảm bảo các nút có chiều rộng đủ */
+}
 
 `}</style>
     </div >

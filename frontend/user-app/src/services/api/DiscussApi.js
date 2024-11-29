@@ -18,8 +18,6 @@ export const DiscussApi = {
   // API: Lấy danh sách discussions và thêm urlProfilePicture
   getDiscussionOptions: async ({ discussionId, pageIndex, pageSize, orderBy, tags }) => {
     try {
-      console.log("Fetching discussion options...", discussionId, orderBy, tags);
-
       // Gửi yêu cầu GET tới API với header Authorization
       const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/options`, {
         params: { pageIndex, pageSize, orderBy, tags }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { DiscussApi } from "@/services/api/DiscussApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronUp, faCommentAlt, faComments, faEdit, faReply, faShareFromSquare, faThumbsDown, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faChevronUp, faComment, faCommentAlt, faComments, faEdit, faRepeat, faReply, faReplyAll, faShareFromSquare, faShower, faThumbsDown, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import { marked } from 'marked'; // Import marked library
@@ -40,10 +40,6 @@ function CommentList({ discussionId }) {
 
   const [openRemoveDialog, setOpenRemoveDialog] = useState(false);  // Trạng thái mở/đóng dialog
   const [commentIdToDelete, setCommentIdToDelete] = useState(null); // Lưu ID comment cần xóa
-
-  const [isReplying, setIsReplying] = useState(false); // Kiểm tra trạng thái trả lời
-  const [replyContent, setReplyContent] = useState("");  // Nội dung của bình luận trả lời
-  const [parentCommentId, setParentCommentId] = useState(null);  // ID của bình luận gốc
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -235,53 +231,6 @@ function CommentList({ discussionId }) {
   };
 
 
-  const handleReply = (commentId) => {
-    if (parentCommentId === commentId) {
-      // If the form is already open for this comment, just keep it open (do nothing)
-      return;
-    }
-    // If the form is not open for this comment, open the reply form
-    setParentCommentId(commentId);
-    setReplyContent(""); // Clear the reply content
-    setIsReplying(true);  // Mở form trả lời
-  };
-
-  // Handle the cancel reply functionality
-  const handleCancelReply = () => {
-    setParentCommentId(null); // Close the form by resetting the parent comment ID
-    setReplyContent(""); // Clear reply content
-    setIsReplying(false);  // Mở form trả lời
-  };
-
-  // Xử lý khi người dùng gửi phản hồi
-  const handleReplySubmit = async () => {
-    try {
-      const idDiscussionCurrent = discussionId;
-
-      const newComment = {
-        discussionId: idDiscussionCurrent, // ID thảo luận
-        content: replyContent,  // Nội dung trả lời
-        dateCreated: new Date().toISOString(),  // Thời gian hiện tại
-        parentCommentId: parentCommentId,  // ID của bình luận gốc
-        depth: 2,  // Depth = 2 cho bình luận trả lời
-        isActive: true,  // Đánh dấu là bình luận hợp lệ
-      };
-
-      const response = await DiscussApi.createComment(newComment);
-
-      if (response) {
-        setReplyContent("");  // Reset nội dung bình luận
-        setIsReplying(false);  // Đóng form trả lời
-        setRefreshComments(prev => !prev);  // Tải lại danh sách bình luận
-
-        console.log("Success!", newComment)
-      }
-    } catch (error) {
-      console.error("Error submitting reply:", error);
-    }
-  };
-
-
   // if (loading) {
   //   return (
   //     <>
@@ -318,13 +267,102 @@ function CommentList({ discussionId }) {
   //   );
   // }
 
-  if (error) {
-    return (
-      <div className="error-container">
-        <p className="error-message">{error}</p>
-      </div>
-    );
-  }
+  const [replies, setReplies] = useState({}); // Dành cho các bình luận con (replies) của mỗi bình luận
+  const [replyFormVisible, setReplyFormVisible] = useState(null); // Quản lý form trả lời hiển thị cho mỗi bình luận
+  const [contentReplyFromComment, setContentReplyFromComment] = useState(''); // Nội dung trả lời từ người dùng
+  const [contentReplyFromReply, setContentReplyFromReply] = useState(''); // Nội dung trả lời từ người dùng
+  const [showRepliesMap, setShowRepliesMap] = useState({}); // Quản lý hiển thị các bình luận con (replies)
+  const [nestedReplyFormVisible, setNestedReplyFormVisible] = useState(null); // Quản lý form trả lời cho các reply con
+
+  // Hàm để load bình luận con (reply)
+  const loadReplies = async (commentId) => {
+    try {
+      const response = await DiscussApi.getCommentsByCommentParentId(discussionId, commentId, 1, 10); // Lấy danh sách bình luận con
+      if (response && response.updatedComments) {
+        setReplies(prevReplies => ({
+          ...prevReplies,
+          [commentId]: response.updatedComments, // Lưu bình luận con vào state theo commentId
+        }));
+      }
+    } catch (error) {
+      console.error("Error loading replies:", error);
+    }
+  };
+
+  // Hàm hiển thị form trả lời cho bình luận gốc
+  const handleToggleReplyFormComment = (commentId) => {
+    setReplyFormVisible(replyFormVisible === commentId ? null : commentId); // Hiển thị/ẩn form trả lời cho mỗi comment
+
+    if (commentId !== replyFormVisible) {
+      setContentReplyFromComment(''); // Reset nội dung khi chuyển sang bình luận khác
+    }
+  };
+
+  // Hàm hiển thị form trả lời cho các reply con
+  const handleToggleNestedReplyForm = (replyId, replyUserNameCurrent) => {
+    setNestedReplyFormVisible(nestedReplyFormVisible === replyId ? null : replyId); // Toggle trạng thái hiển thị form
+    if (nestedReplyFormVisible !== replyId) {
+      setContentReplyFromReply(`@${replyUserNameCurrent} `);  // Reset nội dung trả lời khi mở form
+    }
+  };
+
+  // Xử lý khi người dùng gửi phản hồi (đối với bình luận gốc hoặc reply)
+  const handleReplyCommentSubmit = async (parentCommentId, depth) => {
+    try {
+
+      const contentCheck = depth === 2 ? contentReplyFromComment : contentReplyFromReply;
+
+
+      if (contentReplyFromComment.trim() === '' && (depth === 2)) {
+        alert('Please enter a reply, content cannot be empty!');
+        return;
+      } else if (contentReplyFromReply.trim() === '' && (depth === 3)) {
+        alert('Please enter a reply, content cannot be empty!');
+        return;
+      }
+
+      const newComment = {
+        discussionId: discussionId, // ID thảo luận
+        content: contentCheck, // Nội dung trả lời
+        dateCreated: new Date().toISOString(), // Thời gian hiện tại
+        parentCommentId: parentCommentId, // ID của bình luận gốc (cha)
+        depth: depth, // Depth tùy thuộc vào vị trí bình luận (depth = 3 cho reply của reply)
+        isActive: true, // Đánh dấu là bình luận hợp lệ
+      };
+
+      const response = await DiscussApi.createComment(newComment); // Gọi API để tạo bình luận
+
+      if (response) {
+        if (depth == 2) {
+          setContentReplyFromComment(''); // Reset nội dung bình luận
+        } else if (depth == 3) {
+          setContentReplyFromReply('');
+        }
+
+        setReplyFormVisible(null); // Đóng form trả lời cho bình luận gốc
+        setNestedReplyFormVisible(null); // Đóng form trả lời cho reply con
+        loadReplies(parentCommentId); // Tải lại bình luận con
+
+        console.log("Success!", newComment);
+      }
+    } catch (error) {
+      console.error("Error submitting reply:", error);
+    }
+  };
+
+  // Hàm hiển thị/ẩn các bình luận con
+  const handleShowReplies = async (commentId) => {
+    // Kiểm tra nếu chưa load replies, thì load
+    if (!replies[commentId]) {
+      await loadReplies(commentId);  // Gọi API để tải các câu trả lời (replies)
+    }
+
+    // Toggle trạng thái hiển thị của bình luận này
+    setShowRepliesMap((prevMap) => ({
+      ...prevMap,
+      [commentId]: !prevMap[commentId],  // Toggle giá trị showReplies của bình luận này
+    }));
+  };
 
   return (
     <div className="comment-list__content">
@@ -445,6 +483,71 @@ function CommentList({ discussionId }) {
                     </>
                   )}
 
+                  {/* Kiểm tra xem người dùng có phải là chủ của comment không */}
+                  <button
+                    className="comment-item__reply"
+                    onClick={() => handleToggleReplyFormComment(comment.id)}>
+                    <FontAwesomeIcon icon={faReply} /> Reply
+                  </button>
+
+                  {/* Show Reply button */}
+                  <button
+                    className="comment-item__show-reply"
+                    onClick={() => handleShowReplies(comment.id)} // Khi nhấn vào, gọi hàm toggle
+                  >
+                    <FontAwesomeIcon icon={faComments} />
+                    {showRepliesMap[comment.id] ? 'Hide Reply' : 'Show All Reply'}
+                  </button>
+
+                  {/* Hiển thị form trả lời cho bình luận gốc */}
+                  {replyFormVisible === comment.id && (
+                    <div className="reply-form">
+                      <textarea
+                        placeholder="Type your reply here..."
+                        value={contentReplyFromComment}
+                        onChange={(e) => setContentReplyFromComment(e.target.value)}
+                      />
+                      <button onClick={() => handleReplyCommentSubmit(comment.id, 2)}>Submit</button> {/* Depth = 2 */}
+                    </div>
+                  )}
+
+                  {/* Hiển thị các replies chỉ khi showRepliesMap[comment.id] là true */}
+                  {showRepliesMap[comment.id] && replies[comment.id] && replies[comment.id].length > 0 && (
+                    <div className="replies">
+                      {replies[comment.id].map((reply) => (
+                        <div key={reply.id} className="comment-item reply">
+                          <div className="comment-content">
+                            <p>{reply.content}</p>
+                          </div>
+
+                          {/* Kiểm tra nếu reply này là của chính người dùng hiện tại thì ẩn nút reply */}
+                          {reply.userId !== idCurrentUser && (
+                            <button
+                              className="comment-item__reply"
+                              onClick={() => handleToggleNestedReplyForm(reply.id, reply.userName)} // Truyền userName của reply này...
+                            >
+                              <FontAwesomeIcon icon={faReply} /> Reply to this reply
+                            </button>
+                          )}
+
+                          <h1>{reply.userName}</h1>
+
+                          {/* Hiển thị form trả lời cho reply con */}
+                          {nestedReplyFormVisible === reply.id && (
+                            <div className="reply-form">
+                              <textarea
+                                placeholder="Type your reply here..."
+                                value={contentReplyFromReply}
+                                onChange={(e) => setContentReplyFromReply(e.target.value)}
+                              />
+                              <button onClick={() => handleReplyCommentSubmit(comment.id, 3)}>Submit</button> {/* Depth = 3 */}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   {/* Dialog xác nhận xóa */}
                   <Dialog
                     open={openRemoveDialog}
@@ -472,49 +575,6 @@ function CommentList({ discussionId }) {
                       </Button>
                     </DialogActions>
                   </Dialog>
-
-
-                  {/* Reply button */}
-                  <button className="comment-item__reply" onClick={() => handleReply(comment.id)}>
-                    <FontAwesomeIcon icon={faReply} /> Reply
-                  </button>
-
-                  {/* Reply Form - Only show if this comment is being replied to */}
-                  {isReplying && parentCommentId === comment.id && (
-                    <div className="comment-item__reply-form">
-                      {/* Reply form input and buttons */}
-                      <textarea
-                        className="reply-comment-input"
-                        value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value)}
-                        placeholder="Write your reply here..."
-                      />
-                      <div className="reply-buttons-container">
-                        <button
-                          className="reply-toggle-preview-button"
-                          onClick={() => setIsPreview(!isPreview)}
-                          disabled={submitting}
-                        >
-                          {isPreview ? "Write" : "Preview"}
-                        </button>
-                        <button
-                          className="reply-comment-button"
-                          onClick={handleReplySubmit}
-                          disabled={!replyContent.trim() || submitting}
-                        >
-                          {submitting ? "Submitting..." : "Post Reply"}
-                        </button>
-                        <button
-                          className="reply-cancel-button"
-                          onClick={handleCancelReply}
-                          disabled={submitting}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
                 </div>
               </div>
             )
@@ -1039,113 +1099,6 @@ function CommentList({ discussionId }) {
   }
 }
 
-/* Reply Form nằm dưới comment cha và có chiều rộng 80% */
-.comment-item__reply-form {
-  margin-top: 20px; /* Khoảng cách giữa comment cha và form trả lời */
-  padding: 15px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px; /* Tăng khoảng cách giữa các phần tử trong form */
-  width: 1350%; /* Chiều rộng 80% của comment cha */
-  height: 150px; /* Chiều rộng 80% của comment cha */
-  box-sizing: border-box; /* Đảm bảo không bị tràn ra ngoài */
-  transition: all 0.3s ease-in-out;
-  position: absolute; /* Đặt form này vào vị trí tuyệt đối trong comment cha */
-  top: 100%; /* Đảm bảo form reply nằm dưới comment cha */
-  transform: translateX(-91%); /* Căn chỉnh lại cho chính giữa */
-}
-
-/* Phóng to textarea cho rộng và dài hơn */
-.reply-comment-input {
-  width: 100%;
-  height: 250px; /* Tăng chiều cao của textarea */
-  margin-bottom: 15px; /* Khoảng cách giữa textarea và các nút */
-  padding: 12px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  resize: none; /* Tắt khả năng resize của textarea */
-  box-sizing: border-box;
-}
-
-/* Container cho các nút */
-.reply-buttons-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px; /* Giảm khoảng cách giữa các nút */
-  width: 100%; /* Đảm bảo chiều rộng container là 100% */
-}
-
-.reply-toggle-preview-button {
-  padding: 8px 10px; /* Giảm padding để nút nhỏ hơn */
-  font-size: 12px; /* Giảm kích thước font */
-  font-weight: 400; /* Giảm độ đậm của chữ */
-  color: #f9f9f9;
-  background: #1e334a;
-  border: 1px solid #ccc;
-  border-radius: 6px; /* Giảm border-radius để nút nhỏ gọn hơn */
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  width: 100%; /* Nút rộng toàn bộ chiều rộng */
-  max-width: 120px; /* Giới hạn chiều rộng tối đa */
-  align-self: flex-start; /* Canh trái */
-}
-
-/* Button styles (Post, Cancel) */
-.reply-comment-button,
-.reply-cancel-button {
-  padding: 8px 10px; /* Giảm padding để nút nhỏ hơn */
-  font-size: 12px; /* Giảm kích thước font */
-  font-weight: 400; /* Giảm độ đậm của chữ */
-  color: #f9f9f9;
-  background: #1e334a;
-  border: 1px solid #ccc;
-  border-radius: 6px; /* Giảm border-radius để nút nhỏ gọn hơn */
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  width: 45%; /* Nút chiếm một nửa chiều rộng của form */
-  align-self: flex-start; /* Canh trái */
-}
-
-/* Hover effect for Post and Cancel buttons */
-.reply-comment-button:hover,
-.reply-cancel-button:hover {
-  background-color: #3b4d67;
-  color: white;
-  border-color: #b0b0b0;
-}
-
-/* Hover effect for buttons when disabled */
-.reply-comment-button:disabled,
-.reply-cancel-button:disabled {
-  background-color: #ccc;
-  color: #666;
-  cursor: not-allowed;
-}
-
-.reply-cancel-button {
-  background-color: #e0e0e0;
-}
-
-.reply-cancel-button:hover {
-  background-color: #c0c0c0;
-}
-
-/* Sắp xếp nút Write bên trái và Post, Cancel bên phải */
-.reply-toggle-preview-button {
-  margin-right: auto; /* Đẩy nút Write về phía bên trái */
-}
-
-.reply-comment-button,
-.reply-cancel-button {
-  width: auto; /* Nút Post và Cancel tự động điều chỉnh chiều rộng */
-  margin-left: 8px; /* Khoảng cách giữa Post và Cancel */
-}
       `}</style>
     </div>
   );

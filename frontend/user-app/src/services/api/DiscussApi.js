@@ -244,6 +244,55 @@ export const DiscussApi = {
     }
   },
 
+  getCommentsByCommentParentId: async (discussionId, commentParentId, pageIndex, pageSize) => {
+    try {
+      // Gọi API để lấy danh sách bình luận
+      const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/${commentParentId}/comments`, {
+        params: { PageIndex: pageIndex, PageSize: pageSize }
+      });
+
+      // Kiểm tra và xử lý dữ liệu trả về
+      if (response && response.data && response.data.commentsDetailDtos) {
+        const comments = response.data.commentsDetailDtos.data;
+        const pagination = {
+          pageIndex: response.data.commentsDetailDtos.pageIndex,
+          pageSize: response.data.commentsDetailDtos.pageSize,
+          totalCount: response.data.commentsDetailDtos.count,
+        };
+
+        // Nếu không có bình luận, trả về dữ liệu rỗng
+        if (!comments || comments.length === 0) {
+          return { updatedComments: [], pagination, totalComments: 0 };
+        }
+
+        // Lấy danh sách userId từ các bình luận
+        const commentUserIds = comments.map(comment => comment.userId);
+
+        // Fetch thông tin người dùng cho tất cả các comment
+        const users = await fetchUsers(commentUserIds);
+
+        // Cập nhật thông tin người dùng cho từng bình luận
+        const updatedComments = comments.map(comment => {
+          const commentUser = users.find(user => user.id === comment.userId);
+          return {
+            ...comment,
+            userName: commentUser ? commentUser.userName : "Unknown",
+            urlProfilePicture: commentUser ? commentUser.urlProfilePicture : "default-avatar.png",
+            firstName: commentUser ? commentUser.firstName : "Anonymous",
+            lastName: commentUser ? commentUser.lastName : "xxx",
+          };
+        });
+
+        // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang
+        return { updatedComments, pagination, totalComments: pagination.totalCount };
+      } else {
+        throw new Error("Dữ liệu trả về không hợp lệ từ API.");
+      }
+    } catch (error) {
+      throw error;
+    }
+  },
+
   // API: Remove comment mới
   removeCommentById: async ({ commentId }) => {
     try {
@@ -367,20 +416,26 @@ export const DiscussApi = {
 // API thứ hai: Lấy thông tin chi tiết của UserIds
 async function fetchUsers(userIds) {
   try {
+    // Gửi yêu cầu API với danh sách UserIds
     const response = await axios.post(`${API_AUTHEN_URL}/users/getusers`, { UserIds: userIds });
 
-    console.log(response.data);
-    if (response && response.data) {
-      return response.data;
+    // Kiểm tra xem dữ liệu có hợp lệ hay không
+    if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
+      console.log("Dữ liệu người dùng:", response.data);
+      return response.data; // Trả về danh sách người dùng
     } else {
-      console.error("Dữ liệu trả về từ API users không hợp lệ.");
-      throw new Error("Dữ liệu trả về từ API users không hợp lệ.");
+      console.error("Không tìm thấy người dùng hoặc dữ liệu không hợp lệ.");
+      // Trả về mảng trống hoặc một giá trị mặc định nào đó nếu không có người dùng
+      return []; // Dữ liệu trống, tránh "đứng" ứng dụng
     }
   } catch (error) {
+    // Xử lý lỗi API hoặc lỗi mạng
     console.error("Lỗi khi gọi API users:", error.message);
-    throw error;
+    // Bạn có thể trả về giá trị mặc định khi gặp lỗi
+    return []; // Dữ liệu trống trong trường hợp có lỗi
   }
 }
+
 
 
 

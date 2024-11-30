@@ -73,11 +73,11 @@ export const quizManagementRoute = createRoute({
 })
 
 // Define the login route as a child of the login root route
-const loginRoute = createRoute({
-  getParentRoute: () => loginRootRoute,
-  path: '/login',
-  component: lazy(() => import('@/pages/Login/login'))
-})
+// const loginRoute = createRoute({
+//   getParentRoute: () => loginRootRoute,
+//   path: '/login',
+//   component: lazy(() => import('@/pages/Login/login'))
+// })
 
 const callbackRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -140,7 +140,7 @@ const mainRouteTree = rootRoute.addChildren([
   callbackRoute
 ])
 
-const loginRouteTree = loginRootRoute.addChildren([loginRoute])
+const loginRouteTree = loginRootRoute
 
 // Export the routers
 export const mainRouter = createRouter({ routeTree: mainRouteTree })

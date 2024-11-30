@@ -14,6 +14,7 @@ import useStore from '@/data/store'
 import { LearningAPI } from '@/services/api/learningApi'
 import { LoadingState } from '@/components/loading/CourseDetailLoading/LoadingState'
 import Cookies from 'js-cookie'
+import ChapterLoading from '@/components/loading/ChapterLoading'
 
 function CourseDetail() {
   const [activeTab, setActiveTab] = useState('introduce')
@@ -61,6 +62,7 @@ function CourseDetail() {
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
 
   if (error) {
     return <ErrorPage />
@@ -168,7 +170,7 @@ function CourseDetail() {
 
                 {/* Sidebar - Right Side */}
                 <div className='lg:col-span-1'>
-                  <CourseSidebar enrolledCourses={enrolledCourses} firstLectureId={firstLectureId} />
+                  <CourseSidebar enrolledCourses={enrolledCourses} firstLectureId={firstLectureId} courseId={id} />
                 </div>
               </div>
             </div>

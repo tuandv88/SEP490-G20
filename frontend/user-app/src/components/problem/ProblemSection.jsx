@@ -4,6 +4,8 @@ import { DiscussionList } from '../problem_discuss/DiscussionList'
 import { Button } from '../ui/button'
 import { useNavigate } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
+import { useEffect, useState } from 'react'
+import { DashboardSkeleton } from '../loading/DashboardSkeleton'
 
 export const algorithms = [
   {
@@ -89,6 +91,37 @@ export const discussions = [
 
 export function ProblemSection({}) {
   const navigate = useNavigate()
+  const [problems, setProblems] = useState([])
+  const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const fetchProblemHome = async () => {
+      setLoading(true)
+      try {
+        const data = await ProblemAPI.getProblemHome(1, 8)
+        setProblems(data.problems.data)
+        console.log(data)
+      } catch (err) {
+        setError(err)
+        console.error('Error fetching problems:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProblemHome()
+  }, [])
+
+  if (loading) return <DashboardSkeleton />
+  if (error) return <div>Error loading problems.</div>
+
+  const mediumCount = problems.filter((item) => item.difficulty === 'Medium').length
+
+  // Đếm số lượng phần tử có difficulty = 'True'
+  const trueCount = problems.filter((item) => item.difficulty === 'True').length
+
+  // Đếm số lượng phần tử có difficulty = 'Hard'
+  const hardCount = problems.filter((item) => item.difficulty === 'Hard').length
 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
@@ -104,19 +137,19 @@ export function ProblemSection({}) {
           <div className='flex gap-4 mt-2'>
             <div className='flex items-center gap-2'>
               <span className='w-3 h-3 bg-green-500 rounded-full'></span>
-              <span className='text-sm text-gray-600'>0/851 Easy</span>
+              <span className='text-sm text-gray-600'>{trueCount} Easy</span>
             </div>
             <div className='flex items-center gap-2'>
               <span className='w-3 h-3 bg-yellow-500 rounded-full'></span>
-              <span className='text-sm text-gray-600'>0/594 Medium</span>
+              <span className='text-sm text-gray-600'>{mediumCount} Medium</span>
             </div>
             <div className='flex items-center gap-2'>
               <span className='w-3 h-3 bg-red-500 rounded-full'></span>
-              <span className='text-sm text-gray-600'>0/248 Hard</span>
+              <span className='text-sm text-gray-600'>{hardCount} Hard</span>
             </div>
           </div>
         </div>
-        <AlgorithmList algorithms={algorithms} />
+        <AlgorithmList problems={problems} />
       </div>
 
       <div>

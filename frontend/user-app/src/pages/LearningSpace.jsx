@@ -22,11 +22,13 @@ import SubmissionHistory from '@/components/learning/submission/SubmissionHistor
 import { ProblemAPI } from '@/services/api/problemApi'
 import SubmissionResult from '@/components/learning/submission/SubmissionResult'
 import HeaderCode from '@/layouts/learningheaderLec'
+import CourseLoadingDetail from '@/components/loading/CourseLoadingDetail'
 
 
 
 const LearningSpace = () => {
   const navigate = useNavigate()
+  const { id, lectureId } = useParams()
   const [activeTab, setActiveTab] = useState('default')
   const [chapters, setChapters] = useState([])
   const [title, setTitle] = useState('')
@@ -44,11 +46,20 @@ const LearningSpace = () => {
   const [problemSubmission, setProblemSubmission] = useState(null)
   const [resultCodeSubmit, setResultCodeSubmit] = useState(null)
   const [currentCode, setCurrentCode] = useState(null)
-  const [mainLoading, setMainLoading] = useState(false)
+  const [activeLectureId, setActiveLectureId] = useState(lectureId) 
   //courseId
-  const { id, lectureId } = useParams()
+  
   const toggleProblemList = () => {
     setIsProblemListOpen(!isProblemListOpen)
+  }
+
+  const handleNextLecture = () => {
+    setActiveLectureId(lectureId)
+    toggleCurriculumRef.current.handleNextLecture()
+  }
+
+  const handleLectureChange = (lectureId) => {
+    setActiveLectureId(lectureId)
   }
 
   const handleVideoTimeUpdate = useCallback((time) => {
@@ -68,8 +79,6 @@ const LearningSpace = () => {
         console.log(data)
         setChapters(data?.courseDetailsDto?.chapterDetailsDtos)
         setTitle(data?.courseDetailsDto?.courseDto?.title)
-        // setFirstLectureId(data?.courseDetailsDto.chapterDetailsDtos[4].lectureDtos[0].id)
-        // console.log(firstLectureId)
       } catch (error) {
         console.error('Error fetching course detail:', error)
         if (error.response) {
@@ -151,6 +160,11 @@ const LearningSpace = () => {
     }
   }, [lectureId])
 
+
+  if (loading) {
+    return <CourseLoadingDetail />
+  }
+
   if (error) {
     return <ErrorPage />
   }
@@ -160,6 +174,8 @@ const LearningSpace = () => {
       <NotFound mess='We cannot find documents in this course. Please check the link or search for other courses.' />
     )
   }
+
+  
 
   // if (mainLoading) {
   //   return <Loading />
@@ -181,7 +197,7 @@ const LearningSpace = () => {
           className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
         >
           <ResizablePanel id='panel-1' order={1} defaultSize={40}>
-            <div className='scroll-container h-full'>
+            <div className='scroll-container h-full bg-bGprimary'>
               <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={false} />
               {loading && <ChapterLoading />}
               {(activeTab === 'descriptions' || activeTab === 'default' || activeTab === 'curriculum') && !loading && (
@@ -237,7 +253,10 @@ const LearningSpace = () => {
             <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={true} />
             {loading && <ChapterLoading />}
             {(activeTab === 'curriculum' || activeTab === 'default') && !loading && (
-             <Curriculum courseId={id} chapters={chapters} setSelectedLectureId={setSelectedLectureId} title={title} />
+             <Curriculum courseId={id} chapters={chapters} 
+             setSelectedLectureId={handleLectureChange} title={title} 
+             setActiveLectureId={handleLectureChange}
+             activeLectureId={activeLectureId} />
              //<Curriculum3 />
             )}
             {activeTab === 'comments' && !loading && <Comments />}
@@ -251,7 +270,10 @@ const LearningSpace = () => {
                 description={lectureDetail?.lectureDetailsDto?.summary}
                 videoSrc={videoBlobUrl}
                 loading={loading}
-                titleProblem={lectureDetail?.lectureDetailsDto?.title}
+                titleProblem={lectureDetail?.lectureDetailsDto?.title}   
+                handleNextLecture={handleNextLecture}
+                courseId={id}
+                lectureId={lectureId}
               />
             </div>
           </ResizablePanel>
@@ -285,11 +307,12 @@ const LearningSpace = () => {
         ref={toggleCurriculumRef}
         title={title}
         chapters={chapters}
-        setSelectedLectureId={setSelectedLectureId}
+        setSelectedLectureId={handleLectureChange}
         isProblemListOpen={isProblemListOpen}
         toggleProblemList={toggleProblemList}
         navigate={navigate}
         courseId={id}
+        activeLectureId={activeLectureId}
       />
     </div>
   )

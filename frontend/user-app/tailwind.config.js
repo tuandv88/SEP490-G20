@@ -12,6 +12,7 @@ export default {
   		colors: {
   			bGprimary: 'var(--primary-background)',
   			primaryText: 'var(--primary-text)',
+        	primaryButton: 'var(--primary-button)',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			primary: {

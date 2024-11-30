@@ -5,7 +5,10 @@ import React, { useEffect, useState } from 'react'
 import { ChevronRight, ChevronDown } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-const Curriculum = ({ courseId, chapters, setSelectedLectureId, title }) => {
+const Curriculum = ({ courseId, chapters, 
+  setSelectedLectureId, title, 
+  setActiveLectureId,
+  activeLectureId }) => {
   
   const navigate = useNavigate()
   
@@ -16,17 +19,6 @@ const Curriculum = ({ courseId, chapters, setSelectedLectureId, title }) => {
   })
 
 
-
-  const [activeLectureId, setActiveLectureId] = useState(() => {
-    const savedLectureId = localStorage.getItem('activeLectureId')
-    return savedLectureId ? JSON.parse(savedLectureId) : null
-  })
-
-  // const handleLectureClick = (lectureId) => {
-  //   // console.log(lectureId)
-  //   setActiveLectureId(lectureId)
-  //   setSelectedLectureId(lectureId)
-  // }
 
   const handleLectureClick = (lectureId) => {
     console.log(lectureId)
@@ -45,11 +37,7 @@ const Curriculum = ({ courseId, chapters, setSelectedLectureId, title }) => {
     localStorage.setItem('expandedSections', JSON.stringify(expandedSections))
   }, [expandedSections])
 
-  useEffect(() => {
-    if (activeLectureId !== null) {
-      localStorage.setItem('activeLectureId', JSON.stringify(activeLectureId))
-    }
-  }, [activeLectureId])
+
 
   return (
     <div className='md:col-span-1 p-6 border-r border-[#243b47] bg-[#1b2a32] h-full overflow-y-auto'>

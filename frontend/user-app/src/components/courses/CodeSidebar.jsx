@@ -1,21 +1,25 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Clock, Calendar, Award } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CourseAPI } from '@/services/api/courseApi'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 
 export function CourseSidebar({ enrolledCourses, firstLectureId }) {
-
   const { id } = useParams()
   console.log(id)
-  console.log(firstLectureId)
   const navigate = useNavigate()
 
+  useEffect(() => {
+    async function fetchEnrolledCourses() {
+      const response = await CourseAPI.getEnrolledCourses(id)
+      console.log(response)
+    }
+    fetchEnrolledCourses()
+  }, [id])
 
   const handleLearningCourse = () => {
     navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', id).replace(':lectureId', firstLectureId))
   }
-
 
   const handleEnrollCourse = async () => {
     try {
@@ -26,7 +30,6 @@ export function CourseSidebar({ enrolledCourses, firstLectureId }) {
       console.error('Error enrolling course:', error)
     }
   }
-
 
   return (
     <div className='space-y-6'>
@@ -43,14 +46,20 @@ export function CourseSidebar({ enrolledCourses, firstLectureId }) {
         {/* <h3 className='text-xl font-semibold mb-4'>Free of charge</h3> */}
         {enrolledCourses ? (
           <>
-            <button onClick={() => handleLearningCourse()} className='w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors mb-4'>
+            <button
+              onClick={() => handleLearningCourse()}
+              className='w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors mb-4'
+            >
               Learning Now
             </button>
             <p className='text-center text-gray-600 text-sm'>You are learning this course</p>
           </>
         ) : (
           <>
-            <button onClick={() => handleEnrollCourse()} className='w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors mb-4'>
+            <button
+              onClick={() => handleEnrollCourse()}
+              className='w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors mb-4'
+            >
               Enroll Now
             </button>
             <p className='text-center text-gray-600 text-sm'>Join the course for free</p>

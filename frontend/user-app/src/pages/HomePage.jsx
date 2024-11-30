@@ -19,6 +19,7 @@ import QuizModal from '@/components/surrvey/QuizModal'
 import QuizPopup from '@/components/quiz/QuizPopup'
 import { QuizAPI } from '@/services/api/quizApi'
 import { UserAPI } from '@/services/api/userApi'
+import { CourseAPI } from '@/services/api/courseApi'
 
 export const algorithms = [
   {
@@ -98,8 +99,8 @@ function HomePage() {
           // Kiểm tra điều kiện để hiển thị survey
           if (user.profile.issurvey === 'false') {
             setTimeout(() => {
-              setIsSurveyOpen(true)
               updateSurveyStatus()
+              setIsSurveyOpen(true)
             }, 3000)
           }
         }
@@ -107,11 +108,8 @@ function HomePage() {
         console.error('Error fetching user info:', error)
       }
     }
-    
     fetchUserInfo()
-  }, [])
-
-
+  }, [isSurveyOpen])
 
   async function updateSurveyStatus() {
     try {
@@ -128,7 +126,7 @@ function HomePage() {
       setLoading(true)
       setError(false)
       try {
-        const data = await LearningAPI.getCourseList(1, 20)
+        const data = await CourseAPI.getCoursePopular(1, 5)
         setCourses(data?.courseDtos?.data)
       } catch (error) {
         console.error('Error fetching course detail:', error)
@@ -152,8 +150,10 @@ function HomePage() {
   useEffect(() => {
     const fetchQuizAssessment = async () => {
       try {
-        const data = await QuizAPI.getQuizAssessment()
-        setQuizAssessment(data.quiz)
+        if (userInfo?.issurvey === 'false') {
+          const data = await QuizAPI.getQuizAssessment()
+          setQuizAssessment(data.quiz)
+        }
       } catch (error) {
         console.error('Error fetching quiz assessment:', error)
       }
@@ -189,18 +189,20 @@ function HomePage() {
       <Layout>
         <div className='flex flex-col min-h-screen pt-12'>
           {/* Hero Section */}
-          <section className='py-12 text-white bg-gradient-to-r from-green-500 to-green-700 md:py-20'>
+          <section className='py-12 text-white bg-gradient-to-r from-primaryButton to-primaryButton md:py-20'>
             <div className='container px-4 mx-auto'>
               <div className='flex flex-col items-center justify-between md:flex-row'>
                 <div className='mb-8 md:w-1/2 md:mb-0'>
-                  <h1 className='mb-4 text-3xl font-bold md:text-4xl lg:text-6xl'>Học tập và Thi đấu Trực tuyến</h1>
+                  <h1 className='mb-4 text-3xl font-bold md:text-4xl lg:text-6xl'>
+                    Learning and Practicing Algorithms
+                  </h1>
                   <p className='mb-6 text-lg md:text-xl'>
-                    Nâng cao kiến thức và kỹ năng của bạn với các khóa học chất lượng cao và thử thách bản thân trong
-                    các cuộc thi hấp dẫn.
+                    Enhance your knowledge and skills with high-quality courses and challenge yourself with engaging
+                    algorithms.
                   </p>
                   <div className='flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4'>
-                    <Button className='text-green-300 bg-white hover:bg-blue-100'>Khám phá khóa học</Button>
-                    <Button className='border border-white hover:bg-red-600'>Tham gia cuộc thi</Button>
+                    <Button className='text-black bg-white hover:bg-blue-100'>Explore courses</Button>
+                    <Button className='border border-white hover:bg-red-600'>Participate in the algorithm</Button>
                   </div>
                 </div>
                 <div className='md:w-5/11'>
@@ -220,7 +222,10 @@ function HomePage() {
               <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Featured Courses</h2>
               {loading ? <CourseLoading></CourseLoading> : <CourseCarousel courses={courses} />}
               <div className='mt-8 text-center md:mt-10'>
-                <Button onClick={() => navigate(AUTHENTICATION_ROUTERS.COURSELIST)} className='border border-green-500 hover:bg-blue-50'>
+                <Button
+                  onClick={() => navigate(AUTHENTICATION_ROUTERS.COURSELIST)}
+                  className='border border-primaryButton hover:bg-primaryButton hover:text-white'
+                >
                   View All Courses
                   <ChevronRight className='inline-block ml-2' />
                 </Button>
@@ -230,6 +235,7 @@ function HomePage() {
 
           <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
+              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Featured Courses</h2>
               <ProblemSection />
             </div>
           </section>
@@ -287,7 +293,7 @@ function HomePage() {
           isOpen={isQuizOpen}
           onClose={() => {
             setIsQuizOpen(false)
-            // updateUserFirstLogin()
+            //updateUserFirstLogin()
           }}
           onComplete={handleQuizComplete}
           quiz={quizAssessment}

@@ -128,7 +128,7 @@ const PreferenceNav = ({ onSubmit, loading, problemId, setActiveTab, setResultCo
             )}
           </button>
           <Button
-            // disabled={!isSuccessCode || isSubmit}
+            disabled={loading}
             onClick={handleFetchData}
             className='flex items-center bg-green-100 dark:bg-green-700 rounded-md hover:bg-green-200 dark:hover:bg-green-600 text-green-700 dark:text-green-100'
           >

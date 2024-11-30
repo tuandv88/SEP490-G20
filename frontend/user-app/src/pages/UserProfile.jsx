@@ -5,12 +5,12 @@ import { LearningDashboard } from '../components/userprofile/learning/LearningDa
 import { MyPosts } from '../components/userprofile/MyPosts'
 import { ProfileTabs } from '../components/userprofile/ProfileTabs'
 import { ProfileLayout } from '../components/userprofile/ProfileLayout'
-import { RoadmapDashboard } from '@/components/userprofile/RoadmapDashboard'
 import Layout from '@/layouts/layout'
 import { useNavigate } from 'react-router-dom'
 import { UserContext } from '@/contexts/UserContext'
 import authServiceInstance from '@/oidc/AuthService'
 import { Loading } from '@/components/ui/overlay'
+import RoadmapDashboard from '@/components/userprofile/RoadmapDashboard'
 
 export function UserProfile() {
   const [activeTab, setActiveTab] = useState('account')

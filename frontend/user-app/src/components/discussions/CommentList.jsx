@@ -831,6 +831,7 @@ function CommentList({ discussionId }) {
   position: relative;
   border-radius: 8px;
   transition: all 0.3s ease;
+  margin-top: 5px;
 }
 
 .comment-item:hover {
@@ -843,7 +844,6 @@ function CommentList({ discussionId }) {
   align-items: center;
   margin-bottom: 8px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #f0f0f0;
 }
 
 .comment-item__avatar {
@@ -851,7 +851,7 @@ function CommentList({ discussionId }) {
   height: 40px;
   border-radius: 50%;
   margin-right: 10px;
-  border: 2px solid #3498db;
+  border: 2px solid #808583;
 }
 
 .comment-item__username {
@@ -879,7 +879,10 @@ function CommentList({ discussionId }) {
   line-height: 1.5;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  margin-bottom: 12px;
+  margin-bottom: 3px;
+  margin-left: 50px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 20px;
 }
 
 /* Voting section and Action buttons */
@@ -906,6 +909,7 @@ function CommentList({ discussionId }) {
   cursor: pointer;
   transition: all 0.2s ease;
   margin: 0 4px;
+  margin-bottom: 3px;
   font-size: 16px;
   padding: 4px;
 }
@@ -916,7 +920,7 @@ function CommentList({ discussionId }) {
 
 .comment-item__vote-count {
   margin: 0 6px;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #34495e;
 }
@@ -935,16 +939,16 @@ function CommentList({ discussionId }) {
 .comment-item__show-reply {
   background: transparent;
   border: none;
-  color: #3498db;
+  color: #1e334a;
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s ease;
-  padding: 4px 8px;
+  padding: 5px 10px;
   border-radius: 4px;
 }
 
 .comment-item__share {
-  background: #3498db;
+  background: #1e334a;
   color: white;
 }
 

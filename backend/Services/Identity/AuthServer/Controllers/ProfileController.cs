@@ -11,7 +11,6 @@ using System.Text.Json;
 
 namespace AuthServer.Controllers
 {
-    [Authorize]
     public class ProfileController : Controller
     {
         private readonly SignInManager<Users> _signInManager;

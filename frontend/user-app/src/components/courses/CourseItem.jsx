@@ -12,6 +12,10 @@ export default function CourseItem({ courses }) {
     navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', courseId))
   }
 
+  if (!Array.isArray(courses) || courses.length === 0) {
+    return <p>No courses available.</p>; // Hiển thị thông báo khi không có khóa học
+  }
+
   return (
     <div className='grid grid-cols-1 gap-6 p-6 md:grid-cols-2 lg:grid-cols-4'>
       {courses.map((course, index) => (

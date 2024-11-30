@@ -1,15 +1,25 @@
 import React from 'react';
 
-export function AlgorithmStats() {
+export function AlgorithmStats({ problemSolved }) {
+  console.log(problemSolved)
+  
+  const defaultStats = {
+    easy: { solvedCount: 0, totalCount: 0 },
+    medium: { solvedCount: 0, totalCount: 0 },
+    hard: { solvedCount: 0, totalCount: 0 }
+  }
+
+  const effectiveProblemSolved = problemSolved || defaultStats
+
   const stats = [
-    { label: 'Dễ', solved: 15, total: 20, color: 'bg-green-500' },
-    { label: 'Trung bình', solved: 10, total: 30, color: 'bg-yellow-500' },
-    { label: 'Khó', solved: 5, total: 25, color: 'bg-red-500' },
+    { label: 'Easy', solved: effectiveProblemSolved.easy.solvedCount, total: effectiveProblemSolved.easy.totalCount, color: 'bg-green-500' },
+    { label: 'Medium', solved: effectiveProblemSolved.medium.solvedCount, total: effectiveProblemSolved.medium.totalCount, color: 'bg-yellow-500' },
+    { label: 'Hard', solved: effectiveProblemSolved.hard.solvedCount, total: effectiveProblemSolved.hard.totalCount, color: 'bg-red-500' },
   ];
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-semibold mb-6">Thống kê bài giải</h2>
+      <h2 className="text-xl font-semibold mb-6">Algorithm Stats</h2>
       <div className="space-y-4">
         {stats.map((stat, index) => (
           <div key={index}>

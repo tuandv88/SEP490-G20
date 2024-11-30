@@ -87,13 +87,16 @@ function Problem() {
 
   const [problems, setProblems] = useState([])
   const [totalPages, setTotalPages] = useState(1)
-  const pageSize = 3
+  const [searchString, setSearchString] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  
+  const pageSize = 6
 
   useEffect(() => {
     const fetchProblems = async () => {
       setLoading(true)
       try {
-        const response = await ProblemAPI.getAllProblems(currentPage, pageSize)
+        const response = await ProblemAPI.getAllProblems(currentPage, pageSize, searchString)
         const { data, count } = response.problems
         setProblems(data)
         setTotalPages(Math.ceil(count / pageSize)) // Tính tổng số trang
@@ -104,7 +107,7 @@ function Problem() {
       }
     }
     fetchProblems()
-  }, [currentPage])
+  }, [currentPage, searchQuery])
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
@@ -146,6 +149,13 @@ function Problem() {
       tags: new Set(),
       favorite: false
     })
+    setSearchString('') 
+    setSearchQuery('') 
+    setCurrentPage(1) 
+  }
+
+  const handleSearch = () => {
+    setSearchQuery(searchString) // Cập nhật searchQuery khi nhấn nút Search
   }
 
   const handleTagToggle = (tag) => {
@@ -185,6 +195,9 @@ function Problem() {
                   availableTags={availableTags}
                   handleTagToggle={handleTagToggle}
                   handleReset={handleReset}
+                  setSearchString={setSearchString}
+                  handleSearch={handleSearch} 
+                  searchString={searchString}
                 />
                 <ActiveFilters filters={filters} handleRemoveFilter={handleRemoveFilter} handleReset={handleReset} />
               </div>

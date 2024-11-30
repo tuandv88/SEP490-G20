@@ -11,7 +11,6 @@ using System.Text.Json;
 
 namespace AuthServer.Controllers
 {
-    [Authorize]
     public class ProfileController : Controller
     {
         private readonly SignInManager<Users> _signInManager;
@@ -33,32 +32,48 @@ namespace AuthServer.Controllers
 
         public IActionResult Index()
         {
-            // Sử dụng _apiSettings.UserImageUrl trong view hoặc logic ứng dụng
+            // Lấy thông tin từ cấu hình
             var userImageUrl = _configuration.GetValue<string>("ApiSettings:UserImageUrl");
+
+            // Log thông tin cấu hình UserImageUrl
+            Console.WriteLine($"Index - UserImageUrl from configuration: {userImageUrl}");
 
             // Truyền vào ViewData để sử dụng trong Razor view
             ViewData["UserImageUrl"] = userImageUrl;
 
             return View();
         }
+
         [HttpGet]
         public async Task<IActionResult> Personal(string returnUrl = null)
         {
-            // Sử dụng _apiSettings.UserImageUrl trong view hoặc logic ứng dụng
+            Console.WriteLine("Personal (GET) method started.");
+
+            // Lấy thông tin từ cấu hình
             var userUpdateImageUrl = _configuration.GetValue<string>("ApiSettings:UserUpdateImageUrl");
+
+            // Log thông tin cấu hình UserUpdateImageUrl
+            Console.WriteLine($"Personal (GET) - UserUpdateImageUrl from configuration: {userUpdateImageUrl}");
 
             // Truyền vào ViewData để sử dụng trong Razor view
             ViewData["UserUpdateImageUrl"] = userUpdateImageUrl;
 
             returnUrl = returnUrl ?? Url.Content("~/");
-
             ViewData["ReturnUrl"] = returnUrl;
 
+            // Lấy thông tin người dùng hiện tại
             var userCurrent = await _userManager.GetUserAsync(User); // Đợi kết quả trả về
+            Console.WriteLine($"Personal (GET) - Current user: {userCurrent?.UserName}");
 
             if (userCurrent != null)
             {
+                Console.WriteLine($"Personal (GET) - Fetching profile picture for user: {userCurrent.UserName}");
+
+                // Lấy ảnh đại diện của người dùng từ S3
                 var s3Object = await _filesService.GetFileAsync(StorageConstants.BUCKET, userCurrent.ProfilePicture, 60);
+
+                // Log URL đã ký của ảnh đại diện
+                Console.WriteLine($"Personal (GET) - Profile picture URL: {s3Object.PresignedUrl}");
 
                 PersonalViewModel model = new PersonalViewModel()
                 {
@@ -69,8 +84,12 @@ namespace AuthServer.Controllers
                     urlAvatar = s3Object.PresignedUrl
                 };
 
+                Console.WriteLine($"Personal (GET) - Returning model: {model.UserName}, {model.FirstName} {model.LastName}");
+
                 return View(model);
             }
+
+            Console.WriteLine("Personal (GET) - User not found.");
 
             return View();
         }
@@ -79,9 +98,12 @@ namespace AuthServer.Controllers
         [HttpPost]
         public async Task<IActionResult> Personal(PersonalViewModel model, string returnUrl = null)
         {
+            Console.WriteLine("Personal (POST) method started.");
+
             returnUrl = returnUrl ?? Url.Content("~/");
             ViewData["ReturnUrl"] = returnUrl;
 
+            // Kiểm tra ModelState hợp lệ
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
@@ -90,11 +112,16 @@ namespace AuthServer.Controllers
 
                 var errorMessage = string.Join(", ", errors);
                 ModelState.AddModelError(string.Empty, errorMessage);
+
+                Console.WriteLine($"Personal (POST) - Model is invalid. Errors: {errorMessage}");
+
                 return View(model);
             }
 
             // Lấy thông tin người dùng hiện tại
             var userCurrent = await _userManager.GetUserAsync(User);
+            Console.WriteLine($"Personal (POST) - Current user: {userCurrent?.UserName}");
+
             if (userCurrent != null)
             {
                 // Cập nhật thông tin từ model vào người dùng
@@ -102,25 +129,33 @@ namespace AuthServer.Controllers
                 userCurrent.LastName = model.LastName;
                 userCurrent.DateOfBirth = model.Dob;
 
+                Console.WriteLine($"Personal (POST) - Updating user profile: {userCurrent.UserName}");
+
                 // Lưu các thay đổi vào cơ sở dữ liệu
                 var result = await _userManager.UpdateAsync(userCurrent);
 
                 // Kiểm tra kết quả lưu
                 if (result.Succeeded)
                 {
+                    Console.WriteLine($"Personal (POST) - Profile updated successfully for user: {userCurrent.UserName}");
                     TempData["SuccessMessageProfile"] = "Profile updated successfully.";
                     return RedirectToAction("Index", "Profile");
                 }
                 else
                 {
+                    Console.WriteLine($"Personal (POST) - Profile update failed for user: {userCurrent.UserName}");
                     TempData["ErrorMessageProfile"] = "Update Failed!";
+
                     // Nếu không thành công, thêm lỗi vào ModelState
                     foreach (var error in result.Errors)
                     {
+                        Console.WriteLine($"Personal (POST) - Error: {error.Description}");
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
             }
+
+            Console.WriteLine("Personal (POST) - User not found for update.");
 
             return View(model);
         }

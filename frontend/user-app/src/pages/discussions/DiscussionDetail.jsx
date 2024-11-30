@@ -12,6 +12,19 @@ import 'react-toastify/dist/ReactToastify.css'; // Import CSS của Toastify
 import Swal from 'sweetalert2'; // Import SweetAlert2
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { Select, MenuItem } from '@mui/material';
+import MarkdownIt from "markdown-it";
+import MarkdownEditor from "react-markdown-editor-lite";  // Thư viện Markdown Editor
+import "react-markdown-editor-lite/lib/index.css";  // Style của editor
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
 
 function DiscussionDetail() {
   const { id } = useParams();
@@ -28,6 +41,37 @@ function DiscussionDetail() {
   const [tooltipContent, setTooltipContent] = useState('Share');
   const [clicked, setClicked] = useState(false); // State để theo dõi trạng thái click
   const [voteCount, setVoteCount] = useState(0);
+  const [loadingVoteComment, setloadingVoteComment] = useState(false);
+
+  const [categories, setCategories] = useState([]);
+
+  // Khai báo state cần thiết
+  const [newPost, setNewPost] = useState({
+    id: "",
+    categoryId: "",
+    title: "",
+    content: "",
+    tags: [],
+    image: { fileName: "", base64Image: "", contentType: "image/png" },
+    isActive: true,
+  });
+
+  const [errorMessage, setErrorMessage] = useState("");  // Lưu thông báo lỗi
+  const [openDialog, setOpenDialog] = useState(false);  // Mở/đóng dialog
+  const [openErrorDialog, setOpenErrorDialog] = useState(false);  // Mở/đóng dialog lỗi
+  const [showAlert, setShowAlert] = useState(false);  // Hiển thị thông báo thành công
+  const [reloadComponentCurrent, setReloadComponentCurrent] = useState(false); // Quản lý reload component
+  const [postId, setPostId] = useState("");  // Lưu postId để cập nhật
+
+  const [originalPost, setOriginalPost] = useState({
+    id: "",
+    categoryId: "",
+    title: "",
+    content: "",
+    tags: [],
+    image: { fileName: "", base64Image: "", contentType: "image/png" },
+    isActive: true,
+  });
 
   useEffect(() => {
     const fetchDiscussion = async () => {
@@ -36,10 +80,13 @@ function DiscussionDetail() {
       try {
 
         const data = await DiscussApi.getDiscussionDetails(id);
+        const categories = await DiscussApi.getCategories();
         const currentViewTmp = await DiscussApi.updateViewDiscussion({ discussionId: id });
+
         if (!data) {
           throw new Error("Discussion not found.");
         }
+
         const userTmp = await AuthService.getUser();
         console.log(userTmp);
         setCurrentUser(userTmp);
@@ -57,6 +104,34 @@ function DiscussionDetail() {
           }
         }
 
+        if (categories && categories.categoryDtos) {
+          setCategories(categories.categoryDtos);
+        } else {
+          setCategories([]);
+        }
+
+        if (data) {
+          // Cập nhật dữ liệu vào state
+          setNewPost({
+            id: data.id,
+            categoryId: data.categoryId || "",
+            title: data.title || "",
+            content: data.description || "",
+            tags: data.tags || [],
+            image: data.image || { fileName: "", base64Image: "", contentType: "image/png" },
+            isActive: data.isActive !== undefined ? data.isActive : true,
+          });
+
+          setOriginalPost({
+            id: data.id,
+            categoryId: data.categoryId || "",
+            title: data.title || "",
+            content: data.description || "",
+            tags: data.tags || [],
+            image: data.image || { fileName: "", base64Image: "", contentType: "image/png" },
+            isActive: data.isActive !== undefined ? data.isActive : true,
+          });
+        }
       } catch (err) {
         setError(err.message || "Failed to fetch discussion details.");
       } finally {
@@ -69,7 +144,7 @@ function DiscussionDetail() {
     };
 
     fetchDiscussion();
-  }, [id]);
+  }, [id, reloadComponentCurrent]);
 
 
   const formatDate = (dateString) => {
@@ -94,7 +169,7 @@ function DiscussionDetail() {
       confirmButtonText: 'Yes',
       cancelButtonText: 'No',
       customClass: {
-        popup: 'swal-popup',                 // Lớp cho popup
+        popup: 'swal-popup',                // Lớp cho popup
         confirmButton: 'swal-btn-confirm',  // Lớp CSS cho nút "Yes"
         cancelButton: 'swal-btn-cancel'     // Lớp CSS cho nút "Cancel"
       }
@@ -108,8 +183,13 @@ function DiscussionDetail() {
   const handleRemoveDiscussion = async () => {
     try {
       setLoading(true);  // Bật trạng thái loading khi gọi API xóa
-      await DiscussApi.removeDiscussionById({ discussionId: id });  // Gọi API xóa thảo luận
-      navigate("/discussions/discuss");  // Sau khi xóa xong, điều hướng tới trang danh sách thảo luận
+      const response = await DiscussApi.removeDiscussionById({ discussionId: id });  // Gọi API xóa thảo luận
+
+      if (response) {
+        // Điều hướng đến trang danh sách thảo luận và truyền thông báo trong state
+        navigate("/discussions/discuss", { state: { removeDiscussionStateMessage: "Discussion removed successfully!" } });
+      }
+
     } catch (error) {
       console.error("Error removing discussion:", error.message);
     } finally {
@@ -131,7 +211,6 @@ function DiscussionDetail() {
       setLoading(false); // Tắt trạng thái loading
     }
   };
-
 
   const currentUrl = window.location.href; // Hoặc URL bạn muốn sao chép
 
@@ -163,9 +242,13 @@ function DiscussionDetail() {
     }
   };
 
-
   const handleVote = async (voteType) => {
     try {
+
+      // Nếu đang trong trạng thái loading thì không cho phép vote nữa
+      if (loadingVoteComment) return;
+      setloadingVoteComment(true); // Đặt loading là true khi bắt đầu gọi API
+
       const response = await DiscussApi.createVoteDiscussion({
         discussionId: discussion.id, // Tham số này lấy từ thông tin thảo luận
         commentId: null,
@@ -179,9 +262,113 @@ function DiscussionDetail() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setloadingVoteComment(false); // Tắt loading khi hoàn thành
     }
   };
 
+  // Hàm đóng dialog và reset form
+  const handleDialogClose = () => {
+    setOpenDialog(false);  // Đóng dialog
+  };
+
+  // Hàm hủy bỏ form và đóng dialog
+  const handleDialogCancel = () => {
+
+    setOpenDialog(false);  // Đóng dialog
+
+    // Kiểm tra xem data có tồn tại và có các trường hợp hợp lệ không
+    setNewPost(originalPost);
+  };
+
+  // Dialog thông báo lỗi
+  const handleErrorDialogClose = () => {
+    setOpenErrorDialog(false);
+  };
+
+  // Hàm xử lý submit để cập nhật bài viết
+  const handlePostSubmit = async () => {
+    // Kiểm tra nếu các trường chưa được nhập
+    if (!newPost.categoryId || !newPost.title || !newPost.content || !newPost.tags) {
+      setErrorMessage("Please fill in all data: Category, Tag, Title, Description before submitting.");
+      setOpenErrorDialog(true);
+      setTimeout(() => {
+        setOpenErrorDialog(false);
+      }, 30000);  // Đóng thông báo lỗi sau 3 giây
+      return;
+    }
+
+    // Cập nhật dữ liệu API
+    const updateDiscussionDto = {
+      id: newPost.id,
+      categoryId: newPost.categoryId,
+      title: newPost.title,
+      description: newPost.content,
+      tags: newPost.tags,
+      isActive: discussion.isActive,
+      closed: discussion.closed,
+      pinned: discussion.pinned,
+      viewCount: discussion.viewCount,
+      enableNotification: discussion.enableNotification
+    };
+
+    try {
+      // Gọi API cập nhật bài viết
+      const response = await DiscussApi.updateDiscuss(updateDiscussionDto);
+
+      // Kiểm tra nếu có ảnh thì thêm vào request
+      if (newPost.image && newPost.image.fileName && newPost.image.base64Image && newPost.image.contentType) {
+        const discussionImageData = {
+          fileName: newPost.image.fileName,
+          base64Image: newPost.image.base64Image,
+          contentType: newPost.image.contentType,
+        };
+
+        const responseUpdateImg = await DiscussApi.updateDiscussImage(newPost.id, discussionImageData);
+        if (responseUpdateImg) {
+          console.log("Successs", 11122);
+        }
+      }
+
+      if (response) {
+
+        // Đóng dialog sau khi cập nhật thành công
+        handleDialogClose();
+
+        // Gọi reloadComponent sau khi tạo bài viết thành công
+        reloadComponent();  // Trigger reload component
+      }
+    } catch (error) {
+      console.error("Error updating post:", error);
+    }
+  };
+
+  const handleEditorChange = ({ html, text }) => {
+    setNewPost({ ...newPost, content: text });  // Lưu nội dung Markdown khi người dùng thay đổi
+  };
+
+  const reloadComponent = () => {
+
+    setReloadComponentCurrent(!reloadComponentCurrent); // Trigger lại re-fetch dữ liệu
+
+    setNewPost({
+      id: "",
+      categoryId: "",
+      title: "",
+      content: "",
+      tags: [],
+      image: { fileName: "", base64Image: "", contentType: "image/png" },
+      isActive: true,
+    });
+
+    // Hiển thị thông báo thành công
+    setShowAlert(true);
+
+    // Tự động ẩn thông báo sau 3 giây
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 3000);
+  };
 
   if (loading || !transitioning) {
     return (
@@ -282,7 +469,7 @@ function DiscussionDetail() {
 
           {isOwnerDiscussion && (
             <div className="edit-button">
-              <button className="icon-button-edit">
+              <button className="icon-button-edit" onClick={() => setOpenDialog(true)}>
                 <FontAwesomeIcon icon={faEdit} />
               </button>
             </div>
@@ -315,7 +502,6 @@ function DiscussionDetail() {
               <FontAwesomeIcon icon={faComment} />
             </button>
           </div>
-
         </div>
 
         {/* Content Section */}
@@ -361,6 +547,128 @@ function DiscussionDetail() {
             </div>
           </div>
         </div>
+
+        {/* Dialog Popup for Updating a Post */}
+        <Dialog open={openDialog} onClose={handleDialogClose} fullWidth maxWidth="lg" className="dialog-submit-container">
+          <DialogTitle className="dialog-submit-title">Update Post</DialogTitle>
+          <DialogContent className="dialog-submit-content">
+            {/* Category */}
+            <Select
+              label="Category"
+              fullWidth
+              value={newPost.categoryId || ""}
+              onChange={(e) => setNewPost({ ...newPost, categoryId: e.target.value })}
+              margin="normal"
+              variant="outlined"
+              className="dialog-submit-select"
+            >
+              <MenuItem value="">Select One Category</MenuItem>
+              {categories && Array.isArray(categories) && categories.filter(category => category.isActive).map((category) => (
+                <MenuItem key={category.id} value={category.id}>
+                  {category.name}
+                </MenuItem>
+              ))}
+            </Select>
+
+            {/* Title */}
+            <TextField
+              label="Title"
+              fullWidth
+              value={newPost.title}
+              onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+              margin="normal"
+              variant="outlined"
+              className="dialog-submit-textfield"
+            />
+
+            {/* Tags */}
+            <TextField
+              label="Tags (comma separated)"
+              fullWidth
+              value={newPost.tags.join(", ")}
+              onChange={(e) => setNewPost({ ...newPost, tags: e.target.value.split(",").map(tag => tag.trim()) })}
+              margin="normal"
+              variant="outlined"
+              className="dialog-submit-textfield"
+            />
+
+            {/* Description (Content) - Markdown Editor */}
+            <MarkdownEditor
+              value={newPost.content}
+              style={{ height: "200px", marginTop: "16px" }}
+              onChange={handleEditorChange}
+              renderHTML={(text) => {
+                const md = new MarkdownIt();
+                return md.render(text);
+              }}
+            />
+
+            {/* Image Upload */}
+            <input
+              type="file"
+              accept="image/png, image/jpeg"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    const base64Image = reader.result.split(',')[1];
+                    setNewPost({
+                      ...newPost,
+                      image: {
+                        fileName: file.name,
+                        base64Image,
+                        contentType: file.type,
+                      },
+                    });
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }}
+              className="dialog-submit-file-input"
+            />
+          </DialogContent>
+          <DialogActions className="dialog-submit-actions">
+            <Button onClick={handleDialogCancel} color="secondary" className="dialog-submit-btn-cancel">
+              Cancel
+            </Button>
+            <Button onClick={handlePostSubmit} color="primary" variant="contained" className="dialog-submit-btn-submit">
+              Update
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Pop-up thông báo lỗi khi thiếu thông tin */}
+        <Dialog open={openErrorDialog} onClose={handleErrorDialogClose} fullWidth maxWidth="sm" className="dialog-error-container">
+          <DialogTitle className="dialog-error-title">Error Updating Post</DialogTitle>
+          <DialogContent className="dialog-error-content">
+            <p>{errorMessage}</p>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleErrorDialogClose} color="primary">
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Hiển thị thông báo khi post thành công */}
+        {showAlert && (
+          <Stack
+            sx={{
+              position: 'fixed',
+              top: 20, // Đặt cách từ đầu trang một chút
+              left: '50%', // Căn giữa theo chiều ngang
+              transform: 'translateX(-50%)', // Đảm bảo căn giữa tuyệt đối
+              zIndex: 9999, // Đảm bảo thông báo hiển thị trên tất cả các phần tử khác
+              width: 'auto', // Giới hạn chiều rộng thông báo
+              maxWidth: '500px', // Giới hạn chiều rộng tối đa cho thông báo
+            }}
+          >
+            <Alert severity="success">
+              Post Updated Successfully!
+            </Alert>
+          </Stack>
+        )}
 
         {/* Comments List Section */}
         <div className="comment-section" ref={commentSectionRef} >
@@ -624,13 +932,14 @@ function DiscussionDetail() {
 /* Image Section */
 .discussion-image {
   display: block; /* Chuyển ảnh thành block để căn giữa */
-  text-align: center; /* Căn giữa ảnh theo chiều ngang */
-  margin-bottom: 16px; /* Khoảng cách dưới ảnh */
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng */
   margin: 0 auto; /* Căn giữa ảnh ngang */
+  width: 100%; /* Đảm bảo ảnh có chiều rộng tối đa là 100% của phần tử chứa */
+  max-width: 60%; /* Giới hạn chiều rộng ảnh tối đa là 50% */
+  max-height: 500px; /* Giới hạn chiều cao ảnh tối đa */
   height: auto; /* Giữ tỷ lệ chiều cao ảnh */
 }
+
+
 
 /* Kiểm tra nếu các icon có kích thước quá lớn */
 .count-comment .fa-comment-alt {
@@ -724,6 +1033,228 @@ function DiscussionDetail() {
   cursor: not-allowed; /* Con trỏ khi disabled */
 }
 
+/* General dialog styles */
+.dialog-submit-container {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dialog-submit-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.dialog-submit-content {
+  padding: 16px 24px;
+  background-color: #f9f9f9;
+}
+
+.dialog-submit-select, .dialog-submit-textfield {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  width: 100%; /* Đảm bảo các input, select chiếm 100% chiều rộng */
+}
+
+.dialog-submit-textfield input {
+  padding: 12px 14px;
+}
+
+.dialog-submit-select .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.dialog-submit-file-input {
+  width: auto; /* Đặt chiều rộng tự động thay vì 100% */
+  max-width: 500px; /* Giới hạn chiều rộng tối đa */
+  padding: 10px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  color: #1e334a;
+  background-color: #fff;
+  margin-top: 10px;
+  font-size: 14px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  transition: all 0.3s ease;
+  display: block; /* Đảm bảo nó hiển thị dạng block */
+}
+
+.dialog-submit-file-input:hover {
+  border-color: #1e334a;
+  background-color: #f5f7fa;
+}
+
+.dialog-submit-file-input:focus {
+  border-color: #1e334a;
+  background-color: #fafafa;
+  outline: none;
+}
+
+.dialog-submit-file-input::file-selector-button {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #ffffff;
+  background-color: #2e4156;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.dialog-submit-file-input::file-selector-button:hover {
+  background-color: #1e334a;
+}
+
+.dialog-submit-file-input::file-selector-button:active {
+  background-color: #1e334a;
+}
+
+
+
+
+.dialog-submit-actions {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+/* Nút Submit */
+.dialog-submit-btn-submit {
+  text-transform: none;
+  text-align: center; /* Đảm bảo chữ luôn căn giữa */
+  display: flex;
+  align-items: center; /* Căn giữa nội dung theo chiều dọc */
+  justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+  max-width: 130px; /* Giới hạn kích thước tối đa nhỏ hơn */
+  min-width: 100px; /* Giới hạn kích thước tối thiểu nhỏ hơn */
+  padding: 8px 12px; /* Giảm kích thước padding */
+  font-size: 12px; /* Font chữ nhỏ hơn */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: bold; /* Font chữ đậm để nổi bật */
+  color: #ffffff; /* Màu chữ trắng */
+  border: none; /* Loại bỏ viền */
+  background: #1e334a; /* Nền màu xanh than đậm */
+  border-radius: 8px; /* Bo góc vừa phải */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn để tạo chiều sâu */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative; /* Hiệu ứng ánh sáng cần position */
+  overflow: hidden;
+}
+
+/* Hiệu ứng hover cho nút Submit */
+.dialog-submit-btn-submit:hover {
+  background: #14212b; /* Nền tối hơn khi hover */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Đổ bóng mạnh hơn khi hover */
+  transform: translateY(-2px); /* Nhấn nổi */
+}
+
+/* Nút đang active */
+.dialog-submit-btn-submit:active {
+  transform: translateY(0); /* Không nổi khi active */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ hơn */
+}
+
+/* Hiệu ứng ánh sáng di chuyển qua nút Submit */
+.dialog-submit-btn-submit::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -25%;
+  width: 150%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: skewX(-45deg);
+  transition: left 0.3s ease-in-out;
+}
+
+.dialog-submit-btn-submit:hover::before {
+  left: 100%; /* Ánh sáng trượt qua nút khi hover */
+}
+
+/* Khi nút Submit bị disabled */
+.dialog-submit-btn-submit.disabled {
+  background: #9ca3af; /* Màu xám nhạt */
+  color: #e5e7eb; /* Chữ xám nhạt */
+  cursor: not-allowed; /* Không cho phép click */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Nút Cancel */
+.dialog-submit-btn-cancel {
+  text-transform: none;
+  text-align: center; /* Đảm bảo chữ luôn căn giữa */
+  display: flex;
+  align-items: center; /* Căn giữa nội dung theo chiều dọc */
+  justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+  max-width: 130px; /* Giới hạn kích thước tối đa nhỏ hơn */
+  min-width: 100px; /* Giới hạn kích thước tối thiểu nhỏ hơn */
+  padding: 8px 12px; /* Giảm kích thước padding */
+  font-size: 12px; /* Font chữ nhỏ hơn */
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: bold; /* Font chữ đậm để nổi bật */
+  color: #000000; /* Màu chữ trắng */
+  border: none; /* Loại bỏ viền */
+  background: #aab0ad; /* Màu nền của nút Cancel */
+  border-radius: 8px; /* Bo góc vừa phải */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn để tạo chiều sâu */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative; /* Hiệu ứng ánh sáng cần position */
+  overflow: hidden;
+}
+
+/* Hiệu ứng hover cho nút Cancel */
+.dialog-submit-btn-cancel:hover {
+  background: #8f9795; /* Nền tối hơn khi hover */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Đổ bóng mạnh hơn khi hover */
+  transform: translateY(-2px); /* Nhấn nổi */
+}
+
+/* Nút đang active */
+.dialog-submit-btn-cancel:active {
+  transform: translateY(0); /* Không nổi khi active */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ hơn */
+}
+
+/* Hiệu ứng ánh sáng di chuyển qua nút Cancel */
+.dialog-submit-btn-cancel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -25%;
+  width: 150%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: skewX(-45deg);
+  transition: left 0.3s ease-in-out;
+}
+
+.dialog-submit-btn-cancel:hover::before {
+  left: 100%; /* Ánh sáng trượt qua nút khi hover */
+}
+
+/* Khi nút Cancel bị disabled */
+.dialog-submit-btn-cancel.disabled {
+  background: #9ca3af; /* Màu xám nhạt */
+  color: #e5e7eb; /* Chữ xám nhạt */
+  cursor: not-allowed; /* Không cho phép click */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dialog-error-title {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.dialog-error-content p {
+  color: #d32f2f;
+  font-size: 1rem;
+}
+
+.dialog-submit-btn-cancel, .dialog-submit-btn-submit {
+  min-width: 140px; /* Đảm bảo các nút có chiều rộng đủ */
+}
       `}</style>
     </Layout>
   );

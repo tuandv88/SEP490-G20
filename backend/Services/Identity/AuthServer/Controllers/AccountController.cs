@@ -13,7 +13,6 @@ using BuildingBlocks.Email.Models;
 using BuildingBlocks.Email.Helpers;
 using BuidingBlocks.Storage;
 using BuildingBlocks.Email.Constants;
-using Microsoft.VisualBasic;
 
 namespace AuthServer.Controllers
 {
@@ -338,6 +337,7 @@ namespace AuthServer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
+            Console.WriteLine("Return Url:" + returnUrl);
             returnUrl = returnUrl ?? Url.Content("~/");
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -417,10 +417,12 @@ namespace AuthServer.Controllers
 
                 if (_interactionService.IsValidReturnUrl(returnUrl))
                 {
+                    Console.WriteLine("----------------------------" + returnUrl);
                     return Redirect(returnUrl);
                 }
                 else
                 {
+                    Console.WriteLine("Return Url:" + returnUrl);
                     return RedirectToAction("Index", "Profile");
                 }
             }

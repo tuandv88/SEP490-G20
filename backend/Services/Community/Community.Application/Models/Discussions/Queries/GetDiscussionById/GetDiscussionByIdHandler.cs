@@ -23,9 +23,18 @@ public class GetDiscussionByIdHandler : IQueryHandler<GetDiscussionByIdQuery, Ge
             return new GetDiscussionByIdResult(null);
         }
 
-        var s3Object = await _filesService.GetFileAsync(StorageConstants.BUCKET, discussion.ImageUrl, 60);
+        string? imageUrl = null;
 
-        var discussionDto = discussion?.ToDiscussionDto(s3Object.PresignedUrl!);
+        // Kiểm tra nếu d.ImageUrl không phải null hoặc rỗng
+        if (!string.IsNullOrEmpty(discussion.ImageUrl))
+        {
+            // Nếu có ImageUrl, gọi GetFileAsync để lấy URL ảnh
+            var fileInfo = await _filesService.GetFileAsync(StorageConstants.BUCKET, discussion.ImageUrl, 60);
+            imageUrl = fileInfo.PresignedUrl;  // Lưu URL ảnh vào biến imageUrl
+        }
+
+
+        var discussionDto = discussion?.ToDiscussionDto(imageUrl);
 
         return new GetDiscussionByIdResult(discussionDto);
 

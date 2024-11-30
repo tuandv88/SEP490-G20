@@ -124,5 +124,51 @@ namespace AuthServer.Controllers
 
             return Ok(new { Message = $"Role with ID {roleId} has been deleted successfully." });
         }
+
+        [HttpPut("changerole")]
+        public async Task<IActionResult> ChangeUserRole([FromBody] ChangeUserRoleDto changeUserRoleDto)
+        {
+            // Kiểm tra đầu vào: UserId và Role mới
+            if (changeUserRoleDto.UserId == Guid.Empty)
+            {
+                return BadRequest(new { message = "Invalid UserId." });
+            }
+
+            if (string.IsNullOrEmpty(changeUserRoleDto.NewRole) || !await _roleManager.RoleExistsAsync(changeUserRoleDto.NewRole))
+            {
+                return BadRequest(new { message = "Invalid or non-existing role." });
+            }
+
+            // Tìm người dùng theo ID
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == changeUserRoleDto.UserId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found!" });
+            }
+
+            // Lấy các role hiện tại của người dùng
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            // Nếu người dùng đã có role mới, không cần thay đổi
+            if (currentRoles.Contains(changeUserRoleDto.NewRole))
+            {
+                return BadRequest(new { message = "User already has the specified role." });
+            }
+
+            // Xóa các role hiện tại và thêm role mới
+            var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            if (!removeResult.Succeeded)
+            {
+                return BadRequest(new { message = "Failed to remove existing roles." });
+            }
+
+            var addResult = await _userManager.AddToRoleAsync(user, changeUserRoleDto.NewRole);
+            if (!addResult.Succeeded)
+            {
+                return BadRequest(new { message = "Failed to assign new role." });
+            }
+
+            return Ok(new { message = $"User role updated successfully to {changeUserRoleDto.NewRole}." });
+        }
     }
 }

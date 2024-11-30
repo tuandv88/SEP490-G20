@@ -18,8 +18,6 @@ export const DiscussApi = {
   // API: Lấy danh sách discussions và thêm urlProfilePicture
   getDiscussionOptions: async ({ discussionId, pageIndex, pageSize, orderBy, tags }) => {
     try {
-      console.log("Fetching discussion options...", discussionId, orderBy, tags);
-
       // Gửi yêu cầu GET tới API với header Authorization
       const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/options`, {
         params: { pageIndex, pageSize, orderBy, tags }
@@ -108,11 +106,76 @@ export const DiscussApi = {
   createDiscuss: async (discussionData) => {
     try {
       console.log(discussionData, getAuthHeaders());
-      const response = await axios.post(`${API_BASE_URL}/community-service/discussions`, discussionData, getAuthHeaders());
+      const response = await axios.post(`${API_BASE_URL}/community-service/discussions/create`, discussionData, getAuthHeaders());
       return response.data;
     } catch (error) {
       console.error("Error creating discussion:", error);
       throw error;
+    }
+  },
+
+  // API: Tạo mới một discussion
+  updateDiscuss: async (discussionData) => {
+    try {
+
+      // Bọc `discussionData` vào trong đối tượng `UpdateDiscussionRequest`
+      const requestBody = {
+        updateDiscussionDto: discussionData
+      };
+      console.log(requestBody);
+      const response = await fetch(`${API_BASE_URL}/community-service/discussions/update`, {
+        method: 'PUT', // Phương thức PUT để cập nhật dữ liệu
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('authToken')}`, // Lấy token từ cookies
+          'Content-Type': 'application/json' // Đảm bảo kiểu dữ liệu là JSON
+        },
+        body: JSON.stringify(requestBody) // Chuyển đổi đối tượng thành chuỗi JSON
+      });
+
+      if (!response.ok) {
+        // Nếu response không phải là mã 2xx (thành công), ném lỗi
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const data = await response.json(); // Parse dữ liệu trả về dưới dạng JSON
+      return data; // Trả về dữ liệu nhận được từ API
+    } catch (error) {
+      console.error("Error updating discussion:", error);
+      throw error; // Ném lại lỗi để xử lý ở nơi gọi hàm này
+    }
+  },
+
+  // API: Cập nhật hình ảnh cho một discussion
+  updateDiscussImage: async (idDiscussion, discussionImageData) => {
+    try {
+      // Bọc `discussionImageData` vào trong đối tượng `UpdateDiscussionRequest`
+      const requestBody = {
+        id: idDiscussion,  // ID của discussion cần cập nhật
+        imageDto: discussionImageData // Dữ liệu hình ảnh
+      };
+
+      console.log(requestBody);  // Kiểm tra request body
+
+      // Gửi yêu cầu PUT để cập nhật hình ảnh
+      const response = await fetch(`${API_BASE_URL}/community-service/discussions/updateimage`, {
+        method: 'PUT', // Phương thức PUT để cập nhật dữ liệu
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('authToken')}`, // Lấy token từ cookies
+          'Content-Type': 'application/json' // Đảm bảo kiểu dữ liệu là JSON
+        },
+        body: JSON.stringify(requestBody) // Chuyển đối tượng thành chuỗi JSON
+      });
+
+      if (!response.ok) {
+        // Nếu response không phải là mã 2xx (thành công), ném lỗi
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const data = await response.json(); // Parse dữ liệu trả về dưới dạng JSON
+      return data; // Trả về dữ liệu nhận được từ API
+    } catch (error) {
+      console.error("Error updating discussion:", error);
+      throw error; // Ném lại lỗi để xử lý ở nơi gọi hàm này
     }
   },
 
@@ -139,7 +202,6 @@ export const DiscussApi = {
         params: { PageIndex: pageIndex, PageSize: pageSize }
       });
 
-
       // Kiểm tra và xử lý dữ liệu trả về
       if (response && response.data && response.data.commentsDetailDtos) {
         const comments = response.data.commentsDetailDtos.data;
@@ -149,18 +211,19 @@ export const DiscussApi = {
           totalCount: response.data.commentsDetailDtos.count,
         };
 
+        // Nếu không có bình luận, trả về dữ liệu rỗng
+        if (!comments || comments.length === 0) {
+          return { updatedComments: [], pagination, totalComments: 0 };
+        }
+
         // Lấy danh sách userId từ các bình luận
         const commentUserIds = comments.map(comment => comment.userId);
 
-        if (commentUserIds.length === 0) {
-          throw new Error("Không có người dùng nào trong bình luận này.");
-        }
         // Fetch thông tin người dùng cho tất cả các comment
         const users = await fetchUsers(commentUserIds);
 
         // Cập nhật thông tin người dùng cho từng bình luận
         const updatedComments = comments.map(comment => {
-
           const commentUser = users.find(user => user.id === comment.userId);
           return {
             ...comment,
@@ -170,13 +233,24 @@ export const DiscussApi = {
             lastName: commentUser ? commentUser.lastName : "xxx",
           };
         });
-        // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang
 
+        // Trả về danh sách bình luận đã được cập nhật và thông tin phân trang
         return { updatedComments, pagination, totalComments: pagination.totalCount };
       } else {
         throw new Error("Dữ liệu trả về không hợp lệ từ API.");
       }
     } catch (error) {
+      throw error;
+    }
+  },
+
+  // API: Remove comment mới
+  removeCommentById: async ({ commentId }) => {
+    try {
+      const response = await axios.delete(`${API_BASE_URL}/community-service/comments/${commentId}/remove`, getAuthHeaders());
+      return response;
+    } catch (error) {
+      console.error("Error Remove Comment :", error.message);
       throw error;
     }
   },
@@ -195,7 +269,7 @@ export const DiscussApi = {
   removeDiscussionById: async ({ discussionId }) => {
     try {
       const response = await axios.delete(`${API_BASE_URL}/community-service/discussions/${discussionId}/remove`, getAuthHeaders());
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Error Remove Discussion :", error.message);
       throw error;

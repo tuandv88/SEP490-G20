@@ -9,8 +9,18 @@ public static class DiscussionExtensions
     {
         var tasks = discussions.Select(async d =>
         {
-            var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, d.ImageUrl, 60);
-            return d.ToDiscussionDto(imageUrl.PresignedUrl!);
+            string? imageUrl = null;
+
+            // Kiểm tra nếu d.ImageUrl không phải null hoặc rỗng
+            if (!string.IsNullOrEmpty(d.ImageUrl))
+            {
+                // Nếu có ImageUrl, gọi GetFileAsync để lấy URL ảnh
+                var fileInfo = await filesService.GetFileAsync(StorageConstants.BUCKET, d.ImageUrl, 60);
+                imageUrl = fileInfo.PresignedUrl;  // Lưu URL ảnh vào biến imageUrl
+            }
+
+            // Chuyển đổi đối tượng Discussion thành DiscussionDto với imageUrl (có thể null)
+            return d.ToDiscussionDto(imageUrl);
         });
 
         var discussionDtos = await Task.WhenAll(tasks);
@@ -43,7 +53,15 @@ public static class DiscussionExtensions
 
     public static async Task<DiscussionDetailDto> ToDiscussionDetailDtoAsync(this Discussion discussion, IFilesService filesService)
     {
-        var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, discussion.ImageUrl, 60);
+        string? imageUrl = null;
+
+        // Kiểm tra nếu d.ImageUrl không phải null hoặc rỗng
+        if (!string.IsNullOrEmpty(discussion.ImageUrl))
+        {
+            // Nếu có ImageUrl, gọi GetFileAsync để lấy URL ảnh
+            var fileInfo = await filesService.GetFileAsync(StorageConstants.BUCKET, discussion.ImageUrl, 60);
+            imageUrl = fileInfo.PresignedUrl;  // Lưu URL ảnh vào biến imageUrl
+        }
 
         return new DiscussionDetailDto(
             UserName: "Unknown",                        // Placeholder, có thể thay thế bằng dữ liệu từ bảng Users
@@ -53,7 +71,7 @@ public static class DiscussionExtensions
             Id: discussion.Id.Value,
             Title: discussion.Title,
             Description: discussion.Description,
-            ImageUrl: imageUrl.PresignedUrl!,
+            ImageUrl: imageUrl,
             DateCreated: discussion.DateCreated,
             DateUpdated: discussion.DateUpdated,
             Tags: discussion.Tags,
@@ -77,7 +95,15 @@ public static class DiscussionExtensions
     {
         var tasks = discussions.Select(async d =>
         {
-            var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, d.ImageUrl, 60);
+            string? imageUrl = null;
+
+            // Kiểm tra nếu d.ImageUrl không phải null hoặc rỗng
+            if (!string.IsNullOrEmpty(d.ImageUrl))
+            {
+                // Nếu có ImageUrl, gọi GetFileAsync để lấy URL ảnh
+                var fileInfo = await filesService.GetFileAsync(StorageConstants.BUCKET, d.ImageUrl, 60);
+                imageUrl = fileInfo.PresignedUrl;  // Lưu URL ảnh vào biến imageUrl
+            }
 
             // Cắt Description nếu nó dài hơn 50 ký tự
             var shortDescription = d.Description.Length > 50 ? d.Description.Substring(0, 50) + "...." : d.Description;
@@ -88,7 +114,7 @@ public static class DiscussionExtensions
                 Id: d.Id.Value,
                 Title: d.Title,
                 Description: shortDescription,  // Gán description đã được cắt
-                ImageUrl: imageUrl.PresignedUrl!,
+                ImageUrl: imageUrl,
                 DateCreated: d.DateCreated,
                 DateUpdated: d.DateUpdated,
                 Tags: d.Tags,

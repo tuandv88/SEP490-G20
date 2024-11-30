@@ -2,7 +2,19 @@ FROM node:20-alpine as build
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN rm package-lock.json && npm install
+
+# Nhận các biến môi trường tại thời gian xây dựng
+ARG VITE_API_URL
+ARG VITE_SIGNALR_URL
+ARG VITE_AUTH_URL
+ARG VITE_CALLBACK_URL
+# Thiết lập các biến môi trường cho Vite
+ENV VITE_API_URL=$VITE_API_URL \
+    VITE_SIGNALR_URL=$VITE_SIGNALR_URL \
+    VITE_AUTH_URL=$VITE_AUTH_URL \
+    VITE_CALLBACK_URL=$VITE_CALLBACK_URL
+
 COPY . .
 RUN npm run build
 

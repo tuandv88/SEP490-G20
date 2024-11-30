@@ -3,13 +3,23 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 80
+EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Services/Community/Community.API/Community.API.csproj", "Services/Community/Community.API/"]
+COPY ["Services/Community/Community.Application/Community.Application.csproj", "Services/Community/Community.Application/"]
+COPY ["Services/Community/Community.Domain/Community.Domain.csproj", "Services/Community/Community.Domain/"]
+COPY ["Services/Community/Community.Infrastructure/Community.Infrastructure.csproj", "Services/Community/Community.Infrastructure/"]
+
+#utils
+COPY ["BuildingBlocks/BuidingBlocks.Storage/BuidingBlocks.Storage.csproj", "BuildingBlocks/BuidingBlocks.Storage/"]
+COPY ["BuildingBlocks/BuildingBlocks/BuildingBlocks.csproj", "BuildingBlocks/BuildingBlocks/"]
+COPY ["BuildingBlocks/BuildingBlocks.Email/BuildingBlocks.Email.csproj", "BuildingBlocks/BuildingBlocks.Email/"]
+COPY ["BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj", "BuildingBlocks/BuildingBlocks.Messaging/"]
+
 RUN dotnet restore "./Services/Community/Community.API/./Community.API.csproj"
 COPY . .
 WORKDIR "/src/Services/Community/Community.API"

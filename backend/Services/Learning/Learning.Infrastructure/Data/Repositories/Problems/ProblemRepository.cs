@@ -16,7 +16,7 @@ public class ProblemRepository : Repository<Problem>, IProblemRepository {
         }
     }
 
-    public async Task<IQueryable<Problem>> GetAllAsQueryableAsync() {
+    public IQueryable<Problem> GetAllAsQueryable() {
         var problems = _dbContext.Problems.AsQueryable();
         return problems;
     }

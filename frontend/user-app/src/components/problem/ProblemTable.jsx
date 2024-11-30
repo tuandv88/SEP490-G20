@@ -129,7 +129,7 @@ function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
             </div>
           </div>
           <div className='flex items-center gap-4'>
-            {problem.status === 'Todo' && (
+            {problem.status === 'Solved' && (
               <div className='text-emerald-500'>
                 <Check className='h-5 w-5' />
               </div>

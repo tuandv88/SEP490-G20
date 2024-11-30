@@ -2,83 +2,25 @@ import React, { useEffect, useState } from 'react'
 import { BarChart2, BookOpen, Calendar, Layout, ListChecks, PlusCircle } from 'lucide-react'
 import CourseStep from './CourseStep'
 import { LearningAPI } from '@/services/api/learningApi'
+import ChapterLoading from '../loading/ChapterLoading'
 
-const path = {
-  pathName: 'Full-stack Developer',
-  startDate: '2024-03-15',
-  endDate: '2025-03-15',
-  category: 'Web Development',
-  difficulty: 'Intermediate',
-  totalDuration: '12 months',
-  reasons: [
-    'Strong foundation in both frontend and backend development',
-    'High demand in current job market',
-    'Matches your previous experience with web technologies',
-    'Comprehensive curriculum covering modern web stack'
-  ],
-  steps: [
-    {
-      title: 'Frontend Fundamentals',
-      headline: 'Master HTML, CSS, and JavaScript',
-      price: 299,
-      timeDuration: '3 months',
-      description:
-        'Build a strong foundation in modern web development with hands-on projects and real-world applications.',
-      topics: [
-        'HTML5 Semantic Elements',
-        'CSS3 Layouts and Animations',
-        'JavaScript ES6+ Features',
-        'Responsive Web Design',
-        'Web Accessibility'
-      ],
-      skills: ['HTML', 'CSS', 'JavaScript', 'Git', 'Web Standards']
-    },
-    {
-      title: 'React Development',
-      headline: 'Build modern web applications with React',
-      price: 399,
-      timeDuration: '4 months',
-      description: 'Learn to build scalable applications using React and its ecosystem of tools and libraries.',
-      topics: [
-        'React Fundamentals',
-        'State Management',
-        'Hooks and Custom Hooks',
-        'React Router',
-        'Performance Optimization'
-      ],
-      skills: ['React', 'Redux', 'TypeScript', 'Testing', 'Performance']
-    },
-    {
-      title: 'Backend Development',
-      headline: 'Master Node.js and Express',
-      price: 449,
-      timeDuration: '5 months',
-      description: 'Develop secure and scalable backend services using Node.js and modern backend technologies.',
-      topics: [
-        'Node.js Fundamentals',
-        'Express Framework',
-        'Database Design',
-        'API Development',
-        'Authentication & Security'
-      ],
-      skills: ['Node.js', 'Express', 'MongoDB', 'REST APIs', 'Security']
-    }
-  ],
-  imageUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80'
-}
 
-export function RoadmapDashboard() {
+const RoadmapDashboard = ({ user }) => {
   const [learningPath, setLearningPath] = useState([])
   const [courseDetails, setCourseDetails] = useState({})
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     async function fetchLearningPath() {
       try {
+        setLoading(true)
         const response = await LearningAPI.getLearningPath()
         console.log('Learning Path Data:', response) 
         setLearningPath(response.learningPathDtos)
       } catch (error) {
         console.error('Error fetching learning path:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -88,6 +30,7 @@ export function RoadmapDashboard() {
   useEffect(() => {
     async function fetchCoursePreview(courseId) {
       try {
+        setLoading(true)
         const response = await LearningAPI.getCoursePreview(courseId)
         setCourseDetails(prevDetails => ({
           ...prevDetails,
@@ -95,6 +38,8 @@ export function RoadmapDashboard() {
         }))
       } catch (error) {
         console.error('Error fetching course data:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -110,7 +55,11 @@ export function RoadmapDashboard() {
 
       courseIds.forEach(courseId => fetchCoursePreview(courseId))
     }
-  }, [learningPath])
+  }, [learningPath, user])
+
+  if (loading) {
+    return <ChapterLoading />
+  }
 
   return (
     <div className='space-y-6 mt-6'>
@@ -166,8 +115,10 @@ export function RoadmapDashboard() {
           </div>
         ))
       ) : (
-        <div className='text-center text-gray-500'>No learning paths available.</div>
+        <div className='text-center text-gray-500 w-full h-full'>No learning paths available.</div>
       )}
     </div>
   )
 }
+
+export default React.memo(RoadmapDashboard)

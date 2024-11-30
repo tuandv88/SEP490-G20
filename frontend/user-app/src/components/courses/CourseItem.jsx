@@ -53,7 +53,7 @@ export default function CourseItem({ courses }) {
             </div>
           </div>
   
-          <button onClick={() => handleViewDetail(course.id)} className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 font-medium mt-auto">
+          <button onClick={() => handleViewDetail(course.id)} className="w-full bg-primaryButton text-white py-3 px-4 rounded-lg hover:bg-primaryButton transition-colors flex items-center justify-center gap-2 font-medium mt-auto">
             View Course
             <ExternalLink size={18} />
           </button>

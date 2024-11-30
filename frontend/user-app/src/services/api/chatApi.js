@@ -1,10 +1,11 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const API_BASE_URL =  import.meta.env.VITE_API_URL
 
 export const ChatAPI = {
+  
   getConversation: async (pageIndex, pageSize) => {
-    const response = await axios.get(`${API_BASE_URL}/ai-service/conversations?PageIndex=1&PageSize=100`, {
+    const response = await axios.get(`${API_BASE_URL}/ai-service/conversations?PageIndex=${pageIndex}&PageSize=${pageSize}`, {
       headers: {
         Authorization: `Bearer ${Cookies.get('authToken')}`
       }
@@ -14,13 +15,13 @@ export const ChatAPI = {
   getMessage: async (conversationId) => {
     const response = await axios.get(
       `${API_BASE_URL}/ai-service/conversations/${conversationId}/messages?PageIndex=1&PageSize=10`,
-      {},
       {
         headers: {
           Authorization: `Bearer ${Cookies.get('authToken')}`
         }
       }
     )
+    console.log('response', response.data)
     return response.data
   }
 }

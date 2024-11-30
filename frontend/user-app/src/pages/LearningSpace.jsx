@@ -22,11 +22,14 @@ import SubmissionHistory from '@/components/learning/submission/SubmissionHistor
 import { ProblemAPI } from '@/services/api/problemApi'
 import SubmissionResult from '@/components/learning/submission/SubmissionResult'
 import HeaderCode from '@/layouts/learningheaderLec'
+import CourseLoadingDetail from '@/components/loading/CourseLoadingDetail'
+import { CourseAPI } from '@/services/api/courseApi'
 
 
 
 const LearningSpace = () => {
   const navigate = useNavigate()
+  const { id, lectureId } = useParams()
   const [activeTab, setActiveTab] = useState('default')
   const [chapters, setChapters] = useState([])
   const [title, setTitle] = useState('')
@@ -44,11 +47,22 @@ const LearningSpace = () => {
   const [problemSubmission, setProblemSubmission] = useState(null)
   const [resultCodeSubmit, setResultCodeSubmit] = useState(null)
   const [currentCode, setCurrentCode] = useState(null)
-  const [mainLoading, setMainLoading] = useState(false)
+  const [activeLectureId, setActiveLectureId] = useState(lectureId) 
+  const [courseProgress, setCourseProgress] = useState([])
   //courseId
-  const { id, lectureId } = useParams()
+  
   const toggleProblemList = () => {
     setIsProblemListOpen(!isProblemListOpen)
+  }
+
+  const handleNextLecture = () => {
+    setActiveLectureId(lectureId)
+    toggleCurriculumRef.current.handleNextLecture()
+  }
+  
+
+  const handleLectureChange = (lectureId) => {
+    setActiveLectureId(lectureId)
   }
 
   const handleVideoTimeUpdate = useCallback((time) => {
@@ -60,16 +74,36 @@ const LearningSpace = () => {
   }
 
   useEffect(() => {
+    if (lectureDetail) {
+      if (lectureDetail.lectureDetailsDto.problem) {
+        setActiveTab('descriptions') 
+      } else {
+        setActiveTab('curriculum') 
+      }
+    }
+  }, [lectureDetail])
+
+  useEffect(() => {
+    const fetchCourseProgress = async () => {
+      try {
+        const data = await CourseAPI.getCourseProgress(id)
+        setCourseProgress(data.progress)
+
+      } catch (error) {
+        console.error('Error fetching course progress:', error)
+      }
+    }
+    fetchCourseProgress()
+  }, [lectureId])
+
+  useEffect(() => {
     const fetchCourseDetail = async () => {
       setLoading(true)
       setError(false)
       try {
         const data = await LearningAPI.getCourseDetails(id)
-        console.log(data)
         setChapters(data?.courseDetailsDto?.chapterDetailsDtos)
         setTitle(data?.courseDetailsDto?.courseDto?.title)
-        // setFirstLectureId(data?.courseDetailsDto.chapterDetailsDtos[4].lectureDtos[0].id)
-        // console.log(firstLectureId)
       } catch (error) {
         console.error('Error fetching course detail:', error)
         if (error.response) {
@@ -90,13 +124,13 @@ const LearningSpace = () => {
   }, [id])
 
   useEffect(() => {
-    if (lectureId) {
+    if (activeLectureId) {
       const fetchLectureDetail = async () => {
         try {
-          //console.log(firstLectureId)
+
           const data = await LearningAPI.getLectureDetails(lectureId)
           setLectureDetail(data)
-          console.log(data)
+
 
           //Gọi API để lấy ra file của lecutre đó.
           const lectureFiles = data?.lectureDetailsDto?.files || []
@@ -113,7 +147,6 @@ const LearningSpace = () => {
                   const videoBlob = await videoResponse.blob()
                   const blobUrl = URL.createObjectURL(videoBlob)
                   setVideoBlobUrl(blobUrl)
-                  console.log(blobUrl)
                   // Giải phóng bộ nhớ blob khi component unmount
                   return () => URL.revokeObjectURL(blobUrl)
                 }
@@ -141,7 +174,6 @@ const LearningSpace = () => {
         try {
           const response = await ProblemAPI.getSubmissionHistory(problemId)
           setProblemSubmission(response.submissions)
-          console.log(response)
         } catch (error) {
           console.error('Error fetching submission history:', error)
         } 
@@ -150,6 +182,11 @@ const LearningSpace = () => {
       fetchLectureDetail()
     }
   }, [lectureId])
+
+
+  if (loading) {
+    return <CourseLoadingDetail />
+  }
 
   if (error) {
     return <ErrorPage />
@@ -160,6 +197,7 @@ const LearningSpace = () => {
       <NotFound mess='We cannot find documents in this course. Please check the link or search for other courses.' />
     )
   }
+
 
   // if (mainLoading) {
   //   return <Loading />
@@ -181,7 +219,7 @@ const LearningSpace = () => {
           className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
         >
           <ResizablePanel id='panel-1' order={1} defaultSize={40}>
-            <div className='scroll-container h-full'>
+            <div className='scroll-container h-full bg-bGprimary'>
               <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={false} />
               {loading && <ChapterLoading />}
               {(activeTab === 'descriptions' || activeTab === 'default' || activeTab === 'curriculum') && !loading && (
@@ -192,13 +230,16 @@ const LearningSpace = () => {
                   titleProblem={lectureDetail?.lectureDetailsDto?.problem?.title}
                   initialTime={videoTimeRef.current}
                   onTimeUpdate={handleVideoTimeUpdate}
+                  handleNextLecture={handleNextLecture}
+                  courseId={id}
+                  lectureId={lectureId}
                 />
               )}
               {activeTab === 'submissionResult' && !loading && (
                 <SubmissionResult currentCode={currentCode} resultCodeSubmit={resultCodeSubmit} />
               )}
               {activeTab === 'submission' && !loading && <SubmissionHistory submissions={problemSubmission} />}
-              {activeTab === 'comments' && !loading && <Comments />}
+              {activeTab === 'comments' && !loading && <Comments lectureId={lectureId} courseId={id} />}
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle className='resize-sha w-[3px]' />
@@ -237,21 +278,31 @@ const LearningSpace = () => {
             <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={true} />
             {loading && <ChapterLoading />}
             {(activeTab === 'curriculum' || activeTab === 'default') && !loading && (
-             <Curriculum courseId={id} chapters={chapters} setSelectedLectureId={setSelectedLectureId} title={title} />
+             <Curriculum 
+             courseId={id} 
+             chapters={chapters} 
+             setSelectedLectureId={handleLectureChange} title={title} 
+             setActiveLectureId={handleLectureChange}
+             activeLectureId={activeLectureId}
+             courseProgress={courseProgress} />
+             
              //<Curriculum3 />
             )}
-            {activeTab === 'comments' && !loading && <Comments />}
+            {activeTab === 'comments' && !loading && <Comments lectureId={lectureId} courseId={id} />}
           </ResizablePanel>
           <ResizableHandle withHandle className='resize-sha w-[3px]' />
           <ResizablePanel id='panel-2' order={2} defaultSize={isThreePanels ? 50 : 75}>
-            <div className='scroll-container h-full'>
+            <div className='scroll-container h-full bg-bGprimary'>
               {/* {loading && <ChapterLoading />} */}
 
               <NormalLecture
                 description={lectureDetail?.lectureDetailsDto?.summary}
                 videoSrc={videoBlobUrl}
                 loading={loading}
-                titleProblem={lectureDetail?.lectureDetailsDto?.title}
+                titleProblem={lectureDetail?.lectureDetailsDto?.title}   
+                handleNextLecture={handleNextLecture}
+                courseId={id}
+                lectureId={lectureId}
               />
             </div>
           </ResizablePanel>
@@ -285,11 +336,14 @@ const LearningSpace = () => {
         ref={toggleCurriculumRef}
         title={title}
         chapters={chapters}
-        setSelectedLectureId={setSelectedLectureId}
+        setSelectedLectureId={handleLectureChange}
         isProblemListOpen={isProblemListOpen}
         toggleProblemList={toggleProblemList}
+        setActiveLectureId={handleLectureChange}
         navigate={navigate}
         courseId={id}
+        activeLectureId={activeLectureId}
+        courseProgress={courseProgress}
       />
     </div>
   )

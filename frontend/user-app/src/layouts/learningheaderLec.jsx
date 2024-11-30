@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import { ArrowRight, Bell, BotMessageSquare, ChevronLeft, ChevronRight, Indent, Settings } from 'lucide-react'
+import { ArrowRight, Bell, BotMessageSquare, Check, ChevronLeft, ChevronRight, Indent, Settings } from 'lucide-react'
 import React, { useState } from 'react'
 
 const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef, header }) => {
@@ -57,6 +57,14 @@ const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef, header })
                 </button>
               </div>
             </div>
+            {/* <div className='flex items-center px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700'>
+              <span className='text-sm font-medium text-gray-700 dark:text-gray-200 mr-2'>Lession 12 Lecture</span> */}
+              {/* {currentLesson.isCompleted ? ( */}
+                {/* <Check className='w-4 h-4 text-green-500' /> */}
+              {/* // ) : (
+              //   <Clock className='w-4 h-4 text-gray-400' />
+              // )} */}
+            {/* </div> */}
             <div className='flex items-center space-x-2 mr-4'>
               <button
                 onClick={onChatClick}
@@ -64,21 +72,6 @@ const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef, header })
               >
                 <BotMessageSquare className='w-5 h-5' />
               </button>
-              <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-                <Settings className='w-5 h-5' />
-              </button>
-              <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-                <Bell className='w-5 h-5' />
-              </button>
-              <div className='relative'>
-                <button className='flex items-center focus:outline-none'>
-                  <img
-                    src='https://lh3.googleusercontent.com/a/ACg8ocKsfTHylfAszH0NVPU4Zj-X21su07AFw9wCwAZgiEM4hTEffIZ0EQ=s288-c-no'
-                    alt='User Avatar'
-                    className='w-8 h-8 rounded-full'
-                  />
-                </button>
-              </div>
             </div>
           </div>
         </div>

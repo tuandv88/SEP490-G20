@@ -14,6 +14,7 @@ import useStore from '@/data/store'
 import { LearningAPI } from '@/services/api/learningApi'
 import { LoadingState } from '@/components/loading/CourseDetailLoading/LoadingState'
 import Cookies from 'js-cookie'
+import ChapterLoading from '@/components/loading/ChapterLoading'
 
 function CourseDetail() {
   const [activeTab, setActiveTab] = useState('introduce')
@@ -24,7 +25,6 @@ function CourseDetail() {
   const navigate = useNavigate()
   const setSelectedCourse = useStore((state) => state.setSelectedCourse)
   const [enrolledCourses, setEnrolledCourses] = useState(null)
-  const [firstLectureId, setFirstLectureId] = useState(null)
 
 
   useEffect(() => {
@@ -43,8 +43,7 @@ function CourseDetail() {
           CourseAPI.getEnrolledCourses(id)
         ])
         console.log(Cookies.get('authToken'))
-        setCourseDetail(courseData)
-        setFirstLectureId(courseData.course.chapters[0].lectures[0].id)
+        setCourseDetail(courseData)        
         setEnrolledCourses(enrolledData.enrollmentInfo)
         console.log(enrolledData.enrollmentInfo)
       } catch (error) {
@@ -61,6 +60,7 @@ function CourseDetail() {
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
 
   if (error) {
     return <ErrorPage />
@@ -168,7 +168,7 @@ function CourseDetail() {
 
                 {/* Sidebar - Right Side */}
                 <div className='lg:col-span-1'>
-                  <CourseSidebar enrolledCourses={enrolledCourses} firstLectureId={firstLectureId} />
+                  <CourseSidebar enrolledCourses={enrolledCourses} courseId={id} />
                 </div>
               </div>
             </div>

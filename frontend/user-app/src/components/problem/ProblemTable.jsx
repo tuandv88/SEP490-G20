@@ -11,13 +11,22 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useNavigate } from 'react-router-dom'
+import { useContext } from 'react'
+import { UserContext } from '@/contexts/UserContext'
+import authServiceInstance from '@/oidc/AuthService'
 
 function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
+
+  const { user } = useContext(UserContext)
 
   const navigate = useNavigate()
 
   const handleSolveChallenge = (problemId) => {
-    navigate(`/problem-solve/${problemId}`)
+    if (user) {
+      navigate(`/problem-solve/${problemId}`)
+    } else {
+      authServiceInstance.login()
+    }
   }
 
 

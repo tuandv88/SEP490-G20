@@ -1,12 +1,14 @@
 const VITE_AUTH_URL = import.meta.env.VITE_AUTH_URL
 const VITE_CALLBACK_URL = import.meta.env.VITE_CALLBACK_URL
+const VITE_OAUTH_CLIENT_ID = import.meta.env.VITE_OAUTH_CLIENT_ID
+const VITE_OAUTH_CLIENT_SCOPE = import.meta.env.VITE_OAUTH_CLIENT_SCOPE
 
 export const oidcConfig = {
   authority: VITE_AUTH_URL,
-  client_id: 'local_01',
-  redirect_uri: `${VITE_CALLBACK_URL}/callback`,
+  client_id: VITE_OAUTH_CLIENT_ID,
+  redirect_uri: ${VITE_CALLBACK_URL}/callback,
   response_type: 'code',
-  scope: 'openid profile offline_access',
+  scope: VITE_OAUTH_CLIENT_SCOPE,
   post_logout_redirect_uri: VITE_CALLBACK_URL,
   loadUserInfo: true,
   requirePkce: true,

@@ -32,5 +32,17 @@ export const ProblemAPI = {
       }
     })
     return response.data
+  },
+  getProblemHome: async (pageIndex, pageSize) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/learning-service/problems?PageIndex=${pageIndex}&PageSize=${pageSize}`, {
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('authToken')}`
+        }
+      })
+      return response.data
+    } catch (error) {
+      console.error('Error fetching problems:', error)
+    }
   }
 }

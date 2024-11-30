@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { DiscussApi } from "@/services/api/DiscussApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronUp, faCommentAlt, faComments, faEdit, faReply, faShareFromSquare, faThumbsDown, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faChevronUp, faComment, faCommentAlt, faComments, faEdit, faRepeat, faReply, faReplyAll, faShareFromSquare, faShower, faThumbsDown, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import { marked } from 'marked'; // Import marked library
@@ -40,10 +40,6 @@ function CommentList({ discussionId }) {
 
   const [openRemoveDialog, setOpenRemoveDialog] = useState(false);  // Trạng thái mở/đóng dialog
   const [commentIdToDelete, setCommentIdToDelete] = useState(null); // Lưu ID comment cần xóa
-
-  const [isReplying, setIsReplying] = useState(false); // Kiểm tra trạng thái trả lời
-  const [replyContent, setReplyContent] = useState("");  // Nội dung của bình luận trả lời
-  const [parentCommentId, setParentCommentId] = useState(null);  // ID của bình luận gốc
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -235,53 +231,6 @@ function CommentList({ discussionId }) {
   };
 
 
-  const handleReply = (commentId) => {
-    if (parentCommentId === commentId) {
-      // If the form is already open for this comment, just keep it open (do nothing)
-      return;
-    }
-    // If the form is not open for this comment, open the reply form
-    setParentCommentId(commentId);
-    setReplyContent(""); // Clear the reply content
-    setIsReplying(true);  // Mở form trả lời
-  };
-
-  // Handle the cancel reply functionality
-  const handleCancelReply = () => {
-    setParentCommentId(null); // Close the form by resetting the parent comment ID
-    setReplyContent(""); // Clear reply content
-    setIsReplying(false);  // Mở form trả lời
-  };
-
-  // Xử lý khi người dùng gửi phản hồi
-  const handleReplySubmit = async () => {
-    try {
-      const idDiscussionCurrent = discussionId;
-
-      const newComment = {
-        discussionId: idDiscussionCurrent, // ID thảo luận
-        content: replyContent,  // Nội dung trả lời
-        dateCreated: new Date().toISOString(),  // Thời gian hiện tại
-        parentCommentId: parentCommentId,  // ID của bình luận gốc
-        depth: 2,  // Depth = 2 cho bình luận trả lời
-        isActive: true,  // Đánh dấu là bình luận hợp lệ
-      };
-
-      const response = await DiscussApi.createComment(newComment);
-
-      if (response) {
-        setReplyContent("");  // Reset nội dung bình luận
-        setIsReplying(false);  // Đóng form trả lời
-        setRefreshComments(prev => !prev);  // Tải lại danh sách bình luận
-
-        console.log("Success!", newComment)
-      }
-    } catch (error) {
-      console.error("Error submitting reply:", error);
-    }
-  };
-
-
   // if (loading) {
   //   return (
   //     <>
@@ -318,13 +267,102 @@ function CommentList({ discussionId }) {
   //   );
   // }
 
-  if (error) {
-    return (
-      <div className="error-container">
-        <p className="error-message">{error}</p>
-      </div>
-    );
-  }
+  const [replies, setReplies] = useState({}); // Dành cho các bình luận con (replies) của mỗi bình luận
+  const [replyFormVisible, setReplyFormVisible] = useState(null); // Quản lý form trả lời hiển thị cho mỗi bình luận
+  const [contentReplyFromComment, setContentReplyFromComment] = useState(''); // Nội dung trả lời từ người dùng
+  const [contentReplyFromReply, setContentReplyFromReply] = useState(''); // Nội dung trả lời từ người dùng
+  const [showRepliesMap, setShowRepliesMap] = useState({}); // Quản lý hiển thị các bình luận con (replies)
+  const [nestedReplyFormVisible, setNestedReplyFormVisible] = useState(null); // Quản lý form trả lời cho các reply con
+
+  // Hàm để load bình luận con (reply)
+  const loadReplies = async (commentId) => {
+    try {
+      const response = await DiscussApi.getCommentsByCommentParentId(discussionId, commentId, 1, 10); // Lấy danh sách bình luận con
+      if (response && response.updatedComments) {
+        setReplies(prevReplies => ({
+          ...prevReplies,
+          [commentId]: response.updatedComments, // Lưu bình luận con vào state theo commentId
+        }));
+      }
+    } catch (error) {
+      console.error("Error loading replies:", error);
+    }
+  };
+
+  // Hàm hiển thị form trả lời cho bình luận gốc
+  const handleToggleReplyFormComment = (commentId) => {
+    setReplyFormVisible(replyFormVisible === commentId ? null : commentId); // Hiển thị/ẩn form trả lời cho mỗi comment
+
+    if (commentId !== replyFormVisible) {
+      setContentReplyFromComment(''); // Reset nội dung khi chuyển sang bình luận khác
+    }
+  };
+
+  // Hàm hiển thị form trả lời cho các reply con
+  const handleToggleNestedReplyForm = (replyId, replyUserNameCurrent) => {
+    setNestedReplyFormVisible(nestedReplyFormVisible === replyId ? null : replyId); // Toggle trạng thái hiển thị form
+    if (nestedReplyFormVisible !== replyId) {
+      setContentReplyFromReply(`@${replyUserNameCurrent} `);  // Reset nội dung trả lời khi mở form
+    }
+  };
+
+  // Xử lý khi người dùng gửi phản hồi (đối với bình luận gốc hoặc reply)
+  const handleReplyCommentSubmit = async (parentCommentId, depth) => {
+    try {
+
+      const contentCheck = depth === 2 ? contentReplyFromComment : contentReplyFromReply;
+
+
+      if (contentReplyFromComment.trim() === '' && (depth === 2)) {
+        alert('Please enter a reply, content cannot be empty!');
+        return;
+      } else if (contentReplyFromReply.trim() === '' && (depth === 3)) {
+        alert('Please enter a reply, content cannot be empty!');
+        return;
+      }
+
+      const newComment = {
+        discussionId: discussionId, // ID thảo luận
+        content: contentCheck, // Nội dung trả lời
+        dateCreated: new Date().toISOString(), // Thời gian hiện tại
+        parentCommentId: parentCommentId, // ID của bình luận gốc (cha)
+        depth: depth, // Depth tùy thuộc vào vị trí bình luận (depth = 3 cho reply của reply)
+        isActive: true, // Đánh dấu là bình luận hợp lệ
+      };
+
+      const response = await DiscussApi.createComment(newComment); // Gọi API để tạo bình luận
+
+      if (response) {
+        if (depth == 2) {
+          setContentReplyFromComment(''); // Reset nội dung bình luận
+        } else if (depth == 3) {
+          setContentReplyFromReply('');
+        }
+
+        setReplyFormVisible(null); // Đóng form trả lời cho bình luận gốc
+        setNestedReplyFormVisible(null); // Đóng form trả lời cho reply con
+        loadReplies(parentCommentId); // Tải lại bình luận con
+
+        console.log("Success!", newComment);
+      }
+    } catch (error) {
+      console.error("Error submitting reply:", error);
+    }
+  };
+
+  // Hàm hiển thị/ẩn các bình luận con
+  const handleShowReplies = async (commentId) => {
+    // Kiểm tra nếu chưa load replies, thì load
+    if (!replies[commentId]) {
+      await loadReplies(commentId);  // Gọi API để tải các câu trả lời (replies)
+    }
+
+    // Toggle trạng thái hiển thị của bình luận này
+    setShowRepliesMap((prevMap) => ({
+      ...prevMap,
+      [commentId]: !prevMap[commentId],  // Toggle giá trị showReplies của bình luận này
+    }));
+  };
 
   return (
     <div className="comment-list__content">
@@ -389,44 +427,38 @@ function CommentList({ discussionId }) {
                     alt="User Avatar"
                     className="comment-item__avatar"
                   />
-                  <p className="comment-item__username">{comment.userName}</p>
-                  <p className="comment-item__timestamp">
-                    Created at:  {formatRelativeDate(comment.dateCreated)}
-                  </p>
-
-                  {/* Vote Edited */}
-                  {comment.isEdited && <span className="comment-item__edited">Edited</span>}
+                  <div className="comment-item__header-text">
+                    <p className="comment-item__username">{comment.userName}</p>
+                    <p className="comment-item__timestamp">
+                      Created at: {formatRelativeDate(comment.dateCreated)}
+                    </p>
+                    {comment.isEdited && <span className="comment-item__edited">Edited</span>}
+                  </div>
                 </div>
 
-                {/* Vote Content */}
-                <div className="comment-item__content" dangerouslySetInnerHTML={{ __html: marked(comment.content), }} />
+                <div className="comment-item__content" dangerouslySetInnerHTML={{ __html: marked(comment.content) }} />
 
-                {/* Vote Section */}
                 <div className="comment-item__vote">
                   <button
                     className="vote-icon"
-                    onClick={() => handleVote('Like', comment.id)} // Truyền comment.id vào
+                    onClick={() => handleVote('Like', comment.id)}
                   >
                     <FontAwesomeIcon icon={faChevronUp} />
                   </button>
-                  <span className="comment-item__vote-count">
-                    {comment.totalVote}
-                  </span>
+                  <span className="comment-item__vote-count">{comment.totalVote}</span>
                   <button
                     className="vote-icon"
-                    onClick={() => handleVote('Dislike', comment.id)} // Truyền comment.id vào
+                    onClick={() => handleVote('Dislike', comment.id)}
                   >
                     <FontAwesomeIcon icon={faChevronDown} />
                   </button>
                 </div>
 
-
-                {/* Action buttons */}
                 <div className="comment-item__actions">
-                  {/* Other action buttons */}
-
-                  <button className={`comment-item__share ${clicked ? 'clicked' : ''}`}
-                    onClick={copyToClipboard}>
+                  <button
+                    className={`comment-item__share ${clicked ? 'clicked' : ''}`}
+                    onClick={copyToClipboard}
+                  >
                     <Tooltip title={tooltipContent} arrow>
                       <FontAwesomeIcon icon={faShareFromSquare} /> Share
                     </Tooltip>
@@ -439,10 +471,77 @@ function CommentList({ discussionId }) {
                       </button>
                       <button
                         className="comment-item__delete"
-                        onClick={() => handleOpenRemoveDialog(comment.id)}>
+                        onClick={() => handleOpenRemoveDialog(comment.id)}
+                      >
                         <FontAwesomeIcon icon={faTrash} /> Delete
                       </button>
                     </>
+                  )}
+
+                  <button
+                    className="comment-item__reply"
+                    onClick={() => handleToggleReplyFormComment(comment.id)}
+                  >
+                    <FontAwesomeIcon icon={faReply} /> Reply
+                  </button>
+
+                  <button
+                    className="comment-item__show-reply"
+                    onClick={() => handleShowReplies(comment.id)}
+                  >
+                    <FontAwesomeIcon icon={faComments} />
+                    {showRepliesMap[comment.id] ? 'Hide Reply' : 'Show All Reply'}
+                  </button>
+
+                  {replyFormVisible === comment.id && (
+                    <div className="reply-form">
+                      <textarea
+                        placeholder="Type your reply here..."
+                        value={contentReplyFromComment}
+                        onChange={(e) => setContentReplyFromComment(e.target.value)}
+                      />
+                      <button onClick={() => handleReplyCommentSubmit(comment.id, 2)}>Submit</button>
+                    </div>
+                  )}
+
+                  {showRepliesMap[comment.id] && replies[comment.id]?.length > 0 && (
+                    <div className="replies">
+                      {replies[comment.id].map((reply) => (
+                        <div key={reply.id} className="comment-item reply">
+                          <div className="comment-item__header">
+                            <img
+                              src={reply.urlProfilePicture || "default-avatar.png"}
+                              alt="User Avatar"
+                              className="comment-item__avatar"
+                            />
+                            <div className="comment-item__header-text">
+                              <p className="comment-item__username">{reply.userName}</p>
+                            </div>
+                          </div>
+                          <div className="comment-item__content">{reply.content}</div>
+
+                          {reply.userId !== idCurrentUser && (
+                            <button
+                              className="comment-item__reply"
+                              onClick={() => handleToggleNestedReplyForm(reply.id, reply.userName)}
+                            >
+                              <FontAwesomeIcon icon={faReply} /> Reply to this reply
+                            </button>
+                          )}
+
+                          {nestedReplyFormVisible === reply.id && (
+                            <div className="reply-form">
+                              <textarea
+                                placeholder="Type your reply here..."
+                                value={contentReplyFromReply}
+                                onChange={(e) => setContentReplyFromReply(e.target.value)}
+                              />
+                              <button onClick={() => handleReplyCommentSubmit(comment.id, 3)}>Submit</button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   )}
 
                   {/* Dialog xác nhận xóa */}
@@ -472,49 +571,6 @@ function CommentList({ discussionId }) {
                       </Button>
                     </DialogActions>
                   </Dialog>
-
-
-                  {/* Reply button */}
-                  <button className="comment-item__reply" onClick={() => handleReply(comment.id)}>
-                    <FontAwesomeIcon icon={faReply} /> Reply
-                  </button>
-
-                  {/* Reply Form - Only show if this comment is being replied to */}
-                  {isReplying && parentCommentId === comment.id && (
-                    <div className="comment-item__reply-form">
-                      {/* Reply form input and buttons */}
-                      <textarea
-                        className="reply-comment-input"
-                        value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value)}
-                        placeholder="Write your reply here..."
-                      />
-                      <div className="reply-buttons-container">
-                        <button
-                          className="reply-toggle-preview-button"
-                          onClick={() => setIsPreview(!isPreview)}
-                          disabled={submitting}
-                        >
-                          {isPreview ? "Write" : "Preview"}
-                        </button>
-                        <button
-                          className="reply-comment-button"
-                          onClick={handleReplySubmit}
-                          disabled={!replyContent.trim() || submitting}
-                        >
-                          {submitting ? "Submitting..." : "Post Reply"}
-                        </button>
-                        <button
-                          className="reply-cancel-button"
-                          onClick={handleCancelReply}
-                          disabled={submitting}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
                 </div>
               </div>
             )
@@ -766,202 +822,283 @@ function CommentList({ discussionId }) {
         }
 
 /* List comments */
-.comment-list__content {
-  margin-top: 20px;
-}
-
-.comment-list__body {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 15px;
-}
-
-/* Comment item */
+/* Cải tiến toàn diện bố cục */
 .comment-item {
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 12px; /* Tăng độ bo góc */
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
+  padding: 16px;  /* Giảm padding */
+  border-bottom: 1px solid #e1e1e1;
+  background-color: #fff;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;  /* Giảm khoảng cách giữa các comment */
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 10px;  /* Giảm bo góc */
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-/* Header section */
+.comment-item:hover {
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Phần header của comment */
 .comment-item__header {
   display: flex;
   align-items: center;
-  gap: 20px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f1f1;
 }
 
 .comment-item__avatar {
-  width: 40px;
-  height: 40px;
+  width: 40px;  /* Giảm kích thước avatar */
+  height: 40px;  /* Giảm kích thước avatar */
   border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #53585c; /* Viền xung quanh ảnh */
+  margin-right: 10px;
+  border: 2px solid #007bff;
 }
 
 .comment-item__username {
   font-weight: bold;
-  color: #1e334a;
-  font-size: 18px; /* Đổi kích thước font */
+  font-size: 1rem;  /* Giảm kích thước chữ */
+  color: #333;
+  transition: color 0.3s ease;
 }
 
-/* Content section */
-.comment-item__content {
-  margin-top: 10px;
-  font-size: 16px; /* Tăng kích thước chữ */
-  line-height: 1.7;
-  color: #1e334a;
-  margin-bottom: 15px; /* Đảm bảo có khoảng cách dưới cho nội dung */
-  max-width: 90%; /* Giới hạn chiều rộng tối đa */
-  word-wrap: break-word; /* Tự động xuống dòng nếu nội dung quá dài */
-  white-space: normal; /* Cho phép xuống dòng */
-  margin-left: 60px;
-}
-
-/*No Comment*/
-.comment-list__no-comments {
-  display: flex;  /* Dùng Flexbox để căn giữa nội dung */
-  justify-content: center;  /* Căn ngang */
-  align-items: center;  /* Căn dọc */
-  height: 100%;  /* Đảm bảo chiều cao đầy đủ để căn giữa tốt */
-  text-align: center;  /* Căn giữa văn bản */
-  background-color: #f4f6f8;  /* Màu nền nhẹ nhàng */
-  padding: 20px;
-  border-radius: 10px;  /* Bo góc mềm mại */
-  border-radius: 12px; /* Tăng độ bo góc */
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
-}
-
-.comment-list__no-comments p {
-  font-size: 18px;  /* Cỡ chữ hợp lý */
-  color: #1e334a;  /* Màu chữ chủ đề */
-  font-weight: 500;  /* Chữ in đậm nhẹ */
-  margin: 0;
-  padding: 0;
-}
-
-/* Edited label & timestamp */
-.comment-item__edited, .comment-item__timestamp {
-  color: #888;
-  font-size: 14px;
-  font-style: italic;
-  display: inline-block;
-  margin-right: 10px;
+.comment-item__username:hover {
+  color: #007bff;
 }
 
 .comment-item__timestamp {
-  font-style: normal;
+  font-size: 0.8rem;  /* Giảm kích thước chữ */
+  color: #888;
 }
 
-/* Action buttons container */
-.comment-item__actions {
-  gap: 20px;
-  position: absolute;
-  right: 20px;
-  bottom: 10px;
-  display: flex;
-  align-items: center;
+.comment-item__edited {
+  font-size: 0.8rem;  /* Giảm kích thước chữ */
+  color: #888;
+  margin-left: 4px;
 }
 
-/* Nút Reply luôn hiển thị khi không hover vào bình luận */
-.comment-item__reply {
-  display: inline-flex;
-  color: #1e334a;
-  cursor: pointer;
-  font-size: 15px;
-  transition: color 0.2s ease;
-  padding: 5px 10px;
-  border-radius: 5px;
-  background-color: rgba(0, 123, 255, 0.1); /* Màu nền khi hover vào nút */
+/* Phần nội dung của comment */
+.comment-item__content {
+  margin-top: 8px;  /* Giảm khoảng cách giữa header và content */
+  font-size: 1rem;  /* Giảm kích thước chữ */
+  color: #333;
+  line-height: 1.5;  /* Giảm line-height */
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  transition: color 0.3s ease;
 }
 
-/* Hiển thị tất cả các nút hành động khi hover vào bình luận */
-.comment-item:hover .comment-item__actions {
-  display: flex;
+.comment-item__content:hover {
+  color: #555;
 }
 
-/* Style cho các nút hành động */
-.comment-item__reply,
-.comment-item__edit,
-.comment-item__delete,
-.comment-item__share {
-  background: none;
-  border: none;
-  color: #1e334a;
-  cursor: pointer;
-  font-size: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: color 0.3s ease, background-color 0.3s ease;
-  padding: 5px 10px;
-  border-radius: 5px;
-}
-
-/* Hiển thị màu sắc khi hover vào các nút */
-.comment-item__reply:hover,
-.comment-item__edit:hover,
-.comment-item__delete:hover,
-.comment-item__share:hover {
-  color: #1e334a;
-  background-color: rgba(0, 123, 255, 0.1); /* Màu nền khi hover vào các nút action */
-}
-
-/* Ẩn các nút Edit, Delete, Share khi không hover vào bình luận */
-.comment-item__edit,
-.comment-item__delete,
-.comment-item__share {
-  display: none;
-}
-
-/* Hiển thị các nút Edit, Delete, Share khi hover vào bình luận */
-.comment-item:hover .comment-item__edit,
-.comment-item:hover .comment-item__delete,
-.comment-item:hover .comment-item__share {
-  display: inline-flex;
-}
-
-/* Các nút Vote */
+/* Các phần vote */
 .comment-item__vote {
   display: flex;
   align-items: center;
-  color: #53585c; /* Màu mặc định */
-  font-size: 16px;
-  cursor: pointer;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f1f1f1;
+  justify-content: flex-start;
 }
 
-/* Biểu tượng mũi tên và số lượng vote gần nhau */
-.comment-item__vote-count {
-  font-size: 16px;
-  color: #1e334a; /* Màu số lượng vote */
-  font-weight: bold; 
-  margin: 0 8px;
-  text-align: center;
-  width: 40px; /* Kích thước cố định cho số lượng vote */
-  display: inline-block;
-}
-
-/* Biểu tượng mũi tên */
 .vote-icon {
-  background: none;
+  background: transparent;
   border: none;
-  color: #53585c; /* Màu mặc định cho mũi tên */
-  font-size: 18px; /* Kích thước mũi tên */
+  color: #888;
   cursor: pointer;
-  transition: color 0.2s ease; /* Hiệu ứng chuyển màu */
-  display: inline-flex;
-  align-items: center;
+  transition: color 0.3s ease;
+  margin: 0 6px;  /* Giảm khoảng cách */
+  font-size: 14px;  /* Giảm kích thước biểu tượng */
 }
 
-/* Cải thiện hiệu ứng hover cho mũi tên */
 .vote-icon:hover {
-  color: #1e334a; /* Màu thay đổi khi hover */
-  background-color: rgba(0, 123, 255, 0.1); /* Màu nền khi hover vào các nút mũi tên */
-  border-radius: 5px; /* Bo góc nhẹ khi hover */
+  color: #007bff;
 }
+
+.comment-item__vote-count {
+  margin: 0 8px;  /* Giảm khoảng cách */
+  font-size: 1rem;  /* Giảm kích thước chữ */
+  font-weight: bold;
+  color: #333;
+}
+
+/* Các nút hành động */
+.comment-item__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;  /* Giảm khoảng cách */
+  margin-top: 8px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid #f1f1f1;
+}
+
+.comment-item__share {
+  display: flex;
+  align-items: center;
+  background: #007bff;
+  color: white;
+  padding: 8px 14px;  /* Giảm kích thước button */
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.comment-item__share:hover {
+  background: #0056b3;
+}
+
+.comment-item__edit,
+.comment-item__delete {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;  /* Giảm kích thước chữ */
+  transition: color 0.3s ease;
+}
+
+.comment-item__edit:hover,
+.comment-item__delete:hover {
+  color: #d9534f;
+  text-decoration: underline;
+}
+
+.comment-item__reply {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;  /* Giảm kích thước chữ */
+  transition: color 0.3s ease;
+}
+
+.comment-item__reply:hover {
+  color: #0056b3;
+}
+
+.comment-item__show-reply {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;  /* Giảm kích thước chữ */
+  transition: color 0.3s ease;
+}
+
+.comment-item__show-reply:hover {
+  color: #0056b3;
+}
+
+/* Form trả lời nằm dưới comment */
+.reply-form {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  margin-left: 5%;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid #e1e1e1;
+}
+
+.reply-form textarea {
+  padding: 10px;
+  margin-bottom: 12px;  /* Giảm khoảng cách giữa các phần tử */
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+  font-size: 0.95rem;  /* Giảm kích thước chữ */
+  resize: vertical;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+.reply-form textarea:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.reply-form button {
+  align-self: flex-end;
+  padding: 8px 16px;  /* Giảm kích thước button */
+  background: #007bff;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.reply-form button:hover {
+  background: #0056b3;
+}
+
+/* Danh sách replies */
+.replies {
+  margin-top: 12px;
+  width: 90%;
+  margin-left: 5%;
+}
+
+.replies .comment-item {
+  margin-top: 8px;  /* Giảm khoảng cách giữa các comment trong replies */
+  padding-left: 18px;  /* Giảm khoảng cách bên trái */
+  border-left: 3px solid #007bff;
+  background-color: #f1f1f1;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.replies .comment-item .comment-item__header {
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.replies .comment-item__content {
+  margin-top: 5px;
+  padding: 8px;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+/* Nút Reply to reply */
+.replies .comment-item__reply {
+  margin-top: 8px;
+  background: #007bff;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+.replies .comment-item__reply:hover {
+  background: #0056b3;
+}
+
+/* Hiệu ứng cho hover reply */
+.comment-item__content:hover,
+.reply-form:hover {
+  background-color: #f1f1f1;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Hiệu ứng động cho hover trên tất cả phần tử có thể tương tác */
+.comment-item__share:hover,
+.comment-item__edit:hover,
+.comment-item__delete:hover,
+.comment-item__reply:hover,
+.comment-item__show-reply:hover {
+  color: #007bff;
+  transition: all 0.3s ease;
+}
+
+
 
 /* Cấu hình chung cho dialog */
 .delete-dialog {
@@ -1039,113 +1176,6 @@ function CommentList({ discussionId }) {
   }
 }
 
-/* Reply Form nằm dưới comment cha và có chiều rộng 80% */
-.comment-item__reply-form {
-  margin-top: 20px; /* Khoảng cách giữa comment cha và form trả lời */
-  padding: 15px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px; /* Tăng khoảng cách giữa các phần tử trong form */
-  width: 1350%; /* Chiều rộng 80% của comment cha */
-  height: 150px; /* Chiều rộng 80% của comment cha */
-  box-sizing: border-box; /* Đảm bảo không bị tràn ra ngoài */
-  transition: all 0.3s ease-in-out;
-  position: absolute; /* Đặt form này vào vị trí tuyệt đối trong comment cha */
-  top: 100%; /* Đảm bảo form reply nằm dưới comment cha */
-  transform: translateX(-91%); /* Căn chỉnh lại cho chính giữa */
-}
-
-/* Phóng to textarea cho rộng và dài hơn */
-.reply-comment-input {
-  width: 100%;
-  height: 250px; /* Tăng chiều cao của textarea */
-  margin-bottom: 15px; /* Khoảng cách giữa textarea và các nút */
-  padding: 12px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  resize: none; /* Tắt khả năng resize của textarea */
-  box-sizing: border-box;
-}
-
-/* Container cho các nút */
-.reply-buttons-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px; /* Giảm khoảng cách giữa các nút */
-  width: 100%; /* Đảm bảo chiều rộng container là 100% */
-}
-
-.reply-toggle-preview-button {
-  padding: 8px 10px; /* Giảm padding để nút nhỏ hơn */
-  font-size: 12px; /* Giảm kích thước font */
-  font-weight: 400; /* Giảm độ đậm của chữ */
-  color: #f9f9f9;
-  background: #1e334a;
-  border: 1px solid #ccc;
-  border-radius: 6px; /* Giảm border-radius để nút nhỏ gọn hơn */
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  width: 100%; /* Nút rộng toàn bộ chiều rộng */
-  max-width: 120px; /* Giới hạn chiều rộng tối đa */
-  align-self: flex-start; /* Canh trái */
-}
-
-/* Button styles (Post, Cancel) */
-.reply-comment-button,
-.reply-cancel-button {
-  padding: 8px 10px; /* Giảm padding để nút nhỏ hơn */
-  font-size: 12px; /* Giảm kích thước font */
-  font-weight: 400; /* Giảm độ đậm của chữ */
-  color: #f9f9f9;
-  background: #1e334a;
-  border: 1px solid #ccc;
-  border-radius: 6px; /* Giảm border-radius để nút nhỏ gọn hơn */
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  width: 45%; /* Nút chiếm một nửa chiều rộng của form */
-  align-self: flex-start; /* Canh trái */
-}
-
-/* Hover effect for Post and Cancel buttons */
-.reply-comment-button:hover,
-.reply-cancel-button:hover {
-  background-color: #3b4d67;
-  color: white;
-  border-color: #b0b0b0;
-}
-
-/* Hover effect for buttons when disabled */
-.reply-comment-button:disabled,
-.reply-cancel-button:disabled {
-  background-color: #ccc;
-  color: #666;
-  cursor: not-allowed;
-}
-
-.reply-cancel-button {
-  background-color: #e0e0e0;
-}
-
-.reply-cancel-button:hover {
-  background-color: #c0c0c0;
-}
-
-/* Sắp xếp nút Write bên trái và Post, Cancel bên phải */
-.reply-toggle-preview-button {
-  margin-right: auto; /* Đẩy nút Write về phía bên trái */
-}
-
-.reply-comment-button,
-.reply-cancel-button {
-  width: auto; /* Nút Post và Cancel tự động điều chỉnh chiều rộng */
-  margin-left: 8px; /* Khoảng cách giữa Post và Cancel */
-}
       `}</style>
     </div>
   );

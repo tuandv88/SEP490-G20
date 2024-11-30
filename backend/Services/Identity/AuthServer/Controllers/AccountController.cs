@@ -57,7 +57,6 @@ namespace AuthServer.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
@@ -335,7 +334,6 @@ namespace AuthServer.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
             Console.WriteLine("Return Url:" + returnUrl);
@@ -580,7 +578,6 @@ namespace AuthServer.Controllers
 
         // Phương thức xử lý đăng nhập bằng Google
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
             if (string.IsNullOrEmpty(provider))
@@ -674,7 +671,6 @@ namespace AuthServer.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> TwoFaceLogin(TwoFaceLoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -718,7 +714,6 @@ namespace AuthServer.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             if (ModelState.IsValid)
@@ -842,7 +837,6 @@ namespace AuthServer.Controllers
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -904,7 +898,6 @@ namespace AuthServer.Controllers
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginVerifyAuthenicatorCode(VerifyAuthenicatorViewModel model)
         {
             model.ReturnUrl = model.ReturnUrl ?? Url.Content("~/");

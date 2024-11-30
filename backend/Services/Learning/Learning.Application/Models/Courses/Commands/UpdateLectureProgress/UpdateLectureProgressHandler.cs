@@ -49,6 +49,19 @@ public class UpdateLectureProgressHandler(IUserEnrollmentRepository repository, 
             progress.IsCurrent = progress == latestProgress;
         }
 
+        //kiểm tra trạng thái completed
+        var totalLectures = course.Chapters.SelectMany(ch => ch.Lectures).Count();
+        var completedLectures = userCourse.LectureProgress.Count;
+
+        var newStatus = completedLectures == totalLectures
+            ? UserEnrollmentStatus.Completed
+            : UserEnrollmentStatus.InProgress;
+
+        userCourse.UpdateStatus(newStatus);
+
+        if (userCourse.UserEnrollmentStatus == UserEnrollmentStatus.Completed && userCourse.CompletionDate == null) {
+            userCourse.CompletionDate = DateTime.UtcNow;
+        }
 
         await repository.UpdateAsync(userCourse);
         await repository.SaveChangesAsync(cancellationToken);

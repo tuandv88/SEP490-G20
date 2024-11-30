@@ -131,7 +131,8 @@ namespace AuthServer.Controllers
                             body: emailBody
                         );
 
-                        await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
+                        //await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
+                        Task.Run(() => _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY));
 
                         TempData["ConfirmEmailSuccessMessage"] = "Registration successful! Please check your email and confirm your account.";
 
@@ -417,12 +418,12 @@ namespace AuthServer.Controllers
 
                 if (_interactionService.IsValidReturnUrl(returnUrl))
                 {
-                    Console.WriteLine("----------------------------" + returnUrl);
+                    Console.WriteLine("Login - IsValidReturnUrl Url:" + returnUrl);
                     return Redirect(returnUrl);
                 }
                 else
                 {
-                    Console.WriteLine("Return Url:" + returnUrl);
+                    Console.WriteLine("Login - Return Url:" + returnUrl);
                     return RedirectToAction("Index", "Profile");
                 }
             }
@@ -551,7 +552,9 @@ namespace AuthServer.Controllers
             );
 
             // Gửi email xác nhận
-            await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
+            // await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
+            Task.Run(() => _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY));
+
         }
 
         private async Task HandleLockedOutUser(Users user)
@@ -792,7 +795,9 @@ namespace AuthServer.Controllers
                     );
 
                     // Gửi email xác nhận
-                    await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
+                    // await _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY);
+                    Task.Run(() => _emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.VERIFY));
+
                 }
 
                 // Sau khi gửi email thành công

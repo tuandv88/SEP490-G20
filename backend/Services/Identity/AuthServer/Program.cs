@@ -117,17 +117,17 @@ builder.Services.AddAuthentication(options =>
     googleOptions.CallbackPath = "/signin-google"; // Đảm bảo đường dẫn callback chính xác
 });
 
-builder.Services.ConfigureApplicationCookie(opts =>
-{
-    opts.SessionStore = new RedisCacheTicketStore(new RedisCacheOptions()
-    {
-        // Địa chỉ Redis và cổng
-        Configuration = "109.123.238.31:32644",
+//builder.Services.ConfigureApplicationCookie(opts =>
+//{
+//    opts.SessionStore = new RedisCacheTicketStore(new RedisCacheOptions()
+//    {
+//        // Địa chỉ Redis và cổng
+//        Configuration = "109.123.238.31:32644",
 
-        // Cấu hình mật khẩu Redis (nếu có)
-        ConfigurationOptions = ConfigurationOptions.Parse("109.123.238.31:32644, password=icodervn")
-    });
-});
+//        // Cấu hình mật khẩu Redis (nếu có)
+//        ConfigurationOptions = ConfigurationOptions.Parse("109.123.238.31:32644, password=icodervn")
+//    });
+//});
 
 builder.Services.AddAuthorization(options =>
 {

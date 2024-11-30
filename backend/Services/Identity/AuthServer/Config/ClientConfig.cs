@@ -28,6 +28,7 @@ namespace AuthServer.Config
                     RedirectUris = clientConfig.GetSection("RedirectUris").Get<List<string>>(),
                     PostLogoutRedirectUris = clientConfig.GetSection("PostLogoutRedirectUris").Get<List<string>>(),
                     AllowedScopes = clientConfig.GetSection("AllowedScopes").Get<List<string>>(),
+                    AuthorizationCodeLifetime = int.Parse(clientConfig["AuthorizationCodeLifetime"]),
                     AccessTokenLifetime = int.Parse(clientConfig["AccessTokenLifetime"]),
                     AllowOfflineAccess = bool.Parse(clientConfig["AllowOfflineAccess"]),
                     AbsoluteRefreshTokenLifetime = int.Parse(clientConfig["AbsoluteRefreshTokenLifetime"]),

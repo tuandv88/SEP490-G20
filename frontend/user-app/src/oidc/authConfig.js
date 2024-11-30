@@ -3,10 +3,10 @@ const VITE_CALLBACK_URL = import.meta.env.VITE_CALLBACK_URL
 
 export const oidcConfig = {
   authority: VITE_AUTH_URL,
-  client_id: 'icoder.vn',
+  client_id: 'local_01',
   redirect_uri: `${VITE_CALLBACK_URL}/callback`,
   response_type: 'code',
-  scope: 'openid profile email moviesApi roles offline_access',
+  scope: 'openid profile offline_access',
   post_logout_redirect_uri: VITE_CALLBACK_URL,
   loadUserInfo: true,
   requirePkce: true,

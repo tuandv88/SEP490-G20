@@ -972,7 +972,7 @@ function CommentList({ discussionId }) {
   flex-direction: column;
   width: 95%;
   margin-left: 4%;
-  background-color: #dde2e8;
+  background-color: #f6f7f7;
   border-radius: 8px;
   padding: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);

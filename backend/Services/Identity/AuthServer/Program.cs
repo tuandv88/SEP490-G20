@@ -17,6 +17,7 @@ using AuthServer.Repository.Services.Storage;
 using StackExchange.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using AuthServer.Extensions;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -168,7 +169,20 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddStorage(builder.Configuration);
 builder.Services.AddScoped<IBase64Converter, Base64Converter>();
 
+
 var app = builder.Build();
+
+// Chuyển toàn bộ cấu hình sang một dictionary
+var configDictionary = builder.Configuration.AsEnumerable().ToDictionary(k => k.Key, v => v.Value);
+
+// Chuyển đổi sang JSON
+string configJson = JsonSerializer.Serialize(configDictionary, new JsonSerializerOptions { WriteIndented = true });
+
+// In ra console
+Console.WriteLine("========== Application Configuration (JSON) ==========");
+Console.WriteLine(configJson);
+Console.WriteLine("======================================================");
+
 
 // Kiểm tra tham số đầu vào
 if (args.Contains("/seeddata"))
@@ -215,3 +229,4 @@ app.MapControllerRoute(
     pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();
+

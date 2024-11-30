@@ -77,7 +77,6 @@ namespace AuthServer.Controllers
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Personal(PersonalViewModel model, string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
@@ -145,7 +144,6 @@ namespace AuthServer.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddEmail(EmailViewModel model)
         {
             return View();
@@ -215,7 +213,6 @@ namespace AuthServer.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateContact(ContactViewModel model)
         {
             if (!ModelState.IsValid)
@@ -302,7 +299,6 @@ namespace AuthServer.Controllers
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model, string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
@@ -408,7 +404,6 @@ namespace AuthServer.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         [Authorize] // ~ Login trc
         public async Task<IActionResult> EnableTwoFactorAuth(TwoFactorAuthenticationViewModel model)
         {

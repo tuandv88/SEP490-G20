@@ -164,10 +164,27 @@ namespace AuthServer.Controllers
         [HttpGet]
         public async Task<IActionResult> Emails()
         {
-            var currentUser = await _userManager.GetUserAsync(User); // Lấy thông tin người dùng
+            // Log thông báo khi bắt đầu phương thức
+            Console.WriteLine("Emails method started");
+
+            // Lấy thông tin người dùng
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            // Kiểm tra xem user có tồn tại không
+            if (currentUser == null)
+            {
+                Console.WriteLine("User is not authenticated or not found");
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Log thông tin người dùng
+            Console.WriteLine($"Current User Email: {currentUser.Email}");
 
             // Kiểm tra xem email đã được xác minh chưa
             bool isEmailVerified = await _userManager.IsEmailConfirmedAsync(currentUser);
+
+            // Log trạng thái xác minh email
+            Console.WriteLine($"Is Email Verified: {isEmailVerified}");
 
             // Tạo ViewModel để gửi đến View
             var viewModel = new EmailViewModel
@@ -175,8 +192,13 @@ namespace AuthServer.Controllers
                 CurrentEmail = currentUser.Email,  // Email hiện tại
                 IsVerified = isEmailVerified // Kiểm tra email đã được xác minh
             };
+
+            // Log thông báo khi kết thúc phương thức
+            Console.WriteLine("Returning view with email verification status");
+
             return View(viewModel);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> AddEmail(EmailViewModel model)

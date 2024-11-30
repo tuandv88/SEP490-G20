@@ -939,21 +939,23 @@ function CommentList({ discussionId }) {
 .comment-item__show-reply {
   background: transparent;
   border: none;
-  color: #1e334a;
+  color: #354f6c;
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s ease;
   padding: 5px 10px;
   border-radius: 4px;
+  margin-top: 5px;
+  margin-left: 15px;
 }
 
 .comment-item__share {
-  background: #1e334a;
+  background: #354f6c;
   color: white;
 }
 
 .comment-item__share:hover {
-  background: #2980b9;
+  background: #2c435c;
 }
 
 .comment-item__edit:hover,
@@ -968,9 +970,9 @@ function CommentList({ discussionId }) {
   margin-top: 12px;
   display: flex;
   flex-direction: column;
-  width: 98%;
-  margin-left: 2%;
-  background-color: #f8f9fa;
+  width: 95%;
+  margin-left: 4%;
+  background-color: #f6f7f7;
   border-radius: 8px;
   padding: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -997,8 +999,8 @@ function CommentList({ discussionId }) {
 
 .reply-form button {
   align-self: flex-end;
-  padding: 6px 12px;
-  background: #3498db;
+  padding: 7px 13px;
+  background: #354f6c;
   color: white;
   border-radius: 4px;
   border: none;
@@ -1008,22 +1010,19 @@ function CommentList({ discussionId }) {
 }
 
 .reply-form button:hover {
-  background: #2980b9;
+  background: #3a5675;
 }
 
 /* Replies list */
 .replies {
-  margin-top: 12px;
-  width: 98%;
-  margin-left: 2%;
+  border-top: 1px solid #cbcdd0;
+  width: 96%;
+  margin-left: 4%;
 }
 
 .replies .comment-item {
-  margin-top: 8px;
-  padding-left: 12px;
-  border-left: 2px solid #3498db;
-  background-color: #f8f9fa;
-  border-radius: 0 8px 8px 0;
+  margin-top: 5px;
+  padding-left: 20px;
 }
 
 .replies .comment-item .comment-item__header {
@@ -1032,8 +1031,7 @@ function CommentList({ discussionId }) {
 }
 
 .replies .comment-item__content {
-  margin-top: 6px;
-  padding: 8px;
+  margin-top: 5px;
   background-color: #fff;
   border-radius: 4px;
 }

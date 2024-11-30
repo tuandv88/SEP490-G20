@@ -304,21 +304,30 @@ namespace AuthServer.Controllers
             // Kiểm tra xem người dùng đã đăng nhập chưa
             if (User.Identity.IsAuthenticated)
             {
+                Console.WriteLine("User is already authenticated. Redirecting to Profile Index.");
                 return RedirectToAction("Index", "Profile");
             }
 
             returnUrl = returnUrl ?? Url.Content("~/");
-
             ViewData["ReturnUrl"] = returnUrl;
+
+            // Log thông tin về returnUrl
+            Console.WriteLine($"Return URL: {returnUrl}");
 
             // Kiểm tra cookie và tự động điền thông tin đăng nhập
             var username = Request.Cookies["Username"];
             var encryptedPassword = Request.Cookies["Password"];
 
+            Console.WriteLine($"Cookie Username: {username}");
+            Console.WriteLine($"Cookie Password (Encrypted): {encryptedPassword}");
+
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(encryptedPassword))
             {
                 // Giải mã mật khẩu
                 var decryptedPassword = await Task.Run(() => _protector.Unprotect(encryptedPassword));
+
+                // Log thông tin đã giải mã mật khẩu
+                Console.WriteLine($"Decrypted Password: {decryptedPassword}");
 
                 var model = new LoginViewModel
                 {
@@ -327,45 +336,60 @@ namespace AuthServer.Controllers
                     RememberMe = true
                 };
 
+                // Log thông tin model được tạo
+                Console.WriteLine($"LoginViewModel created: UsernameOrEmail = {model.UsernameOrEmail}, RememberMe = {model.RememberMe}");
+
                 return View(model);
             }
+
+            // Log khi không có cookie
+            Console.WriteLine("No username or password found in cookies.");
 
             return View();
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            Console.WriteLine("Return Url:" + returnUrl);
+            // Log thông tin returnUrl
+            Console.WriteLine($"Return Url: {returnUrl}");
+
             returnUrl = returnUrl ?? Url.Content("~/");
             ViewData["ReturnUrl"] = returnUrl;
 
             if (!ModelState.IsValid)
             {
+                // Log nếu ModelState không hợp lệ
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage)
                                               .ToList();
 
                 var errorMessage = string.Join(", ", errors);
                 ModelState.AddModelError(string.Empty, errorMessage);
+
+                Console.WriteLine($"ModelState is invalid: {errorMessage}");
+
                 return View(model);
             }
 
-
             Users user = null;
 
-
+            // Tìm người dùng theo tên hoặc email
             user = await _userManager.FindByNameAsync(model.UsernameOrEmail);
-
             if (user == null)
             {
                 user = await _userManager.FindByEmailAsync(model.UsernameOrEmail);
             }
 
+            // Ghi log khi bắt đầu đăng nhập
+            Console.WriteLine($"Attempting to sign in with username/email: {model.UsernameOrEmail}");
+
             var result = await _signInManager.PasswordSignInAsync(model.UsernameOrEmail, model.Password, isPersistent: model.RememberMe, lockoutOnFailure: true);
 
             if (!result.Succeeded)
             {
+                // Nếu đăng nhập thất bại, thử lại với tên người dùng khác
                 if (user != null)
                 {
                     result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, isPersistent: model.RememberMe, lockoutOnFailure: true);
@@ -374,54 +398,57 @@ namespace AuthServer.Controllers
 
             if (result.Succeeded)
             {
+                // Log khi đăng nhập thành công
+                Console.WriteLine("Login Successful");
+
+                // Kiểm tra và thêm claims nếu cần
                 var existingClaims = await _userManager.GetClaimsAsync(user);
                 var isSurveyClaim = existingClaims.FirstOrDefault(c => c.Type == "issurvey");
 
                 if (isSurveyClaim == null)
                 {
                     await _userManager.AddClaimAsync(user, new Claim("issurvey", "false"));
+                    Console.WriteLine("Added 'issurvey' claim for the user.");
                 }
 
+                // Xử lý cookies nếu người dùng chọn RememberMe
                 if (model.RememberMe)
                 {
                     var cookieOptions = new CookieOptions
                     {
-                        Expires = DateTime.Now.AddDays(1),  // Cookie tồn tại trong 30 ngày
+                        Expires = DateTime.Now.AddDays(1),  // Cookie tồn tại trong 1 ngày
                         Secure = true,
-                        HttpOnly = true                     // Đảm bảo bảo mật cho username
+                        HttpOnly = true                     // Bảo mật cho username
                     };
 
-                    // Lưu username và mật khẩu đã mã hóa
+                    // Mã hóa mật khẩu và lưu vào cookies
                     var encryptedPassword = _protector.Protect(model.Password);
                     Response.Cookies.Append("Username", model.UsernameOrEmail, cookieOptions);
-
-                    // Mật khẩu chỉ lưu 5 phút để hạn chế rủi ro bảo mật
-                    var passwordCookieOptions = new CookieOptions
+                    Response.Cookies.Append("Password", encryptedPassword, new CookieOptions
                     {
-                        Expires = DateTime.Now.AddMinutes(30), // Cookie mật khẩu tồn tại ngắn hơn
+                        Expires = DateTime.Now.AddMinutes(30),
                         Secure = true,
                         HttpOnly = false                      // Không đặt HttpOnly để có thể tự động điền lại
-                    };
+                    });
 
-                    Response.Cookies.Append("Password", encryptedPassword, passwordCookieOptions);
+                    Console.WriteLine("Stored Username and Encrypted Password in cookies.");
                 }
                 else
                 {
-                    // Xóa cookie nếu không chọn RememberMe
+                    // Xóa cookies nếu không chọn RememberMe
                     Response.Cookies.Delete("Username");
                     Response.Cookies.Delete("Password");
+                    Console.WriteLine("Deleted Username and Password cookies.");
                 }
-
-                Console.WriteLine("Login Successful");
 
                 if (_interactionService.IsValidReturnUrl(returnUrl))
                 {
-                    Console.WriteLine("Login - IsValidReturnUrl Url:" + returnUrl);
+                    Console.WriteLine($"Redirecting to returnUrl: {returnUrl}");
                     return Redirect(returnUrl);
                 }
                 else
                 {
-                    Console.WriteLine("Login - Return Url:" + returnUrl);
+                    Console.WriteLine($"Redirecting to Profile Index.");
                     return RedirectToAction("Index", "Profile");
                 }
             }
@@ -429,59 +456,41 @@ namespace AuthServer.Controllers
             if (user != null)
             {
                 var emailConfirmAccount = await _userManager.IsEmailConfirmedAsync(user);
-
                 if (!emailConfirmAccount)
                 {
                     await HandleEmailConfirmationAsync(user, returnUrl);
 
-                    ModelState.AddModelError(string.Empty, "Check your email & verify your account !");
+                    // Log khi yêu cầu xác minh email
+                    Console.WriteLine("Email is not confirmed. Asking user to verify email.");
+                    ModelState.AddModelError(string.Empty, "Check your email & verify your account!");
                     return View(model);
                 }
             }
-
-            //if (result.RequiresTwoFactor)
-            //{
-            //    if (user != null)
-            //    {
-            //        Console.WriteLine("Login - Two Face.");
-
-            //        var userEmail = await _userManager.GetEmailAsync(user);
-            //        // Tạo mã xác nhận email
-            //        var token = await _userManager.GenerateTwoFactorTokenAsync(user, "Email");
-
-            //        var emailBody = $"Icoder: Your verification code is: {token}";
-
-            //        var emailMetadata = new EmailMetadata(
-            //            toAddress: userEmail,
-            //            subject: "Confirm your email",
-            //            body: emailBody
-            //        );
-
-            //        // Gửi email xác nhận
-            //        await _emailService.Send(emailMetadata);
-
-            //        return RedirectToAction("TwoFaceLogin", "Account", new { email = userEmail });
-            //    }
-            //}
-
 
             if (result.RequiresTwoFactor)
             {
                 if (user != null)
                 {
+                    // Log khi yêu cầu xác thực 2 yếu tố
+                    Console.WriteLine("Two-factor authentication required.");
                     return RedirectToAction("LoginVerifyAuthenicatorCode", "Account", new { usernameOrEmail = user.Email, rememberMe = model.RememberMe, returnUrl = returnUrl });
                 }
             }
 
             if (result.IsLockedOut)
             {
+                // Log khi tài khoản bị khóa
+                Console.WriteLine("Account is locked out.");
                 await HandleLockedOutUser(user);
                 return View(model);
             }
 
+            // Log lỗi nếu thông tin người dùng không chính xác
+            Console.WriteLine("Login failed. Incorrect username/email or password.");
             ModelState.AddModelError(string.Empty, "Check your UserName / Email & Password - Enter Again!");
             return View(model);
         }
+
 
         private async Task HandleEmailConfirmationAsync(Users user, string returnUrl)
         {

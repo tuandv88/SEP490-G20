@@ -11,23 +11,45 @@ import { UserContext } from '@/contexts/UserContext'
 import authServiceInstance from '@/oidc/AuthService'
 import { Loading } from '@/components/ui/overlay'
 import RoadmapDashboard from '@/components/userprofile/RoadmapDashboard'
+import { ProblemAPI } from '@/services/api/problemApi'
 
 export function UserProfile() {
   const [activeTab, setActiveTab] = useState('account')
   const { user } = useContext(UserContext)
   const [loading, setLoading] = useState(true)
-
+  const [problemSolved, setProblemSolved] = useState([])
   const navigate = useNavigate()
+  const [problems, setProblems] = useState([])
+  
   useEffect(() => {
-    const checkUser = async () => {
-      if (!user) {
-        await authServiceInstance.login()
+    const initializeUserProfile = async () => {
+      try {
+        if (!user) {
+          await authServiceInstance.login()
+        }
+        const response = await ProblemAPI.getProblemSolved()
+        setProblemSolved(response.solved)
+      } catch (error) {
+        console.error('Error initializing user profile:', error)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false) 
     }
-
-    checkUser()
+  
+    initializeUserProfile()
   }, [user, navigate])
+
+  useEffect(() => {
+    const fetchSolvedProblems = async () => {
+      try {
+        const solvedProblems = await ProblemAPI.getSolvedProblems();
+        setProblems(solvedProblems);
+      } catch (error) {
+        console.error('Error fetching solved problems:', error);
+      }
+    };
+    fetchSolvedProblems();
+  }, []);
 
   if (loading) {
     return <Loading />
@@ -42,7 +64,7 @@ export function UserProfile() {
       case 'learning':
         return <LearningDashboard />
       case 'algorithm':
-        return <AlgorithmDashboard />
+        return <AlgorithmDashboard problemSolved={problemSolved} problems={problems} />
       case 'posts':
         return <MyPosts />
       default:

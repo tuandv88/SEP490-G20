@@ -822,283 +822,238 @@ function CommentList({ discussionId }) {
         }
 
 /* List comments */
-/* Cải tiến toàn diện bố cục */
 .comment-item {
-  padding: 16px;  /* Giảm padding */
-  border-bottom: 1px solid #e1e1e1;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
   background-color: #fff;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 8px;  /* Giảm khoảng cách giữa các comment */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 12px;
   position: relative;
-  border-radius: 10px;  /* Giảm bo góc */
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  margin-top: 5px;
 }
 
 .comment-item:hover {
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Phần header của comment */
+/* Comment header */
 .comment-item__header {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #f1f1f1;
 }
 
 .comment-item__avatar {
-  width: 40px;  /* Giảm kích thước avatar */
-  height: 40px;  /* Giảm kích thước avatar */
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   margin-right: 10px;
-  border: 2px solid #007bff;
+  border: 2px solid #808583;
 }
 
 .comment-item__username {
-  font-weight: bold;
-  font-size: 1rem;  /* Giảm kích thước chữ */
-  color: #333;
-  transition: color 0.3s ease;
-}
-
-.comment-item__username:hover {
-  color: #007bff;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #2c3e50;
 }
 
 .comment-item__timestamp {
-  font-size: 0.8rem;  /* Giảm kích thước chữ */
-  color: #888;
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  margin-left: auto;
 }
 
 .comment-item__edited {
-  font-size: 0.8rem;  /* Giảm kích thước chữ */
-  color: #888;
-  margin-left: 4px;
+  font-size: 0.75rem;
+  color: #95a5a6;
+  margin-left: 6px;
 }
 
-/* Phần nội dung của comment */
+/* Comment content */
 .comment-item__content {
-  margin-top: 8px;  /* Giảm khoảng cách giữa header và content */
-  font-size: 1rem;  /* Giảm kích thước chữ */
-  color: #333;
-  line-height: 1.5;  /* Giảm line-height */
+  font-size: 0.95rem;
+  color: #34495e;
+  line-height: 1.5;
   word-wrap: break-word;
-  white-space: pre-wrap;
-  transition: color 0.3s ease;
+  overflow-wrap: break-word;
+  margin-bottom: 3px;
+  margin-left: 50px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 20px;
 }
 
-.comment-item__content:hover {
-  color: #555;
+/* Voting section and Action buttons */
+.comment-item__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
 }
 
-/* Các phần vote */
+/* Voting section */
 .comment-item__vote {
   display: flex;
   align-items: center;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #f1f1f1;
-  justify-content: flex-start;
 }
 
 .vote-icon {
   background: transparent;
   border: none;
-  color: #888;
+  color: #bdc3c7;
   cursor: pointer;
-  transition: color 0.3s ease;
-  margin: 0 6px;  /* Giảm khoảng cách */
-  font-size: 14px;  /* Giảm kích thước biểu tượng */
+  transition: all 0.2s ease;
+  margin: 0 4px;
+  margin-bottom: 3px;
+  font-size: 16px;
+  padding: 4px;
 }
 
 .vote-icon:hover {
-  color: #007bff;
+  color: #3498db;
 }
 
 .comment-item__vote-count {
-  margin: 0 8px;  /* Giảm khoảng cách */
-  font-size: 1rem;  /* Giảm kích thước chữ */
-  font-weight: bold;
-  color: #333;
+  margin: 0 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #34495e;
 }
 
-/* Các nút hành động */
+/* Action buttons */
 .comment-item__actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 16px;  /* Giảm khoảng cách */
-  margin-top: 8px;
+  gap: 8px;
   flex-wrap: wrap;
-  padding-top: 8px;
-  border-top: 1px solid #f1f1f1;
 }
 
-.comment-item__share {
-  display: flex;
-  align-items: center;
-  background: #007bff;
-  color: white;
-  padding: 8px 14px;  /* Giảm kích thước button */
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.comment-item__share:hover {
-  background: #0056b3;
-}
-
+.comment-item__share,
 .comment-item__edit,
-.comment-item__delete {
-  background: transparent;
-  border: none;
-  color: #007bff;
-  cursor: pointer;
-  font-size: 0.9rem;  /* Giảm kích thước chữ */
-  transition: color 0.3s ease;
-}
-
-.comment-item__edit:hover,
-.comment-item__delete:hover {
-  color: #d9534f;
-  text-decoration: underline;
-}
-
-.comment-item__reply {
-  background: transparent;
-  border: none;
-  color: #007bff;
-  cursor: pointer;
-  font-size: 0.9rem;  /* Giảm kích thước chữ */
-  transition: color 0.3s ease;
-}
-
-.comment-item__reply:hover {
-  color: #0056b3;
-}
-
+.comment-item__delete,
+.comment-item__reply,
 .comment-item__show-reply {
   background: transparent;
   border: none;
-  color: #007bff;
+  color: #1e334a;
   cursor: pointer;
-  font-size: 0.9rem;  /* Giảm kích thước chữ */
-  transition: color 0.3s ease;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  padding: 5px 10px;
+  border-radius: 4px;
 }
 
-.comment-item__show-reply:hover {
-  color: #0056b3;
-}
-
-/* Form trả lời nằm dưới comment */
-.reply-form {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  width: 90%;
-  margin-left: 5%;
-  background-color: #f8f8f8;
-  border-radius: 10px;
-  padding: 12px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  border-top: 1px solid #e1e1e1;
-}
-
-.reply-form textarea {
-  padding: 10px;
-  margin-bottom: 12px;  /* Giảm khoảng cách giữa các phần tử */
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 100%;
-  font-size: 0.95rem;  /* Giảm kích thước chữ */
-  resize: vertical;
-  background-color: #fff;
-  transition: border-color 0.3s ease;
-}
-
-.reply-form textarea:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-.reply-form button {
-  align-self: flex-end;
-  padding: 8px 16px;  /* Giảm kích thước button */
-  background: #007bff;
+.comment-item__share {
+  background: #1e334a;
   color: white;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease;
 }
 
-.reply-form button:hover {
-  background: #0056b3;
+.comment-item__share:hover {
+  background: #2980b9;
 }
 
-/* Danh sách replies */
-.replies {
-  margin-top: 12px;
-  width: 90%;
-  margin-left: 5%;
-}
-
-.replies .comment-item {
-  margin-top: 8px;  /* Giảm khoảng cách giữa các comment trong replies */
-  padding-left: 18px;  /* Giảm khoảng cách bên trái */
-  border-left: 3px solid #007bff;
-  background-color: #f1f1f1;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid #e1e1e1;
-}
-
-.replies .comment-item .comment-item__header {
-  margin-bottom: 4px;
-  border-bottom: 1px solid #e1e1e1;
-}
-
-.replies .comment-item__content {
-  margin-top: 5px;
-  padding: 8px;
-  background-color: #fff;
-  border-radius: 5px;
-}
-
-/* Nút Reply to reply */
-.replies .comment-item__reply {
-  margin-top: 8px;
-  background: #007bff;
-  color: white;
-  padding: 5px 12px;
-  border-radius: 5px;
-  transition: background 0.3s ease;
-}
-
-.replies .comment-item__reply:hover {
-  background: #0056b3;
-}
-
-/* Hiệu ứng cho hover reply */
-.comment-item__content:hover,
-.reply-form:hover {
-  background-color: #f1f1f1;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-}
-
-/* Hiệu ứng động cho hover trên tất cả phần tử có thể tương tác */
-.comment-item__share:hover,
 .comment-item__edit:hover,
 .comment-item__delete:hover,
 .comment-item__reply:hover,
 .comment-item__show-reply:hover {
-  color: #007bff;
-  transition: all 0.3s ease;
+  background-color: #ecf0f1;
 }
 
+/* Reply form */
+.reply-form {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  width: 98%;
+  margin-left: 2%;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+}
 
+.reply-form textarea {
+  padding: 8px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  border: 1px solid #bdc3c7;
+  width: 100%;
+  font-size: 0.95rem;
+  resize: vertical;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.reply-form textarea:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.reply-form button {
+  align-self: flex-end;
+  padding: 6px 12px;
+  background: #3498db;
+  color: white;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.reply-form button:hover {
+  background: #2980b9;
+}
+
+/* Replies list */
+.replies {
+  margin-top: 12px;
+  width: 98%;
+  margin-left: 2%;
+}
+
+.replies .comment-item {
+  margin-top: 8px;
+  padding-left: 12px;
+  border-left: 2px solid #3498db;
+  background-color: #f8f9fa;
+  border-radius: 0 8px 8px 0;
+}
+
+.replies .comment-item .comment-item__header {
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+}
+
+.replies .comment-item__content {
+  margin-top: 6px;
+  padding: 8px;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .comment-item__footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .comment-item__vote {
+    margin-bottom: 8px;
+  }
+  
+  .comment-item__actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
 
 /* Cấu hình chung cho dialog */
 .delete-dialog {

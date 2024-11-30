@@ -1,4 +1,5 @@
-﻿using AuthServer.Dtos.Users;
+﻿using AuthServer.Dtos.Roles;
+using AuthServer.Dtos.Users;
 using AuthServer.Extensions;
 using AuthServer.Models;
 using AuthServer.Models.ProfileViewModel;
@@ -252,6 +253,6 @@ namespace AuthServer.Controllers
             return Ok(userDetailDtos);
         }
 
-    
+
     }
 }

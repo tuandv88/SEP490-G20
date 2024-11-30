@@ -20,6 +20,7 @@ public class UpdateDiscussionImageHandler: ICommandHandler<UpdateDiscussionImage
     public async Task<UpdateDiscussionImageResult> Handle(UpdateDiscussionImageCommand request, CancellationToken cancellationToken)
     {
         var discussion = await _discussionRepository.GetByIdAsync(request.Id);
+
         if (discussion == null)
         {
             throw new NotFoundException("Discussion Not Found", request.Id);
@@ -28,19 +29,21 @@ public class UpdateDiscussionImageHandler: ICommandHandler<UpdateDiscussionImage
         var imageUrl = await UploadDiscussionImage(request.ImageDto);
         var oldImageUrl = discussion.ImageUrl;
 
-
-
         //Update image
         discussion.UpdateImage(imageUrl);
-        discussion.DateUpdated = DateTime.Now;
+        discussion.DateUpdated = DateTime.UtcNow;
 
         await _discussionRepository.UpdateAsync(discussion);
         await _discussionRepository.SaveChangesAsync(cancellationToken);
 
-        await _filesService.DeleteFileAsync(bucket, oldImageUrl);
+        if (!String.IsNullOrEmpty(oldImageUrl))
+        {
+            await _filesService.DeleteFileAsync(bucket, oldImageUrl);
+        }
 
         //trả về siginkey
         var s3Object = await _filesService.GetFileAsync(bucket, imageUrl, 60);
+
         return new UpdateDiscussionImageResult(s3Object.PresignedUrl!);
 
     }

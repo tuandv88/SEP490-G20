@@ -10,6 +10,10 @@ public class ChapterRepository : Repository<Chapter>, IChapterRepository {
         return await _dbContext.Chapters.CountAsync(c => c.CourseId.Equals(CourseId.Of(courseId)));
     }
 
+    public async Task DeleteAsync(Chapter[] chapters) {
+        _dbContext.Chapters.RemoveRange(chapters);
+    }
+
     public override async Task DeleteByIdAsync(Guid id) {
         var chapter = await GetByIdAsync(id);
         if (chapter != null) {

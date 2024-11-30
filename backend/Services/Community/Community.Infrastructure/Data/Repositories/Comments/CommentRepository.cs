@@ -28,6 +28,7 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
     public override async Task<Comment?> GetByIdAsync(Guid id)
     {
         var comment = _dbContext.Comments
+                        .Include(c => c.Votes)
                         .AsEnumerable()
                         .FirstOrDefault(c => c.Id.Value == id);
         return comment;
@@ -45,9 +46,10 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
     public async Task<List<Comment>?> GetAllCommentsByIdDiscussionAsync(Guid id)
     {
         var comments = _dbContext.Comments
+                        .Include(c => c.Votes)
                         .AsEnumerable()
-                        .Where(c => c.DiscussionId.Value == id)
-                        .OrderBy(c => c.DateCreated)
+                        .Where(c => c.DiscussionId.Value == id && c.ParentCommentId == null)
+                        .OrderByDescending(c => c.DateCreated)
                         .ToList();
         return comments;
     }

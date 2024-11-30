@@ -33,8 +33,8 @@
                 ImageUrl = imageUrl,
                 IsActive = isActive,
                 Tags = tags,
-                DateCreated = DateTime.Now,
-                DateUpdated = DateTime.Now,
+                DateCreated = DateTime.UtcNow,
+                DateUpdated = DateTime.UtcNow,
                 ViewCount = 0,
                 Closed = false,
                 Pinned = false,
@@ -57,7 +57,7 @@
             Closed = closed;
             Pinned = pinned;
             ViewCount = viewCount;
-            DateUpdated = DateTime.Now;
+            DateUpdated = DateTime.UtcNow;
             NotificationsEnabled = notificationsEnabled;
 
             // Thêm sự kiện cập nhật nếu cần thiết

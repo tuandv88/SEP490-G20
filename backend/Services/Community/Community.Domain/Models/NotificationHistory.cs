@@ -20,7 +20,7 @@
                 UserId = userId,
                 NotificationTypeId = notificationTypeId,
                 Message = message,
-                DateSent = DateTime.Now,
+                DateSent = DateTime.UtcNow,
                 IsRead = false,
                 SentVia = sentVia,
                 Status = status
@@ -48,7 +48,7 @@
         public void MarkAsRead()
         {
             IsRead = true;
-            DateRead = DateTime.Now;
+            DateRead = DateTime.UtcNow;
         }
     }
 

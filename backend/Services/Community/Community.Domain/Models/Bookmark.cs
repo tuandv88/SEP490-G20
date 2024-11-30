@@ -14,7 +14,7 @@
                 Id = bookmarkId,
                 UserId = userId,
                 DiscussionId = discussionId,
-                DateBookmarked = DateTime.Now
+                DateBookmarked = DateTime.UtcNow
             };
         }
     }

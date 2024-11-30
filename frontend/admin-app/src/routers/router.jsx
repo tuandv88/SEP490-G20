@@ -8,7 +8,7 @@ const rootRoute = createRootRoute({
 
 // Define a separate root route for the login page without layout
 const loginRootRoute = createRootRoute({
-  component: lazy(() => import('@/pages/Login/login')) // Directly load the login component
+  component: lazy(() => import('@/pages/Login/Login')) // Directly load the login component
 })
 
 // Define other routes as children of the main root route
@@ -27,7 +27,7 @@ const courseTableRoute = createRoute({
 export const editCurriculumCourseRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/edit-curriculum-course/$courseId',
-  component: lazy(() => import('@/pages/Course/EditCourse'))
+  component: lazy(() => import('@/pages/Course/EditCurriculumCourse'))
 })
 
 export const editBasicCourseRoute = createRoute({
@@ -72,7 +72,7 @@ export const quizManagementRoute = createRoute({
   component: lazy(() => import('@/pages/Quiz/QuizManagement'))
 })
 
-// Define the login route as a child of the login root route
+// // Define the login route as a child of the login root route
 // const loginRoute = createRoute({
 //   getParentRoute: () => loginRootRoute,
 //   path: '/login',
@@ -121,6 +121,18 @@ const quizAssessmentRoute = createRoute({
   component: lazy(() => import('@/pages/QuizAssessment/QuizAssessment'))
 })
 
+const userTableRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/user-table',
+  component: lazy(() => import('@/pages/User/UserTable'))
+})
+
+export const userDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/user-detail/$userId',
+  component: lazy(() => import('@/pages/User/UserDetail'))
+})
+
 // Create the route trees
 const mainRouteTree = rootRoute.addChildren([
   indexRoute,
@@ -137,7 +149,9 @@ const mainRouteTree = rootRoute.addChildren([
   problemTableRoute,
   documentAiTableRoute,
   quizAssessmentRoute,
-  callbackRoute
+  callbackRoute,
+  userTableRoute,
+  userDetailRoute
 ])
 
 const loginRouteTree = loginRootRoute

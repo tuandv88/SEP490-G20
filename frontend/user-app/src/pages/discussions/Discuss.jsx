@@ -4,12 +4,21 @@ import Tabs from "../../components/discussions/Tabs";
 import PostList from "../../components/discussions/PostList";
 import Layout from "@/layouts/layout";
 import { DiscussApi } from "@/services/api/DiscussApi";
+import { useLocation } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 
 const Discuss = () => {
   const [categoryId, setCategoryId] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [errorCategories, setErrorCategories] = useState(null);
+
+  const location = useLocation();
+  const { removeDiscussionStateMessage } = location.state || {};  // Lấy thông báo thành công nếu có
+
+  // Trạng thái để kiểm tra khi hiển thị thông báo
+  const [showRemoveSuccesAlert, setShowRemoveSuccesAlert] = useState(removeDiscussionStateMessage);
 
   const handleCategoryChange = (newCategoryId) => {
     setCategoryId(newCategoryId);
@@ -35,8 +44,40 @@ const Discuss = () => {
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    // Hiển thị thông báo thành công sau khi xóa
+    if (showRemoveSuccesAlert) {
+      const timerShowRemoveSucces = setTimeout(() => {
+        setShowRemoveSuccesAlert(false);  // Ẩn thông báo sau 5 giây
+      }, 5000);
+
+      // Dọn dẹp timer khi component unmount hoặc trạng thái thay đổi
+      return () => clearTimeout(timerShowRemoveSucces);
+    }
+  }, [showRemoveSuccesAlert]);  // Chỉ phụ thuộc vào showRemoveSuccesAlert
+
   return (
     <Layout>
+
+      {/* Hiển thị thông báo khi post thành công */}
+      {showRemoveSuccesAlert && (
+        <Stack
+          sx={{
+            position: 'fixed',
+            top: 20, // Đặt cách từ đầu trang một chút
+            left: '50%', // Căn giữa theo chiều ngang
+            transform: 'translateX(-50%)', // Đảm bảo căn giữa tuyệt đối
+            zIndex: 9999, // Đảm bảo thông báo hiển thị trên tất cả các phần tử khác
+            width: 'auto', // Giới hạn chiều rộng thông báo
+            maxWidth: '500px', // Giới hạn chiều rộng tối đa cho thông báo
+          }}
+        >
+          <Alert severity="error">
+            Remove Post Successfully!
+          </Alert>
+        </Stack>
+      )}
+
       <div className="discuss-container">
         {/* Hiển thị khi đang tải categories hoặc có lỗi */}
         {loadingCategories && <p>Loading categories...</p>}

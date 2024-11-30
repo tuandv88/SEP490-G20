@@ -48,8 +48,8 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
         var comments = _dbContext.Comments
                         .Include(c => c.Votes)
                         .AsEnumerable()
-                        .Where(c => c.DiscussionId.Value == id)
-                        .OrderBy(c => c.DateCreated)
+                        .Where(c => c.DiscussionId.Value == id && c.ParentCommentId == null)
+                        .OrderByDescending(c => c.DateCreated)
                         .ToList();
         return comments;
     }

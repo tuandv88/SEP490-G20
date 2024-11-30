@@ -41,6 +41,10 @@ function CommentList({ discussionId }) {
   const [openRemoveDialog, setOpenRemoveDialog] = useState(false);  // Trạng thái mở/đóng dialog
   const [commentIdToDelete, setCommentIdToDelete] = useState(null); // Lưu ID comment cần xóa
 
+  const [isReplying, setIsReplying] = useState(false); // Kiểm tra trạng thái trả lời
+  const [replyContent, setReplyContent] = useState("");  // Nội dung của bình luận trả lời
+  const [parentCommentId, setParentCommentId] = useState(null);  // ID của bình luận gốc
+
   useEffect(() => {
     const fetchComments = async () => {
       setLoading(true);
@@ -227,6 +231,53 @@ function CommentList({ discussionId }) {
       console.error("Error removing comment:", error.message);
     } finally {
       handleCloseRemoveDialog(); // Đóng dialog sau khi xóa xong
+    }
+  };
+
+
+  const handleReply = (commentId) => {
+    if (parentCommentId === commentId) {
+      // If the form is already open for this comment, just keep it open (do nothing)
+      return;
+    }
+    // If the form is not open for this comment, open the reply form
+    setParentCommentId(commentId);
+    setReplyContent(""); // Clear the reply content
+    setIsReplying(true);  // Mở form trả lời
+  };
+
+  // Handle the cancel reply functionality
+  const handleCancelReply = () => {
+    setParentCommentId(null); // Close the form by resetting the parent comment ID
+    setReplyContent(""); // Clear reply content
+    setIsReplying(false);  // Mở form trả lời
+  };
+
+  // Xử lý khi người dùng gửi phản hồi
+  const handleReplySubmit = async () => {
+    try {
+      const idDiscussionCurrent = discussionId;
+
+      const newComment = {
+        discussionId: idDiscussionCurrent, // ID thảo luận
+        content: replyContent,  // Nội dung trả lời
+        dateCreated: new Date().toISOString(),  // Thời gian hiện tại
+        parentCommentId: parentCommentId,  // ID của bình luận gốc
+        depth: 2,  // Depth = 2 cho bình luận trả lời
+        isActive: true,  // Đánh dấu là bình luận hợp lệ
+      };
+
+      const response = await DiscussApi.createComment(newComment);
+
+      if (response) {
+        setReplyContent("");  // Reset nội dung bình luận
+        setIsReplying(false);  // Đóng form trả lời
+        setRefreshComments(prev => !prev);  // Tải lại danh sách bình luận
+
+        console.log("Success!", newComment)
+      }
+    } catch (error) {
+      console.error("Error submitting reply:", error);
     }
   };
 
@@ -423,9 +474,47 @@ function CommentList({ discussionId }) {
                   </Dialog>
 
 
-                  <button className="comment-item__reply">
+                  {/* Reply button */}
+                  <button className="comment-item__reply" onClick={() => handleReply(comment.id)}>
                     <FontAwesomeIcon icon={faReply} /> Reply
                   </button>
+
+                  {/* Reply Form - Only show if this comment is being replied to */}
+                  {isReplying && parentCommentId === comment.id && (
+                    <div className="comment-item__reply-form">
+                      {/* Reply form input and buttons */}
+                      <textarea
+                        className="reply-comment-input"
+                        value={replyContent}
+                        onChange={(e) => setReplyContent(e.target.value)}
+                        placeholder="Write your reply here..."
+                      />
+                      <div className="reply-buttons-container">
+                        <button
+                          className="reply-toggle-preview-button"
+                          onClick={() => setIsPreview(!isPreview)}
+                          disabled={submitting}
+                        >
+                          {isPreview ? "Write" : "Preview"}
+                        </button>
+                        <button
+                          className="reply-comment-button"
+                          onClick={handleReplySubmit}
+                          disabled={!replyContent.trim() || submitting}
+                        >
+                          {submitting ? "Submitting..." : "Post Reply"}
+                        </button>
+                        <button
+                          className="reply-cancel-button"
+                          onClick={handleCancelReply}
+                          disabled={submitting}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               </div>
             )
@@ -698,11 +787,6 @@ function CommentList({ discussionId }) {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.comment-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
-}
-
 /* Header section */
 .comment-item__header {
   display: flex;
@@ -955,8 +1039,113 @@ function CommentList({ discussionId }) {
   }
 }
 
+/* Reply Form nằm dưới comment cha và có chiều rộng 80% */
+.comment-item__reply-form {
+  margin-top: 20px; /* Khoảng cách giữa comment cha và form trả lời */
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Tăng khoảng cách giữa các phần tử trong form */
+  width: 1350%; /* Chiều rộng 80% của comment cha */
+  height: 150px; /* Chiều rộng 80% của comment cha */
+  box-sizing: border-box; /* Đảm bảo không bị tràn ra ngoài */
+  transition: all 0.3s ease-in-out;
+  position: absolute; /* Đặt form này vào vị trí tuyệt đối trong comment cha */
+  top: 100%; /* Đảm bảo form reply nằm dưới comment cha */
+  transform: translateX(-91%); /* Căn chỉnh lại cho chính giữa */
+}
 
+/* Phóng to textarea cho rộng và dài hơn */
+.reply-comment-input {
+  width: 100%;
+  height: 250px; /* Tăng chiều cao của textarea */
+  margin-bottom: 15px; /* Khoảng cách giữa textarea và các nút */
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: none; /* Tắt khả năng resize của textarea */
+  box-sizing: border-box;
+}
 
+/* Container cho các nút */
+.reply-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px; /* Giảm khoảng cách giữa các nút */
+  width: 100%; /* Đảm bảo chiều rộng container là 100% */
+}
+
+.reply-toggle-preview-button {
+  padding: 8px 10px; /* Giảm padding để nút nhỏ hơn */
+  font-size: 12px; /* Giảm kích thước font */
+  font-weight: 400; /* Giảm độ đậm của chữ */
+  color: #f9f9f9;
+  background: #1e334a;
+  border: 1px solid #ccc;
+  border-radius: 6px; /* Giảm border-radius để nút nhỏ gọn hơn */
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  width: 100%; /* Nút rộng toàn bộ chiều rộng */
+  max-width: 120px; /* Giới hạn chiều rộng tối đa */
+  align-self: flex-start; /* Canh trái */
+}
+
+/* Button styles (Post, Cancel) */
+.reply-comment-button,
+.reply-cancel-button {
+  padding: 8px 10px; /* Giảm padding để nút nhỏ hơn */
+  font-size: 12px; /* Giảm kích thước font */
+  font-weight: 400; /* Giảm độ đậm của chữ */
+  color: #f9f9f9;
+  background: #1e334a;
+  border: 1px solid #ccc;
+  border-radius: 6px; /* Giảm border-radius để nút nhỏ gọn hơn */
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  width: 45%; /* Nút chiếm một nửa chiều rộng của form */
+  align-self: flex-start; /* Canh trái */
+}
+
+/* Hover effect for Post and Cancel buttons */
+.reply-comment-button:hover,
+.reply-cancel-button:hover {
+  background-color: #3b4d67;
+  color: white;
+  border-color: #b0b0b0;
+}
+
+/* Hover effect for buttons when disabled */
+.reply-comment-button:disabled,
+.reply-cancel-button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.reply-cancel-button {
+  background-color: #e0e0e0;
+}
+
+.reply-cancel-button:hover {
+  background-color: #c0c0c0;
+}
+
+/* Sắp xếp nút Write bên trái và Post, Cancel bên phải */
+.reply-toggle-preview-button {
+  margin-right: auto; /* Đẩy nút Write về phía bên trái */
+}
+
+.reply-comment-button,
+.reply-cancel-button {
+  width: auto; /* Nút Post và Cancel tự động điều chỉnh chiều rộng */
+  margin-left: 8px; /* Khoảng cách giữa Post và Cancel */
+}
       `}</style>
     </div>
   );

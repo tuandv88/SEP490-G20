@@ -1,9 +1,4 @@
-﻿
-
-
-using Learning.Domain.ValueObjects;
-
-namespace Learning.Infrastructure.Data.Repositories.QuizSubmissions;
+﻿namespace Learning.Infrastructure.Data.Repositories.QuizSubmissions;
 public class QuizSubmissionRepository : Repository<QuizSubmission>, IQuizSubmissionRepository {
     public readonly IApplicationDbContext _dbContext;
     public QuizSubmissionRepository(IApplicationDbContext dbContext) : base(dbContext) {
@@ -42,6 +37,10 @@ public class QuizSubmissionRepository : Repository<QuizSubmission>, IQuizSubmiss
                       .Where(q => q.QuizId.Equals(QuizId.Of(quizId)) && 
                       q.UserId.Equals(UserId.Of(userId))).CountAsync();
         return count;
+    }
+
+    public IQueryable<QuizSubmission> GetAllAsQueryable() {
+        return _dbContext.QuizSubmissions.AsQueryable();
     }
 }
 

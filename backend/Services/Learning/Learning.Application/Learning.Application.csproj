@@ -39,7 +39,6 @@
 
   <ItemGroup>
     <Folder Include="Models\Chapters\EventHandlers\" />
-    <Folder Include="Models\Courses\Queries\GetStatistics\GetTopSolvedProblems\" />
   </ItemGroup>
 
 </Project>

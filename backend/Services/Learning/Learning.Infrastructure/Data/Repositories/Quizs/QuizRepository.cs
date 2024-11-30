@@ -28,7 +28,7 @@ public class QuizRepository : Repository<Quiz>, IQuizRepository {
         return quiz;
     }
 
-    public async Task<IQueryable<Quiz>> GetAllQueryAbleAsync() {
+    public  IQueryable<Quiz> GetAllAsQueryable() {
         return _dbContext.Quizs.AsQueryable();
     }
 

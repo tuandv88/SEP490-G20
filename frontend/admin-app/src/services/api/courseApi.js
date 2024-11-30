@@ -43,6 +43,19 @@ export const updateCourseImage = async (courseId, imageData) => {
   }
 }
 
+export const deleteCourse = async (courseId) => {
+  try {
+    const response = await axiosInstance.delete(`/learning-service/courses/${courseId}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
 export const changeCourseStatus = async (courseId, status) => {
   try {
     const response = await axiosInstance.put(`/learning-service/courses/${courseId}/change-status`, status, {

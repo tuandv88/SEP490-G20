@@ -18,7 +18,9 @@ public class GetCoursesHandler(ICourseRepository repository, IFilesService files
         var titleSearch = query.Filter.SearchString ?? "";
 
         filteredData = filteredData.Where(c => c.Title.Contains(titleSearch, StringComparison.OrdinalIgnoreCase));
-
+        if (query.Filter.Level != null) {
+            filteredData = filteredData.Where(c => c.CourseLevel.ToString().Contains(query.Filter.Level, StringComparison.OrdinalIgnoreCase));
+        }
         if (!isAdmin) {
             filteredData = filteredData.Where(c => c.CourseStatus == CourseStatus.Published);
         }

@@ -27,7 +27,7 @@ public class DeleteChapterHandler(ICourseRepository courseRepository, IChapterRe
         return Unit.Value;
 
     }
-
+        
 
 }
 

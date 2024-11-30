@@ -11,7 +11,6 @@ import QuizSuggestUser from './QuizSuggestUser'
 const QuizModal = ({ isOpen, onClose, quiz }) => {
   if (!isOpen) return null
 
-  console.log('Quiz: ', quiz.timeLimit)
 
   const [isQuizStarted, setIsQuizStarted] = useState(false)
   const [quizData, setQuizData] = useState(null)

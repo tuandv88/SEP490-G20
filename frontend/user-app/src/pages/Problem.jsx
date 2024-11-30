@@ -165,15 +165,7 @@ function Problem() {
       <div className='min-h-screen bg-background text-foreground p-6 mt-[100px]'>
         <div className='max-w-7xl mx-auto'>
           <div className='flex gap-6'>
-            <div className='flex-1'>
-              {/* <CourseCards /> */}
-              {/* <FilterBar
-                filters={filters}
-                setFilters={setFilters}
-                availableTags={availableTags}
-                handleTagToggle={handleTagToggle}
-              />
-              <ActiveFilters filters={filters} handleRemoveFilter={handleRemoveFilter} handleReset={handleReset} /> */}
+            <div className='flex-1'>     
               {loading ? (
                 <ProblemSkeleton />
               ) : (
@@ -185,12 +177,6 @@ function Problem() {
                 />
               )}
             </div>
-
-            {/* <div className='w-80 space-y-6'>
-              <ProblemPanelBot stats={stats} />
-              <ProblemPanelTop />
-            </div> */}
-
             <div className='w-80 space-y-6'>
               <div className='bg-white rounded-lg shadow-md p-6'>
                 <FilterBar

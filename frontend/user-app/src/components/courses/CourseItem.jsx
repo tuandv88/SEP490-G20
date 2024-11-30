@@ -13,7 +13,7 @@ export default function CourseItem({ courses }) {
   }
 
   if (!Array.isArray(courses) || courses.length === 0) {
-    return <p>No courses available.</p>; // Hiển thị thông báo khi không có khóa học
+    return <p>No courses available.</p>
   }
 
   return (

@@ -14,6 +14,8 @@ function Callback() {
     AuthService.handleCallback()
       .then(() => {
         console.log('Verify Auth Code - Get Access_Token & Save Storage..');
+        // Điều hướng về đâu cấu hình ở đây: uriRedirect:" uri  + "/callback"   -> Redirect: " uri " + "url navigate".
+        // navigate('/discussions/discuss');
         navigate('/');
       })
       .catch((error) => {

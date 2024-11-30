@@ -53,5 +53,16 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
                         .ToList();
         return comments;
     }
+
+    public async Task<List<Comment>?> GetAllCommentsByIdCommentParentAsync(Guid idCommentDiscusison, Guid idCommentParent)
+    {
+        var comments = _dbContext.Comments
+                        .Include(c => c.Votes)
+                        .AsEnumerable()
+                        .Where(c => c.DiscussionId.Value == idCommentDiscusison && c?.ParentCommentId?.Value == idCommentParent)
+                        .OrderByDescending(c => c.DateCreated)
+                        .ToList();
+        return comments;
+    }
 }
 

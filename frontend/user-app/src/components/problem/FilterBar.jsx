@@ -14,7 +14,7 @@ import { ChevronDown, RotateCcw } from 'lucide-react'
 function FilterBar({ filters, setFilters, availableTags, handleTagToggle, handleReset }) {
   return (
     <div className='space-y-4'>
-      <div className='space-y-2'>
+      {/* <div className='space-y-2'>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='outline' className='w-full justify-between'>
@@ -89,7 +89,7 @@ function FilterBar({ filters, setFilters, availableTags, handleTagToggle, handle
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      </div> */}
 
       <div className='space-y-2'>
         <Input type='search' placeholder='Search questions' />

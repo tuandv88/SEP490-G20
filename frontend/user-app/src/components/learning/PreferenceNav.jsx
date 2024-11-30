@@ -73,7 +73,6 @@ const PreferenceNav = ({ onSubmit, loading, problemId, setActiveTab, setResultCo
 
     try {
       const response = await LearningAPI.submitCode(problemId, submissionData)
-      console.log(response)
       setResultCodeSubmit(response.submissionResponse)
       setCurrentCode(submissionData.submission.solutionCode)
       setActiveTab('submissionResult')
@@ -101,8 +100,6 @@ const PreferenceNav = ({ onSubmit, loading, problemId, setActiveTab, setResultCo
           </div>
           <select className='bg-gray-700 text-white text-sm rounded-md px-2 py-1'>
             <option>Java</option>
-            <option>C#</option>
-            <option>Python</option>
           </select>
         </div>
         <div className='flex items-center space-x-2 mr-5'>

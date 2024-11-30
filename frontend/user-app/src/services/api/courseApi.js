@@ -58,5 +58,13 @@ export const CourseAPI = {
     );
     console.log(response)
     return response.data;
+  },
+  getCourseProgress: async (courseId) => {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/courses/${courseId}/progress`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
   }
 }

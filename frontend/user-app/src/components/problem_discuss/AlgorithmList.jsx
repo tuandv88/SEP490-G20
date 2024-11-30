@@ -4,14 +4,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Users, ThumbsUp } from "lucide-react";
 import { DifficultyBadge } from "../problem/DifficultyBadge";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { UserContext } from "@/contexts/UserContext";
 
 
 export function AlgorithmList({ problems }) {
   const navigate = useNavigate()
-  console.log(problems)
+  const { user } = useContext(UserContext)
   
   const handleClick = (problemId) => {
-    navigate(`/problem-solve/${problemId}`)
+    if (user) {
+      navigate(`/problem-solve/${problemId}`)
+    } else {
+      authServiceInstance.login()
+    }
   }
 
   return (

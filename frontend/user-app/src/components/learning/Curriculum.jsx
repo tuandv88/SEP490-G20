@@ -8,7 +8,9 @@ import { useNavigate } from 'react-router-dom'
 const Curriculum = ({ courseId, chapters, 
   setSelectedLectureId, title, 
   setActiveLectureId,
-  activeLectureId }) => {
+  activeLectureId,
+  courseProgress
+ }) => {
   
   const navigate = useNavigate()
   
@@ -27,6 +29,11 @@ const Curriculum = ({ courseId, chapters,
     navigate(`/learning-space/${courseId}/lecture/${lectureId}`);
     console.log("Navigate")
   }
+
+  const isLectureCompleted = (lectureId) => {
+    return courseProgress.some(progress => progress.lectureId === lectureId && progress.completionDate)
+  }
+
 
   const toggleSection = (index) => {
     setExpandedSections((prev) => (prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]))
@@ -70,6 +77,9 @@ const Curriculum = ({ courseId, chapters,
                   >
                     <div className='flex justify-between items-center mb-1'>
                       <span className='text-sm text-gray-200'>{lecture.title}</span>
+                      <span className='text-xs text-gray-500'>
+                        {isLectureCompleted(lecture.id) ? 'Completed' : ''}
+                      </span>
                     </div>
                   </div>
                 ))}

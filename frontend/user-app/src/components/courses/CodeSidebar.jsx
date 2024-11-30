@@ -1,33 +1,58 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Clock, Calendar, Award } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CourseAPI } from '@/services/api/courseApi'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
+import { UserContext } from '@/contexts/UserContext'
+import authServiceInstance from '@/oidc/AuthService'
 
-export function CourseSidebar({ enrolledCourses, firstLectureId }) {
+export function CourseSidebar({ enrolledCourses }) {
   const { id } = useParams()
   console.log(id)
   const navigate = useNavigate()
+  const { user } = useContext(UserContext)
+  const [firstLectureId, setFirstLectureId] = useState(null)
 
   useEffect(() => {
-    async function fetchEnrolledCourses() {
-      const response = await CourseAPI.getEnrolledCourses(id)
-      console.log(response)
-    }
-    fetchEnrolledCourses()
-  }, [id])
+    const fetchCourseData = async () => {
+      if (user) { // Kiểm tra nếu người dùng đã đăng nhập
+        try {
+          const courseProgress = await CourseAPI.getCourseProgress(id);
+          console.log('Course Progress:', courseProgress);
+          const currentLecture = courseProgress.progress.find(lecture => lecture.isCurrent);
+          setFirstLectureId(currentLecture ? currentLecture.lectureId : courseData.course.chapters[0].lectures[0].id);
+        } catch (error) {
+          console.error('Error fetching course progress:', error);
+        }
+      } else {
+        console.log('User not logged in, skipping course progress fetch.');
+      }
+    };
+
+    fetchCourseData();
+  }, [id, user]);
+
+
 
   const handleLearningCourse = () => {
     navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', id).replace(':lectureId', firstLectureId))
   }
 
   const handleEnrollCourse = async () => {
-    try {
-      const data = await CourseAPI.enrollCourse(id)
-      console.log(data)
-      navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', id).replace(':lectureId', firstLectureId))
-    } catch (error) {
-      console.error('Error enrolling course:', error)
+    if (!user) {
+      try {
+        await authServiceInstance.login() 
+      } catch (error) {
+        console.error('Error during login:', error)
+      }
+    } else {
+      try {
+        const data = await CourseAPI.enrollCourse(id)
+        console.log(data)
+        navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', id).replace(':lectureId', firstLectureId))
+      } catch (error) {
+        console.error('Error enrolling course:', error)
+      }
     }
   }
 

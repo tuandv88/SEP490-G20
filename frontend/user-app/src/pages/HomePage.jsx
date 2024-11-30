@@ -4,61 +4,19 @@ import { Link, useNavigate } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import Layout from '@/layouts/layout'
 import { useEffect, useState } from 'react'
-import { Star, Clock, Users, Trophy, ChevronRight, Cookie } from 'lucide-react'
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
+import {  ChevronRight } from 'lucide-react'
 import CourseLoading from '@/components/loading/CourseLoading'
-import CourseItem from '@/components/courses/CourseItem'
-import { LearningAPI } from '@/services/api/learningApi'
-import { AlgorithmCard } from '@/components/problem/AlgorithmCard'
 import { ProblemSection } from '@/components/problem/ProblemSection'
 import { CourseCarousel } from '@/components/courses/CourseCarousel'
 import authServiceInstance from '@/oidc/AuthService'
 import SurveyModal from '@/components/surrvey/SurveyModal'
 import AssessmentPrompt from '@/components/surrvey/AssessmentPromptProps'
 import QuizModal from '@/components/surrvey/QuizModal'
-import QuizPopup from '@/components/quiz/QuizPopup'
+
 import { QuizAPI } from '@/services/api/quizApi'
 import { UserAPI } from '@/services/api/userApi'
 import { CourseAPI } from '@/services/api/courseApi'
 
-export const algorithms = [
-  {
-    id: '1',
-    title: 'Two Sum',
-    description: 'Find two numbers in an array that add up to a target sum',
-    difficulty: 'Easy',
-    category: 'Arrays & Hashing',
-    timeComplexity: 'O(n)',
-    spaceComplexity: 'O(n)',
-    likes: 452,
-    submissions: 1250,
-    successRate: 85
-  },
-  {
-    id: '2',
-    title: 'Binary Tree Level Order Traversal',
-    description: 'Traverse a binary tree in level order (breadth-first search)',
-    difficulty: 'Medium',
-    category: 'Trees',
-    timeComplexity: 'O(n)',
-    spaceComplexity: 'O(n)',
-    likes: 328,
-    submissions: 850,
-    successRate: 72
-  },
-  {
-    id: '3',
-    title: 'Merge K Sorted Lists',
-    description: 'Merge k sorted linked lists into one sorted linked list',
-    difficulty: 'Hard',
-    category: 'Linked Lists',
-    timeComplexity: 'O(n log k)',
-    spaceComplexity: 'O(n)',
-    likes: 275,
-    submissions: 620,
-    successRate: 65
-  }
-]
 
 const Button = ({ children, className, ...props }) => (
   <button className={`px-4 py-2 rounded ${className}`} {...props}>
@@ -77,12 +35,10 @@ const Avatar = ({ src, alt, className, ...props }) => (
 )
 
 function HomePage() {
-  const [email, setEmail] = useState('')
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
-
   const [isSurveyOpen, setIsSurveyOpen] = useState(false)
   const [isAssessmentPromptOpen, setIsAssessmentPromptOpen] = useState(false)
   const [isQuizOpen, setIsQuizOpen] = useState(false)
@@ -113,7 +69,7 @@ function HomePage() {
 
   async function updateSurveyStatus() {
     try {
-      console.log(userInfo.sub)
+
       await UserAPI.changeSurveyStatus(userInfo.sub)
       authServiceInstance.refreshToken()
     } catch (error) {
@@ -241,7 +197,7 @@ function HomePage() {
           </section>
 
           {/* Testimonials Section */}
-          <section className='py-12 md:py-20'>
+          {/* <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
               <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Học viên nói gì về chúng tôi</h2>
               <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 md:gap-8'>
@@ -266,7 +222,7 @@ function HomePage() {
                 ))}
               </div>
             </div>
-          </section>
+          </section> */}
         </div>
         <Link to={AUTHENTICATION_ROUTERS.HOME}></Link>
 

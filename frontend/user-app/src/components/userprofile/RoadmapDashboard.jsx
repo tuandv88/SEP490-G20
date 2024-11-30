@@ -5,7 +5,7 @@ import { LearningAPI } from '@/services/api/learningApi'
 import ChapterLoading from '../loading/ChapterLoading'
 
 
-const RoadmapDashboard = () => {
+const RoadmapDashboard = ({ user }) => {
   const [learningPath, setLearningPath] = useState([])
   const [courseDetails, setCourseDetails] = useState({})
   const [loading, setLoading] = useState(false)
@@ -55,7 +55,7 @@ const RoadmapDashboard = () => {
 
       courseIds.forEach(courseId => fetchCoursePreview(courseId))
     }
-  }, [learningPath])
+  }, [learningPath, user])
 
   if (loading) {
     return <ChapterLoading />

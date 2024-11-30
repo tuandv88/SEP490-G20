@@ -25,7 +25,6 @@ function CourseDetail() {
   const navigate = useNavigate()
   const setSelectedCourse = useStore((state) => state.setSelectedCourse)
   const [enrolledCourses, setEnrolledCourses] = useState(null)
-  const [firstLectureId, setFirstLectureId] = useState(null)
 
 
   useEffect(() => {
@@ -44,8 +43,7 @@ function CourseDetail() {
           CourseAPI.getEnrolledCourses(id)
         ])
         console.log(Cookies.get('authToken'))
-        setCourseDetail(courseData)
-        setFirstLectureId(courseData.course.chapters[0].lectures[0].id)
+        setCourseDetail(courseData)        
         setEnrolledCourses(enrolledData.enrollmentInfo)
         console.log(enrolledData.enrollmentInfo)
       } catch (error) {
@@ -170,7 +168,7 @@ function CourseDetail() {
 
                 {/* Sidebar - Right Side */}
                 <div className='lg:col-span-1'>
-                  <CourseSidebar enrolledCourses={enrolledCourses} firstLectureId={firstLectureId} courseId={id} />
+                  <CourseSidebar enrolledCourses={enrolledCourses} courseId={id} />
                 </div>
               </div>
             </div>

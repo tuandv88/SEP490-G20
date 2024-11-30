@@ -38,7 +38,7 @@ export function UserProfile() {
       case 'account':
         return <AccountInfo />
       case 'roadmap':
-        return <RoadmapDashboard />
+        return <RoadmapDashboard user={user} />
       case 'learning':
         return <LearningDashboard />
       case 'algorithm':

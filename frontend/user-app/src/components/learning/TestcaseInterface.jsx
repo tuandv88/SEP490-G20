@@ -62,8 +62,6 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
   const activeTabTestcase = useStore((state) => state.activeTabTestcase)
   const setActiveTabTestcase = useStore((state) => state.setActiveTabTestcase)
 
-  console.log('testCases', testCases)
-
   if (testCase[0] === null) {
     console.log('testCase[0] === null')
   }

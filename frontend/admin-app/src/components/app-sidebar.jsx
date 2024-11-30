@@ -26,7 +26,8 @@ import {
   SidebarRail,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  useSidebar
 } from '@/components/ui/sidebar'
 
 // This is sample data.

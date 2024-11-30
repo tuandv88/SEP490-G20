@@ -4,10 +4,7 @@ import { RouterProvider } from '@tanstack/react-router'
 import { mainRouter, loginRouter } from '@/routers/router'
 import ErrorBoundary from '@/components/error-boundary'
 import { LoadingSpinner } from '@/components/loading'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-
-// Create a QueryClient instance
-const queryClient = new QueryClient()
+import { AuthProvider } from '@/contexts/AuthContext'
 
 function App() {
   // Determine which router to use based on the current path
@@ -15,11 +12,9 @@ function App() {
   const router = currentPath.startsWith('/login') ? loginRouter : mainRouter
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <Suspense fallback={<LoadingSpinner variant='minimal' />}>
-          <RouterProvider router={router} />
-        </Suspense>
-      </QueryClientProvider>
+      <Suspense fallback={<LoadingSpinner variant='minimal' />}>
+        <RouterProvider router={router} />
+      </Suspense>
     </ErrorBoundary>
   )
 }

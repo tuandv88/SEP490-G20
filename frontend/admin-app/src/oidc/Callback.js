@@ -2,7 +2,6 @@ import React from 'react'
 import { useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import AuthService from './AuthService'
-import { Loading } from '@/components/ui/overlay'
 
 function Callback() {
   console.log('Callback method....')
@@ -23,7 +22,7 @@ function Callback() {
   }, [navigate])
 
   // Tạo phần tử React mà không dùng JSX
-  return React.createElement(Loading)
+  return React.createElement('div', null, 'Loading...')
 }
 
 export default Callback

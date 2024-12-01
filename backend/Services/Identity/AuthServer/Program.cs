@@ -110,6 +110,7 @@ builder.Services.AddAuthentication(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";  // Đường dẫn khi truy cập bị từ chối
     options.LoginPath = "/Account/Login";                // Đường dẫn khi người dùng chưa đăng nhập
     options.LogoutPath = "/Account/Logout";              // Đường dẫn khi người dùng đăng xuất
+    options.Cookie.SameSite = SameSiteMode.None;
 })
 .AddGoogle(googleOptions =>
 {

@@ -862,9 +862,12 @@ function DiscussionDetail() {
 
 /* User Info */
 .user-info {
-  display: flex; /* Chuyển sang flex để căn chỉnh ngang */
-  justify-content: space-between; /* Đẩy view-count sang phải */
-  align-items: center; /* Căn giữa theo chiều dọc */
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-top: -15px; /* Move the entire user info section up */
+  margin-left: 15px; /* Move the entire user info section up */
 }
 
 /* Tên người dùng */
@@ -873,20 +876,14 @@ function DiscussionDetail() {
   font-size: 16px;
   font-weight: bold;
   color: #333;
-  position: absolute; /* Đặt vị trí tuyệt đối */
-  top: 20px; /* Căn lên trên cùng */
 }
 
 /* View Count */
 .view-count {
   margin: 0;
-  padding-left: 10px;
   font-size: 15px;
   color: #888;
-  white-space: nowrap; /* Đảm bảo view-count không xuống dòng */
-  position: absolute; /* Đặt vị trí tuyệt đối(Có thể điều chỉnh vị trí tùy ý theo pivot) */
-  top: 22px; /* Căn lên trên cùng */
-  left: 240px; /* Căn lên trên cùng */
+  white-space: nowrap;
 }
 
 /* Created Date */
@@ -898,6 +895,8 @@ function DiscussionDetail() {
   position: absolute; /* Đặt vị trí tuyệt đối */
   top: 50px; /* Căn lên trên cùng */
   left: 138px; /* Căn lên trên cùng */
+  margin-top: 5px; /* Move the entire user info section up */
+  margin-left: 15px; /* Move the entire user info section up */
 }
 /* Tags Section */
 .discussion-tags {
@@ -915,6 +914,8 @@ function DiscussionDetail() {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-left: 80px; /* Move the entire user info section up */
+  margin-top: 5px; /* Move the entire user info section up */
 }
 
 .tag:hover {

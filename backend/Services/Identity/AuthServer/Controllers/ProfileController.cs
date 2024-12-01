@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using BuidingBlocks.Storage.Interfaces;
 using BuidingBlocks.Storage;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthServer.Controllers
 {
@@ -30,7 +31,7 @@ namespace AuthServer.Controllers
         }
 
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             // Lấy thông tin từ cấu hình
             var userImageUrl = _configuration.GetValue<string>("ApiSettings:UserImageUrl");
@@ -40,6 +41,34 @@ namespace AuthServer.Controllers
 
             // Truyền vào ViewData để sử dụng trong Razor view
             ViewData["UserImageUrl"] = userImageUrl;
+
+            // Lấy userId của người dùng hiện tại
+            var currentUser = await _userManager.GetUserAsync(User); // Lấy người dùng hiện tại từ UserManager
+            var userId = currentUser?.Id; // Lấy userId của người dùng (nếu có)
+
+            // Log thông tin userId
+            Console.WriteLine($"Index - UserId: {userId}");
+
+
+            // Lấy thông tin người dùng từ UserManager
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return NotFound(new { message = $"No user found with ID {userId}." });
+            }
+            else
+            {
+                // Lấy URL ảnh đại diện
+                var imageUrl = await _filesService.GetFileAsync(StorageConstants.BUCKET, user.ProfilePicture, 60);
+                Console.WriteLine(imageUrl.PresignedUrl);
+                // Truyền vào ViewData để sử dụng trong Razor view
+
+                ViewData["imageUrl"] = imageUrl.PresignedUrl;
+            }
+
+            ViewData["User"] = currentUser;
+            ViewData["UserId"] = userId; // Truyền userId vào ViewData
 
             return View();
         }

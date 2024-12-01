@@ -2,13 +2,15 @@
 
 namespace User.Application.Models.PathSteps.Dtos
 {
-    public record UpdatePathStepDto(
-        Guid Id,
+    public record CreatePathStepDto(
+        Guid LearningPathId,
         Guid CourseId,
         int StepOrder,
-        PathStepStatus Status,
-        DateTime EnrollmentDate,
+        PathStepStatus Status, // Có thể map với enum Status nếu có
+        DateTime? EnrollmentDate,
         DateTime? CompletionDate,
         DateTime ExpectedCompletionDate
+
     );
+
 }

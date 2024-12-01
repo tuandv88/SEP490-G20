@@ -36,7 +36,6 @@ function CourseList() {
       const data = await CourseAPI.getCourseList(currentPage, coursesPerPage, searchTermString)
       setCourses(data?.courseDtos?.data)
       setTotalItems(data?.courseDtos?.count || 0);
-      console.log(data?.courseDtos?.count)
     } catch (error) {
       console.error('Error fetching course detail:', error)
       if (error.response) {

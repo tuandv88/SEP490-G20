@@ -3,28 +3,39 @@ import { BarChart2, BookOpen, Calendar, Layout, ListChecks, PlusCircle } from 'l
 import CourseStep from './CourseStep'
 import { LearningAPI } from '@/services/api/learningApi'
 import ChapterLoading from '../loading/ChapterLoading'
-
+import { QuizAPI } from '@/services/api/quizApi'
+import AssessmentPrompt from '../surrvey/AssessmentPromptProps'
+import QuizModal from '../surrvey/QuizModal'
+import { Button } from '../ui/button'
 
 const RoadmapDashboard = ({ user }) => {
   const [learningPath, setLearningPath] = useState([])
   const [courseDetails, setCourseDetails] = useState({})
   const [loading, setLoading] = useState(false)
+  const [isAssessmentPromptOpen, setIsAssessmentPromptOpen] = useState(false)
+  const [isQuizOpen, setIsQuizOpen] = useState(false)
+  const [quizAssessment, setQuizAssessment] = useState(null)
 
   useEffect(() => {
-    async function fetchLearningPath() {
+    async function fetchData() {
       try {
         setLoading(true)
-        const response = await LearningAPI.getLearningPath()
-        console.log('Learning Path Data:', response) 
-        setLearningPath(response.learningPathDtos)
+        
+        const [learningResponse, quizResponse] = await Promise.all([
+          LearningAPI.getLearningPath(),
+          QuizAPI.getQuizAssessment()
+        ])
+
+        setLearningPath(learningResponse.learningPathDtos)
+        setQuizAssessment(quizResponse.quiz)
       } catch (error) {
-        console.error('Error fetching learning path:', error)
+        console.error('Error fetching data:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchLearningPath()
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -32,7 +43,7 @@ const RoadmapDashboard = ({ user }) => {
       try {
         setLoading(true)
         const response = await LearningAPI.getCoursePreview(courseId)
-        setCourseDetails(prevDetails => ({
+        setCourseDetails((prevDetails) => ({
           ...prevDetails,
           [courseId]: response.course
         }))
@@ -45,15 +56,15 @@ const RoadmapDashboard = ({ user }) => {
 
     if (Array.isArray(learningPath)) {
       const courseIds = new Set()
-      learningPath.forEach(path => {
-        path.pathSteps.forEach(step => {
+      learningPath.forEach((path) => {
+        path.pathSteps.forEach((step) => {
           if (!courseDetails[step.courseId]) {
             courseIds.add(step.courseId)
           }
         })
       })
 
-      courseIds.forEach(courseId => fetchCoursePreview(courseId))
+      courseIds.forEach((courseId) => fetchCoursePreview(courseId))
     }
   }, [learningPath, user])
 
@@ -61,14 +72,36 @@ const RoadmapDashboard = ({ user }) => {
     return <ChapterLoading />
   }
 
+  const handleGeneratePath = () => {
+    setIsAssessmentPromptOpen(true)
+  }
+
+  const handleAssessmentAccept = () => {
+    setIsAssessmentPromptOpen(false)
+    setIsQuizOpen(true)
+  }
+
+  const handleAssessmentDecline = () => {
+    setIsAssessmentPromptOpen(false)
+    //updateUserFirstLogin()
+  }
+
+  const handleQuizComplete = (score) => {
+    console.log('Quiz completed with score:', score)
+    setIsQuizOpen(false)
+    //updateUserFirstLogin()
+  }
+
+  console.log('Learning Path:', learningPath)
+
   return (
     <div className='space-y-6 mt-6'>
       <div className='flex justify-between items-center'>
         <h2 className='text-xl font-semibold'>Recommended Path</h2>
-        <button className='flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors'>
+        <Button onClick={handleGeneratePath} className='flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors'>
           <PlusCircle className='w-5 h-5 mr-2' />
           Generate Path
-        </button>
+        </Button>
       </div>
 
       {Array.isArray(learningPath) && learningPath.length > 0 ? (
@@ -106,9 +139,7 @@ const RoadmapDashboard = ({ user }) => {
                 <h4 className='font-semibold'>Các bước trong lộ trình</h4>
                 {path.pathSteps.map((step, index) => {
                   const course = courseDetails[step.courseId]
-                  return (
-                    <CourseStep key={step.id} step={step} index={index} course={course} />
-                  )
+                  return <CourseStep key={step.id} step={step} index={index} course={course} />
                 })}
               </div>
             </div>
@@ -117,6 +148,26 @@ const RoadmapDashboard = ({ user }) => {
       ) : (
         <div className='text-center text-gray-500 w-full h-full'>No learning paths available.</div>
       )}
+
+      <AssessmentPrompt
+        isOpen={isAssessmentPromptOpen}
+        onClose={() => {
+          setIsAssessmentPromptOpen(false)
+          // updateUserFirstLogin()
+        }}
+        onAccept={handleAssessmentAccept}
+        onDecline={handleAssessmentDecline}
+      />
+
+      <QuizModal
+        isOpen={isQuizOpen}
+        onClose={() => {
+          setIsQuizOpen(false)
+          //updateUserFirstLogin()
+        }}
+        onComplete={handleQuizComplete}
+        quiz={quizAssessment}
+      />
     </div>
   )
 }

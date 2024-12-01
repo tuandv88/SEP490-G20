@@ -11,7 +11,6 @@ export const CourseAPI = {
         }
       }
     )
-    console.log(response)
     return response.data
   },
   enrollCourse: async (id) => {
@@ -56,11 +55,18 @@ export const CourseAPI = {
       }
      }
     );
-    console.log(response)
     return response.data;
   },
   getCourseProgress: async (courseId) => {
     const response = await axios.get(`${API_BASE_URL}/learning-service/courses/${courseId}/progress`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  },
+  getUserEnrollments: async (pageIndex = 1, pageSize = 10) => {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/courses/u/enrollments?PageIndex=${pageIndex}&PageSize=${pageSize}`, {
       headers: {
         Authorization: `Bearer ${Cookies.get('authToken')}`
       }

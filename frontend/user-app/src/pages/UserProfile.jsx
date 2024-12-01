@@ -65,8 +65,6 @@ export function UserProfile() {
         return <LearningDashboard />
       case 'algorithm':
         return <AlgorithmDashboard problemSolved={problemSolved} problems={problems} />
-      case 'posts':
-        return <MyPosts />
       default:
         return <AccountInfo />
     }
@@ -81,3 +79,7 @@ export function UserProfile() {
     </Layout>
   )
 }
+
+
+      // case 'posts':
+      //   return <MyPosts />

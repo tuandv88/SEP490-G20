@@ -158,6 +158,7 @@ const LearningSpace = () => {
               })
             )
             setFiles(fileDetails)
+            console.log(fileDetails)
           }
 
           // Kiểm tra nếu problem tồn tại
@@ -233,6 +234,7 @@ const LearningSpace = () => {
                   handleNextLecture={handleNextLecture}
                   courseId={id}
                   lectureId={lectureId}
+                  files={files}
                 />
               )}
               {activeTab === 'submissionResult' && !loading && (
@@ -303,6 +305,7 @@ const LearningSpace = () => {
                 handleNextLecture={handleNextLecture}
                 courseId={id}
                 lectureId={lectureId}
+                files={files}
               />
             </div>
           </ResizablePanel>

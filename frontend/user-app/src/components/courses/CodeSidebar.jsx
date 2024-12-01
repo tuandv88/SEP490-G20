@@ -6,21 +6,19 @@ import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 import { UserContext } from '@/contexts/UserContext'
 import authServiceInstance from '@/oidc/AuthService'
 
-export function CourseSidebar({ enrolledCourses }) {
+export function CourseSidebar({ enrolledCourses, courseDetail }) {
   const { id } = useParams()
-  console.log(id)
   const navigate = useNavigate()
   const { user } = useContext(UserContext)
   const [firstLectureId, setFirstLectureId] = useState(null)
 
   useEffect(() => {
     const fetchCourseData = async () => {
-      if (user) { // Kiểm tra nếu người dùng đã đăng nhập
+      if (user) {
         try {
           const courseProgress = await CourseAPI.getCourseProgress(id);
-          console.log('Course Progress:', courseProgress);
           const currentLecture = courseProgress.progress.find(lecture => lecture.isCurrent);
-          setFirstLectureId(currentLecture ? currentLecture.lectureId : courseData.course.chapters[0].lectures[0].id);
+          setFirstLectureId(currentLecture ? currentLecture.lectureId : courseDetail.course.chapters[0].lectures[0].id);         
         } catch (error) {
           console.error('Error fetching course progress:', error);
         }

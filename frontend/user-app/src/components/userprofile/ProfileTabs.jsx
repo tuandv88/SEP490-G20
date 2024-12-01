@@ -7,7 +7,7 @@ export function ProfileTabs({ activeTab, setActiveTab }) {
     { id: 'roadmap', label: 'Roadmap', icon: Compass },
     { id: 'learning', label: 'Learning', icon: BookOpen },
     { id: 'algorithm', label: 'Algorithm', icon: Code },
-    { id: 'posts', label: 'Posts', icon: FileText },
+    // { id: 'posts', label: 'Posts', icon: FileText },
   ];
 
   return (

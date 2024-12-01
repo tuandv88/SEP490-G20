@@ -7,6 +7,7 @@ public record UserEnrollmentDetailsDto(
     DateTime EnrollmentDate,
     DateTime? CompletionDate,
     string Status,
-    double CompletionPercentage
+    double CompletionPercentage,
+    Guid FirstLectureId
 );
 

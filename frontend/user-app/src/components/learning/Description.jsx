@@ -12,7 +12,18 @@ import ChapterLoading from '../loading/ChapterLoading'
 import { Button } from '../ui/button'
 import { CourseAPI } from '@/services/api/courseApi'
 
-const Description = ({ description, videoSrc, loading, titleProblem, initialTime, onTimeUpdate, handleNextLecture, courseId, lectureId }) => {
+const Description = ({
+  description,
+  videoSrc,
+  loading,
+  titleProblem,
+  initialTime,
+  onTimeUpdate,
+  handleNextLecture,
+  courseId,
+  lectureId,
+  files
+}) => {
   const videoRef = useRef(null)
   const [videoTime, setVideoTime] = useState(0) // Lưu thời gian video khi dừng
   const [isPaused, setIsPaused] = useState(false) // Trạng thái video có tạm dừng hay không
@@ -66,9 +77,11 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
   }
 
   const handleComplete = () => {
-    updateProgress();
-    handleNextLecture();
+    updateProgress()
+    handleNextLecture()
   }
+
+  const documentFiles = files.filter((file) => file && file.fileType === 'DOCUMENT')
 
   return (
     // !videoSrc
@@ -134,6 +147,20 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
               {description}
             </ReactMarkdown>
           </div>
+          {documentFiles.length > 0 && (
+            <div className='document-list mt-5'>
+              <h3 className='text-xl font-bold mb-3'>Tài liệu đính kèm</h3>
+              <ul>
+                {documentFiles.map((file, index) => (
+                  <li key={index} className='mb-2'>
+                    <a href={file.presignedUrl} download className='text-blue-500 hover:underline'>
+                      Download document {index + 1}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>

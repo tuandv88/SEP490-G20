@@ -11,7 +11,7 @@ import { Button } from '../ui/button'
 import { LearningAPI } from '@/services/api/learningApi'
 import { CourseAPI } from '@/services/api/courseApi'
 
-const NormalLecture = ({ description, videoSrc, loading, titleProblem, handleNextLecture, courseId, lectureId }) => {
+const NormalLecture = ({ description, videoSrc, loading, titleProblem, handleNextLecture, courseId, lectureId, files }) => {
 
   const updateProgress = async () => {
     try {
@@ -24,6 +24,22 @@ const NormalLecture = ({ description, videoSrc, loading, titleProblem, handleNex
   const handleComplete = () => {
     updateProgress();
     handleNextLecture();
+  }
+
+  const documentFiles = files.filter(
+    (file) => file && file.fileType === 'DOCUMENT'
+  )
+
+  const handleDownload = (e, fileUrl, fileName) => {
+    e.preventDefault();
+
+    // Tạo một thẻ a ẩn và kích hoạt sự kiện click để tải xuống
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.setAttribute('download', fileName || 'document');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   return (
@@ -85,6 +101,32 @@ const NormalLecture = ({ description, videoSrc, loading, titleProblem, handleNex
               {description}
             </ReactMarkdown>
           </div>
+          {documentFiles.length > 0 && (
+            <div className='document-list mt-5'>
+              <h3 className='text-xl font-bold mb-3'>Documents</h3>
+              <ul>
+                {documentFiles.map((file, index) => {
+                  if (file && file.presignedUrl) {
+                    return (
+                      <li key={index} className='mb-2'>
+                        <a
+                          href={file.presignedUrl}
+                          onClick={(e) => handleDownload(e, file.presignedUrl, `Document ${index + 1}`)}
+                          className='text-blue-500 hover:underline cursor-pointer'
+                          target='_blank'
+                        >
+                          Download document {index + 1}
+                        </a>
+                      </li>
+                    );
+                  } else {
+                    console.warn('File bị thiếu hoặc thiếu presignedUrl:', file);
+                    return null;
+                  }
+                })}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>

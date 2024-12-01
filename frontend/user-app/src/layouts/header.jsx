@@ -121,10 +121,16 @@ export default function Header() {
           </nav>
           <div className='flex items-center space-x-4'>
             {user ? (
+
               <div className='flex items-center space-x-3'>
-                <Button variant='ghost' size='icon' className='hidden md:inline-flex'>
-                  <Bell className='w-5 h-5' />
-                </Button>
+
+                <div className='Notification'>
+                  <Button variant='ghost' size='icon' className='hidden md:inline-flex'>
+                    <Bell className='w-5 h-5' />
+                    <a></a>
+                  </Button>
+                </div>
+
                 <div className='relative flex items-center' ref={dropdownRef}>
                   <div onClick={toggleDropdown} className='cursor-pointer'>
                     <Avatar>

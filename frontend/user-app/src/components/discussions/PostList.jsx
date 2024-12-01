@@ -101,7 +101,7 @@ function PostList({ categoryId }) {
       }
     };
 
-    if (categoryId) {
+    if (categoryId && (orderBy || tags || pagination.pageIndex)) {
       fetchPosts();
     }
   }, [categoryId, pagination.pageIndex, orderBy, tags, reloadComponentCurrent]);
@@ -115,8 +115,13 @@ function PostList({ categoryId }) {
   };
 
   const handleFilterClick = (filter) => {
-    setOrderBy(filter);
-    handlePageChange(1);
+    if (filter !== orderBy) {
+      setOrderBy(filter); // Chỉ thay đổi orderBy khi cần
+      setPagination({
+        ...pagination,
+        pageIndex: 1, // Reset lại trang về 1 khi thay đổi filter
+      });
+    }
   };
 
   const handlePageChange = (event, value) => {

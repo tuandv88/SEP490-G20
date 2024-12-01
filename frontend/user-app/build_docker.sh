@@ -6,4 +6,4 @@ docker build \
     --build-arg VITE_AUTH_URL="https://accounts.icoder.vn" \
     --build-arg VITE_CALLBACK_URL="https://icoder.vn" \
     --build-arg VITE_OAUTH_CLIENT_ID="icoder.vn" \
-    -t hub.icoder.vn/k8s/user-frontend:v1.54 .
+    -t hub.icoder.vn/k8s/user-frontend:v1.55 .

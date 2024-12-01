@@ -21,6 +21,9 @@ import CheckIcon from '@mui/icons-material/Check';
 import EditIcon from '@mui/icons-material/Edit'; // Icon bút
 import InputLabel from '@mui/material/InputLabel';
 
+
+import AuthService from '../../oidc/AuthService';
+
 function PostList({ categoryId }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +55,8 @@ function PostList({ categoryId }) {
   const [reloadComponentCurrent, setReloadComponentCurrent] = useState(false);
   const [showAlert, setShowAlert] = useState(false); // State điều khiển thông báo
 
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isOwnerDiscussion, setOwnerDiscussion] = useState(null);
 
   useEffect(() => {
 
@@ -93,6 +98,18 @@ function PostList({ categoryId }) {
         } else {
           setCategories([]);
         }
+
+        const userTmp = await AuthService.getUser();
+        setCurrentUser(userTmp);
+        if (userTmp) {
+          const currentUserId = userTmp.profile.sub;
+          if (currentUserId === data.userId) {
+            setOwnerDiscussion(true);
+          } else {
+            setOwnerDiscussion(false);
+          }
+        }
+
 
       } catch (err) {
         setLoading(true);

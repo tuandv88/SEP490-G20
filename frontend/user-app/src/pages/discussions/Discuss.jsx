@@ -20,6 +20,7 @@ const Discuss = () => {
   // Trạng thái để kiểm tra khi hiển thị thông báo
   const [showRemoveSuccesAlert, setShowRemoveSuccesAlert] = useState(removeDiscussionStateMessage);
 
+
   const handleCategoryChange = (newCategoryId) => {
     setCategoryId(newCategoryId);
   };

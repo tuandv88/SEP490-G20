@@ -8,7 +8,7 @@ import DropdownMenuUser from '@/components/ui/userdropdown'
 import { ModeToggle } from '@/components/mode-toggle'
 import AuthService from '@/oidc/AuthService'
 import { UserContext } from '@/contexts/UserContext'
-import NotificationPopup from '@/components/notifications/NotificationPopup';
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
   const { user, updateUser } = useContext(UserContext)
@@ -18,11 +18,6 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const dropdownRef = useRef(null)
-
-
-  // Trạng thái để kiểm tra xem popup có hiển thị hay không
-  const [isPopupNotificationOpen, setIsPopupNotificationOpen] = useState(false)
-
 
   // Handle scroll hide/show
   const handleScroll = useCallback(() => {
@@ -65,6 +60,11 @@ export default function Header() {
   //   const user = await AuthService.getUser()
   //   updateUser(user)
   // }
+  const navigate = useNavigate();
+  const handleClick = () => {
+    console.log('Navigating to /notifications/history');
+    navigate(`/notifications/history`);
+  }
 
   useEffect(() => {
     // Lấy lại thông tin người dùng khi component được mount hoặc user thay đổi
@@ -131,10 +131,14 @@ export default function Header() {
               <div className='flex items-center space-x-3'>
 
                 <div className='Notification'>
-                  <NotificationPopup
-                    isOpen={isPopupNotificationOpen}
-                    onOpenChange={setIsPopupNotificationOpen}
-                  />
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='hidden md:inline-flex'
+                    onClick={handleClick}
+                  >
+                    <Bell className='w-5 h-5' />
+                  </Button>
                 </div>
 
                 <div className='relative flex items-center' ref={dropdownRef}>

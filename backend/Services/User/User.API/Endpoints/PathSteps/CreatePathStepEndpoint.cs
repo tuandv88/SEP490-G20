@@ -6,19 +6,18 @@ namespace User.API.Endpoints.PathSteps
 {
     public class CreatePathStepEndpoint : ICarterModule
     { // DTO cho yêu cầu tạo một PathStep mới
-        public record CreatePathStepRequest(PathStepDto PathStepDto);
+        public record CreatePathStepRequest(CreatePathStepDto CreatePathStepDto);
 
         // DTO cho phản hồi khi tạo PathStep thành công
         public record CreatePathStepResponse(Guid Id);
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/user/{userId}/pathsteps", async (Guid userId, CreatePathStepRequest request, ISender sender) =>
+            app.MapPost("/pathsteps", async ( CreatePathStepRequest request, ISender sender) =>
             {
                 // Tạo command từ yêu cầu nhận vào
                 var command = new CreatePathStepCommand
                 {
-                    UserId = userId,
-                    PathStepDto = request.PathStepDto // Sử dụng đúng kiểu DTO
+                    CreatePathStepDto = request.CreatePathStepDto // Sử dụng đúng kiểu DTO
                 };
 
                 // Gửi command qua MediatR để xử lý
@@ -28,7 +27,7 @@ namespace User.API.Endpoints.PathSteps
                 var response = new CreatePathStepResponse(result.Id);
 
                 // Trả về HTTP 201 với đường dẫn của PathStep vừa tạo
-                return Results.Created($"/user/{userId}/pathsteps/{response.Id}", response);
+                return Results.Created($"/pathsteps/{response.Id}", response);
             })
             .WithName("CreatePathStep") // Đặt tên cho endpoint
             .Produces<CreatePathStepResponse>(StatusCodes.Status201Created) // Trả về khi tạo thành công

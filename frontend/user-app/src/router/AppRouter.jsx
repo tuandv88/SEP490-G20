@@ -1,9 +1,9 @@
 // src/router/AppRouter.jsx
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import { HomePage, About, NotFound, CourseList } from '../pages'
-import Discuss from "@/pages/discussions/Discuss";
-import DiscussionDetail from "@/pages/discussions/DiscussionDetail";
-import CreateDiscussion from "@/pages/discussions/CreateDiscussion";
+import Discuss from '@/pages/discussions/Discuss'
+import DiscussionDetail from '@/pages/discussions/DiscussionDetail'
+import CreateDiscussion from '@/pages/discussions/CreateDiscussion'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import LearningSpace from '@/pages/LearningSpace'
 import ErrorPage from '@/pages/ErrorPage'
@@ -17,6 +17,7 @@ import CourseDetail from '@/pages/CourseDetail';
 import ProblemSpace from '@/components/problem/SolveChallenge/ProblemSpace';
 import { UserProfile } from '@/pages/UserProfile';
 import { Notifications } from '@mui/icons-material';
+import ProtectedRoute from './ProtectedRoute';
 const Code = lazy(() => import('@/pages/Code'))
 
 export const AppRouter = () => {
@@ -39,7 +40,11 @@ export const AppRouter = () => {
     },
     {
       path: AUTHENTICATION_ROUTERS.LEARNINGSPACE,
-      element: <LearningSpace />
+      element: (
+        <ProtectedRoute>
+          <LearningSpace />
+        </ProtectedRoute>
+      )
     },
     {
       path: AUTHENTICATION_ROUTERS.PROBLEMS,
@@ -61,15 +66,27 @@ export const AppRouter = () => {
     },
     {
       path: AUTHENTICATION_ROUTERS.CREATEDISCUSSION,
-      element: <CreateDiscussion />
+      element: (
+        <ProtectedRoute>
+          <CreateDiscussion />
+        </ProtectedRoute>
+      )
     },
     {
       path: AUTHENTICATION_ROUTERS.USERPROFILE,
-      element: <UserProfile />
+      element: (
+        <ProtectedRoute>
+          <UserProfile />
+        </ProtectedRoute>
+      )
     },
     {
       path: AUTHENTICATION_ROUTERS.PROBLEMSPACE,
-      element: <ProblemSpace />
+      element: (
+        <ProtectedRoute>
+          <ProblemSpace />
+        </ProtectedRoute>
+      )
     },
     {
       path: AUTHENTICATION_ROUTERS.NOTIFICATION,
@@ -78,3 +95,4 @@ export const AppRouter = () => {
   ])
   return <RouterProvider router={router} />
 }
+

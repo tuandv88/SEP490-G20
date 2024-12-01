@@ -409,7 +409,16 @@ export const DiscussApi = {
       //console.error('Error creating vote:', error);
       throw error;
     }
-  }
+  },
+
+  getDiscussionHome: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/community-service/discussions/top`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 
 };
 

@@ -26,5 +26,8 @@ public class UserEnrollment : Aggregate<UserEnrollmentId> {
         Rating = rating;
         Feedback = feedback;
     }
+    public void UpdateStatus(UserEnrollmentStatus status) {
+        UserEnrollmentStatus = status;
+    }
 }
 

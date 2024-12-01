@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Clock, DollarSign, ChevronRight, BookOpen, Target, X } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 
 export default function CourseStep({ step, index, course }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   return (
     <>
@@ -77,7 +79,9 @@ export default function CourseStep({ step, index, course }) {
                     <BookOpen size={18} className="text-red-500" />
                     Course Description
                   </h4>
-                  <p className="text-gray-600">{course?.description || 'No description available.'}</p>
+                  <div className='prose'>
+                    <ReactMarkdown>{course?.description || 'No description available.'}</ReactMarkdown>
+                  </div>
                 </div>
 
                 <div>
@@ -97,15 +101,8 @@ export default function CourseStep({ step, index, course }) {
 
                 <div>
                   <h4 className="font-semibold mb-3">Skills You'll Gain</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {course?.objectives?.split('\n').map((objective, i) => (
-                      <span
-                        key={i}
-                        className="px-3 py-1 bg-red-50 text-red-600 rounded-full text-sm"
-                      >
-                        {objective}
-                      </span>
-                    ))}
+                  <div className="prose">
+                    <ReactMarkdown>{course?.objectives || 'No objectives available.'}</ReactMarkdown>
                   </div>
                 </div>
               </div>

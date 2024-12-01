@@ -18,13 +18,15 @@ public class GetCoursesHandler(ICourseRepository repository, IFilesService files
         var titleSearch = query.Filter.SearchString ?? "";
 
         filteredData = filteredData.Where(c => c.Title.Contains(titleSearch, StringComparison.OrdinalIgnoreCase));
-        if (query.Filter.Level != null) {
-            filteredData = filteredData.Where(c => c.CourseLevel.ToString().Contains(query.Filter.Level, StringComparison.OrdinalIgnoreCase));
-        }
         if (!isAdmin) {
             filteredData = filteredData.Where(c => c.CourseStatus == CourseStatus.Published);
         }
-
+        if (query.Filter.Level != null) {
+            filteredData = filteredData.Where(c => c.CourseLevel.ToString().Contains(query.Filter.Level, StringComparison.OrdinalIgnoreCase));
+        }
+        if (query.Filter.Status != null) {
+            filteredData = filteredData.Where(c => c.CourseStatus.ToString().Contains(query.Filter.Status, StringComparison.OrdinalIgnoreCase));
+        }
         var totalCount = filteredData.Count();
         var courses = filteredData.OrderByDescending(c => c.CreatedAt)
                                 .Skip(pageSize * (pageIndex - 1))

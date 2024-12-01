@@ -11,13 +11,22 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useNavigate } from 'react-router-dom'
+import { useContext } from 'react'
+import { UserContext } from '@/contexts/UserContext'
+import authServiceInstance from '@/oidc/AuthService'
 
 function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
+
+  const { user } = useContext(UserContext)
 
   const navigate = useNavigate()
 
   const handleSolveChallenge = (problemId) => {
-    navigate(`/problem-solve/${problemId}`)
+    if (user) {
+      navigate(`/problem-solve/${problemId}`)
+    } else {
+      authServiceInstance.login()
+    }
   }
 
 
@@ -101,7 +110,7 @@ function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
           <div className='flex-1 space-y-1'>
             <div className='flex items-center gap-2'>
               <h3 className='font-semibold hover:text-blue-500'>
-                <a href='#'>{problem.title}</a>
+                <a onClick={() => handleSolveChallenge(problem.problemsId)}>{problem.title}</a>
               </h3>
             </div>
             <div className='flex items-center gap-2 text-sm'>
@@ -120,7 +129,7 @@ function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
             </div>
           </div>
           <div className='flex items-center gap-4'>
-            {problem.solved && (
+            {problem.status === 'Solved' && (
               <div className='text-emerald-500'>
                 <Check className='h-5 w-5' />
               </div>

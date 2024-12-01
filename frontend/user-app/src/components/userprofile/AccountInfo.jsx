@@ -4,7 +4,6 @@ import { UserContext } from '@/contexts/UserContext'
 
 export function AccountInfo() {
   const { user } = useContext(UserContext)
-  console.log(user)
   return (
     <div className="bg-white shadow rounded-lg p-6 mt-6">
       <h2 className="text-xl font-semibold mb-6">Account Information</h2>

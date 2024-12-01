@@ -3,7 +3,6 @@ import { CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 
 export function CourseIntro({ courseDetail }) {
-  console.log(courseDetail)
   const [isExpanded, setIsExpanded] = useState(false);
 
 

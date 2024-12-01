@@ -28,6 +28,8 @@ const ChatAI = ({ lectureId, problemId }) => {
   const selectedConversationId = useStore((state) => state.selectedConversationId)
   const setSelectedConversationId = useStore((state) => state.setSelectedConversationId)
   const messagesEndRef = useRef(null)
+  const [pageIndex, setPageIndex] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -49,8 +51,9 @@ const ChatAI = ({ lectureId, problemId }) => {
   useEffect(() => {
     const fetchConversation = async () => {
       try {
-        const data = await ChatAPI.getConversation()
-        setChatHistory(data.conversations.data)    
+        const data = await ChatAPI.getConversation(pageIndex, 20)
+        setChatHistory(data.conversations.data) 
+        console.log('chatHistory', data)
       } catch (error) {
         console.error('Error fetching conversation:', error)
       }
@@ -58,6 +61,7 @@ const ChatAI = ({ lectureId, problemId }) => {
 
     const fetchMessage = async () => {
       try {
+        console.log('selectedConversationId', selectedConversationId)
         const data = await ChatAPI.getMessage(selectedConversationId)
         setMessages(data.messages.data.reverse())       
         setSelectedConversationId(selectedConversationId)
@@ -169,7 +173,7 @@ const ChatAI = ({ lectureId, problemId }) => {
           {chatHistory.map((chat) => (
             <div onClick={() => handleChatClick(chat.id)} key={chat.id} className={`p-4 cursor-pointer border-b border-gray-700 ${selectedConversationId === chat.id ? 'bg-gray-500' : 'hover:bg-[#3D3D3D]'}`}>
               <div className='flex items-start gap-3'>
-                <Square size={16} className='mt-1' />
+                {/* <Square size={16} className='mt-1' /> */}
                 <div>
                   <p className='text-sm'>{chat.title}</p>
                   <span className='text-xs text-gray-400'>Just now</span>
@@ -241,7 +245,7 @@ const ChatAI = ({ lectureId, problemId }) => {
                                           </div>
                                         ) : (
                                           <code
-                                            className='bg-gray-300 inline-block text-black rounded px-1 py-0.3 text-sm font-mono'
+                                            className='bg-gray-300 opacity-40 inline-block text-black rounded px-1 py-0.3 text-sm font-mono'
                                             style={{ content: 'none' }}
                                             {...props}
                                           >
@@ -265,15 +269,15 @@ const ChatAI = ({ lectureId, problemId }) => {
                                   {message.referenceLinks && (
                                     <div className='flex flex-wrap gap-2'>
                                       {message.referenceLinks.map((link, index) => (
-                                        <div key={index} className='flex items-center gap-2 px-4 bg-gray-300 rounded-full'>
-                                          <div className='flex items-center justify-center w-3 h-3 text-xs text-black font-medium rounded-full bg-[#ffe4ca]'>
+                                        <div key={index} className='flex items-center gap-2 px-4 bg-[#646e76] rounded-full'>
+                                          <div className='flex items-center justify-center w-3 h-3 text-xs text-black font-medium rounded-full bg-[#ffe4ca] opacity-40'>
                                             {index + 1}
                                           </div>
-                                          <span className='text-[11px] markdown-chat-a markdown-chat-p'>
+                                          <span className='text-[11px] markdown-chat-a markdown-chat-p '>
                                             <ReactMarkdown
                                             components={{
                                               a: ({ node, ...props }) => (
-                                                <a {...props} target="_blank" rel="noopener noreferrer">
+                                                <a {...props} target="_blank" rel="noopener noreferrer" style={{ color: '#0000ff !important', fontWeight: 'bold !important' }}>
                                                   {props.children}
                                                 </a>
                                               ),
@@ -318,7 +322,7 @@ const ChatAI = ({ lectureId, problemId }) => {
           <div className="flex items-end gap-2">
         <div className="relative flex-grow">
           <Textarea 
-            //value={message}
+            value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isLoading}

@@ -874,7 +874,7 @@ function CommentList({ discussionId }) {
 
 /* Comment content */
 .comment-item__content {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #34495e;
   line-height: 1.5;
   word-wrap: break-word;
@@ -1016,7 +1016,7 @@ function CommentList({ discussionId }) {
 /* Replies list */
 .replies {
   border-top: 1px solid #cbcdd0;
-  width: 96%;
+  width: 95%;
   margin-left: 4%;
 }
 

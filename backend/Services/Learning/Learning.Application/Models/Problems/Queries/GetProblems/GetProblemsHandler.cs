@@ -18,7 +18,7 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IUserConte
         // Lọc dữ liệu: Chỉ admin mới thấy được các problem chưa active
         var filteredProblems = allDataProblem.Where(p =>
                 (isAdmin || (p.IsActive && p.ProblemType == ProblemType.Challenge)) &&
-                p.Title.Contains(titleSearch, StringComparison.CurrentCultureIgnoreCase)); 
+                p.Title.ToLower().Contains(titleSearch.ToLower())); 
 
         //Phân trang
         var pageIndex = request.PaginationRequest.PageIndex;

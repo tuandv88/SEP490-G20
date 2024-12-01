@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-r
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { DOCUMENT_AI_TABLE_PATH } from '@/routers/router'
 
 export function DataTablePagination({ table, setPageIndex, setPageSize, isLoading }) {
   return (
@@ -45,7 +46,7 @@ export function DataTablePagination({ table, setPageIndex, setPageSize, isLoadin
             asChild
             disabled={!table.getCanPreviousPage() || isLoading}
           >
-            <Link to='/document-ai-table' search={(prev) => ({ ...prev, page: 1 })} aria-label='First page'>
+            <Link to={DOCUMENT_AI_TABLE_PATH} search={(prev) => ({ ...prev, page: 1 })} aria-label='First page'>
               <ChevronsLeft className='h-4 w-4' />
             </Link>
           </Button>
@@ -57,7 +58,7 @@ export function DataTablePagination({ table, setPageIndex, setPageSize, isLoadin
             disabled={!table.getCanPreviousPage() || isLoading}
           >
             <Link
-              to='/document-ai-table'
+              to={DOCUMENT_AI_TABLE_PATH}
               search={(prev) => ({ ...prev, page: Math.max(1, Number(prev.page) - 1) })}
               aria-label='Previous page'
             >
@@ -72,7 +73,7 @@ export function DataTablePagination({ table, setPageIndex, setPageSize, isLoadin
             disabled={!table.getCanNextPage() || isLoading}
           >
             <Link
-              to='/document-ai-table'
+              to={DOCUMENT_AI_TABLE_PATH}
               search={(prev) => ({ ...prev, page: Math.min(table.getPageCount(), Number(prev.page) + 1) })}
               aria-label='Next page'
             >
@@ -87,7 +88,7 @@ export function DataTablePagination({ table, setPageIndex, setPageSize, isLoadin
             disabled={!table.getCanNextPage() || isLoading}
           >
             <Link
-              to='/document-ai-table'
+              to={DOCUMENT_AI_TABLE_PATH}
               search={(prev) => ({ ...prev, page: table.getPageCount() })}
               aria-label='Last page'
             >

@@ -15,6 +15,7 @@ class AuthService {
     })
 
     this.userManager.events.addUserUnloaded(() => {
+      Cookies.remove('authToken')
       console.log('User logged out')
     })
 

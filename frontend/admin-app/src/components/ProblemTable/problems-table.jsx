@@ -21,12 +21,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-
+import { PROBLEM_TABLE_PATH, CREATE_PROBLEM_PATH } from '@/routers/router'
 import { columns } from './columns'
 import { getProblemAg, getProblems } from '@/services/api/problemApi'
 
 export default function ProblemsTable() {
-  const search = useSearch({ from: '/problem-table' })
+  const search = useSearch({ from: PROBLEM_TABLE_PATH })
   const navigate = useNavigate()
   const pageFromUrl = React.useMemo(() => {
     try {
@@ -82,7 +82,7 @@ export default function ProblemsTable() {
   }, [pagination.pageIndex, navigate])
 
   const handleAddNewProblem = () => {
-    navigate({ to: '/create-problem' })
+    navigate({ to: CREATE_PROBLEM_PATH })
   }
 
   const table = useReactTable({

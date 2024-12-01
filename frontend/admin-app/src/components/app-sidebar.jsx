@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
+import AuthService from '@/oidc/AuthService'
 import * as React from 'react'
-
+import authServiceInstance from '@/oidc/AuthService'
 import {
   BookOpen,
   Codesandbox,
@@ -30,12 +31,32 @@ import {
   useSidebar
 } from '@/components/ui/sidebar'
 
+import {
+  COURSE_TABLE_PATH,
+  PROBLEM_TABLE_PATH,
+  CREATE_COURSE_PATH,
+  EDIT_CURRICULUM_COURSE_PATH,
+  EDIT_BASIC_COURSE_PATH,
+  CREATE_CODE_PROBLEM_PATH,
+  CREATE_PROBLEM_PATH,
+  CREATE_PROBLEM_LECTURE_PATH,
+  QUIZ_MANAGEMENT_PATH,
+  UPDATE_PROBLEM_PATH,
+  UPDATE_PROBLEM_LECTURE_PATH,
+  DOCUMENT_AI_TABLE_PATH,
+  QUIZ_ASSESSMENT_PATH,
+  USER_TABLE_PATH,
+  USER_DETAIL_PATH
+} from '@/routers/router'
+
+const user = await AuthService.getUser()
+
 // This is sample data.
 const data = {
   user: {
-    name: 'Lamnb',
-    email: 'lamnbicoder.com',
-    avatar: '/avatars/shadcn.jpg'
+    name: 'Hello admin',
+    email: user.profile.email,
+    avatar: user.profile.urlImagePresigned
   },
 
   navMain: [
@@ -47,10 +68,10 @@ const data = {
       items: [
         {
           title: 'User Management',
-          url: '/user-table'
+          url: USER_TABLE_PATH
         },
         {
-          title: 'TestUser',
+          title: 'Role Management',
           url: '#'
         }
       ]
@@ -63,26 +84,26 @@ const data = {
       items: [
         {
           title: 'Course List',
-          url: '/course-table'
+          url: COURSE_TABLE_PATH
         },
         {
           title: 'Create Course',
-          url: '/create-course'
+          url: CREATE_COURSE_PATH
         }
       ]
     },
     {
       title: 'Problem',
-      url: '/problem-table',
+      url: '#',
       icon: Code,
       items: [
         {
           title: 'Problem List',
-          url: '/problem-table'
+          url: PROBLEM_TABLE_PATH
         },
         {
           title: 'Create Problem',
-          url: '/create-problem'
+          url: CREATE_PROBLEM_PATH
         }
       ]
     },
@@ -92,8 +113,8 @@ const data = {
       icon: CircleHelp,
       items: [
         {
-          title: 'Quiz Assessment',
-          url: '/quiz-assessment'
+          title: 'Quiz Survey',
+          url: QUIZ_ASSESSMENT_PATH
         }
       ]
     },
@@ -104,31 +125,9 @@ const data = {
       items: [
         {
           title: 'For AI',
-          url: '/document-ai-table'
+          url: DOCUMENT_AI_TABLE_PATH
         }
       ]
-    },
-    {
-      title: 'Settings',
-      url: '#',
-      icon: Settings2,
-      items: [
-        {
-          title: 'General',
-          url: '#'
-        },
-        {
-          title: 'Team',
-          url: '#'
-        }
-      ]
-    }
-  ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame
     }
   ]
 }

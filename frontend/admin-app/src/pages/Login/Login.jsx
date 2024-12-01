@@ -1,8 +1,7 @@
 import { LogInIcon } from 'lucide-react'
 import AuthService from '@/oidc/AuthService'
-import { useState } from 'react'
 
-export default function Login() {
+function Login() {
   const handleLogin = async () => {
     AuthService.login()
   }
@@ -44,3 +43,5 @@ export default function Login() {
     </div>
   )
 }
+
+export default Login

@@ -32,6 +32,7 @@ import { Skeleton } from './skeleton'
 import { useToast } from '@/hooks/use-toast'
 import { useSearch } from '@tanstack/react-router'
 import { useNavigate } from '@tanstack/react-router'
+import { DOCUMENT_AI_TABLE_PATH } from '@/routers/router'
 
 const TagsCell = ({ tags }) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -120,7 +121,7 @@ export default function DocumentList() {
   const [isLoading, setIsLoading] = useState(true)
   const [isDeleting, setIsDeleting] = useState(false)
   const { toast } = useToast()
-  const search = useSearch({ from: '/document-ai-table' })
+  const search = useSearch({ from: DOCUMENT_AI_TABLE_PATH })
   const navigate = useNavigate()
   const pageIndex = search.page ? parseInt(search.page) - 1 : 0
   const pageSize = search.pageSize ? parseInt(search.pageSize) : 10

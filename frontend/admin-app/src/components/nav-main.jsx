@@ -12,6 +12,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem
 } from '@/components/ui/sidebar'
+import { DASHBOARD_PATH } from '@/routers/router'
 
 export function NavMain({ items }) {
   return (
@@ -20,7 +21,7 @@ export function NavMain({ items }) {
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton asChild>
-            <a href='/'>
+            <a href={DASHBOARD_PATH}>
               <LayoutDashboard className='w-4 h-4 mr-2' />
               <span>Dashboard</span>
             </a>
@@ -32,7 +33,7 @@ export function NavMain({ items }) {
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton tooltip={item.title}>
                   {item.icon && <item.icon />}
-                  
+
                   <span>{item.title}</span>
                   <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
                 </SidebarMenuButton>

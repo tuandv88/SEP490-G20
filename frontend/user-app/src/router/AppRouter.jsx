@@ -16,7 +16,6 @@ import Callback from '@/oidc/Callback'
 import CourseDetail from '@/pages/CourseDetail';
 import ProblemSpace from '@/components/problem/SolveChallenge/ProblemSpace';
 import { UserProfile } from '@/pages/UserProfile';
-import { Notifications } from '@mui/icons-material';
 import ProtectedRoute from './ProtectedRoute';
 const Code = lazy(() => import('@/pages/Code'))
 

@@ -8,7 +8,7 @@ namespace User.API.Endpoints.PathSteps
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapDelete("/user/{userId}/pathsteps/{pathStepId}", async (Guid userId, Guid pathStepId, ISender sender) =>
+            app.MapDelete("/pathsteps/{pathStepId}", async ( Guid pathStepId, ISender sender) =>
             {
                 // Tạo query từ yêu cầu xóa PathStep
                 var query = new DeletePathStepQuery(pathStepId);

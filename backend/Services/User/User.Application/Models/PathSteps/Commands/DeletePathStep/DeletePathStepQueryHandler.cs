@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using User.Application.Data.Repositories; // Repository Interface
 using BuildingBlocks.CQRS;
 using BuildingBlocks.Exceptions;
+using User.Application.Interfaces;
 
 namespace User.Application.Models.PathSteps.Commands.DeletePathStep
 {
@@ -10,9 +11,11 @@ namespace User.Application.Models.PathSteps.Commands.DeletePathStep
     {
         private readonly IPathStepsRepository _pathStepRepository;
 
+        private readonly IUserContextService _userContext;
         // Constructor để inject repository
-        public DeletePathStepQueryHandler(IPathStepsRepository pathStepRepository)
+        public DeletePathStepQueryHandler(IPathStepsRepository pathStepRepository, IUserContextService userContext)
         {
+            _userContext = userContext;
             _pathStepRepository = pathStepRepository;
         }
 

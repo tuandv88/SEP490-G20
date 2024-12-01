@@ -18,6 +18,7 @@ using StackExchange.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using AuthServer.Extensions;
 using System.Text.Json;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -110,7 +111,6 @@ builder.Services.AddAuthentication(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";  // Đường dẫn khi truy cập bị từ chối
     options.LoginPath = "/Account/Login";                // Đường dẫn khi người dùng chưa đăng nhập
     options.LogoutPath = "/Account/Logout";              // Đường dẫn khi người dùng đăng xuất
-    options.Cookie.SameSite = SameSiteMode.None;
 })
 .AddGoogle(googleOptions =>
 {
@@ -170,6 +170,17 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddStorage(builder.Configuration);
 builder.Services.AddScoped<IBase64Converter, Base64Converter>();
 
+#region Thêm mới ở đây
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.Name = "ICoderVN";
+    options.Cookie.Path = "/";
+    // Các tùy chọn khác
+});
+#endregion Thêm mới ở đây
 
 var app = builder.Build();
 
@@ -209,6 +220,17 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+#region Thêm mới ở đây
+
+var forwardedHeadersOptions = new ForwardedHeadersOptions {
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeadersOptions);
+
+#endregion Thêm mới ở đây
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

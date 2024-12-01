@@ -6,6 +6,7 @@ import { DifficultyBadge } from "../problem/DifficultyBadge";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "@/contexts/UserContext";
+import authServiceInstance from "@/oidc/AuthService";
 
 
 export function AlgorithmList({ problems }) {

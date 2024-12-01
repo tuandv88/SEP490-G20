@@ -60,23 +60,7 @@ const HeaderCode = ({ onButtonClick, toggleCurriculumRef, header }) => {
                 </button>
               </div>
             </div>
-            <div className='flex items-center space-x-2 mr-4'>            
-              <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-                <Settings className='w-5 h-5' />
-              </button>
-              <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-                <Bell className='w-5 h-5' />
-              </button>
-              <div className='relative'>
-                <button className='flex items-center focus:outline-none'>
-                  <img
-                    src='https://lh3.googleusercontent.com/a/ACg8ocKsfTHylfAszH0NVPU4Zj-X21su07AFw9wCwAZgiEM4hTEffIZ0EQ=s288-c-no'
-                    alt='User Avatar'
-                    className='w-8 h-8 rounded-full'
-                  />
-                </button>
-              </div>
-            </div>
+            
           </div>
         </div>
       </nav>

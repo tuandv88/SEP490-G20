@@ -196,33 +196,7 @@ function HomePage() {
             </div>
           </section>
 
-          {/* Testimonials Section */}
-          {/* <section className='py-12 md:py-20'>
-            <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Học viên nói gì về chúng tôi</h2>
-              <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 md:gap-8'>
-                {[1, 2, 3].map((testimonial) => (
-                  <Card key={testimonial} className='p-6'>
-                    <div className='flex items-center mb-4'>
-                      <Avatar
-                        src={`https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?height=40&width=40&text=User+${testimonial}`}
-                        alt={`User ${testimonial}`}
-                        className='w-10 h-10 mr-4'
-                      />
-                      <div>
-                        <p className='font-semibold'>Học viên {testimonial}</p>
-                        <p className='text-sm text-gray-600'>Khóa học: React Nâng cao</p>
-                      </div>
-                    </div>
-                    <p className='text-sm italic md:text-base'>
-                      &quot;Tôi đã học được rất nhiều từ khóa học này. Giảng viên rất nhiệt tình và kiến thức được
-                      truyền đạt rất dễ hiểu.&quot;
-                    </p>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </section> */}
+
         </div>
         <Link to={AUTHENTICATION_ROUTERS.HOME}></Link>
 

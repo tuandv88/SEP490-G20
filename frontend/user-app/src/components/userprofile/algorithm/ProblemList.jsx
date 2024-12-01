@@ -19,7 +19,7 @@ export function ProblemList({ problems }) {
 
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
-      {/* <div className="p-6">
+      <div className="p-6">
         <h2 className="text-xl font-semibold mb-6">Recent Solved Problems</h2>
       </div>
       <div className="overflow-x-auto">
@@ -61,7 +61,7 @@ export function ProblemList({ problems }) {
             ))}
           </tbody>
         </table>
-      </div> */}
+      </div>
     </div>
   );
 }

@@ -1,39 +1,66 @@
-import React from 'react';
-
+import { Button } from '@/components/ui/button'
+import { AUTHENTICATION_ROUTERS } from '@/data/constants';
+import { Play } from 'lucide-react'
+import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
 export function CourseCard({ course }) {
+
+  const navigate = useNavigate();
+
+  const handleContinueLearning = () => {
+    if (course.currentLectureId) {
+      navigate(
+        AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', course.courseId).replace(
+          ':lectureId',
+          course.currentLectureId
+        )
+      );
+    } else {
+      console.error('Không tìm thấy bài học hiện tại cho khóa học này.');
+    }
+  };
+
+
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex space-x-4">
-        <img 
-          src={course.image} 
-          alt={course.title} 
-          className="w-48 h-32 object-cover rounded-lg"
-        />
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">{course.title}</h3>
-            <div className="flex items-center">
-              {'★'.repeat(Math.floor(course.rating))}
-              <span className="ml-1 text-gray-600">{course.rating.toFixed(1)}</span>
-            </div>
+    <div className='bg-white rounded-lg shadow p-6'>
+      <div className='flex space-x-4'>
+        <img src={course.imageUrl} alt={course.title} className='w-48 h-32 object-cover rounded-lg' />
+        <div className='flex-1'>
+          <div className='flex items-center justify-between'>
+            <h3 className='text-lg font-semibold'>{course.title}</h3>
           </div>
-          <p className="text-sm text-gray-600 mt-2">
-            Số bài đã hoàn thành: {course.progress} của {course.total} bài-học
-          </p>
-          <div className="mt-4">
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full" 
-                style={{ width: `${(course.progress / course.total) * 100}%` }}
-              ></div>
+          <p className='text-sm text-gray-600 mt-2'>{course.headline}</p>
+          <div className='mt-4'>
+            <div className='w-full bg-gray-200 rounded-full h-2'>
+              <div className='bg-primaryButton h-2 rounded-full' style={{ width: `${course.completionPercentage}%` }}></div>
             </div>
-            <p className="text-sm text-gray-500 mt-1">
-              {Math.round((course.progress / course.total) * 100)}% Hoàn thành
-            </p>
+            <p className='text-sm text-gray-500 mt-1'>{Math.round(course.completionPercentage)}% Completed</p>
+          </div>
+          {/* Thêm nút hành động */}
+          <div className='mt-4'>
+            {course.status === 'InProgress' && (
+              <Button
+                onClick={handleContinueLearning}
+                className='inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primaryButton rounded-md hover:bg-[#3e80c1] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryButton'
+              >
+                <Play className='w-4 h-4 mr-2' />
+                Continue Learning
+              </Button>
+            )}
+            {course.status === 'Completed' && (
+              <Button
+                onClick={() => {
+                  /* Hàm xử lý phản hồi */
+                }}
+                className='inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primaryButton rounded-md hover:bg-[#3e80c1] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryButton'
+              >
+                Feedback
+              </Button>
+            )}
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

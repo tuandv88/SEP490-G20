@@ -42,10 +42,8 @@ function CourseDetail() {
           LearningAPI.getCoursePreview(id),
           CourseAPI.getEnrolledCourses(id)
         ])
-        console.log(Cookies.get('authToken'))
-        setCourseDetail(courseData)        
-        setEnrolledCourses(enrolledData.enrollmentInfo)
-        console.log(enrolledData.enrollmentInfo)
+        setCourseDetail(courseData)     
+        setEnrolledCourses(enrolledData.enrollmentInfo)     
       } catch (error) {
         console.error('Error fetching data:', error)
         setError(true)
@@ -168,7 +166,7 @@ function CourseDetail() {
 
                 {/* Sidebar - Right Side */}
                 <div className='lg:col-span-1'>
-                  <CourseSidebar enrolledCourses={enrolledCourses} courseId={id} />
+                  <CourseSidebar enrolledCourses={enrolledCourses} courseDetail={courseDetail} />
                 </div>
               </div>
             </div>

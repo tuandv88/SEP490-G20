@@ -54,9 +54,11 @@ function PostList({ categoryId }) {
   const navigate = useNavigate();
   const [reloadComponentCurrent, setReloadComponentCurrent] = useState(false);
   const [showAlert, setShowAlert] = useState(false); // State điều khiển thông báo
+  const [showAlertCheckIsNewPost, setShowAlertCheckIsNewPost] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(null);
   const [isOwnerDiscussion, setOwnerDiscussion] = useState(null);
+  const [isAuth, setIsAuthor] = useState(false);
 
   useEffect(() => {
 
@@ -101,13 +103,12 @@ function PostList({ categoryId }) {
 
         const userTmp = await AuthService.getUser();
         setCurrentUser(userTmp);
-        if (userTmp) {
-          const currentUserId = userTmp.profile.sub;
-          if (currentUserId === data.userId) {
-            setOwnerDiscussion(true);
-          } else {
-            setOwnerDiscussion(false);
-          }
+
+
+        if (userTmp && userTmp.profile.sub) {
+          setIsAuthor(true);
+        } else {
+          setIsAuthor(false);
         }
 
 
@@ -286,6 +287,16 @@ function PostList({ categoryId }) {
     setNewPost({ ...newPost, content: text });  // Lưu nội dung Markdown khi người dùng thay đổi
   };
 
+  const handleNewPostButtonClick = () => {
+    if (isAuth) {
+      // Nếu người dùng đã đăng nhập, mở form
+      setOpenDialog(true);
+    } else {
+      setShowAlertCheckIsNewPost(true);
+      setTimeout(() => setShowAlertCheckIsNewPost(false), 5000);
+    }
+  };
+
   return (
     <div className="post-list-container">
       {/* Filters Section */}
@@ -320,11 +331,30 @@ function PostList({ categoryId }) {
             className="search-input"
           />
 
-          <button className="new-button" onClick={() => setOpenDialog(true)}>
+          <button className="new-button" onClick={handleNewPostButtonClick}>
             New Post +
           </button>
         </div>
       </div>
+
+      {/* Alert Popup Dialog New Post*/}
+      {showAlertCheckIsNewPost && (
+        <Stack
+          sx={{
+            position: 'fixed',
+            top: 20,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            width: 'auto',
+            maxWidth: '500px',
+          }}
+        >
+          <Alert severity="error">
+            Please log in to create a new post!
+          </Alert>
+        </Stack>
+      )}
 
       {/* Dialog Popup for Creating a New Post */}
       <Dialog open={openDialog} onClose={handleDialogClose} fullWidth maxWidth="lg" className="dialog-submit-container">
@@ -430,128 +460,138 @@ function PostList({ categoryId }) {
       </Dialog>
 
       {/* Hiển thị thông báo khi post thành công */}
-      {showAlert && (
-        <Stack
-          sx={{
-            position: 'fixed',
-            top: 20, // Đặt cách từ đầu trang một chút
-            left: '50%', // Căn giữa theo chiều ngang
-            transform: 'translateX(-50%)', // Đảm bảo căn giữa tuyệt đối
-            zIndex: 9999, // Đảm bảo thông báo hiển thị trên tất cả các phần tử khác
-            width: 'auto', // Giới hạn chiều rộng thông báo
-            maxWidth: '500px', // Giới hạn chiều rộng tối đa cho thông báo
-          }}
-        >
-          <Alert severity="success">
-            Create New Post Successfully!
-          </Alert>
-        </Stack>
-      )}
+      {
+        showAlert && (
+          <Stack
+            sx={{
+              position: 'fixed',
+              top: 20, // Đặt cách từ đầu trang một chút
+              left: '50%', // Căn giữa theo chiều ngang
+              transform: 'translateX(-50%)', // Đảm bảo căn giữa tuyệt đối
+              zIndex: 9999, // Đảm bảo thông báo hiển thị trên tất cả các phần tử khác
+              width: 'auto', // Giới hạn chiều rộng thông báo
+              maxWidth: '500px', // Giới hạn chiều rộng tối đa cho thông báo
+            }}
+          >
+            <Alert severity="success">
+              Create New Post Successfully!
+            </Alert>
+          </Stack>
+        )
+      }
 
       {/* Posts Section */}
-      {loading && (
-        <div className="loader-container">
-          <div className="loader"></div>
-        </div>
-      )}
+      {
+        loading && (
+          <div className="loader-container">
+            <div className="loader"></div>
+          </div>
+        )
+      }
       {error && <p className="error">{error}</p>}
       {/* Hiển thị thông báo nếu không có bài viết */}
-      {!loading && posts.length === 0 && (
-        <div className="post-list__empty">
-          <Typography variant="h6" color="textSecondary" align="center">
-            There aren't any discussion topics here yet!
-          </Typography>
+      {
+        !loading && posts.length === 0 && (
+          <div className="post-list__empty">
+            <Typography variant="h6" color="textSecondary" align="center">
+              There aren't any discussion topics here yet!
+            </Typography>
 
-          {/* Nút tạo mới với logo bút */}
-          <Stack direction="row" justifyContent="center" spacing={2}>
-            <Button
-              className="post-list__create-btn"
-              variant="contained"
-              color="primary"
-              startIcon={<EditIcon />}
-              onClick={() => setOpenDialog(true)}
-            >
-              Create New Post
-            </Button>
-          </Stack>
-        </div>
-      )}
+            {/* Nút tạo mới với logo bút */}
+            <Stack direction="row" justifyContent="center" spacing={2}>
+              <Button
+                className="post-list__create-btn"
+                variant="contained"
+                color="primary"
+                startIcon={<EditIcon />}
+                onClick={() => setOpenDialog(true)}
+              >
+                Create New Post
+              </Button>
+            </Stack>
+          </div>
+        )
+      }
 
-      {!loading && (
-        <div className="posts">
-          {posts.map((post) => (
-            <div key={post.id} className="post-item" onClick={() => handlePostClick(post.id)}>
-              {/* Header */}
-              <div className="post-header">
-                <div className="post-header-left">
-                  {/* Avatar */}
-                  <img
-                    src={post.urlProfilePicture || "default-avatar.png"}
-                    alt="User Avatar"
-                    className="user-avatar"
-                  />
+      {
+        !loading && (
+          <div className="posts">
+            {posts.map((post) => (
+              <div key={post.id} className="post-item" onClick={() => handlePostClick(post.id)}>
+                {/* Header */}
+                <div className="post-header">
+                  <div className="post-header-left">
+                    {/* Avatar */}
+                    <img
+                      src={post.urlProfilePicture || "default-avatar.png"}
+                      alt="User Avatar"
+                      className="user-avatar"
+                    />
 
-                  {/* Title */}
-                  <div>
-                    <h3 className="post-title">
-                      {post.pinned && (
-                        <FontAwesomeIcon icon={faThumbtack} className="icon pin-icon" />
-                      )}
-                      {post.title}
-                    </h3>
-                    <div className="post-tags">
-                      {post.tags.map((tag, idx) => (
-                        <span key={idx} className="tag" onClick={(e) => {
-                          e.stopPropagation();
-                          handleTagClick(tag);
-                        }}>
-                          {tag}
-                        </span>
-                      ))}
+                    {/* Title */}
+                    <div>
+                      <h3 className="post-title">
+                        {post.pinned && (
+                          <FontAwesomeIcon icon={faThumbtack} className="icon pin-icon" />
+                        )}
+                        {post.title}
+                      </h3>
+                      <div className="post-tags">
+                        {post.tags.map((tag, idx) => (
+                          <span key={idx} className="tag" onClick={(e) => {
+                            e.stopPropagation();
+                            handleTagClick(tag);
+                          }}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Footer: Meta and Stats */}
-              <div className="post-footer">
-                {/* Meta */}
-                <div className="post-meta">
-                  <strong>{post.firstName} {post.lastName}</strong>
-                  <p>Created at: {formatRelativeDate(post.dateCreated)} | Updated at: {formatRelativeDate(post.dateUpdated)}</p>
-                </div>
+                {/* Footer: Meta and Stats */}
+                <div className="post-footer">
+                  {/* Meta */}
+                  <div className="post-meta">
+                    <strong>{post.firstName} {post.lastName}</strong>
+                    <p>Created at: {formatRelativeDate(post.dateCreated)} | Updated at: {formatRelativeDate(post.dateUpdated)}</p>
+                  </div>
 
-                {/* Stats */}
-                <div className="post-stats">
-                  <span className="stat">
-                    <FontAwesomeIcon icon={faChevronUp} className="icon" /> {post.voteCount}
-                  </span>
-                  <span className="stat">
-                    <FontAwesomeIcon icon={faEye} className="icon" /> {post.viewCount}
-                  </span>
+                  {/* Stats */}
+                  <div className="post-stats">
+                    <span className="stat">
+                      <FontAwesomeIcon icon={faChevronUp} className="icon" /> {post.voteCount}
+                    </span>
+                    <span className="stat">
+                      <FontAwesomeIcon icon={faEye} className="icon" /> {post.viewCount}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )
+      }
 
       {/* Pagination */}
 
-      {!loading && totalPages > 0 && (
-        <div className="comment-list__pagination">
-          <Stack spacing={2}>
-            <Pagination
-              count={totalPages}
-              page={pagination.pageIndex}
-              onChange={handlePageChange}
-              shape="rounded"
-              variant="outlined"
-              className="pagination-buttons" // Thêm class này để dễ dàng định dạng
-            />
-          </Stack>
-        </div>
-      )}
+      {
+        !loading && totalPages > 0 && (
+          <div className="comment-list__pagination">
+            <Stack spacing={2}>
+              <Pagination
+                count={totalPages}
+                page={pagination.pageIndex}
+                onChange={handlePageChange}
+                shape="rounded"
+                variant="outlined"
+                className="pagination-buttons" // Thêm class này để dễ dàng định dạng
+              />
+            </Stack>
+          </div>
+        )
+      }
 
       <style jsx>{`
   /* Container chính của PostList */

@@ -9,8 +9,10 @@ import { formatDistanceToNow } from 'date-fns'
 import { Typography } from '@mui/material';;
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
+import Alert from '@mui/material/Alert';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, CircularProgress } from "@mui/material";
 import AuthService from '../../oidc/AuthService'; // Import để lấy dữ liệu Auth...
+
 
 function CommentList({ discussionId }) {
   const [isPreview, setIsPreview] = useState(false);
@@ -37,9 +39,13 @@ function CommentList({ discussionId }) {
 
   const [currentUser, setCurrentUser] = useState(null);
   const [idCurrentUser, setIdCurrentUser] = useState(null);
+  const [isAuth, setIsAuthor] = useState(false);
 
   const [openRemoveDialog, setOpenRemoveDialog] = useState(false);  // Trạng thái mở/đóng dialog
   const [commentIdToDelete, setCommentIdToDelete] = useState(null); // Lưu ID comment cần xóa
+
+
+  const [showAlertCheckIsCreateComment, setShowAlertCheckIsCreateComment] = useState(false);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -65,6 +71,7 @@ function CommentList({ discussionId }) {
         if (userTmp) {
           setCurrentUser(userTmp);
           setIdCurrentUser(userTmp.profile.sub);
+          setIsAuthor(true);
         }
 
       } catch (err) {
@@ -369,6 +376,33 @@ function CommentList({ discussionId }) {
     }));
   };
 
+  const handleCreateCommentButtonClick = () => {
+    if (!isAuth) {
+      setShowAlertCheckIsCreateComment(true);
+      setTimeout(() => setShowAlertCheckIsCreateComment(false), 5000);
+    } else {
+      handleAddComment();
+    }
+  };
+
+  const handleCreateReplyButtonClick = (parentCommentId, depth) => {
+    if (!isAuth) {
+      setShowAlertCheckIsCreateComment(true);
+      setTimeout(() => setShowAlertCheckIsCreateComment(false), 5000);
+    } else {
+      handleReplyCommentSubmit(parentCommentId, depth)
+    }
+  };
+
+  const handleCreateReplyNestedButtonClick = (parentCommentId, depth) => {
+    if (!isAuth) {
+      setShowAlertCheckIsCreateComment(true);
+      setTimeout(() => setShowAlertCheckIsCreateComment(false), 5000);
+    } else {
+      handleReplyCommentSubmit(parentCommentId, depth)
+    }
+  };
+
   return (
     <div className="comment-list__content">
 
@@ -413,13 +447,34 @@ function CommentList({ discussionId }) {
 
           <button
             className="comment-button"
-            onClick={handleAddComment}
+            onClick={handleCreateCommentButtonClick}
             disabled={!newComment.trim() || submitting} // Disable Post button if no content
           >
             {submitting ? "Submitting..." : "Post Comment"}
           </button>
         </div>
       </div>
+
+
+
+      {/* Alert Popup Dialog New Post*/}
+      {showAlertCheckIsCreateComment && (
+        <Stack
+          sx={{
+            position: 'fixed',
+            top: 20,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            width: 'auto',
+            maxWidth: '500px',
+          }}
+        >
+          <Alert severity="error">
+            Please log in to create a new Comment or Reply!
+          </Alert>
+        </Stack>
+      )}
 
       <div className="comment-list__body">
         {comments.length > 0 ? (
@@ -505,7 +560,7 @@ function CommentList({ discussionId }) {
                         value={contentReplyFromComment}
                         onChange={(e) => setContentReplyFromComment(e.target.value)}
                       />
-                      <button onClick={() => handleReplyCommentSubmit(comment.id, 2)}>Submit</button>
+                      <button onClick={() => handleCreateReplyButtonClick(comment.id, 2)}>Reply Now</button>
                     </div>
                   )}
 
@@ -545,7 +600,7 @@ function CommentList({ discussionId }) {
                                 value={contentReplyFromReply}
                                 onChange={(e) => setContentReplyFromReply(e.target.value)}
                               />
-                              <button onClick={() => handleReplyCommentSubmit(comment.id, 3)}>Submit</button>
+                              <button onClick={() => handleCreateReplyNestedButtonClick(comment.id, 3)}>Submit</button>
                             </div>
                           )}
                         </div>

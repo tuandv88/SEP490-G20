@@ -8,6 +8,7 @@ import DropdownMenuUser from '@/components/ui/userdropdown'
 import { ModeToggle } from '@/components/mode-toggle'
 import AuthService from '@/oidc/AuthService'
 import { UserContext } from '@/contexts/UserContext'
+import NotificationPopup from '@/components/notifications/NotificationPopup';
 
 export default function Header() {
   const { user, updateUser } = useContext(UserContext)
@@ -17,6 +18,11 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const dropdownRef = useRef(null)
+
+
+  // Trạng thái để kiểm tra xem popup có hiển thị hay không
+  const [isPopupNotificationOpen, setIsPopupNotificationOpen] = useState(false)
+
 
   // Handle scroll hide/show
   const handleScroll = useCallback(() => {
@@ -125,10 +131,10 @@ export default function Header() {
               <div className='flex items-center space-x-3'>
 
                 <div className='Notification'>
-                  <Button variant='ghost' size='icon' className='hidden md:inline-flex'>
-                    <Bell className='w-5 h-5' />
-                    <a></a>
-                  </Button>
+                  <NotificationPopup
+                    isOpen={isPopupNotificationOpen}
+                    onOpenChange={setIsPopupNotificationOpen}
+                  />
                 </div>
 
                 <div className='relative flex items-center' ref={dropdownRef}>

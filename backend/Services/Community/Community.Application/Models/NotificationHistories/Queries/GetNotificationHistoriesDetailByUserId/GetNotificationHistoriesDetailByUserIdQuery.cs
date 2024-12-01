@@ -2,7 +2,7 @@
 
 namespace Community.Application.Models.NotificationHistories.Queries.GetNotificationHistoriesDetail;
 
-public record GetNotificationHistoriesDetailByUserIdResult(PaginatedResult<NotificationHistoryDto> NotificationHistoryDtos);
+public record GetNotificationHistoriesDetailByUserIdResult(PaginatedResult<NotificationHistoryDetailDto> NotificationHistoryDetailDtos);
 [Authorize]
 public record GetNotificationHistoriesDetailByUserIdQuery(PaginationRequest PaginationRequest) : IQuery<GetNotificationHistoriesDetailByUserIdResult>;
 public class GetNotificationHistoriesDetailByUserIdValidator : AbstractValidator<GetNotificationHistoriesDetailByUserIdQuery>

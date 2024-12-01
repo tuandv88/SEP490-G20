@@ -2,11 +2,13 @@
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import { HomePage, About, NotFound, CourseList } from '../pages'
 import Discuss from "@/pages/discussions/Discuss";
-import DiscussionDetail from "@/pages/discussions/DiscussionDetail"; 
+import DiscussionDetail from "@/pages/discussions/DiscussionDetail";
 import CreateDiscussion from "@/pages/discussions/CreateDiscussion";
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import LearningSpace from '@/pages/LearningSpace'
 import ErrorPage from '@/pages/ErrorPage'
+// import Notification from '@/pages/notifications'
+import NotificationHistory from "@/pages/notifications/NotificationHistory";
 // import Problems from '@/pages/Problems'
 import Problem from '@/pages/Problem'
 import { lazy, Suspense } from 'react'
@@ -14,6 +16,7 @@ import Callback from '@/oidc/Callback'
 import CourseDetail from '@/pages/CourseDetail';
 import ProblemSpace from '@/components/problem/SolveChallenge/ProblemSpace';
 import { UserProfile } from '@/pages/UserProfile';
+import { Notifications } from '@mui/icons-material';
 const Code = lazy(() => import('@/pages/Code'))
 
 export const AppRouter = () => {
@@ -67,6 +70,10 @@ export const AppRouter = () => {
     {
       path: AUTHENTICATION_ROUTERS.PROBLEMSPACE,
       element: <ProblemSpace />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.NOTIFICATION,
+      element: <NotificationHistory />
     }
   ])
   return <RouterProvider router={router} />

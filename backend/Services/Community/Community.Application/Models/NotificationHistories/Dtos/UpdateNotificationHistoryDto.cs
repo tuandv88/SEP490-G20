@@ -7,5 +7,7 @@ public record UpdateNotificationHistoryDto(
     DateTime? DateRead,          // Thời gian đọc thông báo (có thể null)
     bool IsRead,                 // Trạng thái đã đọc hay chưa
     string SentVia,              // Phương thức gửi: Web, Email, Both
-    string Status                // Trạng thái gửi: Sent, Failed, Pending, Received
+    string Status,               // Trạng thái gửi: Sent, Failed, Pending, Received
+    string? Subject             // Tiêu đề mới của thông báo (nullable)
 );
+

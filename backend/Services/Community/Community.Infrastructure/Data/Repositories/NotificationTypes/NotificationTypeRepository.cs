@@ -1,4 +1,6 @@
-﻿namespace Community.Infrastructure.Data.Repositories.NotificationTypes;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Community.Infrastructure.Data.Repositories.NotificationTypes;
 
 public class NotificationTypeRepository : Repository<NotificationType>, INotificationTypeRepository
 {
@@ -20,7 +22,6 @@ public class NotificationTypeRepository : Repository<NotificationType>, INotific
     public override async Task<NotificationType?> GetByIdAsync(Guid id)
     {
         var notificationType = _dbContext.NotificationTypes
-                        .Include(nt => nt.UserNotificationSettings)
                         .Include(nt => nt.NotificationHistorys)
                         .AsEnumerable()
                         .FirstOrDefault(c => c.Id.Value == id);
@@ -31,4 +32,13 @@ public class NotificationTypeRepository : Repository<NotificationType>, INotific
     {
         return null;
     }
+
+    public async Task<List<NotificationType>> GetByIdsAsync(List<Guid> ids)
+    {
+        var notificationTypes = await _dbContext.NotificationTypes
+                                              .ToListAsync();  // Đưa tất cả dữ liệu vào bộ nhớ
+
+        return notificationTypes.Where(nt => ids.Contains(nt.Id.Value)).ToList();
+    }
+
 }

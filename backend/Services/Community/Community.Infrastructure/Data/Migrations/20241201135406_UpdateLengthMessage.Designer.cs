@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Community.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241120151513_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241201135406_UpdateLengthMessage")]
+    partial class UpdateLengthMessage
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -261,6 +261,9 @@ namespace Community.Infrastructure.Data.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime?>("DateRead")
                         .HasColumnType("timestamp with time zone");
 
@@ -280,10 +283,12 @@ namespace Community.Infrastructure.Data.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("NotificationTypeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SenderId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("SentVia")
@@ -292,16 +297,27 @@ namespace Community.Infrastructure.Data.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Subject")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("UserNotificationSettingId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DateCreated");
 
                     b.HasIndex("DateSent");
 
                     b.HasIndex("NotificationTypeId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserNotificationSettingId");
 
                     b.ToTable("NotificationHistories");
                 });
@@ -438,8 +454,6 @@ namespace Community.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NotificationTypeId");
-
                     b.HasIndex("UserId", "NotificationTypeId");
 
                     b.ToTable("UserNotificationSettings");
@@ -528,6 +542,12 @@ namespace Community.Infrastructure.Data.Migrations
                         .HasForeignKey("NotificationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Community.Domain.Models.UserNotificationSetting", null)
+                        .WithMany("NotificationHistorys")
+                        .HasForeignKey("UserNotificationSettingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Community.Domain.Models.UserDiscussion", b =>
@@ -535,15 +555,6 @@ namespace Community.Infrastructure.Data.Migrations
                     b.HasOne("Community.Domain.Models.Discussion", null)
                         .WithMany("UserDiscussions")
                         .HasForeignKey("DiscussionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Community.Domain.Models.UserNotificationSetting", b =>
-                {
-                    b.HasOne("Community.Domain.Models.NotificationType", null)
-                        .WithMany("UserNotificationSettings")
-                        .HasForeignKey("NotificationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -585,8 +596,11 @@ namespace Community.Infrastructure.Data.Migrations
             modelBuilder.Entity("Community.Domain.Models.NotificationType", b =>
                 {
                     b.Navigation("NotificationHistorys");
+                });
 
-                    b.Navigation("UserNotificationSettings");
+            modelBuilder.Entity("Community.Domain.Models.UserNotificationSetting", b =>
+                {
+                    b.Navigation("NotificationHistorys");
                 });
 #pragma warning restore 612, 618
         }

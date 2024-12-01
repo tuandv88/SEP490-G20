@@ -6,6 +6,9 @@
 @{
     var userId = User.FindFirst("sub")?.Value;  // Lấy userId từ claim 'sub' (hoặc từ bất kỳ nguồn nào)
     var userImageUrl = ViewData["UserImageUrl"] as string;  // Lấy URL từ ViewData
+
+    var user = ViewData["User"] as Users;
+    var imageUrl = ViewData["imageUrl"] as string;
 }
 
 
@@ -411,11 +414,18 @@
 
         <div class="content" id="content">
             <div class="user-header">
-                @if (currentUser != null)
+
+                @if (!String.IsNullOrEmpty(imageUrl))
                 {
-                    <img id="avatarPreview" src="" alt="User Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #ddd;">
-                    <h2>Welcome, @currentUser.FirstName @currentUser.LastName</h2>
+                    <img id="avatarPreview" src="@imageUrl" alt="User Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #ddd;">
                 }
+
+
+                @if (user != null)
+                {
+                    <h2>Welcome, @user.FirstName @user.LastName</h2>
+                }
+
                 <p class="custom-paragraph">Manage your personal information and security with ICoder Accounts</p>
             </div>
 
@@ -639,35 +649,35 @@
             }
         });
 
-        // Extract 'sub' claim (userId) from Razor syntax
-        // Chuyển Razor giá trị vào JavaScript
-        const userId = '@userId';  // Truyền userId từ Razor vào JavaScript
-        const userImageUrl = '@userImageUrl';  // Truyền userImageUrl từ Razor vào JavaScript
+        // // Extract 'sub' claim (userId) from Razor syntax
+        // // Chuyển Razor giá trị vào JavaScript
+        // const userId = '@userId';  // Truyền userId từ Razor vào JavaScript
+        // const userImageUrl = '@userImageUrl';  // Truyền userImageUrl từ Razor vào JavaScript
 
-        // Function to fetch profile image URL by userId
-        async function fetchProfileImage(userId) {
-            try {
-                // Sử dụng userImageUrl đã được truyền từ Razor
-                const response = await fetch(userImageUrl.replace("{0}", userId));  // Thay thế {0} bằng userId
+        // // Function to fetch profile image URL by userId
+        // async function fetchProfileImage(userId) {
+        //     try {
+        //         // Sử dụng userImageUrl đã được truyền từ Razor
+        //         const response = await fetch(userImageUrl.replace("{0}", userId));  // Thay thế {0} bằng userId
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch the image');
-                }
+        //         if (!response.ok) {
+        //             throw new Error('Failed to fetch the image');
+        //         }
 
-                // Parse the response as JSON
-                const data = await response.json();
+        //         // Parse the response as JSON
+        //         const data = await response.json();
 
-                // Assuming the API response is like: { ImageUrlProfile: 'presigned-url' }
-                const imageUrl = data.imageUrlProfile;
+        //         // Assuming the API response is like: { ImageUrlProfile: 'presigned-url' }
+        //         const imageUrl = data.imageUrlProfile;
 
-                // Set the image URL as the src of the avatar image
-                document.getElementById('avatarPreview').src = imageUrl;
-            } catch (error) {
-                console.error('Error fetching profile image:', error);
-            }
-        }
-        // Call the function to fetch the image using the userId
-        fetchProfileImage(userId);
+        //         // Set the image URL as the src of the avatar image
+        //         document.getElementById('avatarPreview').src = imageUrl;
+        //     } catch (error) {
+        //         console.error('Error fetching profile image:', error);
+        //     }
+        // }
+        // // Call the function to fetch the image using the userId
+        // fetchProfileImage(userId);
 
     </script>
 </body>

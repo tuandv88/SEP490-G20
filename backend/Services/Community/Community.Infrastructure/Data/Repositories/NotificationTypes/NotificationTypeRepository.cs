@@ -20,6 +20,8 @@ public class NotificationTypeRepository : Repository<NotificationType>, INotific
     public override async Task<NotificationType?> GetByIdAsync(Guid id)
     {
         var notificationType = _dbContext.NotificationTypes
+                        .Include(nt => nt.UserNotificationSettings)
+                        .Include(nt => nt.NotificationHistorys)
                         .AsEnumerable()
                         .FirstOrDefault(c => c.Id.Value == id);
         return notificationType;

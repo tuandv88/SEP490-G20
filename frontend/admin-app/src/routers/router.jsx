@@ -205,7 +205,6 @@ const routeTree = rootRoute.addChildren([
     createProblemLectureRoute,
     updateAgProblemRoute,
     quizManagementRoute,
-    updateLectureProblemRoute,
     problemTableRoute,
     createAgProblemRoute,
     updateLectureProblemRoute,

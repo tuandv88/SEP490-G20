@@ -6,19 +6,17 @@ import { useNavigate } from 'react-router-dom';
 
 export function CourseCard({ course }) {
 
+  console.log(course)
   const navigate = useNavigate();
 
   const handleContinueLearning = () => {
-    if (course.currentLectureId) {
+
       navigate(
         AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', course.courseId).replace(
           ':lectureId',
-          course.currentLectureId
+          course.currentLectureId === null ? course.firstLectureId : course.currentLectureId
         )
       );
-    } else {
-      console.error('Không tìm thấy bài học hiện tại cho khóa học này.');
-    }
   };
 
 

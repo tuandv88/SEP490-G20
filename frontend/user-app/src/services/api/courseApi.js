@@ -55,7 +55,6 @@ export const CourseAPI = {
       }
      }
     );
-    console.log(response)
     return response.data;
   },
   getCourseProgress: async (courseId) => {

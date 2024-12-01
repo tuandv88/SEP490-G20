@@ -12,14 +12,10 @@ import { LearningAPI } from '@/services/api/learningApi'
 import { CourseAPI } from '@/services/api/courseApi'
 
 const NormalLecture = ({ description, videoSrc, loading, titleProblem, handleNextLecture, courseId, lectureId }) => {
-  console.log(videoSrc)
-  const [videoBlobUrl, setVideoBlobUrl] = useState(null);
-  const [files, setFiles] = useState([]);
 
   const updateProgress = async () => {
     try {
       const response = await CourseAPI.updateCourseProgress(courseId, lectureId)
-      console.log('Progress updated:', response)
     } catch (error) {
       console.error('Error updating progress:', error)
     }

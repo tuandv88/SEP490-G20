@@ -32,10 +32,12 @@ namespace User.Application.Models.PathSteps.Commands.UpdatePathStep
             }
 
             // Cập nhật các thuộc tính của PathStep  
+            pathStep.CourseId = new CourseId(dto.CourseId);
             pathStep.StepOrder = dto.StepOrder;
             pathStep.Status = dto.Status;
             pathStep.EnrollmentDate = dto.EnrollmentDate;
             pathStep.CompletionDate = dto.CompletionDate;
+            pathStep.ExpectedCompletionDate = dto.ExpectedCompletionDate;
 
             await _pathStepRepository.SaveChangesAsync(cancellationToken);
             

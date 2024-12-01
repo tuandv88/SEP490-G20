@@ -53,7 +53,8 @@ function HomePage() {
         if (user) {
           setUserInfo(user.profile)
           // Kiểm tra điều kiện để hiển thị survey
-          if (user.profile.issurvey === 'false') {
+          const isSurveyCompleted = localStorage.getItem('isSurveyCompleted')
+          if (isSurveyCompleted !== 'true' && user.profile.issurvey === 'false') {
             setTimeout(() => {
               updateSurveyStatus()
               setIsSurveyOpen(true)
@@ -72,6 +73,7 @@ function HomePage() {
 
       await UserAPI.changeSurveyStatus(userInfo.sub)
       authServiceInstance.refreshToken()
+      localStorage.setItem('isSurveyCompleted', 'true')
     } catch (error) {
       console.error('Error updating survey status:', error)
     }

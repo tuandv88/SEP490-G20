@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
+import AuthService from '@/oidc/AuthService'
 import * as React from 'react'
-
+import { useState, useEffect } from 'react'
 import {
   BookOpen,
   Codesandbox,
@@ -26,113 +27,126 @@ import {
   SidebarRail,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  useSidebar
 } from '@/components/ui/sidebar'
 
-// This is sample data.
-const data = {
-  user: {
-    name: 'Lamnb',
-    email: 'lamnbicoder.com',
-    avatar: '/avatars/shadcn.jpg'
-  },
+import {
+  COURSE_TABLE_PATH,
+  PROBLEM_TABLE_PATH,
+  CREATE_COURSE_PATH,
+  EDIT_CURRICULUM_COURSE_PATH,
+  EDIT_BASIC_COURSE_PATH,
+  CREATE_CODE_PROBLEM_PATH,
+  CREATE_PROBLEM_PATH,
+  CREATE_PROBLEM_LECTURE_PATH,
+  QUIZ_MANAGEMENT_PATH,
+  UPDATE_PROBLEM_PATH,
+  UPDATE_PROBLEM_LECTURE_PATH,
+  DOCUMENT_AI_TABLE_PATH,
+  QUIZ_ASSESSMENT_PATH,
+  USER_TABLE_PATH,
+  USER_DETAIL_PATH
+} from '@/routers/router'
 
-  navMain: [
-    {
-      title: 'User',
-      url: '#',
-      icon: User,
-      isActive: false,
-      items: [
-        {
-          title: 'User Management',
-          url: '/user-table'
-        },
-        {
-          title: 'TestUser',
-          url: '#'
-        }
-      ]
-    },
-    {
-      title: 'Course',
-      url: '#',
-      icon: BookOpenText,
-      isActive: false,
-      items: [
-        {
-          title: 'Course List',
-          url: '/course-table'
-        },
-        {
-          title: 'Create Course',
-          url: '/create-course'
-        }
-      ]
-    },
-    {
-      title: 'Problem',
-      url: '/problem-table',
-      icon: Code,
-      items: [
-        {
-          title: 'Problem List',
-          url: '/problem-table'
-        },
-        {
-          title: 'Create Problem',
-          url: '/create-problem'
-        }
-      ]
-    },
-    {
-      title: 'Quiz',
-      url: '#',
-      icon: CircleHelp,
-      items: [
-        {
-          title: 'Quiz Assessment',
-          url: '/quiz-assessment'
-        }
-      ]
-    },
-    {
-      title: 'Document',
-      url: '#',
-      icon: BookOpen,
-      items: [
-        {
-          title: 'For AI',
-          url: '/document-ai-table'
-        }
-      ]
-    },
-    {
-      title: 'Settings',
-      url: '#',
-      icon: Settings2,
-      items: [
-        {
-          title: 'General',
-          url: '#'
-        },
-        {
-          title: 'Team',
-          url: '#'
-        }
-      ]
-    }
-  ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame
-    }
-  ]
-}
+// This is sample data.
 
 export function AppSidebar({ ...props }) {
+  const [user, setUser] = useState({ profile: { email: '', urlImagePresigned: '' } })
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const fetchedUser = await AuthService.getUser()
+        setUser(fetchedUser)
+      } catch (error) {
+        console.error('Failed to get user:', error)
+      }
+    }
+
+    fetchUser()
+  }, [])
+
+  const data = {
+    user: {
+      name: 'Hello admin',
+      email: user.profile.email,
+      avatar: user.profile.urlImagePresigned
+    },
+
+    navMain: [
+      {
+        title: 'User',
+        url: '#',
+        icon: User,
+        isActive: false,
+        items: [
+          {
+            title: 'User Management',
+            url: USER_TABLE_PATH
+          },
+          {
+            title: 'Role Management',
+            url: '#'
+          }
+        ]
+      },
+      {
+        title: 'Course',
+        url: '#',
+        icon: BookOpenText,
+        isActive: false,
+        items: [
+          {
+            title: 'Course List',
+            url: COURSE_TABLE_PATH
+          },
+          {
+            title: 'Create Course',
+            url: CREATE_COURSE_PATH
+          }
+        ]
+      },
+      {
+        title: 'Problem',
+        url: '#',
+        icon: Code,
+        items: [
+          {
+            title: 'Problem List',
+            url: PROBLEM_TABLE_PATH
+          },
+          {
+            title: 'Create Problem',
+            url: CREATE_PROBLEM_PATH
+          }
+        ]
+      },
+      {
+        title: 'Quiz',
+        url: '#',
+        icon: CircleHelp,
+        items: [
+          {
+            title: 'Quiz Survey',
+            url: QUIZ_ASSESSMENT_PATH
+          }
+        ]
+      },
+      {
+        title: 'Document',
+        url: '#',
+        icon: BookOpen,
+        items: [
+          {
+            title: 'For AI',
+            url: DOCUMENT_AI_TABLE_PATH
+          }
+        ]
+      }
+    ]
+  }
+
   return (
     <Sidebar collapsible='icon' {...props}>
       <SidebarHeader>

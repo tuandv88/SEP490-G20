@@ -13,6 +13,6 @@ public static class PoliciesType {
             Administrator,
             Moderator,
             Learner
-        };
+        }; 
     }
 }

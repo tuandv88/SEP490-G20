@@ -30,7 +30,22 @@ export function convertLocalToUTC(localDate) {
   return utcDate
 }
 
-// Ví dụ sử dụng
-const localDate = '2024-11-27T09:28:37' // Định dạng ISO 8601
-const utcDate = convertLocalToUTC(localDate)
-console.log(utcDate.toISOString()) // In ra ngày giờ UTC dưới dạng ISO 8601
+export function getPastAndCurrentDates() {
+  const now = new Date()
+
+  const pastDate = new Date(now)
+  pastDate.setMonth(pastDate.getMonth() - 8)
+
+  const encodeISODate = (date) => {
+    const isoString = date.toISOString()
+    const [datePart, timePart] = isoString.split('T')
+    const [time] = timePart.split('.')
+    const formattedTime = time.replace(/:/g, '%3A')
+    return `${datePart}T${formattedTime}Z`
+  }
+
+  return {
+    pastDate: encodeISODate(pastDate),
+    currentDate: encodeISODate(now) // Thời gian hiện tại
+  }
+}

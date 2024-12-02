@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.KernelMemory;
 using Newtonsoft.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 #pragma warning disable SKEXP0010
 namespace AI.Infrastructure.Services;
 public class ConversationalAIService(
@@ -67,13 +68,15 @@ public class ConversationalAIService(
         var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
         var result = await chatCompletionService.GetChatMessageContentAsync(prompt, settings, kernel, token);
         PathwayAnswer answers = new PathwayAnswer();
-        try {
-            answers = JsonConvert.DeserializeObject<PathwayAnswer>(result.Content!)!;
-        } catch (Exception ex) {
-            logger.LogError(ex.Message);
-            answers.Reason = result.Content!;
 
+        try {
+            string cleanedContent = Regex.Replace(result.Content!, @"```json[\s\S]*?```", "").Trim();
+            answers = JsonConvert.DeserializeObject<PathwayAnswer>(cleanedContent)!;
+        } catch (Exception ex) {
+            logger.LogError(ex, "Error deserializing the pathway answer.");
+            answers.Reason = result.Content!;
         }
+
         return answers;
     }
 

@@ -18,7 +18,7 @@ public class AssessmentQuizScoringCompletedEventHandler(IKernelMemory memory, IR
         //tạo context
         var messageContext = new Interfaces.MessageContext(new Dictionary<string, object?>() {
             {ContextConstant.Pathway.Answer, quizAnswers},
-            {ContextConstant.Rag.MaxTokens,  16*1000}
+            {ContextConstant.Rag.MaxTokens,  5000}
         });
         var prompt = messageService.BuildPrompt(PromptType.Pathway, "", facts, messageContext);
         var answer = await chatService.GenerateAnswer(prompt, messageContext);

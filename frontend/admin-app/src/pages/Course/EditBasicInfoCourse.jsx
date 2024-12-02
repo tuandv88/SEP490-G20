@@ -13,13 +13,13 @@ import { useToast } from '@/hooks/use-toast'
 import { ArrowLeft, BookOpen, Rocket, AlertCircle, CheckCircle, X } from 'lucide-react'
 import { useMatch } from '@tanstack/react-router'
 import { editBasicCourseRoute } from '@/routers/router'
-
+import { COURSE_TABLE_PATH, EDIT_BASIC_COURSE_PATH } from '@/routers/router'
 export default function EditBasicInfoCourse() {
   const { params } = useMatch(editBasicCourseRoute.id)
   const { courseId } = params
   const breadcrumbs = [
-    { label: 'Course Table', href: '/course-table' },
-    { label: 'Edit Course', href: `/edit-course/${courseId}` }
+    { label: 'Course Table', href: COURSE_TABLE_PATH },
+    { label: 'Edit Course', href: EDIT_BASIC_COURSE_PATH }
   ]
   const [activeTab, setActiveTab] = useState('step1')
   const [error, setError] = useState(null)
@@ -47,12 +47,6 @@ export default function EditBasicInfoCourse() {
 
     fetchCourseData()
   }, [courseId])
-
-  const handleBackToCourseList = () => {
-    if (window.confirm('Are you sure you want to leave? Your changes may not be saved.')) {
-      navigate({ to: '/course-table' })
-    }
-  }
 
   const handleStep1Submit = (data) => {
     setCourseData((prevData) => ({ ...prevData, ...data }))
@@ -86,7 +80,7 @@ export default function EditBasicInfoCourse() {
         description: 'Your course has been updated.',
         duration: 3000
       })
-      navigate({ to: '/course-table' })
+      navigate({ to: COURSE_TABLE_PATH })
     } catch (error) {
       console.error('Error updating course:', error)
       setError('There was a problem updating your course. Please try again.')
@@ -133,10 +127,6 @@ export default function EditBasicInfoCourse() {
                 <CardTitle className='text-2xl sm:text-3xl font-bold'>Edit Course: {courseData.title}</CardTitle>
                 <CardDescription className='mt-1'>Update your course information</CardDescription>
               </div>
-              <Button variant='outline' onClick={handleBackToCourseList} className='w-full sm:w-auto'>
-                <ArrowLeft className='w-4 h-4 mr-2' />
-                Back to Course List
-              </Button>
             </div>
           </CardHeader>
           <CardContent className='w-full'>

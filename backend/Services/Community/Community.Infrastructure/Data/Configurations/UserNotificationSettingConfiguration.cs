@@ -42,6 +42,13 @@ namespace Community.Infrastructure.Data.Configurations
 
             // Thiết lập chỉ mục
             builder.HasIndex(uns => new { uns.UserId, uns.NotificationTypeId });
+
+            // Mối quan hệ với NotificationHistory
+            builder.HasMany(uns => uns.NotificationHistorys)
+                .WithOne()
+                .HasForeignKey(nh => nh.UserNotificationSettingId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
+
 }

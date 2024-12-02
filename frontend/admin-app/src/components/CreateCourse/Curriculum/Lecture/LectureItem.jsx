@@ -22,9 +22,10 @@ import { getLectureDetails, deleteLecture, deleteFileFromLecture } from '@/servi
 import { getVideoDuration } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 import QuizCreationForm from './QuizCreationForm'
-import { FileQuestion, PencilIcon, TrashIcon } from 'lucide-react'
+import { FileQuestion, PencilIcon, TrashIcon, PlusIcon } from 'lucide-react'
 import { deleteProblem } from '@/services/api/problemApi'
 import EditLectureDialog from './EditLectureDialog'
+import { CREATE_QUESTION_PATH, CREATE_PROBLEM_LECTURE_PATH, UPDATE_PROBLEM_LECTURE_PATH } from '@/routers/router'
 
 export default function LectureItem({
   chapterId,
@@ -152,7 +153,11 @@ export default function LectureItem({
     }
   }
   const handleEditCodeProblem = (problem) => {
-    navigate({ to: `/create-code-problem/${problem.id}` })
+    console.log(problem.id)
+    console.log(courseId)
+    console.log(lecture.id)
+    // navigate({ to: `/create-code-problem/${problem.id}` })
+    navigate({ to: UPDATE_PROBLEM_LECTURE_PATH, params: { courseId, lectureId: lecture.id, problemId: problem.id } })
   }
   const handleDeleteCodeProblem = async (problemId) => {
     try {
@@ -181,7 +186,10 @@ export default function LectureItem({
   }
   const handleCreateCodeProblem = () => {
     navigate({
-      to: `/edit-course/${courseId}/create-problem-lecture/${lecture.id}`
+      to: CREATE_PROBLEM_LECTURE_PATH,
+      params: { courseId, lectureId: lecture.id }
+
+      // to: `/edit-course/${courseId}/create-problem-lecture/${lecture.id}`
     })
   }
 
@@ -257,7 +265,7 @@ export default function LectureItem({
 
   const handleEditQuiz = (quizId) => {
     // Implement edit functionality
-    navigate({ to: `/create-question/${quizId}` })
+    navigate({ to: CREATE_QUESTION_PATH, params: { quizId } })
   }
 
   const handleDeleteQuiz = async (quizId) => {
@@ -502,7 +510,7 @@ export default function LectureItem({
             <div key={codeProblem.id} className='flex items-center p-2 mt-2 bg-white rounded-md'>
               <CodeIcon className='w-4 h-4 mr-2 text-blue-500' />
               <span className='flex-grow text-sm truncate'>{codeProblem.title}</span>
-              <Button onClick={() => handleEditCodeProblem()} size='sm' variant='ghost' className='ml-2'>
+              <Button onClick={() => handleEditCodeProblem(codeProblem)} size='sm' variant='ghost' className='ml-2'>
                 <PencilIcon className='w-4 h-4 text-blue-500' />
                 <span className='sr-only'>Edit problem</span>
               </Button>
@@ -529,10 +537,10 @@ export default function LectureItem({
               <FileQuestion className='w-4 h-4 mr-2 text-blue-500' />
               <span className='flex-grow text-sm truncate'>{createdQuiz.title}</span>
               <Button onClick={() => handleEditQuiz(createdQuiz.id)} size='sm' variant='outline' className='ml-2'>
-                <Pencil1Icon className='w-4 h-4 mr-2' />
+                <PlusIcon className='w-4 h-4 mr-2' />
               </Button>
               <Button onClick={() => handleDeleteQuiz(createdQuiz.id)} size='sm' variant='destructive' className='ml-2'>
-                <Cross2Icon className='w-4 h-4 mr-2' />
+                <TrashIcon className='w-4 h-4 mr-2' />
               </Button>
             </div>
           )}

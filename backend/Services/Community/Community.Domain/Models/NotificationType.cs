@@ -2,7 +2,6 @@
 {
     public class NotificationType : Aggregate<NotificationTypeId>
     {
-        public List<UserNotificationSetting> UserNotificationSettings = new();
         public List<NotificationHistory> NotificationHistorys = new();
         public string Name { get; set; } = default!;                   // Tên loại thông báo
         public string Description { get; set; } = default!;            // Mô tả loại thông báo

@@ -47,34 +47,39 @@ namespace Community.Application.Models.NotificationHistories.Commands.CreateNoti
 
         private async Task<NotificationHistory> CreateNewNotificationHistory(CreateNotificationHistoryDto createNotificationHistoryDto, SentVia sentVia, Status status)
         {
-            // Dữ liệu test UserId
-            var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
+            // Lấy UserId từ UserContextService
+            var currentUserId = _userContextService.User.Id;
 
-            if (!Guid.TryParse(userContextTest, out var currentUserIdTest))
+            if (currentUserId == null)
             {
-                throw new UnauthorizedAccessException("Invalid user ID.");
+                throw new UnauthorizedAccessException("User is not authenticated.");
             }
 
-            var userId = UserId.Of(currentUserIdTest);
+            // Chuyển đổi UserId
+            var userId = UserId.Of(currentUserId);
 
-            // Lấy UserId từ UserContextService nếu cần
-            //var currentUserId = _userContextService.User.Id;
-            //if (currentUserId == null)
-            //{
-            //    throw new UnauthorizedAccessException("User is not authenticated.");
-            //}
-            //var userId = UserId.Of(currentUserId.Value);
-
+            // Lấy NotificationTypeId từ DTO
             var notificationTypeId = NotificationTypeId.Of(createNotificationHistoryDto.NotificationTypeId);
+            var userNotificationId = UserNotificationSettingId.Of(createNotificationHistoryDto.UserNotificationSettingId);
 
-            return NotificationHistory.Create(
+            // Tạo NotificationHistory mới
+            var notificationHistory = NotificationHistory.Create(
                 notificationHistoryId: NotificationHistoryId.Of(Guid.NewGuid()),
                 userId,
-                notificationTypeId,
+                notificationTypeId: notificationTypeId,
+                userNotificationSettingId: userNotificationId,
                 createNotificationHistoryDto.Message,
                 sentVia,
                 status
             );
+
+            // Cập nhật các trường bổ sung
+            notificationHistory.DateCreated = DateTime.UtcNow; // Thời gian tạo thông báo
+            notificationHistory.Subject = createNotificationHistoryDto.Subject; // Nếu có Subject
+            notificationHistory.SenderId = createNotificationHistoryDto.SenderId; // Gán SenderId từ user hiện tại
+
+            return notificationHistory;
         }
+
     }
 }

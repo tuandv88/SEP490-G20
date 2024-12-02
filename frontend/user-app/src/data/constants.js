@@ -15,9 +15,10 @@ export const AUTHENTICATION_ROUTERS = {
   SURVEY: '/survey',
   DISCUSS: '/discussions/discuss',
   DISCUSSIONDETAIL: '/discussion/:id',
-  CREATEDISCUSSION:'/discussions/creatediscussion',
+  CREATEDISCUSSION: '/discussions/creatediscussion',
   USERPROFILE: '/user-profile',
-  PROBLEMSPACE: '/problem-solve/:problemId'
+  PROBLEMSPACE: '/problem-solve/:problemId',
+  NOTIFICATION: '/notifications/history'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

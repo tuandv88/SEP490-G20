@@ -368,7 +368,6 @@ function CommentList({ discussionId }) {
     if (!replies[commentId]) {
       await loadReplies(commentId);  // Gọi API để tải các câu trả lời (replies)
     }
-
     // Toggle trạng thái hiển thị của bình luận này
     setShowRepliesMap((prevMap) => ({
       ...prevMap,

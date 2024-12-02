@@ -62,6 +62,24 @@ namespace User.Infrastructure.Data.Repositories.PathSteps
 
             return pathStep;
         }
+        public async Task<int?> GetMaxStepOrderByLearningPathIdAsync(Guid learningPathId)
+        {
+            var learningPathObject = LearningPathId.Of(learningPathId);
+            // Truy vấn lấy StepOrder lớn nhất cho LearningPathId cụ thể
+            var maxStepOrder = await _dbContext.PathSteps
+                .Where(ps => ps.LearningPathId == learningPathObject)  // Lọc theo LearningPathId
+                .MaxAsync(ps => (int?)ps.StepOrder) ?? 0;  // Dùng MaxAsync để lấy giá trị StepOrder lớn nhất, chuyển đổi về kiểu nullable int
 
+            return maxStepOrder;  // Trả về giá trị MaxStepOrder, có thể là null nếu không có bản ghi nào phù hợp
+        }
+
+        public async Task<PathStep> GetByLearningPathAndCourseIdAsync(Guid learningPathId, Guid courseId)
+        {
+            var learningPathObject = LearningPathId.Of(learningPathId);
+            var courseidObject = CourseId.Of(courseId);
+            // Truy vấn để tìm PathStep với LearningPathId và CourseId
+            return await _dbContext.PathSteps
+                .FirstOrDefaultAsync(ps => ps.LearningPathId == learningPathObject && ps.CourseId == courseidObject);
+        }
     }
 }

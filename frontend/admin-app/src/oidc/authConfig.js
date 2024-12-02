@@ -6,7 +6,7 @@ const VITE_OAUTH_CLIENT_SCOPE = import.meta.env.VITE_OAUTH_CLIENT_SCOPE
 export const oidcConfig = {
   authority: API_BASE_URL_AUTH,
   client_id: VITE_OAUTH_CLIENT_ID,
-  redirect_uri: ${API_BASE_URL_CALLBACK}/callback,
+  redirect_uri: `${API_BASE_URL_CALLBACK}/callback`,
   response_type: 'code',
   scope: VITE_OAUTH_CLIENT_SCOPE,
   post_logout_redirect_uri: API_BASE_URL_CALLBACK,

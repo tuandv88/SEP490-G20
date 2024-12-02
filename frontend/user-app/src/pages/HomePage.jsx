@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import Layout from '@/layouts/layout'
 import { useEffect, useState } from 'react'
-import {  ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import CourseLoading from '@/components/loading/CourseLoading'
 import { ProblemSection } from '@/components/problem/ProblemSection'
 import { CourseCarousel } from '@/components/courses/CourseCarousel'
@@ -16,7 +16,6 @@ import QuizModal from '@/components/surrvey/QuizModal'
 import { QuizAPI } from '@/services/api/quizApi'
 import { UserAPI } from '@/services/api/userApi'
 import { CourseAPI } from '@/services/api/courseApi'
-
 
 const Button = ({ children, className, ...props }) => (
   <button className={`px-4 py-2 rounded ${className}`} {...props}>
@@ -43,8 +42,28 @@ function HomePage() {
   const [isAssessmentPromptOpen, setIsAssessmentPromptOpen] = useState(false)
   const [isQuizOpen, setIsQuizOpen] = useState(false)
   const [quizAssessment, setQuizAssessment] = useState(null)
+  const [isLoadedQuizAssessment, setIsLoadedQuizAssessment] = useState(false)
 
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchQuizAssessment = async () => {
+      try {
+        setLoading(true)
+        if (userInfo) {
+          const data = await QuizAPI.getQuizAssessment()
+          setQuizAssessment(data.quiz)
+          setIsLoadedQuizAssessment(true)
+        }
+      } catch (error) {
+        console.error('Error fetching quiz assessment:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchQuizAssessment()
+  }, [userInfo])
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -55,10 +74,8 @@ function HomePage() {
           // Kiểm tra điều kiện để hiển thị survey
           const isSurveyCompleted = localStorage.getItem('isSurveyCompleted')
           if (isSurveyCompleted !== 'true' && user.profile.issurvey === 'false') {
-            setTimeout(() => {
-              updateSurveyStatus()
-              setIsSurveyOpen(true)
-            }, 3000)
+            updateSurveyStatus()
+            setIsSurveyOpen(true)
           }
         }
       } catch (error) {
@@ -66,11 +83,10 @@ function HomePage() {
       }
     }
     fetchUserInfo()
-  }, [isSurveyOpen])
+  }, [isSurveyOpen, isLoadedQuizAssessment])
 
   async function updateSurveyStatus() {
     try {
-
       await UserAPI.changeSurveyStatus(userInfo.sub)
       authServiceInstance.refreshToken()
       localStorage.setItem('isSurveyCompleted', 'true')
@@ -105,21 +121,6 @@ function HomePage() {
     fetchCourseDetail()
   }, [])
 
-  useEffect(() => {
-    const fetchQuizAssessment = async () => {
-      try {
-        if (userInfo?.issurvey === 'false') {
-          const data = await QuizAPI.getQuizAssessment()
-          setQuizAssessment(data.quiz)
-        }
-      } catch (error) {
-        console.error('Error fetching quiz assessment:', error)
-      }
-    }
-
-    fetchQuizAssessment()
-  }, [])
-
   const handleSurveySubmit = (data) => {
     // console.log('Survey submitted:', data)
     setIsSurveyOpen(false)
@@ -140,6 +141,10 @@ function HomePage() {
     console.log('Quiz completed with score:', score)
     setIsQuizOpen(false)
     //updateUserFirstLogin()
+  }
+
+  if (loading) {
+    return null
   }
 
   return (
@@ -197,8 +202,6 @@ function HomePage() {
               <ProblemSection />
             </div>
           </section>
-
-
         </div>
         <Link to={AUTHENTICATION_ROUTERS.HOME}></Link>
 

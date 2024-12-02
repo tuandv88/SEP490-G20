@@ -14,6 +14,7 @@ import { useStore } from '@/data/store'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FileQuestion, Award } from 'lucide-react'
+import { FullScreenPopup } from './FullScreenPopup'
 
 export default function QuizManagement() {
   const { params } = useMatch(quizManagementRoute.id)
@@ -25,6 +26,7 @@ export default function QuizManagement() {
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
   const { toast } = useToast()
+  const [isFullScreenPopupOpen, setIsFullScreenPopupOpen] = useState(false)
 
   useEffect(() => {
     const fetchQuizDetail = async () => {
@@ -259,6 +261,14 @@ export default function QuizManagement() {
             </Card>
           </div>
         </div>
+      )}
+
+      {isFullScreenPopupOpen && (
+        <FullScreenPopup
+          isOpen={isFullScreenPopupOpen}
+          onClose={() => setIsFullScreenPopupOpen(false)}
+          quizId={quizId}
+        />
       )}
     </div>
   )

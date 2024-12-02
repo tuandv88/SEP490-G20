@@ -7,14 +7,11 @@ import { Button } from '../ui/button'
 import { QuizAPI } from '@/services/api/quizApi'
 import QuizSuggestUser from './QuizSuggestUser'
 
-
 const QuizModal = ({ isOpen, onClose, quiz }) => {
   if (!isOpen) return null
 
-
   const [isQuizStarted, setIsQuizStarted] = useState(false)
   const [quizData, setQuizData] = useState(null)
-
 
   const startQuiz = async () => {
     try {
@@ -83,7 +80,12 @@ const QuizModal = ({ isOpen, onClose, quiz }) => {
         </Card>
       </div>
       {isQuizStarted && quizData && (
-        <QuizSuggestUser quiz={quizData.quiz} answer={quizData.answer} timeLimit={quiz.timeLimit} onComplete={() => handleCloseQuiz()} />
+        <QuizSuggestUser
+          quiz={quizData.quiz}
+          answer={quizData.answer}
+          timeLimit={quiz.timeLimit}
+          onComplete={() => handleCloseQuiz()}
+        />
       )}
     </div>
   )

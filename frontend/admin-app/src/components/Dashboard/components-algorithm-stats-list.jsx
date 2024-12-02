@@ -6,7 +6,7 @@ function AlgorithmStatsList({ stats }) {
     return (
       <Card className='bg-card text-card-foreground'>
         <CardHeader>
-          <CardTitle>Algorithm Statistics</CardTitle>
+          <CardTitle>Top 4 Algorithm Submitted</CardTitle>
           <CardDescription>No algorithm statistics available at the moment</CardDescription>
         </CardHeader>
       </Card>
@@ -15,18 +15,18 @@ function AlgorithmStatsList({ stats }) {
   return (
     <Card className='bg-card text-card-foreground'>
       <CardHeader>
-        <CardTitle>Algorithm Statistics</CardTitle>
+        <CardTitle>Top 4 Algorithm Submitted</CardTitle>
         <CardDescription>Performance across different algorithm types</CardDescription>
       </CardHeader>
       <CardContent>
         <ul className='space-y-4'>
-          {stats.map((stat) => (
-            <li key={stat.name} className='flex items-center justify-between'>
+          {stats?.map((stat) => (
+            <li key={stat.problemId} className='flex items-center justify-between'>
               <div>
-                <p className='font-medium'>{stat.name}</p>
-                <p className='text-sm text-muted-foreground'>{stat.submissions} submissions</p>
+                <p className='font-medium'>{stat.title}</p>
+                <p className='text-sm text-muted-foreground'>{stat.acceptedSubmissions} acceptedSubmissions</p>
               </div>
-              <p className='font-medium'>Avg. Score: {stat.avgScore}%</p>
+              <p className='font-medium'>Acceptance Rate (%): {stat.acceptanceRate.toFixed(2)}%</p>
             </li>
           ))}
         </ul>
@@ -34,13 +34,5 @@ function AlgorithmStatsList({ stats }) {
     </Card>
   )
 }
-AlgorithmStatsList.propTypes = {
-  stats: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      submissions: PropTypes.number.isRequired,
-      avgScore: PropTypes.number.isRequired
-    })
-  ).isRequired
-}
+
 export default AlgorithmStatsList

@@ -17,6 +17,7 @@ import { TableRowSkeleton } from './TableRowSkeleton'
 import useCourseTable from '@/hooks/useCourseTable'
 
 import SchedulePublishDialog from '@/components/SchedulePublishDialog'
+import { CREATE_COURSE_PATH } from '@/routers/router'
 
 function CourseTable() {
   const navigate = useNavigate()
@@ -45,7 +46,7 @@ function CourseTable() {
   } = useCourseTable()
 
   const handleNewCourse = () => {
-    navigate({ to: '/create-course' })
+    navigate({ to: CREATE_COURSE_PATH })
   }
 
   const hasActiveFilters = () => {

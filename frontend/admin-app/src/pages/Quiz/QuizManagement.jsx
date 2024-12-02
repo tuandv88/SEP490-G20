@@ -14,6 +14,7 @@ import { useStore } from '@/data/store'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FileQuestion, Award } from 'lucide-react'
+import { EDIT_CURRICULUM_COURSE_PATH } from '@/routers/router'
 
 export default function QuizManagement() {
   const { params } = useMatch(quizManagementRoute.id)
@@ -25,6 +26,7 @@ export default function QuizManagement() {
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
   const { toast } = useToast()
+  const [isFullScreenPopupOpen, setIsFullScreenPopupOpen] = useState(false)
 
   useEffect(() => {
     const fetchQuizDetail = async () => {
@@ -134,7 +136,7 @@ export default function QuizManagement() {
       <Button
         variant='outline'
         className='flex items-center gap-2'
-        onClick={() => navigate({ to: `/edit-course/${courseIdToBack}` })}
+        onClick={() => navigate({ to: EDIT_CURRICULUM_COURSE_PATH, params: { courseId: courseIdToBack } })}
       >
         <ChevronLeft className='h-4 w-4' />
         Back to Curriculum
@@ -205,12 +207,12 @@ export default function QuizManagement() {
             </div>
           </CardContent>
         </Card>
-        <Button className='mt-4 w-full' onClick={() => setShowAddQuestionForm(true)}>
+        {/* <Button className='mt-4 w-full' onClick={() => setShowAddQuestionForm(true)}>
           Add Question Normal
         </Button>
         <Button className='mt-4 w-full' onClick={() => setIsFullScreenPopupOpen(true)}>
           Create Problem Quiz
-        </Button>
+        </Button> */}
 
         <Card className='md:col-span-2'>
           <CardHeader className='flex flex-row items-center justify-between'>
@@ -259,6 +261,14 @@ export default function QuizManagement() {
             </Card>
           </div>
         </div>
+      )}
+
+      {isFullScreenPopupOpen && (
+        <FullScreenPopup
+          isOpen={isFullScreenPopupOpen}
+          onClose={() => setIsFullScreenPopupOpen(false)}
+          quizId={quizId}
+        />
       )}
     </div>
   )

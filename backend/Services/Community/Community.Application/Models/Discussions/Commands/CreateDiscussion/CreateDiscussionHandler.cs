@@ -56,7 +56,7 @@ public class CreateDiscussionHandler : ICommandHandler<CreateDiscussionCommand, 
 
         if (currentUserId == null)
         {
-            throw new UnauthorizedAccessException("User is not authenticated.");
+            throw new UnauthorizedAccessException("User is not authenticated.");    
         }
 
         var userId = UserId.Of(currentUserId);

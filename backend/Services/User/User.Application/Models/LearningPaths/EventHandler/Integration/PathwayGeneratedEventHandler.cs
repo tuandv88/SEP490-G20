@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Messaging.Events.AIs;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using User.Application.Data.Repositories;
 using User.Domain.Enums;
 using User.Domain.ValueObjects;
@@ -11,7 +12,7 @@ public class PathwayGeneratedEventHandler(ILearningPathRepository pathRepository
     public async Task Consume(ConsumeContext<PathwayGeneratedEvent> context) {
         var @event = context.Message;
         var existLearningPath = await pathRepository.GetByUserIdAsync(@event.UserId);
-        if (existLearningPath != null) {
+        if (!existLearningPath.IsNullOrEmpty()) {
             logger.LogDebug($"Exist learning path of user: {@event.UserId}");
             return;
         }
@@ -24,7 +25,7 @@ public class PathwayGeneratedEventHandler(ILearningPathRepository pathRepository
                 LearningPathStatus.NotStarted,
                 @event.Reason
             );
-
+        await pathRepository.AddAsync(learningPath);
         var listPathSteps = new List<PathStep>();
         int step = 1;
         DateTime now = DateTime.UtcNow;
@@ -43,7 +44,8 @@ public class PathwayGeneratedEventHandler(ILearningPathRepository pathRepository
             step++;
         }
         learningPath.AddPathSteps(listPathSteps);
-        await pathStepsRepository.SaveChangesAsync();
+        
+        await pathRepository.SaveChangesAsync();
     }
 }
 

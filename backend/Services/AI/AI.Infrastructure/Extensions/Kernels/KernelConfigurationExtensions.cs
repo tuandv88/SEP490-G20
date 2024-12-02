@@ -1,6 +1,8 @@
-﻿using AI.Infrastructure.Plugins;
+﻿using AI.Application.Data;
+using AI.Infrastructure.Plugins;
 using AI.Infrastructure.Services.Kernels;
 using AI.Infrastructure.Services.Kernels.Prompts;
+using BuidingBlocks.Storage.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.KernelMemory;
@@ -142,9 +144,14 @@ public static class KernelConfigurationExtensions
                 var kernelMemory = scopedProvider.GetRequiredService<IKernelMemory>();
                 var communicationPlugin = new CommunicationPlugin(clientService);
                 var learningPlugin = new LearningPlugin(kernelMemory);
+
+                var documentService = scopedProvider.GetRequiredService<IDocumentService>();
+                var documentPlugin = new DocumentPlugin(documentService);
+
                 kernel.ImportPluginFromObject(communicationPlugin);
                 kernel.ImportPluginFromObject(learningPlugin);
                 kernel.ImportPluginFromType<UtilsPlugin>();
+                kernel.ImportPluginFromObject(documentPlugin);
             }
 
             return kernel;

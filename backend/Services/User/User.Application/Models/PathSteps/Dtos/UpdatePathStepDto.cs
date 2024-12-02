@@ -11,4 +11,15 @@ namespace User.Application.Models.PathSteps.Dtos
         DateTime? CompletionDate,
         DateTime ExpectedCompletionDate
     );
+
+    // DTO mới chứa mảng các PathSteps
+    public class UpdatePathStepsRequestDto
+    {
+        public List<UpdatePathStepDto> PathSteps { get; set; }
+
+        public UpdatePathStepsRequestDto(List<UpdatePathStepDto> pathSteps)
+        {
+            PathSteps = pathSteps;
+        }
+    }
 }

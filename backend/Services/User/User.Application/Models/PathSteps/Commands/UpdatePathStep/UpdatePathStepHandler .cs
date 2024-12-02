@@ -21,26 +21,28 @@ namespace User.Application.Models.PathSteps.Commands.UpdatePathStep
 
         public async Task<bool> Handle(UpdatePathStepCommand request, CancellationToken cancellationToken)
         {
-            var dto = request.PathStepDto;
-
-            // Lấy PathStep cần cập nhật từ repository
-            var pathStep = await _pathStepRepository.GetByPathStepIdAsync(dto.Id);
-
-            if (pathStep == null)
+            // Lặp qua từng PathStepDto trong mảng PathStepDtos
+            foreach (var dto in request.PathStepDtos)
             {
-                throw new NotFoundException($"PathStep với Id '{dto.Id}' không tồn tại.");
+                // Lấy PathStep cần cập nhật từ repository
+                var pathStep = await _pathStepRepository.GetByPathStepIdAsync(dto.Id);
+
+                if (pathStep == null)
+                {
+                    throw new NotFoundException($"PathStep với Id '{dto.Id}' không tồn tại.");
+                }
+
+                // Cập nhật các thuộc tính của PathStep  
+                //pathStep.CourseId = new CourseId(dto.CourseId);
+                pathStep.StepOrder = dto.StepOrder;
+                //pathStep.Status = dto.Status;
+                //pathStep.EnrollmentDate = dto.EnrollmentDate;
+                //pathStep.CompletionDate = dto.CompletionDate;
+                //pathStep.ExpectedCompletionDate = dto.ExpectedCompletionDate;
             }
 
-            // Cập nhật các thuộc tính của PathStep  
-            pathStep.CourseId = new CourseId(dto.CourseId);
-            pathStep.StepOrder = dto.StepOrder;
-            pathStep.Status = dto.Status;
-            pathStep.EnrollmentDate = dto.EnrollmentDate;
-            pathStep.CompletionDate = dto.CompletionDate;
-            pathStep.ExpectedCompletionDate = dto.ExpectedCompletionDate;
-
+            // Save changes cho tất cả các PathStep đã cập nhật
             await _pathStepRepository.SaveChangesAsync(cancellationToken);
-            
 
             return true;
         }

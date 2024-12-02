@@ -1,12 +1,12 @@
 import axios from '@/lib/axios'
 import axiosInstance from '@/lib/axios'
 import Cookies from 'js-cookie'
-
+const API_BASE_URL = import.meta.env.VITE_BASE_URL
 export const getDocuments = async (pageIndex, pageSize) => {
   try {
-    const response = await axios.get(`/ai-service/documents?PageIndex=${pageIndex}&PageSize=${pageSize}`, {
+    const response = await axios.get(`${API_BASE_URL}/ai-service/documents?PageIndex=${pageIndex}&PageSize=${pageSize}`, {
       headers: {
-        Authorization: `Bearer ${Cookies.get('access_token')}`
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
     return response.data
@@ -16,10 +16,10 @@ export const getDocuments = async (pageIndex, pageSize) => {
 }
 export const importDocumentFile = async (data) => {
   try {
-    const response = await axios.post('/ai-service/documents/imports/files', data, {
+    const response = await axios.post(`${API_BASE_URL}/ai-service/documents/imports/files`, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${Cookies.get('access_token')}`
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
     return response.data
@@ -30,9 +30,9 @@ export const importDocumentFile = async (data) => {
 
 export const importDocumentWeb = async (data) => {
   try {
-    const response = await axiosInstance.post('/ai-service/documents/imports/webs', data, {
+    const response = await axios.post(`${API_BASE_URL}/ai-service/documents/imports/webs`, data, {
       headers: {
-        Authorization: `Bearer ${Cookies.get('access_token')}`
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
     return response.data
@@ -43,9 +43,9 @@ export const importDocumentWeb = async (data) => {
 
 export const importDocumentText = async (data) => {
   try {
-    const response = await axiosInstance.post('/ai-service/documents/imports/text', data, {
+    const response = await axios.post(`${API_BASE_URL}/ai-service/documents/imports/text`, data, {
       headers: {
-        Authorization: `Bearer ${Cookies.get('access_token')}`
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
     return response.data
@@ -65,8 +65,8 @@ export const deleteDocuments = async (documentIds) => {
 
   try {
     const queryString = `documentIds=${documentIds.join(',')}`
-    const response = await axiosInstance.delete(`/ai-service/documents?${queryString}`, {
-      headers: { Authorization: `Bearer ${Cookies.get('access_token')}` }
+    const response = await axios.delete(`${API_BASE_URL}/ai-service/documents?${queryString}`, {
+      headers: { Authorization: `Bearer ${Cookies.get('authToken')}` }
     })
 
     return response.data

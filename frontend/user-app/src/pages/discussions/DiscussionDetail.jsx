@@ -903,6 +903,7 @@ function DiscussionDetail() {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  justify-content: flex-start; /* Hoặc 'space-between' hoặc 'space-evenly' */
 }
 
 .tag {
@@ -914,7 +915,6 @@ function DiscussionDetail() {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-left: 80px; /* Move the entire user info section up */
   margin-top: 5px; /* Move the entire user info section up */
 }
 

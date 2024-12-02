@@ -213,10 +213,17 @@ function CommentList({ discussionId }) {
     });
   };
 
+
+  const [idCommentParentRemove, setIdCommentParentRemove] = useState(null);
+
   // Hàm mở dialog xác nhận xóa
-  const handleOpenRemoveDialog = (commentId) => {
+  const handleOpenRemoveDialog = (commentId, idCommentParentRemove = null) => {
     setCommentIdToDelete(commentId); // Lưu commentId cần xóa
     setOpenRemoveDialog(true); // Mở dialog
+
+    if (idCommentParentRemove) {
+      setIdCommentParentRemove(idCommentParentRemove);
+    }
   };
 
   // Hàm đóng dialog
@@ -234,7 +241,13 @@ function CommentList({ discussionId }) {
       if (response) {
         // Gọi lại hàm refreshComments (truyền từ parent component) để làm mới danh sách comments
         setRefreshComments(prev => !prev);
+
+        if (idCommentParentRemove) {
+          handleKeepShowReplies(idCommentParentRemove);
+          setIdCommentParentRemove(null);
+        }
       }
+
     } catch (error) {
       console.error("Error removing comment:", error.message);
     } finally {
@@ -307,7 +320,12 @@ function CommentList({ discussionId }) {
 
     if (commentId !== replyFormVisible) {
       setContentReplyFromComment(''); // Reset nội dung khi chuyển sang bình luận khác
+
+      if (editCommentFormVisible !== null) {
+        setEditCommentFormVisible(null); // Đóng form chỉnh sửa
+      }
     }
+
   };
 
   // Hàm hiển thị form trả lời cho các reply con
@@ -342,6 +360,8 @@ function CommentList({ discussionId }) {
         isActive: true, // Đánh dấu là bình luận hợp lệ
       };
 
+      //console.log(newComment);
+
       const response = await DiscussApi.createComment(newComment); // Gọi API để tạo bình luận
 
       if (response) {
@@ -353,9 +373,11 @@ function CommentList({ discussionId }) {
 
         setReplyFormVisible(null); // Đóng form trả lời cho bình luận gốc
         setNestedReplyFormVisible(null); // Đóng form trả lời cho reply con
-        loadReplies(parentCommentId); // Tải lại bình luận con
+        //loadReplies(parentCommentId); // Tải lại bình luận con
 
-        console.log("Success!", newComment);
+        handleKeepShowReplies(parentCommentId);
+
+        //console.log("Success!", newComment);
       }
     } catch (error) {
       console.error("Error submitting reply:", error);
@@ -363,7 +385,7 @@ function CommentList({ discussionId }) {
   };
 
   // Hàm hiển thị/ẩn các bình luận con
-  const handleShowReplies = async (commentId) => {
+  const handleShowOrHidenReplies = async (commentId) => {
     // Kiểm tra nếu chưa load replies, thì load
     if (!replies[commentId]) {
       await loadReplies(commentId);  // Gọi API để tải các câu trả lời (replies)
@@ -375,6 +397,15 @@ function CommentList({ discussionId }) {
     }));
   };
 
+  const handleKeepShowReplies = async (commentId) => {
+    await loadReplies(commentId);
+    setShowRepliesMap((prevMap) => ({
+      ...prevMap,
+      [commentId]: true,
+    }));
+  };
+
+  // Auth 
   const handleCreateCommentButtonClick = () => {
     if (!isAuth) {
       setShowAlertCheckIsCreateComment(true);
@@ -399,6 +430,115 @@ function CommentList({ discussionId }) {
       setTimeout(() => setShowAlertCheckIsCreateComment(false), 5000);
     } else {
       handleReplyCommentSubmit(parentCommentId, depth)
+    }
+  };
+
+
+  const [editCommentFormVisible, setEditCommentFormVisible] = useState(null);
+  const [contentEditFromComment, setContentEditFromComment] = useState('');
+  const [editNestedReplyFormVisible, setEditNestedReplyFormVisible] = useState(null);
+  const [contentEditFromReply, setContentEditFromReply] = useState('');
+
+  // Comment Handler.
+  const handleToggleEditFormComment = (idComment, content) => {
+
+    if (idComment === editCommentFormVisible) {
+      setContentEditFromComment('');
+    } else {
+
+      setContentEditFromComment(content);
+
+      // Nếu đang mở form trả lời, đóng form trả lời
+      if (replyFormVisible !== null) {
+        setReplyFormVisible(null); // Đóng form trả lời
+      }
+    }
+
+    setEditCommentFormVisible(editCommentFormVisible === idComment ? null : idComment);
+  };
+
+  // Xử lý khi người dùng gửi phản hồi (đối với bình luận gốc hoặc reply)
+  const handleEditCommentSubmit = async (idComment) => {
+    try {
+
+      if (contentEditFromComment.trim() === '') {
+        alert('Please enter a reply, content cannot be empty!');
+        return;
+      }
+
+      const updatedComment = {
+        id: idComment, // ID comment cần chỉnh sửa
+        discussionId: discussionId, // ID của discussion
+        content: contentEditFromComment, // Nội dung chỉnh sửa
+        isActive: true, // Trạng thái hoạt động của comment
+        parentCommentId: null, // ID của comment cha (nếu có)
+        depth: 2, // Độ sâu của comment (tùy chỉnh theo yêu cầu của bạn)
+      };
+
+      const response = await DiscussApi.updateComment({ updateCommentData: updatedComment });
+      if (response) {
+        setEditCommentFormVisible(null); // Đóng form trả lời cho bình luận gốc
+        setContentEditFromComment('');
+        setRefreshComments(prev => !prev);
+
+        //console.log("Success Edit!", newComment);
+      }
+    } catch (error) {
+      console.error("Error submitting edit:", error);
+    }
+  };
+
+  // Comment Handler.
+  const handleToggleEditNestedFormComment = (idComment, contentReplyEdit) => {
+
+    if (idComment === editNestedReplyFormVisible) {
+      setContentEditFromReply('');
+    } else {
+      setContentEditFromReply(contentReplyEdit);
+    }
+
+    setEditNestedReplyFormVisible(editNestedReplyFormVisible === idComment ? null : idComment);
+  };
+
+  const handleEditReplyNestedButtonClick = (idCommentCurrent, parentCommentId, depth) => {
+    if (!isAuth) {
+      setShowAlertCheckIsCreateComment(true);
+      setTimeout(() => setShowAlertCheckIsCreateComment(false), 5000);
+    } else {
+      handleEditNestedReplyCommentSubmit(idCommentCurrent, parentCommentId, depth)
+    }
+  };
+
+  // Xử lý khi người dùng gửi phản hồi (đối với bình luận gốc hoặc reply)
+  const handleEditNestedReplyCommentSubmit = async (idCommentCurrent, parentCommentId, depth) => {
+    try {
+
+      if (contentEditFromReply.trim() === '') {
+        alert('Please enter a reply, content cannot be empty!');
+        return;
+      }
+
+      const updatedComment = {
+        id: idCommentCurrent, // ID comment cần chỉnh sửa
+        discussionId: discussionId, // ID của discussion
+        content: contentEditFromReply, // Nội dung chỉnh sửa
+        isActive: true, // Trạng thái hoạt động của comment
+        parentCommentId: parentCommentId, // ID của comment cha (nếu có)
+        depth: depth, // Độ sâu của comment (tùy chỉnh theo yêu cầu của bạn)
+      };
+
+      //console.log(updatedComment);
+
+      const response = await DiscussApi.updateComment({ updateCommentData: updatedComment });
+      if (response) {
+        setEditNestedReplyFormVisible(null); // Đóng form trả lời cho bình luận gốc
+        setContentEditFromReply('');
+        loadReplies(parentCommentId); // Tải lại bình luận con
+
+        console.log("Success Edit!", newComment);
+      }
+    } catch (error) {
+      console.error("Error submitting edit:", error);
     }
   };
 
@@ -525,7 +665,9 @@ function CommentList({ discussionId }) {
 
                   {comment.userId === idCurrentUser && (
                     <>
-                      <button className="comment-item__edit">
+                      <button className="comment-item__edit"
+                        onClick={() => handleToggleEditFormComment(comment.id, comment.content)}
+                      >
                         <FontAwesomeIcon icon={faEdit} /> Edit
                       </button>
                       <button
@@ -546,12 +688,13 @@ function CommentList({ discussionId }) {
 
                   <button
                     className="comment-item__show-reply"
-                    onClick={() => handleShowReplies(comment.id)}
+                    onClick={() => handleShowOrHidenReplies(comment.id)}
                   >
                     <FontAwesomeIcon icon={faComments} />
                     {showRepliesMap[comment.id] ? 'Hide Reply' : 'Show All Reply'}
                   </button>
 
+                  {/*Replies*/}
                   {replyFormVisible === comment.id && (
                     <div className="reply-form">
                       <textarea
@@ -560,6 +703,18 @@ function CommentList({ discussionId }) {
                         onChange={(e) => setContentReplyFromComment(e.target.value)}
                       />
                       <button onClick={() => handleCreateReplyButtonClick(comment.id, 2)}>Reply Now</button>
+                    </div>
+                  )}
+
+                  {/*Comment*/}
+                  {editCommentFormVisible === comment.id && (
+                    <div className="reply-form">
+                      <textarea
+                        placeholder="Type your reply here..."
+                        value={contentEditFromComment}
+                        onChange={(e) => setContentEditFromComment(e.target.value)}
+                      />
+                      <button onClick={() => handleEditCommentSubmit(comment.id)}>Edit Now</button>
                     </div>
                   )}
 
@@ -579,7 +734,7 @@ function CommentList({ discussionId }) {
                             <p className="comment-item__timestamp_replies">
                               Created at: {formatRelativeDate(reply.dateCreated)}
                             </p>
-                            {comment.isEdited && <span className="comment-item__edited_replies">Edited</span>}
+                            {reply.isEdited && <span className="comment-item__edited_replies">Edited</span>}
                           </div>
                           <div className="comment-item__content">{reply.content}</div>
 
@@ -592,6 +747,34 @@ function CommentList({ discussionId }) {
                             </button>
                           )}
 
+
+                          {reply.userId === idCurrentUser && (
+                            <>
+                              <button className="comment-item__edit_replies"
+                                onClick={() => handleToggleEditNestedFormComment(reply.id, reply.content)}
+                              >
+                                <FontAwesomeIcon icon={faEdit} /> Edit
+                              </button>
+
+                              <button
+                                className="comment-item__delete_replies"
+                                onClick={() => handleOpenRemoveDialog(reply.id, comment.id)}
+                              >
+                                <FontAwesomeIcon icon={faTrash} /> Delete
+                              </button>
+                            </>
+                          )}
+
+                          <button
+                            className={`comment-item__share-edit ${clicked ? 'clicked' : ''}`}
+                            onClick={copyToClipboard}
+                          >
+                            <Tooltip title={tooltipContent} arrow>
+                              <FontAwesomeIcon icon={faShareFromSquare} /> Share
+                            </Tooltip>
+                          </button>
+
+
                           {nestedReplyFormVisible === reply.id && (
                             <div className="reply-form">
                               <textarea
@@ -599,7 +782,18 @@ function CommentList({ discussionId }) {
                                 value={contentReplyFromReply}
                                 onChange={(e) => setContentReplyFromReply(e.target.value)}
                               />
-                              <button onClick={() => handleCreateReplyNestedButtonClick(comment.id, 3)}>Submit</button>
+                              <button onClick={() => handleCreateReplyNestedButtonClick(comment.id, 3)}>Reply Now</button>
+                            </div>
+                          )}
+
+                          {editNestedReplyFormVisible === reply.id && (
+                            <div className="reply-form-edit">
+                              <textarea
+                                placeholder="Type your reply here..."
+                                value={contentEditFromReply}
+                                onChange={(e) => setContentEditFromReply(e.target.value)}
+                              />
+                              <button onClick={() => handleEditReplyNestedButtonClick(reply.id, comment.id, 3)}>Edit Now</button>
                             </div>
                           )}
                         </div>
@@ -991,7 +1185,7 @@ function CommentList({ discussionId }) {
 /* Action buttons */
 .comment-item__actions {
   display: flex;
-  gap: 8px;
+  gap: 3px;
   flex-wrap: wrap;
 }
 
@@ -1006,14 +1200,34 @@ function CommentList({ discussionId }) {
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s ease;
-  padding: 5px 10px;
+  padding: 2px 7px;
   border-radius: 4px;
   margin-top: 5px;
   margin-left: 15px;
 }
 
+.comment-item__delete_replies,
+.comment-item__edit_replies,
+.comment-item__share-edit {
+  background: transparent;
+  border: none;
+  color: #354f6c;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  border-radius: 5px;
+  margin-top: 0px;
+  margin-left: 10px;
+}
+
+.comment-item__edit_replies:hover,
+.comment-item__delete_replies:hover,
+.comment-item__share-edit:hover {
+  background-color: #ecf0f1;
+}
+
 .comment-item__share {
-  background: #354f6c;
+  background: #425870;
   color: white;
 }
 
@@ -1076,6 +1290,54 @@ function CommentList({ discussionId }) {
   background: #3a5675;
 }
 
+/* Reply form */
+.reply-form-edit {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  width: 95%;
+  margin-left: 4%;
+  background-color: #f6f7f7;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+}
+
+.reply-form-edit textarea {
+  padding: 8px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  border: 1px solid #bdc3c7;
+  width: 100%;
+  font-size: 0.95rem;
+  resize: vertical;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.reply-form-edit textarea:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.reply-form-edit button {
+  align-self: flex-end;
+  padding: 7px 13px;
+  background: #354f6c;
+  color: white;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.reply-form-edit button:hover {
+  background: #3a5675;
+}
+
 /* Replies list */
 .replies {
   border-top: 1px solid #cbcdd0;
@@ -1114,11 +1376,12 @@ function CommentList({ discussionId }) {
   font-size: 0.8rem;
   color: #7f8c8d;
   position: absolute;
-  bottom: 5px; /* Adjust as needed */
-  left: 75px; /* This replaces margin-left: -75px */
-  top: 42px; /* This replaces margin-left: -75px */
-  white-space: nowrap; /* Prevents wrapping to multiple lines */
+  bottom: 5px; 
+  left: 75px;
+  top: 42px;
+  white-space: nowrap; 
   overflow: hidden;
+  height: 20px;
   text-overflow: ellipsis; /* Adds ... if text overflows */
   max-width: calc(100% - 75px); /* Ensures it doesn't overlap with other content */
 }

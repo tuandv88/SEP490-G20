@@ -504,7 +504,7 @@ function PostList({ categoryId }) {
                 variant="contained"
                 color="primary"
                 startIcon={<EditIcon />}
-                onClick={() => handleNewPostButtonClick}
+                onClick={handleNewPostButtonClick}
               >
                 Create New Post
               </Button>

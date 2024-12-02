@@ -43,6 +43,7 @@ import {
   changeCourseStatus,
   deleteCourse
 } from '@/services/api/courseApi'
+import { EDIT_CURRICULUM_COURSE_PATH, EDIT_BASIC_COURSE_PATH } from '@/routers/router'
 
 const statusOptions = [
   {
@@ -518,15 +519,13 @@ export default function useCourseTable() {
                 {isDraft && (
                   <>
                     <DropdownMenuItem
-                      onClick={() =>
-                        navigate({ to: '/edit-curriculum-course/$courseId', params: { courseId: course.id } })
-                      }
+                      onClick={() => navigate({ to: EDIT_CURRICULUM_COURSE_PATH, params: { courseId: course.id } })}
                     >
                       <Edit className='mr-2 h-4 w-4' />
                       <span>Edit Curriculum course</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => navigate({ to: '/edit-basic-course/$courseId', params: { courseId: course.id } })}
+                      onClick={() => navigate({ to: EDIT_BASIC_COURSE_PATH, params: { courseId: course.id } })}
                     >
                       <Edit className='mr-2 h-4 w-4' />
                       <span>Edit Basic course</span>

@@ -10,16 +10,17 @@ import { ToastAction } from '@/components/ui/toast'
 import { useMatch, useNavigate } from '@tanstack/react-router'
 import { updateAgProblemRoute } from '@/routers/router'
 import { Loading } from '@/components/ui/overlay'
+import { PROBLEM_TABLE_PATH } from '@/routers/router'
 const UpdateProblemAg = ({}) => {
   const [activeTab, setActiveTab] = useState('basic')
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
   const { toast } = useToast()
   const [isRunSuccess, setIsRunSuccess] = useState(false)
   const [problemDetail, setProblemDetail] = useState(null)
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true)
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
 
-  const { params } = useMatch(updateAgProblemRoute.id);
+  const { params } = useMatch(updateAgProblemRoute.id)
   const { problemId } = params
 
   const navigate = useNavigate()
@@ -41,21 +42,21 @@ const UpdateProblemAg = ({}) => {
       testCases: {},
       createTestScriptDto: []
     }
-  });
+  })
 
   useEffect(() => {
     const fetchProblemDetail = async () => {
       try {
-        const response = await getProblemDetail(problemId);
-        setProblemDetail(response.problemDetailsDto);
-        setIsLoading(false);
+        const response = await getProblemDetail(problemId)
+        setProblemDetail(response.problemDetailsDto)
+        setIsLoading(false)
       } catch (error) {
-        console.error('Error get problem detail:', error);
-        setIsLoading(false);
+        console.error('Error get problem detail:', error)
+        setIsLoading(false)
       }
-    };
-    fetchProblemDetail();
-  }, []);
+    }
+    fetchProblemDetail()
+  }, [])
 
   useEffect(() => {
     if (problemDetail) {
@@ -74,14 +75,13 @@ const UpdateProblemAg = ({}) => {
         isActive: problemDetail.isActive || true,
         testCases: problemDetail.testCases || {},
         testcripts: problemDetail.testScrips || []
-      });
+      })
     }
-  }, [problemDetail, form]);
+  }, [problemDetail, form])
 
   if (isLoading) {
-    return <Loading />;
+    return <Loading />
   }
-
 
   const onSubmit = async (data) => {
     const updatedData = { ...data }
@@ -103,13 +103,17 @@ const UpdateProblemAg = ({}) => {
         title: 'Update problem successfully',
         description: 'Update problem successfully'
       })
-      navigate({ to: '/problem-table' })
+      navigate({ to: PROBLEM_TABLE_PATH })
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Oops! Something went wrong',
         description: 'Please try again!',
-        action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
+        action: (
+          <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>
+            Try again
+          </ToastAction>
+        )
       })
       console.error('Error updating problem:', error)
     } finally {

@@ -4,12 +4,7 @@ namespace User.Application.Models.PathSteps.Dtos
 {
     public record UpdatePathStepDto(
         Guid Id,
-        Guid CourseId,
-        int StepOrder,
-        PathStepStatus Status,
-        DateTime EnrollmentDate,
-        DateTime? CompletionDate,
-        DateTime ExpectedCompletionDate
+        int StepOrder
     );
 
     // DTO mới chứa mảng các PathSteps

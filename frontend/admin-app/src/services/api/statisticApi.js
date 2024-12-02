@@ -1,12 +1,12 @@
 import axios from 'axios'
 import axiosInstance from '@/lib/axios'
 import Cookies from 'js-cookie'
-
+const API_BASE_URL = import.meta.env.VITE_BASE_URL
 export const getMonthlyNewLearnersComparison = async () => {
   try {
-    const response = await axiosInstance.get('/learning-service/statistics/learners/monthly-comparison', {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/statistics/learners/monthly-comparison`, {
       headers: {
-        Authorization: Cookies.get('token')
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
     return response.data
@@ -17,9 +17,9 @@ export const getMonthlyNewLearnersComparison = async () => {
 
 export const getMonthlyProblemSubmissionsComparison = async () => {
   try {
-    const response = await axiosInstance.get('/learning-service/statistics/problems/submissions/monthly-comparison', {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/statistics/problems/submissions/monthly-comparison`, {
       headers: {
-        Authorization: Cookies.get('token')
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
     return response.data
@@ -30,11 +30,11 @@ export const getMonthlyProblemSubmissionsComparison = async () => {
 
 export const getTopSolvedProblems = async (pageIndex, pageSize) => {
   try {
-    const response = await axiosInstance.get(
-      `/learning-service/statistics/problems/top-solved?PageIndex=${pageIndex}&PageSize=${pageSize}`,
+    const response = await axios.get(
+      `${API_BASE_URL}/learning-service/statistics/problems/top-solved?PageIndex=${pageIndex}&PageSize=${pageSize}`,
       {
         headers: {
-          Authorization: Cookies.get('token')
+          Authorization: `Bearer ${Cookies.get('authToken')}`
         }
       }
     )
@@ -46,11 +46,11 @@ export const getTopSolvedProblems = async (pageIndex, pageSize) => {
 
 export const getMostPopularCoursesWithEnrollments = async (pageIndex, pageSize) => {
   try {
-    const response = await axiosInstance.get(
-      `/learning-service/statistics/courses/most-popular?PageIndex=${pageIndex}&PageSize=${pageSize}`,
+    const response = await axios.get(
+      `${API_BASE_URL}/learning-service/statistics/courses/most-popular?PageIndex=${pageIndex}&PageSize=${pageSize}`,
       {
         headers: {
-          Authorization: Cookies.get('token')
+          Authorization: `Bearer ${Cookies.get('authToken')}`
         }
       }
     )
@@ -62,11 +62,11 @@ export const getMostPopularCoursesWithEnrollments = async (pageIndex, pageSize) 
 
 export const getMonthlyEnrollmentsPerCourse = async (startTime, endTime, coursePerMonth) => {
   try {
-    const response = await axiosInstance.get(
-      `/learning-service/statistics/courses/enrollments/monthly?StartTime=${startTime}&EndTime=${endTime}&CoursePerMonth=${coursePerMonth}`,
+    const response = await axios.get(
+      `${API_BASE_URL}/learning-service/statistics/courses/enrollments/monthly?StartTime=${startTime}&EndTime=${endTime}&CoursePerMonth=${coursePerMonth}`,
       {
         headers: {
-          Authorization: Cookies.get('token')
+          Authorization: `Bearer ${Cookies.get('authToken')}`
         }
       }
     )

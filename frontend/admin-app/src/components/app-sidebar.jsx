@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import AuthService from '@/oidc/AuthService'
 import * as React from 'react'
-import authServiceInstance from '@/oidc/AuthService'
+import { useState, useEffect } from 'react'
 import {
   BookOpen,
   Codesandbox,
@@ -49,90 +49,104 @@ import {
   USER_DETAIL_PATH
 } from '@/routers/router'
 
-const user = await AuthService.getUser()
-
 // This is sample data.
-const data = {
-  user: {
-    name: 'Hello admin',
-    email: user.profile.email,
-    avatar: user.profile.urlImagePresigned
-  },
-
-  navMain: [
-    {
-      title: 'User',
-      url: '#',
-      icon: User,
-      isActive: false,
-      items: [
-        {
-          title: 'User Management',
-          url: USER_TABLE_PATH
-        },
-        {
-          title: 'Role Management',
-          url: '#'
-        }
-      ]
-    },
-    {
-      title: 'Course',
-      url: '#',
-      icon: BookOpenText,
-      isActive: false,
-      items: [
-        {
-          title: 'Course List',
-          url: COURSE_TABLE_PATH
-        },
-        {
-          title: 'Create Course',
-          url: CREATE_COURSE_PATH
-        }
-      ]
-    },
-    {
-      title: 'Problem',
-      url: '#',
-      icon: Code,
-      items: [
-        {
-          title: 'Problem List',
-          url: PROBLEM_TABLE_PATH
-        },
-        {
-          title: 'Create Problem',
-          url: CREATE_PROBLEM_PATH
-        }
-      ]
-    },
-    {
-      title: 'Quiz',
-      url: '#',
-      icon: CircleHelp,
-      items: [
-        {
-          title: 'Quiz Survey',
-          url: QUIZ_ASSESSMENT_PATH
-        }
-      ]
-    },
-    {
-      title: 'Document',
-      url: '#',
-      icon: BookOpen,
-      items: [
-        {
-          title: 'For AI',
-          url: DOCUMENT_AI_TABLE_PATH
-        }
-      ]
-    }
-  ]
-}
 
 export function AppSidebar({ ...props }) {
+  const [user, setUser] = useState({ profile: { email: '', urlImagePresigned: '' } })
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const fetchedUser = await AuthService.getUser()
+        setUser(fetchedUser)
+      } catch (error) {
+        console.error('Failed to get user:', error)
+      }
+    }
+
+    fetchUser()
+  }, [])
+
+  const data = {
+    user: {
+      name: 'Hello admin',
+      email: user.profile.email,
+      avatar: user.profile.urlImagePresigned
+    },
+
+    navMain: [
+      {
+        title: 'User',
+        url: '#',
+        icon: User,
+        isActive: false,
+        items: [
+          {
+            title: 'User Management',
+            url: USER_TABLE_PATH
+          },
+          {
+            title: 'Role Management',
+            url: '#'
+          }
+        ]
+      },
+      {
+        title: 'Course',
+        url: '#',
+        icon: BookOpenText,
+        isActive: false,
+        items: [
+          {
+            title: 'Course List',
+            url: COURSE_TABLE_PATH
+          },
+          {
+            title: 'Create Course',
+            url: CREATE_COURSE_PATH
+          }
+        ]
+      },
+      {
+        title: 'Problem',
+        url: '#',
+        icon: Code,
+        items: [
+          {
+            title: 'Problem List',
+            url: PROBLEM_TABLE_PATH
+          },
+          {
+            title: 'Create Problem',
+            url: CREATE_PROBLEM_PATH
+          }
+        ]
+      },
+      {
+        title: 'Quiz',
+        url: '#',
+        icon: CircleHelp,
+        items: [
+          {
+            title: 'Quiz Survey',
+            url: QUIZ_ASSESSMENT_PATH
+          }
+        ]
+      },
+      {
+        title: 'Document',
+        url: '#',
+        icon: BookOpen,
+        items: [
+          {
+            title: 'For AI',
+            url: DOCUMENT_AI_TABLE_PATH
+          }
+        ]
+      }
+    ]
+  }
+
   return (
     <Sidebar collapsible='icon' {...props}>
       <SidebarHeader>

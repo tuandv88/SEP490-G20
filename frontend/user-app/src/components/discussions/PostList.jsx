@@ -504,7 +504,7 @@ function PostList({ categoryId }) {
                 variant="contained"
                 color="primary"
                 startIcon={<EditIcon />}
-                onClick={() => setOpenDialog(true)}
+                onClick={() => handleNewPostButtonClick}
               >
                 Create New Post
               </Button>

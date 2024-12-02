@@ -89,7 +89,11 @@ export const AppRouter = () => {
     },
     {
       path: AUTHENTICATION_ROUTERS.NOTIFICATION,
-      element: <NotificationHistory />
+      element: (
+        <ProtectedRoute>
+          <NotificationHistory />
+        </ProtectedRoute>
+      )
     }
   ])
   return <RouterProvider router={router} />

@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { useNavigate } from '@tanstack/react-router'
 import { deleteProblemAg } from '@/services/api/problemApi'
-
+import { UPDATE_PROBLEM_AG_PATH } from '@/routers/router'
 const columnHelper = createColumnHelper()
 
 export const columns = [
@@ -82,6 +82,7 @@ export const columns = [
     cell: ({ row }) => {
       const problem = row.original
       const navigate = useNavigate()
+      const problemId = problem.problemsId
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -92,13 +93,11 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(problem.problemsId)}>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(problemId)}>
               Copy problem ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => navigate({ to: '/update-problem/$problemId', params: { problemId: problem.problemsId } })}
-            >
+            <DropdownMenuItem onClick={() => navigate({ to: UPDATE_PROBLEM_AG_PATH, params: { problemId } })}>
               Edit problem
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => deleteProblemAg(problem.problemsId)}>Delete problem</DropdownMenuItem>

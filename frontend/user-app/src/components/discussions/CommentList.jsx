@@ -9,8 +9,10 @@ import { formatDistanceToNow } from 'date-fns'
 import { Typography } from '@mui/material';;
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
+import Alert from '@mui/material/Alert';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, CircularProgress } from "@mui/material";
 import AuthService from '../../oidc/AuthService'; // Import để lấy dữ liệu Auth...
+
 
 function CommentList({ discussionId }) {
   const [isPreview, setIsPreview] = useState(false);
@@ -37,9 +39,13 @@ function CommentList({ discussionId }) {
 
   const [currentUser, setCurrentUser] = useState(null);
   const [idCurrentUser, setIdCurrentUser] = useState(null);
+  const [isAuth, setIsAuthor] = useState(false);
 
   const [openRemoveDialog, setOpenRemoveDialog] = useState(false);  // Trạng thái mở/đóng dialog
   const [commentIdToDelete, setCommentIdToDelete] = useState(null); // Lưu ID comment cần xóa
+
+
+  const [showAlertCheckIsCreateComment, setShowAlertCheckIsCreateComment] = useState(false);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -65,6 +71,7 @@ function CommentList({ discussionId }) {
         if (userTmp) {
           setCurrentUser(userTmp);
           setIdCurrentUser(userTmp.profile.sub);
+          setIsAuthor(true);
         }
 
       } catch (err) {
@@ -113,6 +120,11 @@ function CommentList({ discussionId }) {
       await DiscussApi.createComment(commentData);
       setRefreshComments(prev => !prev); // Toggle the refresh state to trigger useEffect
       setNewComment("");
+
+      if (commentData) {
+        console.log(commentData);
+      }
+
     } catch (err) {
       console.error("Failed to add comment:", err);
     } finally {
@@ -364,6 +376,33 @@ function CommentList({ discussionId }) {
     }));
   };
 
+  const handleCreateCommentButtonClick = () => {
+    if (!isAuth) {
+      setShowAlertCheckIsCreateComment(true);
+      setTimeout(() => setShowAlertCheckIsCreateComment(false), 5000);
+    } else {
+      handleAddComment();
+    }
+  };
+
+  const handleCreateReplyButtonClick = (parentCommentId, depth) => {
+    if (!isAuth) {
+      setShowAlertCheckIsCreateComment(true);
+      setTimeout(() => setShowAlertCheckIsCreateComment(false), 5000);
+    } else {
+      handleReplyCommentSubmit(parentCommentId, depth)
+    }
+  };
+
+  const handleCreateReplyNestedButtonClick = (parentCommentId, depth) => {
+    if (!isAuth) {
+      setShowAlertCheckIsCreateComment(true);
+      setTimeout(() => setShowAlertCheckIsCreateComment(false), 5000);
+    } else {
+      handleReplyCommentSubmit(parentCommentId, depth)
+    }
+  };
+
   return (
     <div className="comment-list__content">
 
@@ -408,13 +447,34 @@ function CommentList({ discussionId }) {
 
           <button
             className="comment-button"
-            onClick={handleAddComment}
+            onClick={handleCreateCommentButtonClick}
             disabled={!newComment.trim() || submitting} // Disable Post button if no content
           >
             {submitting ? "Submitting..." : "Post Comment"}
           </button>
         </div>
       </div>
+
+
+
+      {/* Alert Popup Dialog New Post*/}
+      {showAlertCheckIsCreateComment && (
+        <Stack
+          sx={{
+            position: 'fixed',
+            top: 20,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            width: 'auto',
+            maxWidth: '500px',
+          }}
+        >
+          <Alert severity="error">
+            Please log in to create a new Comment or Reply!
+          </Alert>
+        </Stack>
+      )}
 
       <div className="comment-list__body">
         {comments.length > 0 ? (
@@ -500,7 +560,7 @@ function CommentList({ discussionId }) {
                         value={contentReplyFromComment}
                         onChange={(e) => setContentReplyFromComment(e.target.value)}
                       />
-                      <button onClick={() => handleReplyCommentSubmit(comment.id, 2)}>Submit</button>
+                      <button onClick={() => handleCreateReplyButtonClick(comment.id, 2)}>Reply Now</button>
                     </div>
                   )}
 
@@ -515,8 +575,12 @@ function CommentList({ discussionId }) {
                               className="comment-item__avatar"
                             />
                             <div className="comment-item__header-text">
-                              <p className="comment-item__username">{reply.userName}</p>
+                              <p className="comment-item__username_replies">{reply.userName}</p>
                             </div>
+                            <p className="comment-item__timestamp_replies">
+                              Created at: {formatRelativeDate(reply.dateCreated)}
+                            </p>
+                            {comment.isEdited && <span className="comment-item__edited_replies">Edited</span>}
                           </div>
                           <div className="comment-item__content">{reply.content}</div>
 
@@ -536,7 +600,7 @@ function CommentList({ discussionId }) {
                                 value={contentReplyFromReply}
                                 onChange={(e) => setContentReplyFromReply(e.target.value)}
                               />
-                              <button onClick={() => handleReplyCommentSubmit(comment.id, 3)}>Submit</button>
+                              <button onClick={() => handleCreateReplyNestedButtonClick(comment.id, 3)}>Submit</button>
                             </div>
                           )}
                         </div>
@@ -869,12 +933,12 @@ function CommentList({ discussionId }) {
 .comment-item__edited {
   font-size: 0.75rem;
   color: #95a5a6;
-  margin-left: 6px;
+  margin-left: 2px;
 }
 
 /* Comment content */
 .comment-item__content {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #34495e;
   line-height: 1.5;
   word-wrap: break-word;
@@ -1028,13 +1092,45 @@ function CommentList({ discussionId }) {
 .replies .comment-item .comment-item__header {
   margin-bottom: 6px;
   padding-bottom: 6px;
+  margin-top: 2px;
+}
+
+.comment-item__edited_replies {
+  font-size: 0.75rem;
+  color: #95a5a6;
+  position: absolute;
+  top: 65px;
+  left: 23px;
+}
+
+.comment-item__username_replies {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #2c3e50;
+  margin-top: -20px;
+  margin-left: 5px;
+}
+
+.comment-item__timestamp_replies {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  position: absolute;
+  bottom: 5px; /* Adjust as needed */
+  left: 75px; /* This replaces margin-left: -75px */
+  top: 42px; /* This replaces margin-left: -75px */
+  white-space: nowrap; /* Prevents wrapping to multiple lines */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds ... if text overflows */
+  max-width: calc(100% - 75px); /* Ensures it doesn't overlap with other content */
 }
 
 .replies .comment-item__content {
   margin-top: 5px;
   background-color: #fff;
   border-radius: 4px;
+  margin-left: 55px;
 }
+
 
 /* Responsive adjustments */
 @media (max-width: 576px) {

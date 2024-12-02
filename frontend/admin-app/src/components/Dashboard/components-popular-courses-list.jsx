@@ -9,13 +9,13 @@ function PopularCoursesList({ courses }) {
       </CardHeader>
       <CardContent>
         <ul className='space-y-4'>
-          {courses.map((course) => (
-            <li key={course.id} className='flex items-center justify-between'>
+          {courses?.map((course) => (
+            <li key={course.courseId} className='flex items-center justify-between'>
               <div>
-                <p className='font-medium'>{course.name}</p>
-                <p className='text-sm text-muted-foreground'>{course.enrollments} students</p>
+                <p className='font-medium'>{course.title}</p>
+                <p className='text-sm text-muted-foreground'>{course.enrollmentCount} learners</p>
               </div>
-              <p className='font-medium'>{course.revenue.toLocaleString()} $</p>
+              <p className='font-medium'>{course.price.toLocaleString()} $</p>
             </li>
           ))}
         </ul>
@@ -24,14 +24,4 @@ function PopularCoursesList({ courses }) {
   )
 }
 
-PopularCoursesList.propTypes = {
-  courses: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      name: PropTypes.string.isRequired,
-      enrollments: PropTypes.number.isRequired,
-      revenue: PropTypes.number.isRequired
-    })
-  ).isRequired
-}
 export default PopularCoursesList

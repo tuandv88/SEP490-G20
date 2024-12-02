@@ -137,30 +137,89 @@ namespace Community.Infrastructure.Extensions
 
         // Danh sách NotificationType mẫu
         public static readonly List<NotificationType> NotificationTypes = new List<NotificationType>
-        {
-            new NotificationType { Id = new NotificationTypeId(Guid.NewGuid()), Name = "New Comment", Description = "Notify when a new comment is added",
-                CanSendEmail = true, CanSendWebsite = true, Priority = 3 },
-            new NotificationType { Id = new NotificationTypeId(Guid.NewGuid()), Name = "New Vote", Description = "Notify when a new vote is received",
-                CanSendEmail = false, CanSendWebsite = true, Priority = 2 }
-        };
+{
+    new NotificationType
+    {
+        Id = new NotificationTypeId(Guid.NewGuid()),
+        Name = "New Comment",
+        Description = "Notify when a new comment is added",
+        CanSendEmail = true,
+        CanSendWebsite = true,
+        Priority = 3
+    },
+    new NotificationType
+    {
+        Id = new NotificationTypeId(Guid.NewGuid()),
+        Name = "New Vote",
+        Description = "Notify when a new vote is received",
+        CanSendEmail = false,
+        CanSendWebsite = true,
+        Priority = 2
+    }
+};
 
         // Danh sách UserNotificationSetting mẫu
         public static readonly List<UserNotificationSetting> UserNotificationSettings = new List<UserNotificationSetting>
-        {
-            new UserNotificationSetting { Id = new UserNotificationSettingId(Guid.NewGuid()), UserId = Users[0].Id, NotificationTypeId = NotificationTypes[0].Id,
-                IsNotificationEnabled = true, IsEmailEnabled = true, IsWebsiteEnabled = true, NotificationFrequency = NotificationFrequency.Immediate },
-            new UserNotificationSetting { Id = new UserNotificationSettingId(Guid.NewGuid()), UserId = Users[1].Id, NotificationTypeId = NotificationTypes[1].Id,
-                IsNotificationEnabled = true, IsEmailEnabled = false, IsWebsiteEnabled = true, NotificationFrequency = NotificationFrequency.Daily }
-        };
+{
+    new UserNotificationSetting
+    {
+        Id = new UserNotificationSettingId(Guid.NewGuid()),
+        UserId = Users[0].Id,
+        NotificationTypeId = NotificationTypes[0].Id,
+        IsNotificationEnabled = true,
+        IsEmailEnabled = true,
+        IsWebsiteEnabled = true,
+        NotificationFrequency = NotificationFrequency.Immediate
+    },
+    new UserNotificationSetting
+    {
+        Id = new UserNotificationSettingId(Guid.NewGuid()),
+        UserId = Users[1].Id,
+        NotificationTypeId = NotificationTypes[1].Id,
+        IsNotificationEnabled = true,
+        IsEmailEnabled = false,
+        IsWebsiteEnabled = true,
+        NotificationFrequency = NotificationFrequency.Daily
+    }
+};
 
         // Danh sách NotificationHistory mẫu
         public static readonly List<NotificationHistory> NotificationHistories = new List<NotificationHistory>
-        {
-            new NotificationHistory { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = Users[0].Id, NotificationTypeId = NotificationTypes[0].Id,
-                Message = "New comment on your post", DateSent = DateTime.UtcNow, DateRead = null, IsRead = false, SentVia = SentVia.Web, Status = Status.Sent },
-            new NotificationHistory { Id = new NotificationHistoryId(Guid.NewGuid()), UserId = Users[1].Id, NotificationTypeId = NotificationTypes[1].Id,
-                Message = "Your post received a new vote", DateSent = DateTime.UtcNow, DateRead = DateTime.UtcNow, IsRead = true, SentVia = SentVia.Web, Status = Status.Received }
-        };
+{
+    new NotificationHistory
+    {
+        Id = new NotificationHistoryId(Guid.NewGuid()),
+        UserNotificationSettingId = UserNotificationSettings[0].Id,  // Sử dụng Id hợp lệ từ UserNotificationSettings
+        UserId = Users[0].Id,
+        NotificationTypeId = NotificationTypes[0].Id,
+        Message = "New comment on your post",
+        DateSent = DateTime.UtcNow,
+        DateCreated = DateTime.UtcNow,
+        DateRead = null,
+        IsRead = false,
+        SentVia = SentVia.Web,
+        Status = Status.Sent,
+        Subject = "New Comment",
+        SenderId = null
+    },
+    new NotificationHistory
+    {
+        Id = new NotificationHistoryId(Guid.NewGuid()),
+        UserNotificationSettingId = UserNotificationSettings[1].Id,  // Sử dụng Id hợp lệ từ UserNotificationSettings
+        UserId = Users[1].Id,
+        NotificationTypeId = NotificationTypes[1].Id,
+        Message = "Your post received a new vote",
+        DateSent = DateTime.UtcNow,
+        DateCreated = DateTime.UtcNow,
+        DateRead = DateTime.UtcNow,
+        IsRead = true,
+        SentVia = SentVia.Web,
+        Status = Status.Received,
+        Subject = "New Vote",
+        SenderId = null
+    }
+};
+
     }
 
     public class User

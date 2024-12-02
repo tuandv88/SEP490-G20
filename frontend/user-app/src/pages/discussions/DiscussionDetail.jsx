@@ -88,7 +88,7 @@ function DiscussionDetail() {
         }
 
         const userTmp = await AuthService.getUser();
-        console.log(userTmp);
+        console.log("Hi: ", userTmp);
         setCurrentUser(userTmp);
 
         setDiscussion(data);

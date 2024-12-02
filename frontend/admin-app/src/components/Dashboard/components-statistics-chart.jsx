@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import PropTypes from 'prop-types'
 import { Button } from '@/components/ui/button'
@@ -17,9 +17,40 @@ import {
   Cell
 } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+const colorPalette = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+  'hsl(var(--chart-6))',
+  'hsl(var(--chart-7))',
+  'hsl(var(--chart-8))'
+]
 
-function StatisticsChart({ courseEnrollmentData, userDistributionData, revenueGrowthData, topEnrolledCourses }) {
+function StatisticsChart({ courseEnrollmentData, topEnrolledCourses }) {
   const [activeTab, setActiveTab] = useState('courseEnrollment')
+
+  // Get unique course names and create a config object
+  const { uniqueCourses, chartConfig } = useMemo(() => {
+    const courseSet = new Set()
+    courseEnrollmentData.forEach((entry) => {
+      Object.keys(entry).forEach((key) => {
+        if (key !== 'month') courseSet.add(key)
+      })
+    })
+    const uniqueCourses = Array.from(courseSet)
+
+    const chartConfig = {}
+    uniqueCourses.forEach((course, index) => {
+      chartConfig[course] = {
+        label: course,
+        color: colorPalette[index % colorPalette.length]
+      }
+    })
+
+    return { uniqueCourses, chartConfig }
+  }, [courseEnrollmentData])
 
   return (
     <Card className='mb-8 bg-card text-card-foreground'>
@@ -34,22 +65,15 @@ function StatisticsChart({ courseEnrollmentData, userDistributionData, revenueGr
           >
             Course Enrollment
           </Button>
-          <Button
-            size='sm'
-            variant={activeTab === 'userDistribution' ? 'default' : 'outline'}
-            onClick={() => setActiveTab('userDistribution')}
-            className='min-w-[140px]'
-          >
-            User Distribution
-          </Button>
-          <Button
+
+          {/* <Button
             size='sm'
             variant={activeTab === 'revenueGrowth' ? 'default' : 'outline'}
             onClick={() => setActiveTab('revenueGrowth')}
             className='min-w-[140px]'
           >
             Revenue Growth
-          </Button>
+          </Button> */}
           <Button
             size='sm'
             variant={activeTab === 'topCourses' ? 'default' : 'outline'}
@@ -62,31 +86,7 @@ function StatisticsChart({ courseEnrollmentData, userDistributionData, revenueGr
       </CardHeader>
       <CardContent className='flex items-center justify-center px-4 py-6'>
         <div className='w-full max-w-5xl mx-auto'>
-          <ChartContainer
-            config={{
-              'Web Development': {
-                label: 'Web Development',
-                color: 'hsl(var(--chart-1))'
-              },
-              'Data Science': {
-                label: 'Data Science',
-                color: 'hsl(var(--chart-2))'
-              },
-              'Mobile App': {
-                label: 'Mobile App',
-                color: 'hsl(var(--chart-3))'
-              },
-              revenue: {
-                label: 'Revenue',
-                color: 'hsl(var(--chart-4))'
-              },
-              enrollments: {
-                label: 'Enrollments',
-                color: 'hsl(var(--chart-5))'
-              }
-            }}
-            className='h-[400px]'
-          >
+          <ChartContainer config={chartConfig} className='h-[400px]'>
             <ResponsiveContainer width='100%' height='100%'>
               {activeTab === 'courseEnrollment' && (
                 <BarChart data={courseEnrollmentData} margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
@@ -95,12 +95,12 @@ function StatisticsChart({ courseEnrollmentData, userDistributionData, revenueGr
                   <YAxis tick={{ fontSize: 13 }} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Legend wrapperStyle={{ fontSize: '13px', marginTop: '15px' }} />
-                  <Bar dataKey='Web Development' stackId='a' fill='hsl(var(--chart-1))' />
-                  <Bar dataKey='Data Science' stackId='a' fill='hsl(var(--chart-2))' />
-                  <Bar dataKey='Mobile App' stackId='a' fill='hsl(var(--chart-3))' />
+                  {uniqueCourses.map((course, index) => (
+                    <Bar key={course} dataKey={course} stackId='a' fill={colorPalette[index % colorPalette.length]} />
+                  ))}
                 </BarChart>
               )}
-              {activeTab === 'userDistribution' && (
+              {/* {activeTab === 'userDistribution' && (
                 <PieChart margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
                   <Pie
                     data={userDistributionData}
@@ -135,7 +135,7 @@ function StatisticsChart({ courseEnrollmentData, userDistributionData, revenueGr
                     dot={{ strokeWidth: 2, r: 4 }}
                   />
                 </LineChart>
-              )}
+              )} */}
               {activeTab === 'topCourses' && (
                 <BarChart
                   layout='vertical'
@@ -158,9 +158,9 @@ function StatisticsChart({ courseEnrollmentData, userDistributionData, revenueGr
   )
 }
 StatisticsChart.propTypes = {
-  courseEnrollmentData: PropTypes.arrayOf(PropTypes.object).isRequired,
-  userDistributionData: PropTypes.arrayOf(PropTypes.object).isRequired,
-  revenueGrowthData: PropTypes.arrayOf(PropTypes.object).isRequired,
-  topEnrolledCourses: PropTypes.arrayOf(PropTypes.object).isRequired
+  courseEnrollmentData: PropTypes.arrayOf(PropTypes.object).isRequired
+  // userDistributionData: PropTypes.arrayOf(PropTypes.object).isRequired,
+  // revenueGrowthData: PropTypes.arrayOf(PropTypes.object).isRequired,
+  // topEnrolledCourses: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 export default StatisticsChart

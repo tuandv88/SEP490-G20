@@ -8,6 +8,7 @@ import DropdownMenuUser from '@/components/ui/userdropdown'
 import { ModeToggle } from '@/components/mode-toggle'
 import AuthService from '@/oidc/AuthService'
 import { UserContext } from '@/contexts/UserContext'
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
   const { user, updateUser } = useContext(UserContext)
@@ -59,6 +60,11 @@ export default function Header() {
   //   const user = await AuthService.getUser()
   //   updateUser(user)
   // }
+  const navigate = useNavigate();
+  const handleClick = () => {
+    console.log('Navigating to /notifications/history');
+    navigate(`/notifications/history`);
+  }
 
   useEffect(() => {
     // Lấy lại thông tin người dùng khi component được mount hoặc user thay đổi
@@ -121,10 +127,20 @@ export default function Header() {
           </nav>
           <div className='flex items-center space-x-4'>
             {user ? (
+
               <div className='flex items-center space-x-3'>
-                <Button variant='ghost' size='icon' className='hidden md:inline-flex'>
-                  <Bell className='w-5 h-5' />
-                </Button>
+
+                <div className='Notification'>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='hidden md:inline-flex'
+                    onClick={handleClick}
+                  >
+                    <Bell className='w-5 h-5' />
+                  </Button>
+                </div>
+
                 <div className='relative flex items-center' ref={dropdownRef}>
                   <div onClick={toggleDropdown} className='cursor-pointer'>
                     <Avatar>

@@ -7,34 +7,69 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import PreCoppy from '../ui/PreCoppy'
 import { BookOpenCheck, Frown } from 'lucide-react'
 import DescriptionLoading from '../loading/DescriptionLoading'
+import { Button } from '../ui/button'
+import { LearningAPI } from '@/services/api/learningApi'
+import { CourseAPI } from '@/services/api/courseApi'
 
-const NormalLecture = ({ description, videoSrc, loading, titleProblem }) => {
+const NormalLecture = ({ description, videoSrc, loading, titleProblem, handleNextLecture, courseId, lectureId, files }) => {
 
-  console.log(videoSrc)
+  const updateProgress = async () => {
+    try {
+      const response = await CourseAPI.updateCourseProgress(courseId, lectureId)
+    } catch (error) {
+      console.error('Error updating progress:', error)
+    }
+  }
+
+  const handleComplete = () => {
+    updateProgress();
+    handleNextLecture();
+  }
+
+  const documentFiles = files.filter(
+    (file) => file && file.fileType === 'DOCUMENT'
+  )
+
+  const handleDownload = (e, fileUrl, fileName) => {
+    e.preventDefault();
+
+    // Tạo một thẻ a ẩn và kích hoạt sự kiện click để tải xuống
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.setAttribute('download', fileName || 'document');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 
   return (
-    <div >
+    <div>
       {loading ? (
         <DescriptionLoading />
       ) : (
         <div className='bg-bGprimary text-gray-300 p-6 mx-auto font-sans h-full'>
           {videoSrc && (
             <div className='relative pb-[56.25%] h-0'>
-              <video           
-              className='absolute top-0 left-0 w-full h-full'
-              controls
-              src={videoSrc}
-              title='Lecture Video'  
-              preload='auto'           
-            >
-              Your browser does not support the video tag.
+              <video
+                className='absolute top-0 left-0 w-full h-full'
+                controls
+                src={videoSrc}
+                title='Lecture Video'
+                preload='auto'                
+              >
+                Your browser does not support the video tag.
               </video>
             </div>
           )}
 
+          <Button onClick={handleComplete} className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-5'>
+            Mark as complete
+          </Button>
+
           <div className='p-3 rounded-lg flex items-center mb-10 mt-10 w-full border border-spacing-10'>
             <BookOpenCheck className='inline mr-4' size={40} color='#ffffff' />
             <h1 className=' text-white text-2xl font-bold'>{titleProblem}</h1>
+            <div className='mt-6'></div>
           </div>
 
           <hr className='border-b-2 border-gray-100 mb-6 mt-6 overflow-visible' />
@@ -66,6 +101,32 @@ const NormalLecture = ({ description, videoSrc, loading, titleProblem }) => {
               {description}
             </ReactMarkdown>
           </div>
+          {documentFiles.length > 0 && (
+            <div className='document-list mt-5'>
+              <h3 className='text-xl font-bold mb-3'>Documents</h3>
+              <ul>
+                {documentFiles.map((file, index) => {
+                  if (file && file.presignedUrl) {
+                    return (
+                      <li key={index} className='mb-2'>
+                        <a
+                          href={file.presignedUrl}
+                          onClick={(e) => handleDownload(e, file.presignedUrl, `Document ${index + 1}`)}
+                          className='text-blue-500 hover:underline cursor-pointer'
+                          target='_blank'
+                        >
+                          Download document {index + 1}
+                        </a>
+                      </li>
+                    );
+                  } else {
+                    console.warn('File bị thiếu hoặc thiếu presignedUrl:', file);
+                    return null;
+                  }
+                })}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>

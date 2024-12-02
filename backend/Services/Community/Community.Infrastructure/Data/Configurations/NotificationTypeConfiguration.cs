@@ -1,5 +1,4 @@
-﻿using Community.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Community.Infrastructure.Data.Configurations
@@ -32,19 +31,16 @@ namespace Community.Infrastructure.Data.Configurations
             builder.Property(nt => nt.Priority)
                 .IsRequired();
 
-            // Quan hệ với UserNotificationSetting và NotificationHistory
-            builder.HasMany(nt => nt.UserNotificationSettings)
-                .WithOne()
-                .HasForeignKey("NotificationTypeId")
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(nt => nt.NotificationHistorys)
-                .WithOne()
-                .HasForeignKey("NotificationTypeId")
-                .OnDelete(DeleteBehavior.Cascade);
 
             // Thiết lập chỉ mục
             builder.HasIndex(nt => nt.Name);
+
+            // Mối quan hệ với NotificationHistory
+            builder.HasMany(uns => uns.NotificationHistorys)
+                .WithOne()
+                .HasForeignKey(nh => nh.NotificationTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
+
 }

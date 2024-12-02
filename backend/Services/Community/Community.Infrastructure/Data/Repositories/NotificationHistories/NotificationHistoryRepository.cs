@@ -1,4 +1,5 @@
-﻿namespace Community.Infrastructure.Data.Repositories.NotificationHistories;
+﻿
+namespace Community.Infrastructure.Data.Repositories.NotificationHistories;
 public class NotificationHistoryRepository : Repository<NotificationHistory>, INotificationHistoryRepository
 {
     private readonly IApplicationDbContext _dbContext;
@@ -15,6 +16,17 @@ public class NotificationHistoryRepository : Repository<NotificationHistory>, IN
             _dbContext.NotificationHistories.Remove(notificationHistory);
         }
     }
+
+    public async Task<List<NotificationHistory>?> GetAllNotificationDetailByUserId(Guid userId)
+    {
+        var notificationHistories = await _dbContext.NotificationHistories
+                                                    .Where(n => n.UserId == UserId.Of(userId)) // Đảm bảo UserId.Of() hoạt động đúng
+                                                    .OrderByDescending(n => n.DateSent)
+                                                    .ToListAsync(); // Dùng ToListAsync() thay vì AsEnumerable() để chạy trên cơ sở dữ liệu và trả về danh sách
+
+        return notificationHistories;
+    }
+
 
     public override async Task<NotificationHistory?> GetByIdAsync(Guid id)
     {

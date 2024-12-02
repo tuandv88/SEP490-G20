@@ -10,67 +10,69 @@ import ErrorPage from './ErrorPage'
 import NotFound from './NotFound'
 import CourseLoading from '@/components/loading/CourseLoading'
 import CourseItem from '@/components/courses/CourseItem'
+import { CourseAPI } from '@/services/api/courseApi'
+import lodash, { isEmpty } from 'lodash'
 
 const levels = ['Basic', 'Intermediate', 'Advanced', 'Expert']
 
 function CourseList() {
   const [courses, setCourses] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedLevel, setSelectedLevel] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
-  const [coursesPerPage] = useState(5)
+  const [coursesPerPage] = useState(4)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [courses])
 
-  // Filter courses based on search term, level, and category
-  // useEffect(() => {
-  //   let filteredCourses = courses.filter(
-  //     (course) =>
-  //       course.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-  //       (selectedLevel === '' || course.level === selectedLevel) &&
-  //       (selectedCategory === '' || course.category === selectedCategory)
-  //   )
-  //   setCourses(filteredCourses)
-  //   setCurrentPage(1) // Reset to first page when filters change
-  // }, [searchTerm, selectedLevel, selectedCategory, courses])
+
+  const fetchCourseDetail = async (searchTermString) => {
+    setLoading(true)
+    setError(false)
+    try {
+      const data = await CourseAPI.getCourseList(currentPage, coursesPerPage, searchTermString)
+      setCourses(data?.courseDtos?.data)
+      setTotalItems(data?.courseDtos?.count || 0);
+    } catch (error) {
+      console.error('Error fetching course detail:', error)
+      if (error.response) {
+        if (error.response.status >= 500) {
+          setError(true)
+        } else if (error.response.status === 404) {
+          setCourses(null)
+        }
+      } else {
+        setError(true)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchCourseDetail = async () => {
-      setLoading(true)
-      setError(false)
-      try {
-        const data = await LearningAPI.getCourseList(1, 20)
-        setCourses(data?.courseDtos?.data)
-      } catch (error) {
-        console.error('Error fetching course detail:', error)
-        if (error.response) {
-          if (error.response.status >= 500) {
-            setError(true)
-          } else if (error.response.status === 404) {
-            setCourses(null)
-          }
-        } else {
-          setError(true)
-        }
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchCourseDetail()
-  }, [])
+  }, [currentPage])
 
-  // Pagination logic
-  // const indexOfLastCourse = currentPage * coursesPerPage
-  // const indexOfFirstCourse = indexOfLastCourse - coursesPerPage
-  // const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse)
+  const handleSearch = () => {
+    console.log(searchTerm)
+    setCurrentPage(1)
+    fetchCourseDetail(searchTerm)
+  }
 
-  // const paginate = (pageNumber) => setCurrentPage(pageNumber)
+  const handleReset = () => {
+    setSearchTerm('');
+    setCurrentPage(1);
+    fetchCourseDetail('')
+  };
+  
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const totalPages = Math.ceil(totalItems / coursesPerPage);
+
   if (error) {
     return <ErrorPage />
   }
@@ -83,7 +85,7 @@ function CourseList() {
     <div>
       <Header />
       <div className='container px-4 pt-40 pb-12 mx-auto bg-gray-50'>
-        <h1 className='mb-8 text-4xl font-bold text-center text-gray-800'>Khám phá khóa học</h1>
+        <h1 className='mb-8 text-4xl font-bold text-center text-gray-800'>Explore Courses</h1>
 
         {/* Search and Filter Section */}
         <div className='flex flex-col gap-4 p-6 mb-8 bg-white rounded-lg shadow-md md:flex-row'>
@@ -99,36 +101,35 @@ function CourseList() {
               <FaSearch className='absolute left-3 top-3.5 text-gray-400' />
             </div>
           </div>
-          <div className='gap-4 ml-10'>
-            <select
-              className='mr-5 px-10 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-              value={selectedLevel}
-            >
-              <option value=''>All levels</option>
-              {levels.map((level) => (
-                <option key={level} value={level}>
-                  {level}
-                </option>
-              ))}
-            </select>
-          </div>
+          <button
+            onClick={handleSearch}
+            className='px-4 py-2 text-white bg-primaryButton rounded-lg hover:bg-primaryButton focus:outline-none focus:ring-2 focus:ring-primaryButton focus:ring-offset-2'
+          >
+            Search
+          </button>
+          <button
+            onClick={handleReset}
+            className='px-4 py-2 text-white bg-gray-500 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2'
+          >
+            Reset
+          </button>
         </div>
 
         {/* Course List */}
-        {loading ? <CourseLoading></CourseLoading> : <CourseItem courses={courses} />}
+        {loading ? <CourseLoading /> : <CourseItem courses={courses} />}
         {/* Pagination */}
         <div className='flex justify-center mt-12'>
           <nav className='inline-flex -space-x-px rounded-md shadow-sm' aria-label='Pagination'>
-            {Array.from({ length: Math.ceil(courses.length / coursesPerPage) }, (_, i) => (
+            {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
-                // onClick={() => paginate(i + 1)}
+                onClick={() => paginate(i + 1)}
                 className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium
           ${
             currentPage === i + 1
               ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
               : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-          } ${i === 0 ? 'rounded-l-md' : ''} ${i === Math.ceil(courses.length / coursesPerPage) - 1 ? 'rounded-r-md' : ''}`}
+          } ${i === 0 ? 'rounded-l-md' : ''} ${i === totalPages - 1 ? 'rounded-r-md' : ''}`}
               >
                 {i + 1}
               </button>

@@ -90,8 +90,8 @@ public static class DiscussionExtensions
     }
 
     public static async Task<List<DiscussionsTopDto>> ToDiscussionsTopDtoListAsync(
-    this List<Discussion> discussions,
-    IFilesService filesService) // Thêm CategoryRepository để truy vấn Category
+this List<Discussion> discussions,
+IFilesService filesService) // Thêm CategoryRepository để truy vấn Category
     {
         var tasks = discussions.Select(async d =>
         {

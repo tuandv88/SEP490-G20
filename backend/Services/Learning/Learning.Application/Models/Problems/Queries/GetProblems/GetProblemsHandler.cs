@@ -2,8 +2,7 @@
 using Learning.Application.Models.Problems.Dtos;
 
 namespace Learning.Application.Models.Problems.Queries.GetProblems;
-public class GetProblemsHandler(IProblemRepository problemRepository, IProblemSubmissionRepository problemSubmissionRepository
-    , IUserContextService userContext) : IQueryHandler<GetProblemsQuery, GetProblemsResult> {
+public class GetProblemsHandler(IProblemRepository problemRepository, IUserContextService userContext) : IQueryHandler<GetProblemsQuery, GetProblemsResult> {
     public async Task<GetProblemsResult> Handle(GetProblemsQuery request, CancellationToken cancellationToken) {
         var userId = userContext.User.Id;
         //problem phải được active đối với người dùng cơ bản

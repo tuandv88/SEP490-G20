@@ -1,32 +1,58 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Clock, Calendar, Award } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CourseAPI } from '@/services/api/courseApi'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
+import { UserContext } from '@/contexts/UserContext'
+import authServiceInstance from '@/oidc/AuthService'
 
-export function CourseSidebar({ enrolledCourses, firstLectureId }) {
-
+export function CourseSidebar({ enrolledCourses, courseDetail }) {
   const { id } = useParams()
-  console.log(id)
-  console.log(firstLectureId)
   const navigate = useNavigate()
+  const { user } = useContext(UserContext)
+  const [firstLectureId, setFirstLectureId] = useState(null)
+
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      if (user) {
+        try {
+          const courseProgress = await CourseAPI.getCourseProgress(id);
+          const currentLecture = courseProgress.progress.find(lecture => lecture.isCurrent);
+          setFirstLectureId(currentLecture ? currentLecture.lectureId : courseDetail.course.chapters[0].lectures[0].id);         
+        } catch (error) {
+          console.error('Error fetching course progress:', error);
+        }
+      } else {
+        console.log('User not logged in, skipping course progress fetch.');
+      }
+    };
+
+    fetchCourseData();
+  }, [id, user]);
+
 
 
   const handleLearningCourse = () => {
     navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', id).replace(':lectureId', firstLectureId))
   }
 
-
   const handleEnrollCourse = async () => {
-    try {
-      const data = await CourseAPI.enrollCourse(id)
-      console.log(data)
-      navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', id).replace(':lectureId', firstLectureId))
-    } catch (error) {
-      console.error('Error enrolling course:', error)
+    if (!user) {
+      try {
+        await authServiceInstance.login() 
+      } catch (error) {
+        console.error('Error during login:', error)
+      }
+    } else {
+      try {
+        const data = await CourseAPI.enrollCourse(id)
+        console.log(data)
+        navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', id).replace(':lectureId', firstLectureId))
+      } catch (error) {
+        console.error('Error enrolling course:', error)
+      }
     }
   }
-
 
   return (
     <div className='space-y-6'>
@@ -43,14 +69,20 @@ export function CourseSidebar({ enrolledCourses, firstLectureId }) {
         {/* <h3 className='text-xl font-semibold mb-4'>Free of charge</h3> */}
         {enrolledCourses ? (
           <>
-            <button onClick={() => handleLearningCourse()} className='w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors mb-4'>
+            <button
+              onClick={() => handleLearningCourse()}
+              className='w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors mb-4'
+            >
               Learning Now
             </button>
             <p className='text-center text-gray-600 text-sm'>You are learning this course</p>
           </>
         ) : (
           <>
-            <button onClick={() => handleEnrollCourse()} className='w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors mb-4'>
+            <button
+              onClick={() => handleEnrollCourse()}
+              className='w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors mb-4'
+            >
               Enroll Now
             </button>
             <p className='text-center text-gray-600 text-sm'>Join the course for free</p>

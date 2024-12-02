@@ -2,124 +2,106 @@ import React, { useEffect, useState } from 'react'
 import { BarChart2, BookOpen, Calendar, Layout, ListChecks, PlusCircle } from 'lucide-react'
 import CourseStep from './CourseStep'
 import { LearningAPI } from '@/services/api/learningApi'
+import ChapterLoading from '../loading/ChapterLoading'
+import { QuizAPI } from '@/services/api/quizApi'
+import AssessmentPrompt from '../surrvey/AssessmentPromptProps'
+import QuizModal from '../surrvey/QuizModal'
+import { Button } from '../ui/button'
 
-const path = {
-  pathName: 'Full-stack Developer',
-  startDate: '2024-03-15',
-  endDate: '2025-03-15',
-  category: 'Web Development',
-  difficulty: 'Intermediate',
-  totalDuration: '12 months',
-  reasons: [
-    'Strong foundation in both frontend and backend development',
-    'High demand in current job market',
-    'Matches your previous experience with web technologies',
-    'Comprehensive curriculum covering modern web stack'
-  ],
-  steps: [
-    {
-      title: 'Frontend Fundamentals',
-      headline: 'Master HTML, CSS, and JavaScript',
-      price: 299,
-      timeDuration: '3 months',
-      description:
-        'Build a strong foundation in modern web development with hands-on projects and real-world applications.',
-      topics: [
-        'HTML5 Semantic Elements',
-        'CSS3 Layouts and Animations',
-        'JavaScript ES6+ Features',
-        'Responsive Web Design',
-        'Web Accessibility'
-      ],
-      skills: ['HTML', 'CSS', 'JavaScript', 'Git', 'Web Standards']
-    },
-    {
-      title: 'React Development',
-      headline: 'Build modern web applications with React',
-      price: 399,
-      timeDuration: '4 months',
-      description: 'Learn to build scalable applications using React and its ecosystem of tools and libraries.',
-      topics: [
-        'React Fundamentals',
-        'State Management',
-        'Hooks and Custom Hooks',
-        'React Router',
-        'Performance Optimization'
-      ],
-      skills: ['React', 'Redux', 'TypeScript', 'Testing', 'Performance']
-    },
-    {
-      title: 'Backend Development',
-      headline: 'Master Node.js and Express',
-      price: 449,
-      timeDuration: '5 months',
-      description: 'Develop secure and scalable backend services using Node.js and modern backend technologies.',
-      topics: [
-        'Node.js Fundamentals',
-        'Express Framework',
-        'Database Design',
-        'API Development',
-        'Authentication & Security'
-      ],
-      skills: ['Node.js', 'Express', 'MongoDB', 'REST APIs', 'Security']
-    }
-  ],
-  imageUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80'
-}
-
-export function RoadmapDashboard() {
+const RoadmapDashboard = ({ user }) => {
   const [learningPath, setLearningPath] = useState([])
   const [courseDetails, setCourseDetails] = useState({})
+  const [loading, setLoading] = useState(false)
+  const [isAssessmentPromptOpen, setIsAssessmentPromptOpen] = useState(false)
+  const [isQuizOpen, setIsQuizOpen] = useState(false)
+  const [quizAssessment, setQuizAssessment] = useState(null)
 
   useEffect(() => {
-    async function fetchLearningPath() {
+    async function fetchData() {
       try {
-        const response = await LearningAPI.getLearningPath()
-        console.log('Learning Path Data:', response) 
-        setLearningPath(response.learningPathDtos)
+        setLoading(true)
+        
+        const [learningResponse, quizResponse] = await Promise.all([
+          LearningAPI.getLearningPath(),
+          QuizAPI.getQuizAssessment()
+        ])
+
+        setLearningPath(learningResponse.learningPathDtos)
+        setQuizAssessment(quizResponse.quiz)
       } catch (error) {
-        console.error('Error fetching learning path:', error)
+        console.error('Error fetching data:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
-    fetchLearningPath()
+    fetchData()
   }, [])
 
   useEffect(() => {
     async function fetchCoursePreview(courseId) {
       try {
+        setLoading(true)
         const response = await LearningAPI.getCoursePreview(courseId)
-        setCourseDetails(prevDetails => ({
+        setCourseDetails((prevDetails) => ({
           ...prevDetails,
           [courseId]: response.course
         }))
       } catch (error) {
         console.error('Error fetching course data:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
     if (Array.isArray(learningPath)) {
       const courseIds = new Set()
-      learningPath.forEach(path => {
-        path.pathSteps.forEach(step => {
+      learningPath.forEach((path) => {
+        path.pathSteps.forEach((step) => {
           if (!courseDetails[step.courseId]) {
             courseIds.add(step.courseId)
           }
         })
       })
 
-      courseIds.forEach(courseId => fetchCoursePreview(courseId))
+      courseIds.forEach((courseId) => fetchCoursePreview(courseId))
     }
-  }, [learningPath])
+  }, [learningPath, user])
+
+  if (loading) {
+    return <ChapterLoading />
+  }
+
+  const handleGeneratePath = () => {
+    setIsAssessmentPromptOpen(true)
+  }
+
+  const handleAssessmentAccept = () => {
+    setIsAssessmentPromptOpen(false)
+    setIsQuizOpen(true)
+  }
+
+  const handleAssessmentDecline = () => {
+    setIsAssessmentPromptOpen(false)
+    //updateUserFirstLogin()
+  }
+
+  const handleQuizComplete = (score) => {
+    console.log('Quiz completed with score:', score)
+    setIsQuizOpen(false)
+    //updateUserFirstLogin()
+  }
+
+  console.log('Learning Path:', learningPath)
 
   return (
     <div className='space-y-6 mt-6'>
       <div className='flex justify-between items-center'>
         <h2 className='text-xl font-semibold'>Recommended Path</h2>
-        <button className='flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors'>
+        <Button onClick={handleGeneratePath} className='flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors'>
           <PlusCircle className='w-5 h-5 mr-2' />
           Generate Path
-        </button>
+        </Button>
       </div>
 
       {Array.isArray(learningPath) && learningPath.length > 0 ? (
@@ -157,17 +139,37 @@ export function RoadmapDashboard() {
                 <h4 className='font-semibold'>Các bước trong lộ trình</h4>
                 {path.pathSteps.map((step, index) => {
                   const course = courseDetails[step.courseId]
-                  return (
-                    <CourseStep key={step.id} step={step} index={index} course={course} />
-                  )
+                  return <CourseStep key={step.id} step={step} index={index} course={course} />
                 })}
               </div>
             </div>
           </div>
         ))
       ) : (
-        <div className='text-center text-gray-500'>No learning paths available.</div>
+        <div className='text-center text-gray-500 w-full h-full'>No learning paths available.</div>
       )}
+
+      <AssessmentPrompt
+        isOpen={isAssessmentPromptOpen}
+        onClose={() => {
+          setIsAssessmentPromptOpen(false)
+          // updateUserFirstLogin()
+        }}
+        onAccept={handleAssessmentAccept}
+        onDecline={handleAssessmentDecline}
+      />
+
+      <QuizModal
+        isOpen={isQuizOpen}
+        onClose={() => {
+          setIsQuizOpen(false)
+          //updateUserFirstLogin()
+        }}
+        onComplete={handleQuizComplete}
+        quiz={quizAssessment}
+      />
     </div>
   )
 }
+
+export default React.memo(RoadmapDashboard)

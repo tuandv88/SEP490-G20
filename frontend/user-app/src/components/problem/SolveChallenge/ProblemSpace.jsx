@@ -95,12 +95,17 @@ const ProblemSpace = () => {
   }, [activeTab])
 
 
-  if (error) {
-    return <ErrorPage />
+  if(loading) {
+    return <ChapterLoading />
   }
 
-  if (!problemDetail && !loading) {
-    return <NotFound mess='We cannot find this problem. Please check the link or search for other problems.' />
+  if (!problemDetail) {
+    return <NotFound />
+  }
+
+
+  if (error) {
+    return <ErrorPage />
   }
 
   return (

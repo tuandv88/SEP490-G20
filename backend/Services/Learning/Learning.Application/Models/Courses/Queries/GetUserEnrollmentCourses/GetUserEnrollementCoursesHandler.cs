@@ -9,7 +9,7 @@ public class GetUserEnrollementCoursesHandler(ICourseRepository repository, IFil
         var userRole = userContext.User.Role;
         var isAdmin = userRole == PoliciesType.Administrator;
 
-        
+
         // Lọc các khóa học mà user đã tham gia
         var filteredData = repository.GetAllAsQueryable()
                                      .Include(c => c.UserEnrollments)
@@ -47,7 +47,10 @@ public class GetUserEnrollementCoursesHandler(ICourseRepository repository, IFil
             var completionPercentage = totalLectures > 0
                 ? Math.Round((double)completedLectures / totalLectures * 100, 2)
                 : 0;
-            var s3Object = filesService.GetFileAsync(StorageConstants.BUCKET, course.ImageUrl, 60*24).Result;
+            var s3Object = filesService.GetFileAsync(StorageConstants.BUCKET, course.ImageUrl, 60 * 24).Result;
+
+            var firstChapter = course.Chapters.FirstOrDefault(c => c.OrderIndex == 1);
+            var firstLecture = firstChapter?.Lectures.FirstOrDefault(l => l.OrderIndex == 1);
             return new UserEnrollmentDetailsDto(
                 course.Id.Value,
                 course.Title,
@@ -56,7 +59,8 @@ public class GetUserEnrollementCoursesHandler(ICourseRepository repository, IFil
                 userEnrollment.EnrollmentDate,
                 userEnrollment.CompletionDate,
                 userEnrollment.UserEnrollmentStatus.ToString(),
-                completionPercentage
+                completionPercentage,
+                firstLecture != null ? firstLecture.Id.Value : Guid.Empty
             );
         }).ToList();
 

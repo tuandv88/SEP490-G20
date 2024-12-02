@@ -15,6 +15,7 @@ class AuthService {
     })
 
     this.userManager.events.addUserUnloaded(() => {
+      Cookies.remove('authToken');
       console.log('User logged out')
     })
 
@@ -56,6 +57,7 @@ class AuthService {
     try {
       const user = await this.userManager.signinSilent();
       Cookies.set('authToken', user.access_token, { expires: 7 });
+      console.log('Token refreshed')
       return user;
     } catch (err) {
       console.error("Lỗi khi làm mới token:", err);

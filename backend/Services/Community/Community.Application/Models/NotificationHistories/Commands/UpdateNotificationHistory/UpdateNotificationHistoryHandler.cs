@@ -52,6 +52,12 @@ public class UpdateNotificationHistoryHandler : ICommandHandler<UpdateNotificati
             status
         );
 
+        // Cập nhật các trường mới nếu có
+        if (!string.IsNullOrEmpty(request.UpdateNotificationHistoryDto.Subject))
+        {
+            notificationHistory.Subject = request.UpdateNotificationHistoryDto.Subject;
+        }
+
         // Lưu thay đổi
         await _notificationHistoryRepository.UpdateAsync(notificationHistory);
         await _notificationHistoryRepository.SaveChangesAsync(cancellationToken);

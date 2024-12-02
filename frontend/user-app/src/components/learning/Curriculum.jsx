@@ -5,7 +5,12 @@ import React, { useEffect, useState } from 'react'
 import { ChevronRight, ChevronDown } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-const Curriculum = ({ courseId, chapters, setSelectedLectureId, title }) => {
+const Curriculum = ({ courseId, chapters, 
+  setSelectedLectureId, title, 
+  setActiveLectureId,
+  activeLectureId,
+  courseProgress
+ }) => {
   
   const navigate = useNavigate()
   
@@ -17,17 +22,6 @@ const Curriculum = ({ courseId, chapters, setSelectedLectureId, title }) => {
 
 
 
-  const [activeLectureId, setActiveLectureId] = useState(() => {
-    const savedLectureId = localStorage.getItem('activeLectureId')
-    return savedLectureId ? JSON.parse(savedLectureId) : null
-  })
-
-  // const handleLectureClick = (lectureId) => {
-  //   // console.log(lectureId)
-  //   setActiveLectureId(lectureId)
-  //   setSelectedLectureId(lectureId)
-  // }
-
   const handleLectureClick = (lectureId) => {
     console.log(lectureId)
     setActiveLectureId(lectureId)
@@ -35,6 +29,11 @@ const Curriculum = ({ courseId, chapters, setSelectedLectureId, title }) => {
     navigate(`/learning-space/${courseId}/lecture/${lectureId}`);
     console.log("Navigate")
   }
+
+  const isLectureCompleted = (lectureId) => {
+    return courseProgress.some(progress => progress.lectureId === lectureId && progress.completionDate)
+  }
+
 
   const toggleSection = (index) => {
     setExpandedSections((prev) => (prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]))
@@ -45,11 +44,7 @@ const Curriculum = ({ courseId, chapters, setSelectedLectureId, title }) => {
     localStorage.setItem('expandedSections', JSON.stringify(expandedSections))
   }, [expandedSections])
 
-  useEffect(() => {
-    if (activeLectureId !== null) {
-      localStorage.setItem('activeLectureId', JSON.stringify(activeLectureId))
-    }
-  }, [activeLectureId])
+
 
   return (
     <div className='md:col-span-1 p-6 border-r border-[#243b47] bg-[#1b2a32] h-full overflow-y-auto'>
@@ -82,6 +77,9 @@ const Curriculum = ({ courseId, chapters, setSelectedLectureId, title }) => {
                   >
                     <div className='flex justify-between items-center mb-1'>
                       <span className='text-sm text-gray-200'>{lecture.title}</span>
+                      <span className='text-xs text-gray-500'>
+                        {isLectureCompleted(lecture.id) ? 'Completed' : ''}
+                      </span>
                     </div>
                   </div>
                 ))}

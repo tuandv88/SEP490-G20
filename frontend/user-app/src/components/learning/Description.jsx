@@ -8,68 +8,110 @@ import remarkGfm from 'remark-gfm'
 import PreCoppy from '../ui/PreCoppy'
 import { BookOpenCheck, Frown } from 'lucide-react'
 import DescriptionLoading from '../loading/DescriptionLoading'
+import ChapterLoading from '../loading/ChapterLoading'
+import { Button } from '../ui/button'
+import { CourseAPI } from '@/services/api/courseApi'
 
-const Description = ({ description, videoSrc, loading, titleProblem, initialTime, onTimeUpdate }) => {
-
-  const videoRef = useRef(null);
-  const [videoTime, setVideoTime] = useState(0); // Lưu thời gian video khi dừng
-  const [isPaused, setIsPaused] = useState(false); // Trạng thái video có tạm dừng hay không
+const Description = ({
+  description,
+  videoSrc,
+  loading,
+  titleProblem,
+  initialTime,
+  onTimeUpdate,
+  handleNextLecture,
+  courseId,
+  lectureId,
+  files
+}) => {
+  const videoRef = useRef(null)
+  const [videoTime, setVideoTime] = useState(0) // Lưu thời gian video khi dừng
+  const [isPaused, setIsPaused] = useState(false) // Trạng thái video có tạm dừng hay không
+  const [isVideoLoading, setIsVideoLoading] = useState(true)
 
   console.log(videoSrc)
 
   // Khôi phục thời gian khi component mount
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.currentTime = initialTime;
+      videoRef.current.currentTime = initialTime
     }
-  }, [initialTime, videoSrc]);
+  }, [initialTime, videoSrc])
 
   // Lưu thời gian hiện tại khi component unmount
   useEffect(() => {
     const handlePause = () => {
       if (videoRef.current) {
-        onTimeUpdate(videoRef.current.currentTime);
+        onTimeUpdate(videoRef.current.currentTime)
       }
-    };
+    }
 
-    const videoElement = videoRef.current;
+    const videoElement = videoRef.current
     if (videoElement) {
-      videoElement.addEventListener('pause', handlePause);
+      videoElement.addEventListener('pause', handlePause)
     }
 
     return () => {
       if (videoElement) {
-        videoElement.removeEventListener('pause', handlePause);
-        onTimeUpdate(videoElement.currentTime); // Lưu thời gian khi unmount
+        videoElement.removeEventListener('pause', handlePause)
+        onTimeUpdate(videoElement.currentTime) // Lưu thời gian khi unmount
       }
-    };
-  }, [onTimeUpdate]);
+    }
+  }, [onTimeUpdate])
 
+  if (loading) {
+    return <ChapterLoading />
+  }
 
-  
-  
+  const handleVideoLoaded = () => {
+    setIsVideoLoading(false) // Video đã sẵn sàng
+  }
 
+  const updateProgress = async () => {
+    try {
+      const response = await CourseAPI.updateCourseProgress(courseId, lectureId)
+      console.log('Progress updated:', response)
+    } catch (error) {
+      console.error('Error updating progress:', error)
+    }
+  }
+
+  const handleComplete = () => {
+    updateProgress()
+    handleNextLecture()
+  }
+
+  const documentFiles = files.filter((file) => file && file.fileType === 'DOCUMENT')
 
   return (
-    <div >
-      {loading || !videoSrc ? (
-        <DescriptionLoading />
+    // !videoSrc
+    <div>
+      {loading ? (
+        <ChapterLoading />
       ) : (
         <div className='bg-bGprimary text-gray-300 p-6 mx-auto font-sans h-full'>
           {videoSrc && (
             <div className='relative pb-[56.25%] h-0'>
-              <video           
-              ref={videoRef}
-              className='absolute top-0 left-0 w-full h-full'
-              controls
-              src={videoSrc}
-              title='Lecture Video'  
-              preload='auto'           
-            >
-              Your browser does not support the video tag.
+              <video
+                ref={videoRef}
+                className='absolute top-0 left-0 w-full h-full'
+                controls
+                src={videoSrc}
+                title='Lecture Video'
+                preload='auto'
+                onLoadedData={handleVideoLoaded}
+              >
+                Your browser does not support the video tag.
               </video>
             </div>
           )}
+
+          <Button
+            onClick={handleComplete}
+            className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-5'
+          >
+            Mark as complete
+          </Button>
 
           <div className='p-3 rounded-lg flex items-center mb-10 mt-10 w-full border border-spacing-10'>
             <BookOpenCheck className='inline mr-4' size={40} color='#ffffff' />
@@ -92,7 +134,7 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
                     </div>
                   ) : (
                     <code
-                      className='bg-gray-300 inline-block text-black rounded px-1 py-0.3 text-sm font-mono'
+                      className='bg-gray-200 inline-block text-black rounded px-1 py-0.3 text-sm font-mono opacity-60'
                       style={{ content: 'none' }}
                       {...props}
                     >
@@ -105,6 +147,20 @@ const Description = ({ description, videoSrc, loading, titleProblem, initialTime
               {description}
             </ReactMarkdown>
           </div>
+          {documentFiles.length > 0 && (
+            <div className='document-list mt-5'>
+              <h3 className='text-xl font-bold mb-3'>Tài liệu đính kèm</h3>
+              <ul>
+                {documentFiles.map((file, index) => (
+                  <li key={index} className='mb-2'>
+                    <a href={file.presignedUrl} download className='text-blue-500 hover:underline'>
+                      Download document {index + 1}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>

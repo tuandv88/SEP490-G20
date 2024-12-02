@@ -5,29 +5,51 @@ import { LearningDashboard } from '../components/userprofile/learning/LearningDa
 import { MyPosts } from '../components/userprofile/MyPosts'
 import { ProfileTabs } from '../components/userprofile/ProfileTabs'
 import { ProfileLayout } from '../components/userprofile/ProfileLayout'
-import { RoadmapDashboard } from '@/components/userprofile/RoadmapDashboard'
 import Layout from '@/layouts/layout'
 import { useNavigate } from 'react-router-dom'
 import { UserContext } from '@/contexts/UserContext'
 import authServiceInstance from '@/oidc/AuthService'
 import { Loading } from '@/components/ui/overlay'
+import RoadmapDashboard from '@/components/userprofile/RoadmapDashboard'
+import { ProblemAPI } from '@/services/api/problemApi'
 
 export function UserProfile() {
   const [activeTab, setActiveTab] = useState('account')
   const { user } = useContext(UserContext)
   const [loading, setLoading] = useState(true)
-
+  const [problemSolved, setProblemSolved] = useState([])
   const navigate = useNavigate()
+  const [problems, setProblems] = useState([])
+  
   useEffect(() => {
-    const checkUser = async () => {
-      if (!user) {
-        await authServiceInstance.login()
+    const initializeUserProfile = async () => {
+      try {
+        if (!user) {
+          await authServiceInstance.login()
+        }
+        const response = await ProblemAPI.getProblemSolved()
+        setProblemSolved(response.solved)
+      } catch (error) {
+        console.error('Error initializing user profile:', error)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false) 
     }
-
-    checkUser()
+  
+    initializeUserProfile()
   }, [user, navigate])
+
+  useEffect(() => {
+    const fetchSolvedProblems = async () => {
+      try {
+        const solvedProblems = await ProblemAPI.getSolvedProblems();
+        setProblems(solvedProblems);
+      } catch (error) {
+        console.error('Error fetching solved problems:', error);
+      }
+    };
+    fetchSolvedProblems();
+  }, []);
 
   if (loading) {
     return <Loading />
@@ -38,13 +60,11 @@ export function UserProfile() {
       case 'account':
         return <AccountInfo />
       case 'roadmap':
-        return <RoadmapDashboard />
+        return <RoadmapDashboard user={user} />
       case 'learning':
         return <LearningDashboard />
       case 'algorithm':
-        return <AlgorithmDashboard />
-      case 'posts':
-        return <MyPosts />
+        return <AlgorithmDashboard problemSolved={problemSolved} problems={problems} />
       default:
         return <AccountInfo />
     }
@@ -59,3 +79,7 @@ export function UserProfile() {
     </Layout>
   )
 }
+
+
+      // case 'posts':
+      //   return <MyPosts />

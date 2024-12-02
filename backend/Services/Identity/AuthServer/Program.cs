@@ -17,6 +17,8 @@ using AuthServer.Repository.Services.Storage;
 using StackExchange.Redis;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using AuthServer.Extensions;
+using System.Text.Json;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -117,17 +119,17 @@ builder.Services.AddAuthentication(options =>
     googleOptions.CallbackPath = "/signin-google"; // Đảm bảo đường dẫn callback chính xác
 });
 
-builder.Services.ConfigureApplicationCookie(opts =>
-{
-    opts.SessionStore = new RedisCacheTicketStore(new RedisCacheOptions()
-    {
-        // Địa chỉ Redis và cổng
-        Configuration = "109.123.238.31:32644",
+//builder.Services.ConfigureApplicationCookie(opts =>
+//{
+//    opts.SessionStore = new RedisCacheTicketStore(new RedisCacheOptions()
+//    {
+//        // Địa chỉ Redis và cổng
+//        Configuration = "109.123.238.31:32644",
 
-        // Cấu hình mật khẩu Redis (nếu có)
-        ConfigurationOptions = ConfigurationOptions.Parse("109.123.238.31:32644, password=icodervn")
-    });
-});
+//        // Cấu hình mật khẩu Redis (nếu có)
+//        ConfigurationOptions = ConfigurationOptions.Parse("109.123.238.31:32644, password=icodervn")
+//    });
+//});
 
 builder.Services.AddAuthorization(options =>
 {
@@ -168,7 +170,31 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddStorage(builder.Configuration);
 builder.Services.AddScoped<IBase64Converter, Base64Converter>();
 
+#region Thêm mới ở đây
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.Name = "ICoderVN";
+    options.Cookie.Path = "/";
+    // Các tùy chọn khác
+});
+#endregion Thêm mới ở đây
+
 var app = builder.Build();
+
+// Chuyển toàn bộ cấu hình sang một dictionary
+var configDictionary = builder.Configuration.AsEnumerable().ToDictionary(k => k.Key, v => v.Value);
+
+// Chuyển đổi sang JSON
+string configJson = JsonSerializer.Serialize(configDictionary, new JsonSerializerOptions { WriteIndented = true });
+
+// In ra console
+Console.WriteLine("========== Application Configuration (JSON) ==========");
+Console.WriteLine(configJson);
+Console.WriteLine("======================================================");
+
 
 // Kiểm tra tham số đầu vào
 if (args.Contains("/seeddata"))
@@ -195,6 +221,17 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+#region Thêm mới ở đây
+
+var forwardedHeadersOptions = new ForwardedHeadersOptions {
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeadersOptions);
+
+#endregion Thêm mới ở đây
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -215,3 +252,4 @@ app.MapControllerRoute(
     pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();
+

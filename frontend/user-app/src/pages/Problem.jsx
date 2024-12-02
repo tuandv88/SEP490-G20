@@ -87,16 +87,45 @@ function Problem() {
 
   const [problems, setProblems] = useState([])
   const [totalPages, setTotalPages] = useState(1)
-  const pageSize = 3
+  const [searchString, setSearchString] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [problemSolved, setProblemSolved] = useState([])
+  const [leaderboardData, setLeaderboardData] = useState([])
+
+  const pageSize = 6
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Thực hiện hai API call song song
+        const [solvedResponse, leaderboardResponse] = await Promise.all([
+          ProblemAPI.getProblemSolved(),
+          ProblemAPI.getLeaderboard(1, 6),
+        ])
+  
+        // Cập nhật state với dữ liệu nhận được
+        setProblemSolved(solvedResponse)
+        setLeaderboardData(leaderboardResponse)
+  
+        console.log('Solved Problems:', solvedResponse)
+        console.log('Leaderboard Data:', leaderboardResponse)
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+  
+    fetchData()
+  }, [])
 
   useEffect(() => {
     const fetchProblems = async () => {
       setLoading(true)
       try {
-        const response = await ProblemAPI.getAllProblems(currentPage, pageSize)
+        const response = await ProblemAPI.getAllProblems(currentPage, pageSize, searchString)
         const { data, count } = response.problems
         setProblems(data)
-        setTotalPages(Math.ceil(count / pageSize)) // Tính tổng số trang
+        console.log('Problems:', data)
+        setTotalPages(Math.ceil(count / pageSize))
       } catch (error) {
         console.error('Error fetching problems:', error)
       } finally {
@@ -104,7 +133,7 @@ function Problem() {
       }
     }
     fetchProblems()
-  }, [currentPage])
+  }, [currentPage, searchQuery])
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
@@ -146,6 +175,13 @@ function Problem() {
       tags: new Set(),
       favorite: false
     })
+    setSearchString('')
+    setSearchQuery('')
+    setCurrentPage(1)
+  }
+
+  const handleSearch = () => {
+    setSearchQuery(searchString) // Cập nhật searchQuery khi nhấn nút Search
   }
 
   const handleTagToggle = (tag) => {
@@ -166,14 +202,6 @@ function Problem() {
         <div className='max-w-7xl mx-auto'>
           <div className='flex gap-6'>
             <div className='flex-1'>
-              {/* <CourseCards /> */}
-              {/* <FilterBar
-                filters={filters}
-                setFilters={setFilters}
-                availableTags={availableTags}
-                handleTagToggle={handleTagToggle}
-              />
-              <ActiveFilters filters={filters} handleRemoveFilter={handleRemoveFilter} handleReset={handleReset} /> */}
               {loading ? (
                 <ProblemSkeleton />
               ) : (
@@ -185,12 +213,6 @@ function Problem() {
                 />
               )}
             </div>
-
-            {/* <div className='w-80 space-y-6'>
-              <ProblemPanelBot stats={stats} />
-              <ProblemPanelTop />
-            </div> */}
-
             <div className='w-80 space-y-6'>
               <div className='bg-white rounded-lg shadow-md p-6'>
                 <FilterBar
@@ -199,11 +221,14 @@ function Problem() {
                   availableTags={availableTags}
                   handleTagToggle={handleTagToggle}
                   handleReset={handleReset}
+                  setSearchString={setSearchString}
+                  handleSearch={handleSearch}
+                  searchString={searchString}
                 />
                 <ActiveFilters filters={filters} handleRemoveFilter={handleRemoveFilter} handleReset={handleReset} />
               </div>
-              <ProblemPanelBot stats={stats} />
-              <ProblemPanelTop />
+              <ProblemPanelBot problemSolved={problemSolved} leaderboardData={leaderboardData} />
+              <ProblemPanelTop leaderboardData={leaderboardData} />
             </div>
           </div>
         </div>

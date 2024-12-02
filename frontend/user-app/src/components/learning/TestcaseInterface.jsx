@@ -62,8 +62,6 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
   const activeTabTestcase = useStore((state) => state.activeTabTestcase)
   const setActiveTabTestcase = useStore((state) => state.setActiveTabTestcase)
 
-  console.log('testCases', testCases)
-
   if (testCase[0] === null) {
     console.log('testCase[0] === null')
   }
@@ -123,8 +121,6 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
   }
 
   useEffect(() => {
-    //console.log('Received result in TestcaseInterface:', response)
-    //setData(testCases)
     setStoreTestCases(Object.values(testCases).map((inputs) => ({ inputs }))) // Cập nhật dữ liệu trong store
   }, [response, setStoreTestCases, testCases])
 
@@ -227,9 +223,17 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
                 {response.codeExecuteDto.testResults.map((result, index) => (
                   <div key={index} className='relative mr-2 mb-2'>
                     <Button
-                      variant={activeTestResult === index ? 'secondary' : 'outline'}
+                      variant='outline'
                       size='sm'
-                      className={`${response.codeExecuteDto.testResults[activeTestResult].isPass ? 'bg-green-400' : 'bg-red-100'}`}
+                      className={`${
+                        activeTestResult === index
+                          ? result.isPass
+                            ? 'border border-green-500'
+                            : 'border border-red-500'
+                          : result.isPass
+                          ? 'bg-green-400'
+                          : 'bg-red-400'
+                      }`}
                       onClick={() => setActiveTestResult(index)}
                     >
                       Case {index + 1}

@@ -26,6 +26,7 @@ export default function QuizManagement() {
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
   const { toast } = useToast()
+  const [isFullScreenPopupOpen, setIsFullScreenPopupOpen] = useState(false)
 
   useEffect(() => {
     const fetchQuizDetail = async () => {
@@ -260,6 +261,14 @@ export default function QuizManagement() {
             </Card>
           </div>
         </div>
+      )}
+
+      {isFullScreenPopupOpen && (
+        <FullScreenPopup
+          isOpen={isFullScreenPopupOpen}
+          onClose={() => setIsFullScreenPopupOpen(false)}
+          quizId={quizId}
+        />
       )}
     </div>
   )

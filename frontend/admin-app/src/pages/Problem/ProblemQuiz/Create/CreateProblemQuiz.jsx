@@ -65,23 +65,23 @@ const CreateProblemQuiz = ({ onClose, quizId }) => {
 
     console.log(problemData)
 
-    try {
-      const response = await createProblemQuestion(quizIdToCreateProblem, problemData)   
-      onClose()
-      toast({
-        variant: 'success',
-        title: 'Create question successfully T',
-        description: 'Create question successfully'
-      })
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Oops! Something went wrong',
-        description: 'Please try again!',
-        action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
-      })
-      console.error('Error creating question:', error)
-    }
+    // try {
+    //   const response = await createProblemQuestion(quizId, problemData)   
+    //   onClose()
+    //   toast({
+    //     variant: 'success',
+    //     title: 'Create question successfully T',
+    //     description: 'Create question successfully'
+    //   })
+    // } catch (error) {
+    //   toast({
+    //     variant: 'destructive',
+    //     title: 'Oops! Something went wrong',
+    //     description: 'Please try again!',
+    //     action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
+    //   })
+    //   console.error('Error creating question:', error)
+    // }
   }
 
   return (

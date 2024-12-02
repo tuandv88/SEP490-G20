@@ -20,6 +20,8 @@
         public bool Pinned { get; set; }                         // Đánh dấu nếu thảo luận được ghim
         public bool NotificationsEnabled { get; set; } = true;  // Mặc định là tắt thông báo
 
+        public FlagId? FlagId { get; set; } = null;               // 1 - 1
+
         // Phương thức tạo mới một Discussion
         public static Discussion Create(DiscussionId discussionId, UserId userId, CategoryId categoryId, string title, string description, bool isActive, List<string> tags, string? imageUrl = null)
         {

@@ -253,6 +253,87 @@ namespace AuthServer.Controllers
             return Ok(userDetailDtos);
         }
 
+        [HttpPost("account/create")]
+        public async Task<IActionResult> CreateAccount([FromBody] CreateAccountDto createAccountDto)
+        {
+            if (createAccountDto == null)
+            {
+                return BadRequest(new { message = "Invalid user data." });
+            }
+
+            // Kiểm tra xem email đã tồn tại chưa
+            var existingUserByEmail = await _userManager.FindByEmailAsync(createAccountDto.Email);
+            if (existingUserByEmail != null)
+            {
+                return Conflict(new { message = "Email already in use." });
+            }
+
+            // Kiểm tra xem username đã tồn tại chưa
+            var existingUserByUsername = await _userManager.FindByNameAsync(createAccountDto.UserName);
+            if (existingUserByUsername != null)
+            {
+                return Conflict(new { message = "Username already in use." });
+            }
+
+            // Kiểm tra xem role có được nhập không
+            if (string.IsNullOrEmpty(createAccountDto.Role))
+            {
+                return BadRequest(new { message = "Role is required." });
+            }
+
+            // Tạo role cho người dùng nếu có
+            var role = await _roleManager.FindByNameAsync(createAccountDto.Role);
+            if (role == null)
+            {
+                return BadRequest(new { message = $"Role '{createAccountDto.Role}' does not exist." });
+            }
+
+            var bio = new Bio
+            {
+                Facebook = "",
+                LinkedIn = "",
+                Twitter = ""
+            };
+
+            string bioJson = JsonSerializer.Serialize(bio);
+
+            var address = new Address
+            {
+                Province = "", // Giá trị mặc định nếu không nhập
+                District = "",
+                School = ""
+            };
+
+            string addressJson = JsonSerializer.Serialize(address);
+
+            // Tạo người dùng mới
+            var user = new Users
+            {
+                UserName = createAccountDto.UserName, // Sử dụng username làm UserName
+                Email = createAccountDto.Email,
+                FirstName = createAccountDto.FirstName,
+                LastName = createAccountDto.LastName,
+                ProfilePicture = "backend/imageidentity/avatardefault.jpg", // Mặc định ảnh đại diện
+                Address = addressJson,
+                Bio = bioJson,
+                EmailConfirmed = createAccountDto.ConfirmEmail // Xác nhận email từ input
+            };
+
+            // Tạo người dùng mới và lưu vào cơ sở dữ liệu
+            var result = await _userManager.CreateAsync(user, createAccountDto.Password);
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { message = "User creation failed.", errors = result.Errors.Select(e => e.Description) });
+            }
+
+            // Thêm người dùng vào role sau khi người dùng đã được tạo
+            await _userManager.AddToRoleAsync(user, role.Name);
+
+            return Ok(new { message = "User created successfully", userId = user.Id });
+        }
+
+
+
 
     }
 }

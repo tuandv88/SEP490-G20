@@ -55,7 +55,7 @@ namespace AuthServer.Controllers
 
             if (user == null)
             {
-                return NotFound(new { message = $"No user found with ID {userId}." });
+                Console.WriteLine($"No user found with ID {userId}.");
             }
             else
             {

@@ -1,6 +1,13 @@
-﻿namespace Community.Application.Models.NotificationHistories.Dtos;
+﻿using Community.Application.Models.NotificationTypes.Dtos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-public record NotificationHistoryDto(
+namespace Community.Application.Models.NotificationHistories.Dtos;
+
+public record NotificationHistoryDetailDto(
     Guid Id,                      // ID của thông báo
     Guid UserId,                  // ID của người nhận thông báo
     Guid NotificationTypeId,      // ID loại thông báo
@@ -12,8 +19,7 @@ public record NotificationHistoryDto(
     Status Status,                // Trạng thái của thông báo
     DateTime DateCreated,         // Thời gian tạo thông báo
     string? Subject,              // Tiêu đề của thông báo (nullable)
-    Guid? SenderId                // ID người gửi (nullable)
+    Guid? SenderId,               // ID người gửi (nullable)
+    NotificationTypeDto NotificationTypeDto // Chi tiết loại thông báo
 );
-
-
 

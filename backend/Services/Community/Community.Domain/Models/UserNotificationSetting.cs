@@ -2,6 +2,7 @@
 {
     public class UserNotificationSetting : Aggregate<UserNotificationSettingId>
     {
+        public List<NotificationHistory> NotificationHistorys = new();
         public UserId UserId { get; set; } = default!;                         // ID của người dùng
         public NotificationTypeId NotificationTypeId { get; set; } = default!; // ID loại thông báo áp dụng cài đặt này
         public bool IsNotificationEnabled { get; set; }                      // Kích hoạt thông báo hay không

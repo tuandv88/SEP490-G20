@@ -6,7 +6,7 @@ public class Flag : Aggregate<FlagId>
 
     public ViolationLevel ViolationLevel { get; set; }
 
-    public string? Reason { get; set; }
+    public string Reason { get; set; } = string.Empty;
 
     public DateTime FlaggedDate { get; set; }
 }

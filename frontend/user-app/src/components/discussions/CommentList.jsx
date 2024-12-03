@@ -34,6 +34,7 @@ function CommentList({ discussionId }) {
   // New state to handle the comment input
   const [submitting, setSubmitting] = useState(false);
   const [loadingVoteComment, setloadingVoteComment] = useState(false);
+  const [loadingVoteReply, setloadingVoteReply] = useState(false);
   const [tooltipContent, setTooltipContent] = useState('Share');
   const [clicked, setClicked] = useState(false); // State để theo dõi trạng thái click
 
@@ -72,6 +73,13 @@ function CommentList({ discussionId }) {
           setCurrentUser(userTmp);
           setIdCurrentUser(userTmp.profile.sub);
           setIsAuthor(true);
+        }
+
+        // Lấy các bình luận con (replies) - cập nhập vào Array: replies {}
+        const allReplies = {}; // Dùng để lưu tất cả các bình luận con cho từng commentId (Array...)
+        // Dùng hàm loadReplies để tải replies
+        for (let comment of updatedComments) {
+          await loadReplies(comment.id); // Gọi hàm loadReplies để tải replies
         }
 
       } catch (err) {
@@ -163,39 +171,88 @@ function CommentList({ discussionId }) {
     return distance;
   };
 
-  const handleVote = async (voteType, commentId) => {
+  const handleVote = async (voteType, commentId, replyId = null) => {
     try {
-      // Nếu đang trong trạng thái loading thì không cho phép vote nữa
-      if (loadingVoteComment) return;
-      setloadingVoteComment(true); // Đặt loading là true khi bắt đầu gọi API
+
+      if (replyId) {
+        // Nếu đang trong trạng thái loading thì không cho phép vote nữa
+        if (loadingVoteComment) return;
+        setloadingVoteComment(true); // Đặt loading là true khi bắt đầu gọi API
+
+      } else {
+        // Nếu đang trong trạng thái loading thì không cho phép vote nữa
+        if (loadingVoteReply) return;
+        setloadingVoteReply(true); // Đặt loading là true khi bắt đầu gọi API
+      }
+
+      const currentCommentId = replyId ? replyId : commentId;
 
       // Gọi API để tạo phiếu bầu
       const response = await DiscussApi.createVoteComment({
         discussionId: null, // Thêm discussionId nếu cần
-        commentId: commentId,
+        commentId: currentCommentId,
         voteType: voteType,
         isActive: true, // Hoặc false nếu cần
       });
 
+      console.log(response)
+
       if (response) {
-        // Cập nhật lại số lượng vote sau khi thực hiện hành động
-        setComments(prevComments =>
-          prevComments.map(comment =>
-            comment.id === commentId
-              ? {
-                ...comment,
-                totalVote: voteType === 'Like' ? comment.totalVote + 1 : comment.totalVote - 1,
-              }
-              : comment
-          )
-        );
+
+        if (!replyId) {
+          // Cập nhật số lượng vote cho comment
+          setComments(prevComments =>
+            prevComments.map(comment =>
+              comment.id === commentId
+                ? {
+                  ...comment,
+                  totalVote: voteType === 'Like' ? comment.totalVote + 1 : comment.totalVote - 1,
+                }
+                : comment
+            )
+          );
+        } else {
+          const statusUpdateToTalVoteByReplyIdAndVoteType = updateTotalVote(replyId, voteType);
+          if (statusUpdateToTalVoteByReplyIdAndVoteType) {
+            console.log("Success Add Vote!");
+          }
+        }
       }
     } catch (error) {
       console.log(error);
     } finally {
-      setloadingVoteComment(false); // Tắt loading khi hoàn thành
+      if (replyId) {
+        setloadingVoteComment(false); // Tắt loading khi hoàn thành
+      } else {
+        setloadingVoteReply(false);
+      }
     }
   };
+
+  function updateTotalVote(replyId, voteType) {
+    // Lặp qua tất cả các key trong đối tượng replies
+    for (let key in replies) {
+      let commentsArray = replies[key];
+
+      // Tìm phần tử trong mảng con theo id
+      let element = commentsArray.find(item => item.id === replyId);
+
+      if (element) {
+        // Cập nhật totalVote theo voteType
+        if (voteType === 'Like') {
+          element.totalVote += 1;  // Thêm 1 nếu vote là 'Like'
+        } else if (voteType === 'Dislike') {
+          element.totalVote -= 1;  // Giảm 1 nếu vote là 'Dislike'
+        }
+
+        // Trả về totalVote đã cập nhật
+        return element.totalVote;
+      }
+    }
+
+    // Nếu không tìm thấy phần tử có replyId, trả về null hoặc một giá trị mặc định
+    return null;
+  }
 
   const currentUrl = window.location.href; // Hoặc URL bạn muốn sao chép
 
@@ -312,6 +369,11 @@ function CommentList({ discussionId }) {
     } catch (error) {
       console.error("Error loading replies:", error);
     }
+  };
+
+  const getRepliesCount = (commentId) => {
+    // Kiểm tra xem có bình luận con cho commentId không và trả về số lượng
+    return Array.isArray(replies[commentId]) ? replies[commentId].length : 0;
   };
 
   // Hàm hiển thị form trả lời cho bình luận gốc
@@ -640,14 +702,14 @@ function CommentList({ discussionId }) {
                 <div className="comment-item__vote">
                   <button
                     className="vote-icon"
-                    onClick={() => handleVote('Like', comment.id)}
+                    onClick={() => handleVote('Like', comment.id, null)}
                   >
                     <FontAwesomeIcon icon={faChevronUp} />
                   </button>
                   <span className="comment-item__vote-count">{comment.totalVote}</span>
                   <button
                     className="vote-icon"
-                    onClick={() => handleVote('Dislike', comment.id)}
+                    onClick={() => handleVote('Dislike', comment.id, null)}
                   >
                     <FontAwesomeIcon icon={faChevronDown} />
                   </button>
@@ -691,7 +753,9 @@ function CommentList({ discussionId }) {
                     onClick={() => handleShowOrHidenReplies(comment.id)}
                   >
                     <FontAwesomeIcon icon={faComments} />
-                    {showRepliesMap[comment.id] ? 'Hide Reply' : 'Show All Reply'}
+                    {showRepliesMap[comment.id]
+                      ? `Hide Reply (${getRepliesCount(comment.id)})`
+                      : `Show All Reply (${getRepliesCount(comment.id)})`}
                   </button>
 
                   {/*Replies*/}
@@ -737,6 +801,22 @@ function CommentList({ discussionId }) {
                             {reply.isEdited && <span className="comment-item__edited_replies">Edited</span>}
                           </div>
                           <div className="comment-item__content">{reply.content}</div>
+
+                          <div className="comment-item__vote">
+                            <button
+                              className="vote-icon"
+                              onClick={() => handleVote('Like', reply.id, reply.id)}
+                            >
+                              <FontAwesomeIcon icon={faChevronUp} />
+                            </button>
+                            <span className="comment-item__vote-count">{reply.totalVote}</span>
+                            <button
+                              className="vote-icon"
+                              onClick={() => handleVote('Dislike', reply.id, reply.id)}
+                            >
+                              <FontAwesomeIcon icon={faChevronDown} />
+                            </button>
+                          </div>
 
                           {reply.userId !== idCurrentUser && (
                             <button
@@ -1108,7 +1188,7 @@ function CommentList({ discussionId }) {
   height: 40px;
   border-radius: 50%;
   margin-right: 10px;
-  border: 2px solid #808583;
+  border: 1px solid #c2c2c2;
 }
 
 .comment-item__username {

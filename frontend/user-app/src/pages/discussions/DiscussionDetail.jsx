@@ -857,7 +857,7 @@ function DiscussionDetail() {
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #ccc;
+  border: 1px solid #c2c2c2;
 }
 
 /* User Info */
@@ -935,8 +935,8 @@ function DiscussionDetail() {
   display: block; /* Chuyển ảnh thành block để căn giữa */
   margin: 0 auto; /* Căn giữa ảnh ngang */
   width: 100%; /* Đảm bảo ảnh có chiều rộng tối đa là 100% của phần tử chứa */
-  max-width: 60%; /* Giới hạn chiều rộng ảnh tối đa là 50% */
-  max-height: 500px; /* Giới hạn chiều cao ảnh tối đa */
+  max-width: 50%; /* Giới hạn chiều rộng ảnh tối đa là 50% */
+  max-height: 400px; /* Giới hạn chiều cao ảnh tối đa */
   height: auto; /* Giữ tỷ lệ chiều cao ảnh */
 }
 

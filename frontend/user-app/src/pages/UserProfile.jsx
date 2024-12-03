@@ -12,6 +12,7 @@ import authServiceInstance from '@/oidc/AuthService'
 import { Loading } from '@/components/ui/overlay'
 import RoadmapDashboard from '@/components/userprofile/RoadmapDashboard'
 import { ProblemAPI } from '@/services/api/problemApi'
+import DiscussionUserList from '@/components/userprofile/discussion/DiscussionUserList'
 
 export function UserProfile() {
   const [activeTab, setActiveTab] = useState('account')
@@ -20,7 +21,7 @@ export function UserProfile() {
   const [problemSolved, setProblemSolved] = useState([])
   const navigate = useNavigate()
   const [problems, setProblems] = useState([])
-  
+
   useEffect(() => {
     const initializeUserProfile = async () => {
       try {
@@ -35,7 +36,7 @@ export function UserProfile() {
         setLoading(false)
       }
     }
-  
+
     initializeUserProfile()
   }, [user, navigate])
 
@@ -65,6 +66,8 @@ export function UserProfile() {
         return <LearningDashboard />
       case 'algorithm':
         return <AlgorithmDashboard problemSolved={problemSolved} problems={problems} />
+      case 'discussionuserlist':
+        return <DiscussionUserList />
       default:
         return <AccountInfo />
     }
@@ -81,5 +84,5 @@ export function UserProfile() {
 }
 
 
-      // case 'posts':
-      //   return <MyPosts />
+// case 'posts':
+//   return <MyPosts />

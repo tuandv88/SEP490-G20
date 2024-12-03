@@ -136,4 +136,14 @@ public class CachedDiscussionRepository : IDiscussionRepository
             return cachedData;
         }
     }
+
+    public Task<IQueryable<Discussion>?> GetAllDiscussionByUserIdAsync(Guid userId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IQueryable<Discussion>?> GetDiscussionsAll()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -136,10 +136,8 @@ function DiscussionDetail() {
         setError(err.message || "Failed to fetch discussion details.");
       } finally {
         // Delay thêm 500ms trước khi chuyển
-        setTimeout(() => {
-          setLoading(false);
-          setTransitioning(true); // Chuyển trạng thái để kích hoạt chuyển cảnh
-        }, 200);
+        setLoading(false);
+        setTransitioning(true); // Chuyển trạng thái để kích hoạt chuyển cảnh
       }
     };
 

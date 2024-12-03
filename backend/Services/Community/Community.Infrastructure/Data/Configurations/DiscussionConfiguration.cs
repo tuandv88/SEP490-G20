@@ -90,6 +90,12 @@ namespace Community.Infrastructure.Data.Configurations
             builder.Property(d => d.NotificationsEnabled)
                 .HasDefaultValue(true);
 
+            // Thiết lập mối quan hệ 1-1 với Flag (Quan hệ phụ thuộc)
+            builder.HasOne<Flag>()                          // Một Discussion có thể có một Flag
+                .WithOne()                                   // Mỗi Flag chỉ liên kết với một Discussion
+                .HasForeignKey<Discussion>(d => d.FlagId)    // Discussion tham chiếu đến FlagId
+                .OnDelete(DeleteBehavior.SetNull);           // Nếu Flag bị xóa, chỉ set null cho FlagId trong Discussion
+
             // Tùy chọn thiết lập các chỉ mục để cải thiện hiệu năng tìm kiếm
             builder.HasIndex(d => d.UserId);
             builder.HasIndex(d => d.CategoryId);

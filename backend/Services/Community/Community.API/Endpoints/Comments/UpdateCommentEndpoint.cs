@@ -10,7 +10,7 @@ public class UpdateCommentEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/comments", async (UpdateCommentRequest request, ISender sender) =>
+        app.MapPut("/comments/update", async (UpdateCommentRequest request, ISender sender) =>
         {
             var command = request.Adapt<UpdateCommentCommand>();
 

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Community.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241201135406_UpdateLengthMessage")]
-    partial class UpdateLengthMessage
+    [Migration("20241202195501_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -194,6 +194,9 @@ namespace Community.Infrastructure.Data.Migrations
                         .HasMaxLength(2147483647)
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("FlagId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -241,6 +244,9 @@ namespace Community.Infrastructure.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("FlagId")
+                        .IsUnique();
+
                     b.HasIndex("IsActive");
 
                     b.HasIndex("Title");
@@ -248,6 +254,44 @@ namespace Community.Infrastructure.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Discussions");
+                });
+
+            modelBuilder.Entity("Community.Domain.Models.Flag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("DiscussionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("FlaggedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ViolationLevel")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscussionId")
+                        .IsUnique();
+
+                    b.ToTable("Flag");
                 });
 
             modelBuilder.Entity("Community.Domain.Models.NotificationHistory", b =>
@@ -531,6 +575,20 @@ namespace Community.Infrastructure.Data.Migrations
                     b.HasOne("Community.Domain.Models.Category", null)
                         .WithMany("Discussions")
                         .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Community.Domain.Models.Flag", null)
+                        .WithOne()
+                        .HasForeignKey("Community.Domain.Models.Discussion", "FlagId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
+            modelBuilder.Entity("Community.Domain.Models.Flag", b =>
+                {
+                    b.HasOne("Community.Domain.Models.Discussion", null)
+                        .WithOne()
+                        .HasForeignKey("Community.Domain.Models.Flag", "DiscussionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

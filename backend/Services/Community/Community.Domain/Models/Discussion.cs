@@ -1,4 +1,6 @@
-﻿namespace Community.Domain.Models
+﻿using Community.Domain.ValueObjects;
+
+namespace Community.Domain.Models
 {
     public class Discussion : Aggregate<DiscussionId>
     {
@@ -43,7 +45,8 @@
                 NotificationsEnabled = true // Gán giá trị
             };
 
-            discussion.AddDomainEvent(new DiscussionCreatedEvent(discussion));
+            //discussion.AddDomainEvent(new DiscussionCreatedEvent(discussion));
+            discussion.AddDomainEvent(new DiscussionChangedEvent(discussion));
             return discussion;
         }
 
@@ -64,11 +67,17 @@
 
             // Thêm sự kiện cập nhật nếu cần thiết
             // AddDomainEvent(new DiscussionUpdatedEvent(this));
+            AddDomainEvent(new DiscussionChangedEvent(this));
         }
 
         public void UpdateImage(string imageUrl)
         {
             ImageUrl = imageUrl;
+            AddDomainEvent(new DiscussionChangedEvent(this));
+        }
+
+        public void UpdateStatus(bool isActive) {
+            IsActive = isActive;
         }
     }
 }

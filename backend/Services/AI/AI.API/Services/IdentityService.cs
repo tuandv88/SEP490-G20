@@ -3,7 +3,7 @@ using AI.Application.Data;
 using AI.Application.Interfaces;
 
 namespace AI.API.Services;
-public class IdentityService(IUserContextService userContext, IApplicationDbContext dbContext) : IIdentityService {
+public class IdentityService(IUserContextService userContext) : IIdentityService {
     public bool AuthorizePolicyAsync(params string[] policies) {
         var userRole = userContext.User.Role;
         foreach (var policy in policies) {

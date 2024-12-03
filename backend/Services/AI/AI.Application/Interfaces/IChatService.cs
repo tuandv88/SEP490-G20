@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using DocumentFormat.OpenXml.Office2021.DocumentTasks;
+using Newtonsoft.Json;
 using System.ComponentModel;
 
 namespace AI.Application.Interfaces;
 public interface IChatService {
     Task<MessageAnswer> GenerateAnswer(Guid conversationId, string prompt, IMessageContext? context = default, CancellationToken token = default);
     Task<PathwayAnswer> GenerateAnswer(string prompt, IMessageContext? context, CancellationToken token = default);
+    Task<FlagAnswer> GenerateAnswer(string prompt, string? imageUrl, IMessageContext? context, CancellationToken token = default);
 }
 
 public class MessageAnswer {
@@ -29,4 +31,8 @@ public class PathwayAnswer {
 public class PathStepAnswer {
     public Guid CourseId { get; set; }
     public TimeSpan EstimatedCompletionTime { get; set; }
+}
+public class FlagAnswer {
+    public string ViolationLevel { get; set; } = string.Empty; //None, Low, Medium, High
+    public string Reason { get; set; } = string.Empty;
 }

@@ -195,6 +195,34 @@ export const DiscussApi = {
     }
   },
 
+  // API: Edit comment mới
+  updateComment: async ({ updateCommentData }) => {
+    try {
+      // Bọc đối tượng updateCommentDto vào trong một đối tượng
+      const updateCommentDto = {
+        updateCommentDto: {
+          id: updateCommentData.id, // Lấy id comment cần chỉnh sửa
+          discussionId: updateCommentData.discussionId,  // ID của thảo luận
+          content: updateCommentData.content,       // Nội dung mới của comment
+          parentCommentId: updateCommentData.parentCommentId, // ID của comment cha (nếu có)
+          isActive: updateCommentData.isActive,      // Trạng thái hoạt động của comment
+          depth: updateCommentData.depth          // Độ sâu của comment
+        }
+      };
+
+      console.log(updateCommentDto, 1111);
+
+      // Gửi yêu cầu PUT để cập nhật comment (thay vì POST, vì bạn đang chỉnh sửa comment đã có)
+      const response = await axios.put(`${API_BASE_URL}/community-service/comments/update`, updateCommentDto, getAuthHeaders());
+
+      // Trả về dữ liệu comment đã được chỉnh sửa
+      return response.data;
+    } catch (error) {
+      console.error("Error updating comment:", error.message);
+      throw error;
+    }
+  },
+
   getCommentsByDiscussionId: async (discussionId, pageIndex, pageSize) => {
     try {
       // Gọi API để lấy danh sách bình luận
@@ -430,7 +458,7 @@ async function fetchUsers(userIds) {
 
     // Kiểm tra xem dữ liệu có hợp lệ hay không
     if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
-      console.log("Dữ liệu người dùng:", response.data);
+      //console.log("Dữ liệu người dùng:", response.data);
       return response.data; // Trả về danh sách người dùng
     } else {
       console.error("Không tìm thấy người dùng hoặc dữ liệu không hợp lệ.");

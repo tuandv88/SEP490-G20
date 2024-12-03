@@ -1,4 +1,6 @@
-﻿namespace Community.Domain.Models
+﻿using Community.Domain.ValueObjects;
+
+namespace Community.Domain.Models
 {
     public class Discussion : Aggregate<DiscussionId>
     {
@@ -19,6 +21,8 @@
         public bool Closed { get; set; }                         // Đánh dấu nếu thảo luận đã đóng
         public bool Pinned { get; set; }                         // Đánh dấu nếu thảo luận được ghim
         public bool NotificationsEnabled { get; set; } = true;  // Mặc định là tắt thông báo
+
+        public FlagId? FlagId { get; set; } = null;               // 1 - 1
 
         // Phương thức tạo mới một Discussion
         public static Discussion Create(DiscussionId discussionId, UserId userId, CategoryId categoryId, string title, string description, bool isActive, List<string> tags, string? imageUrl = null)
@@ -41,7 +45,8 @@
                 NotificationsEnabled = true // Gán giá trị
             };
 
-            discussion.AddDomainEvent(new DiscussionCreatedEvent(discussion));
+            //discussion.AddDomainEvent(new DiscussionCreatedEvent(discussion));
+            discussion.AddDomainEvent(new DiscussionChangedEvent(discussion));
             return discussion;
         }
 
@@ -62,11 +67,17 @@
 
             // Thêm sự kiện cập nhật nếu cần thiết
             // AddDomainEvent(new DiscussionUpdatedEvent(this));
+            AddDomainEvent(new DiscussionChangedEvent(this));
         }
 
         public void UpdateImage(string imageUrl)
         {
             ImageUrl = imageUrl;
+            AddDomainEvent(new DiscussionChangedEvent(this));
+        }
+
+        public void UpdateStatus(bool isActive) {
+            IsActive = isActive;
         }
     }
 }

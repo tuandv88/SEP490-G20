@@ -27,9 +27,9 @@ public static class MassTransitConfigurationExtensions {
                     host.Password(configuration["MessageBroker:Password"]!);
                 });
                 configurator.ConfigureEndpoints(context);
-                //configurator.UseMessageRetry(r => {
-
-                //});
+                configurator.UseMessageRetry(r => {
+                    r.Interval(10, TimeSpan.FromSeconds(2));
+                });
             });
         });
     }

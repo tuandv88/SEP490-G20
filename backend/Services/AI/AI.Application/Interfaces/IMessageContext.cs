@@ -84,6 +84,13 @@ public static class MessageContextExtensions {
 
         return defaultValue;
     }
+    public static string GetCustomContentModerationOrDefault(this IMessageContext? context, string defaultValue) {
+        if (context.TryGetArg<string>(ContextConstant.ContentModeration.Discussion, out var customValue)) {
+            return customValue;
+        }
+
+        return defaultValue;
+    }
     public static bool TryGetArg<T>(this IMessageContext? context, string key, [NotNullWhen(true)] out T? value) {
         if (context != null && context.Arguments.TryGetValue(key, out object? x)) {
             if (x is JsonValue or JsonElement) {

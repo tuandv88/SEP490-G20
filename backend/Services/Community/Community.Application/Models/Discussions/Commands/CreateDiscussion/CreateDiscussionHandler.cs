@@ -91,7 +91,7 @@ public class CreateDiscussionHandler : ICommandHandler<CreateDiscussionCommand, 
             title: createDiscussionDto.Title,
             description: createDiscussionDto.Description,
             tags: createDiscussionDto.Tags,
-            isActive: createDiscussionDto.IsActive,
+            isActive: false,
             imageUrl: imageUrl
         );
     }

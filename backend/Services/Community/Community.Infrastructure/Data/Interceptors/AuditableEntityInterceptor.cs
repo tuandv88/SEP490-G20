@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Community.Application.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace Community.Infrastructure.Data.Interceptors;
-public class AuditableEntityInterceptor : SaveChangesInterceptor {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public AuditableEntityInterceptor(IHttpContextAccessor httpContextAccessor) {
-        _httpContextAccessor = httpContextAccessor;
-    }
+public class AuditableEntityInterceptor(IUserContextService userContext) : SaveChangesInterceptor {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result) {
         UpdateEntities(eventData.Context);
         return base.SavingChanges(eventData, result);
@@ -20,7 +16,7 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor {
 
     public void UpdateEntities(DbContext? context) {
         if (context == null) return;
-        var userName = _httpContextAccessor.HttpContext?.User.Identity?.Name ?? "system";
+        var userName = userContext.User?.UserName ?? "system";
         foreach (var entry in context.ChangeTracker.Entries<IEntity>()) {
             if (entry.State == EntityState.Added) {
                 entry.Entity.CreatedBy = userName;

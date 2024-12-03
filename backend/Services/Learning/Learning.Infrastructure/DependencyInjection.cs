@@ -24,8 +24,6 @@ using Microsoft.Extensions.Logging;
 namespace Learning.Infrastructure;
 public static class DependencyInjection {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration) {
-
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<ApplicationDbContext>((sp, options) => {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),

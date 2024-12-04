@@ -35,6 +35,8 @@ const ProblemSpace = () => {
     setIsProblemListOpen(!isProblemListOpen)
   }
 
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
 
   useEffect(() => {
     const fetchProblemList = async () => {
@@ -64,6 +66,7 @@ const ProblemSpace = () => {
           setError(true)
         } finally {
           setLoading(false)
+          setIsInitialLoading(false)
         }
       }
 
@@ -80,8 +83,6 @@ const ProblemSpace = () => {
     }
   }, [problemId])
 
-
-
   useEffect(() => {
     const fetchSubmissionHistory = async () => {
         try {
@@ -94,24 +95,31 @@ const ProblemSpace = () => {
       fetchSubmissionHistory()
   }, [activeTab])
 
+  useEffect(() => {
+    if (problemList.length > 0 && problemId) {
+      const index = problemList.findIndex(problem => problem.problemsId === problemId);
+      if (index !== -1) {
+        setCurrentProblemIndex(index);
+      }
+    }
+  }, [problemId, problemList]);
 
-  if(loading) {
+  if (isInitialLoading || loading) {
     return <ChapterLoading />
   }
-
-  if (!problemDetail) {
-    return <NotFound />
-  }
-
 
   if (error) {
     return <ErrorPage />
   }
 
+  if (!isInitialLoading && !problemDetail) {
+    return <NotFound />
+  }
+
   return (
     <div>
       <div>
-        <HeaderCode onButtonClick={toggleProblemList} toggleProblemRef={toggleProblemRef} header='Problem List' />
+        <HeaderCode onButtonClick={toggleProblemList} toggleCurriculumRef={toggleProblemRef} header='Problem List' currentProblemIndex={currentProblemIndex} problemList={problemList} navigate={navigate} />
       </div>
 
       {problemDetail && (
@@ -150,7 +158,7 @@ const ProblemSpace = () => {
             />
           </ResizablePanel>
         </ResizablePanelGroup>
-      )}
+      )} 
 
       {isProblemListOpen && (
         <div

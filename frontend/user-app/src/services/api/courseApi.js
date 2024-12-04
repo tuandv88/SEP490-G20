@@ -35,11 +35,12 @@ export const CourseAPI = {
     )
     return response.data
   },
-  getCourseList: async (pageIndex = 1, pageSize = 20, searchString = '') => {
+  getCourseList: async (pageIndex = 1, pageSize = 20, searchString = '', level = '') => {
     const params = new URLSearchParams({
       PageIndex: pageIndex,
       PageSize: pageSize,
-      SearchString: searchString
+      SearchString: searchString,
+      Level: level
     });
 
     const response = await axios.get(`${API_BASE_URL}/learning-service/courses?${params.toString()}`);
@@ -71,6 +72,18 @@ export const CourseAPI = {
         Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
+    return response.data
+  },
+  feedbackCourse: async (courseId, data) => {
+    const response = await axios.put(`${API_BASE_URL}/learning-service/courses/${courseId}/reviews`, data, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  },
+  getCourseReviews: async (courseId, pageIndex = 1, pageSize = 5) => {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/courses/${courseId}/reviews?PageIndex=${pageIndex}&PageSize=${pageSize}`)
     return response.data
   }
 }

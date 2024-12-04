@@ -7,7 +7,7 @@ import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'rea
 const ToggleProblem = forwardRef(
   ({ currentProblemId, problems, isProblemListOpen, toggleProblemList, navigate }, ref) => {
     const [activeProblemIndex, setActiveProblemIndex] = useState(0)
-
+  
     const handlePreviousProblem = () => {
       if (activeProblemIndex > 0) {
         const newIndex = activeProblemIndex - 1
@@ -39,17 +39,14 @@ const ToggleProblem = forwardRef(
 
     return (
       <div
-        className={`z-50 bg-white dark:bg-gray-800 fixed left-0 top-0 flex h-full w-[600px] flex-col transition-all duration-500 ${
+        className={`overflow-y-auto z-50 bg-[#1b2a32] dark:bg-gray-800 fixed left-0 top-0 flex h-full w-[600px] flex-col transition-all duration-500 ${
           isProblemListOpen ? 'transform-none' : '-translate-x-full'
         }`}
       >
-        <div className='flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700'>
-          <TableOfContents size={30} color='#000000' />
-          <h2 className='text-2xl font-medium'>Problem List</h2>
+        <div className='flex bg-[#1b2a32] justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700'>
+          <TableOfContents size={30} color='#ffffff' />
+          <h2 className='text-2xl text-white font-medium'>Problem List</h2>
           <div className='flex items-center space-x-2'>
-            <button className='p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-              <Tag className='w-4 h-4 text-gray-500' />
-            </button>
             <button onClick={toggleProblemList} className='p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
               <X className='w-4 h-4 text-gray-500' />
             </button>
@@ -60,9 +57,6 @@ const ToggleProblem = forwardRef(
             <div className='p-4 border-b border-gray-700'>
               <div className='flex justify-between items-center'>
                 <h1 className='text-2xl font-bold text-white'>Problems</h1>
-                <button className='px-3 py-1 text-sm bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors'>
-                  Tag
-                </button>
               </div>
             </div>
             <div className='divide-y divide-gray-700'>

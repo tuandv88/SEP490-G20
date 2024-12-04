@@ -134,6 +134,11 @@ function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
                 <Check className='h-5 w-5' />
               </div>
             )}
+            {problem.status === 'Attempted' && (
+              <div className='text-yellow-500'>
+                <Star className='h-5 w-5' />
+              </div>
+            )}
             <Button className='h-9' variant='outline' onClick={() => handleSolveChallenge(problem.problemsId)}>
               Solve Challenge
             </Button>

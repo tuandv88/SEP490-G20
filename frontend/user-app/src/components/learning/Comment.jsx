@@ -114,12 +114,15 @@ export default function Comments({ lectureId, courseId }) {
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(true)
   const { user } = useContext(UserContext)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const COMMENTS_PER_PAGE = 4
 
   useEffect(() => {
     const fetchComment = async () => {
       setLoading(true)
       try {
-        const response = await CommentAPI.getCommentLecture(lectureId, 1, 10)
+        const response = await CommentAPI.getCommentLecture(lectureId, 1, COMMENTS_PER_PAGE)
         const commentsWithUserDetails = await Promise.all(
           response.comments.data.map(async (comment) => {
             const userResponse = await UserAPI.getUserById(comment.userId)
@@ -132,6 +135,7 @@ export default function Comments({ lectureId, courseId }) {
           })
         )
         setComments(commentsWithUserDetails)
+        setHasMore(response.comments.data.length === COMMENTS_PER_PAGE)
       } catch (error) {
         console.error('Error fetching comments:', error)
       } finally {
@@ -176,6 +180,29 @@ export default function Comments({ lectureId, courseId }) {
     }
   }
 
+  const loadMoreComments = async () => {
+    try {
+      const nextPage = page + 1
+      const response = await CommentAPI.getCommentLecture(lectureId, nextPage, COMMENTS_PER_PAGE)
+      const newCommentsWithDetails = await Promise.all(
+        response.comments.data.map(async (comment) => {
+          const userResponse = await UserAPI.getUserById(comment.userId)
+          const user = userResponse
+          return {
+            ...comment,
+            userName: user.firstName + ' ' + user.lastName,
+            avatar: user.urlProfilePicture
+          }
+        })
+      )
+      setComments([...comments, ...newCommentsWithDetails])
+      setPage(nextPage)
+      setHasMore(response.comments.data.length === COMMENTS_PER_PAGE)
+    } catch (error) {
+      console.error('Error loading more comments:', error)
+    }
+  }
+
   if (loading) {
     return <ChapterLoading />
   }
@@ -207,11 +234,16 @@ export default function Comments({ lectureId, courseId }) {
                 />
               ))}
             </div>
-            <div className='text-center mb-[50px]'>
-              <button type='submit' className='bg-orange-500 text-white px-4 py-2 rounded-full hover:bg-orange-600'>
-                Load More
-              </button>
-            </div>
+            {hasMore && (
+              <div className='text-center mb-[50px]'>
+                <button 
+                  onClick={loadMoreComments}
+                  className='bg-[#243947] text-gray-300 px-6 py-2 rounded-lg hover:bg-[#2a4251] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
+                >
+                  Load More
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ) : (

@@ -262,14 +262,6 @@ export default function QuizManagement() {
           </div>
         </div>
       )}
-
-      {isFullScreenPopupOpen && (
-        <FullScreenPopup
-          isOpen={isFullScreenPopupOpen}
-          onClose={() => setIsFullScreenPopupOpen(false)}
-          quizId={quizId}
-        />
-      )}
     </div>
   )
 }

@@ -21,13 +21,19 @@ export const ProblemAPI = {
     return response.data
   },
   getAllProblems: async (pageIndex, pageSize, searchString = '') => {
-    const response = await axios.get(`${API_BASE_URL}/learning-service/problems`, {
-      params: {
-        PageIndex: pageIndex,
-        PageSize: pageSize,
-        SearchString: searchString
+    const response = await axios.get(
+      `${API_BASE_URL}/learning-service/problems`,
+      {
+        params: {
+          PageIndex: pageIndex,
+          PageSize: pageSize,
+          SearchString: searchString
+        },
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
       }
-    })
+    )
     return response.data
   },
   getProblemDetails: async (problemId) => {

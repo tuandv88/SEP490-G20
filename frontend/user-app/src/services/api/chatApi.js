@@ -4,7 +4,7 @@ const API_BASE_URL =  import.meta.env.VITE_API_URL
 
 export const ChatAPI = {
   
-  getConversation: async (pageIndex, pageSize) => {
+  getConversation: async (pageIndex, pageSize = 4) => {
     const response = await axios.get(`${API_BASE_URL}/ai-service/conversations?PageIndex=${pageIndex}&PageSize=${pageSize}`, {
       headers: {
         Authorization: `Bearer ${Cookies.get('authToken')}`
@@ -22,6 +22,17 @@ export const ChatAPI = {
       }
     )
     console.log('response', response.data)
+    return response.data
+  },
+  deleteConversation: async (conversationId) => {
+    const response = await axios.delete(
+      `${API_BASE_URL}/ai-service/conversations/${conversationId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+      }
+    )
     return response.data
   }
 }

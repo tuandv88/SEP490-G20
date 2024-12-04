@@ -6,7 +6,7 @@ export const AUTHENTICATION_ROUTERS = {
   NOTFOUND: '*',
   ERROR: '/error',
   THEME: '/themes',
-  COURSELIST: '/courseList',
+  COURSELIST: '/course-list',
   COURSEDETAIL: '/course-detail/:id',
   LEARNINGSPACE: '/learning-space/:id/lecture/:lectureId?',
   PROBLEMS: '/problems',
@@ -18,7 +18,8 @@ export const AUTHENTICATION_ROUTERS = {
   CREATEDISCUSSION: '/discussions/creatediscussion',
   USERPROFILE: '/user-profile',
   PROBLEMSPACE: '/problem-solve/:problemId',
-  NOTIFICATION: '/notifications/history'
+  NOTIFICATION: '/notifications/history',
+  PAYMENT: '/payment'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

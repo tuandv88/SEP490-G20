@@ -12,6 +12,7 @@ import authServiceInstance from '@/oidc/AuthService'
 import { Loading } from '@/components/ui/overlay'
 import RoadmapDashboard from '@/components/userprofile/RoadmapDashboard'
 import { ProblemAPI } from '@/services/api/problemApi'
+import TransactionHistory from '@/components/transaction/TransactionHistory'
 
 export function UserProfile() {
   const [activeTab, setActiveTab] = useState('account')
@@ -48,8 +49,10 @@ export function UserProfile() {
         console.error('Error fetching solved problems:', error);
       }
     };
+    
     fetchSolvedProblems();
   }, []);
+
 
   if (loading) {
     return <Loading />
@@ -65,6 +68,8 @@ export function UserProfile() {
         return <LearningDashboard />
       case 'algorithm':
         return <AlgorithmDashboard problemSolved={problemSolved} problems={problems} />
+      case 'transaction':
+        return <TransactionHistory />
       default:
         return <AccountInfo />
     }
@@ -72,14 +77,9 @@ export function UserProfile() {
 
   return (
     <Layout>
-      <ProfileLayout>
-        <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+       <ProfileLayout activeTab={activeTab} setActiveTab={setActiveTab}>
         {renderTabContent()}
       </ProfileLayout>
     </Layout>
   )
 }
-
-
-      // case 'posts':
-      //   return <MyPosts />

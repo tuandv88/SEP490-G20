@@ -35,6 +35,8 @@ const ProblemPanelTop = ({ leaderboardData }) => {
     }
   }, [leaderboardData]);
 
+  console.log(leaderboardData);
+
   if (
     !leaderboardData ||
     !leaderboardData.ranks ||
@@ -44,6 +46,7 @@ const ProblemPanelTop = ({ leaderboardData }) => {
   ) {
     return null;
   }
+  
 
   return (
     <div className='bg-white rounded-lg shadow-md p-6 mb-6'>

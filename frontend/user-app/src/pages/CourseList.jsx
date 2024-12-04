@@ -23,17 +23,18 @@ function CourseList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [totalItems, setTotalItems] = useState(0);
+  const [selectedLevel, setSelectedLevel] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [courses])
 
 
-  const fetchCourseDetail = async (searchTermString) => {
+  const fetchCourseDetail = async (searchTermString, levelString = selectedLevel) => {
     setLoading(true)
     setError(false)
     try {
-      const data = await CourseAPI.getCourseList(currentPage, coursesPerPage, searchTermString)
+      const data = await CourseAPI.getCourseList(currentPage, coursesPerPage, searchTermString, levelString)
       setCourses(data?.courseDtos?.data)
       setTotalItems(data?.courseDtos?.count || 0);
     } catch (error) {
@@ -64,10 +65,16 @@ function CourseList() {
 
   const handleReset = () => {
     setSearchTerm('');
+    setSelectedLevel('');
     setCurrentPage(1);
-    fetchCourseDetail('')
+    fetchCourseDetail('', '');
   };
-  
+
+  const handleLevelChange = (level) => {
+    setSelectedLevel(level);
+    setCurrentPage(1);
+    fetchCourseDetail(searchTerm, level);
+  };
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -101,6 +108,20 @@ function CourseList() {
               <FaSearch className='absolute left-3 top-3.5 text-gray-400' />
             </div>
           </div>
+          
+          <select
+            value={selectedLevel}
+            onChange={(e) => handleLevelChange(e.target.value)}
+            className='px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+          >
+            <option value=''>All Levels</option>
+            {levels.map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
+          </select>
+
           <button
             onClick={handleSearch}
             className='px-4 py-2 text-white bg-primaryButton rounded-lg hover:bg-primaryButton focus:outline-none focus:ring-2 focus:ring-primaryButton focus:ring-offset-2'

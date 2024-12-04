@@ -50,14 +50,11 @@ const CodeEditor = ({
     setTestCase(dictionary)
   }
 
-
   const handleRunCode = async () => {
     if (!code || isEmpty(code)) {
       setIsOpen(true)
       return
     }
-
-    console.log(code)
 
     const submissionData = {
       createCodeExecuteDto: {
@@ -92,6 +89,8 @@ const CodeEditor = ({
   useEffect(() => {
     //console.log('Updated testCase:', testCase)
   }, [testCase])
+
+  console.log(testCase)
 
   return (
     <div className='flex flex-col bg-gray-900 h-full'>

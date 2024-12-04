@@ -62,8 +62,9 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
   const activeTabTestcase = useStore((state) => state.activeTabTestcase)
   const setActiveTabTestcase = useStore((state) => state.setActiveTabTestcase)
 
-  if (testCase[0] === null) {
-    console.log('testCase[0] === null')
+  // Thêm hàm kiểm tra testCase rỗng
+  const isEmptyTestCase = (testCase) => {
+    return Object.keys(testCase).length === 1 && Object.keys(testCase['0']).length === 0
   }
 
   useEffect(() => {
@@ -168,49 +169,58 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
               </svg>
               <span className='font-semibold text-white'>Testcase</span>
             </div>
-            <div className='flex mb-4 flex-wrap'>
-              {Object.keys(testCases).map((caseId, index) => (
-                <div key={caseId} className='relative mr-2 mb-2'>
-                  <Button
-                    variant={activeTestCase === index ? 'secondary' : 'outline'}
-                    size='sm'
-                    className='pr-6'
-                    onClick={() => setActiveTestCase(index)}
-                  >
-                    Case {parseInt(caseId) + 1}
+
+            {isEmptyTestCase(testCases) ? (
+              <div className='bg-gray-100 rounded-md p-4'>
+                <p className='text-gray-700 text-center font-medium'>No testcase available</p>
+              </div>
+            ) : (
+              <>
+                <div className='flex mb-4 flex-wrap'>
+                  {Object.keys(testCases).map((caseId, index) => (
+                    <div key={caseId} className='relative mr-2 mb-2'>
+                      <Button
+                        variant={activeTestCase === index ? 'secondary' : 'outline'}
+                        size='sm'
+                        className='pr-6'
+                        onClick={() => setActiveTestCase(index)}
+                      >
+                        Case {parseInt(caseId) + 1}
+                      </Button>
+                      {Object.keys(testCases).length > 1 && (
+                        <Button
+                          variant='destructive'
+                          size='icon'
+                          className='absolute -top-1 -right-1 h-5 w-5 rounded-full p-0'
+                          onClick={() => handleRemoveTestCase(caseId)}
+                        >
+                          <X size={12} />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button variant='outline' size='icon' className='h-9 w-9' onClick={handleAddTestCase}>
+                    <Plus size={16} />
                   </Button>
-                  {Object.keys(testCases).length > 1 && (
-                    <Button
-                      variant='destructive'
-                      size='icon'
-                      className='absolute -top-1 -right-1 h-5 w-5 rounded-full p-0'
-                      onClick={() => handleRemoveTestCase(caseId)}
-                    >
-                      <X size={12} />
-                    </Button>
-                  )}
                 </div>
-              ))}
-              <Button variant='outline' size='icon' className='h-9 w-9' onClick={handleAddTestCase}>
-                <Plus size={16} />
-              </Button>
-            </div>
-            <div className='bg-gray-100 rounded-md p-4'>
-              {Object.entries(testCases[activeTestCase.toString()]).map(([param, value]) => (
-                <div key={param} className='mb-4 last:mb-0'>
-                  <Label htmlFor={`${param}-${activeTestCase}`} className='text-gray-700 mb-2 block'>
-                    {param} =
-                  </Label>
-                  <Input
-                    id={`${param}-${activeTestCase}`}
-                    value={value}
-                    onChange={(e) => handleInputChange(activeTestCase.toString(), param, e.target.value)}
-                    className='bg-white p-2 rounded-md w-full'
-                    placeholder={`Enter value for ${param}`}
-                  />
+                <div className='bg-gray-100 rounded-md p-4'>
+                  {Object.entries(testCases[activeTestCase.toString()]).map(([param, value]) => (
+                    <div key={param} className='mb-4 last:mb-0'>
+                      <Label htmlFor={`${param}-${activeTestCase}`} className='text-gray-700 mb-2 block'>
+                        {param} =
+                      </Label>
+                      <Input
+                        id={`${param}-${activeTestCase}`}
+                        value={value}
+                        onChange={(e) => handleInputChange(activeTestCase.toString(), param, e.target.value)}
+                        className='bg-white p-2 rounded-md w-full'
+                        placeholder={`Enter value for ${param}`}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
           </div>
         </>
       )}
@@ -231,8 +241,8 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
                             ? 'border border-green-500'
                             : 'border border-red-500'
                           : result.isPass
-                          ? 'bg-green-400'
-                          : 'bg-red-400'
+                            ? 'bg-green-400'
+                            : 'bg-red-400'
                       }`}
                       onClick={() => setActiveTestResult(index)}
                     >
@@ -303,10 +313,8 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
           )} */}
 
           {!loading && response === null && (
-            <div>
-              <pre className='bg-red-100 p-4 rounded-md text-gray-700 whitespace-pre-wrap'>
-                You must run your code first
-              </pre>
+            <div className='bg-gray-100 rounded-md p-4'>
+              <p className='text-gray-700 text-center font-medium'>You must run your code first</p>
             </div>
           )}
         </div>

@@ -88,13 +88,12 @@ const LearningSpace = () => {
       try {
         const data = await CourseAPI.getCourseProgress(id)
         setCourseProgress(data.progress)
-
       } catch (error) {
         console.error('Error fetching course progress:', error)
       }
     }
     fetchCourseProgress()
-  }, [lectureId])
+  }, [lectureId, id])
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
@@ -184,6 +183,14 @@ const LearningSpace = () => {
     }
   }, [lectureId])
 
+  const updateCourseProgressState = async () => {
+    try {
+      const data = await CourseAPI.getCourseProgress(id)
+      setCourseProgress(data.progress)
+    } catch (error) {
+      console.error('Error fetching course progress:', error)
+    }
+  }
 
   if (loading) {
     return <CourseLoadingDetail />
@@ -199,10 +206,6 @@ const LearningSpace = () => {
     )
   }
 
-
-  // if (mainLoading) {
-  //   return <Loading />
-  // }
 
   return (
     <div>
@@ -236,6 +239,7 @@ const LearningSpace = () => {
                   lectureId={lectureId}
                   files={files}
                   lectureScore={lectureDetail?.lectureDetailsDto?.point}
+                  updateCourseProgress={updateCourseProgressState}
                 />
               )}
               {activeTab === 'submissionResult' && !loading && (
@@ -308,6 +312,7 @@ const LearningSpace = () => {
                 lectureId={lectureId}
                 files={files}
                 lectureScore={lectureDetail?.lectureDetailsDto?.point}
+                updateCourseProgress={updateCourseProgressState}
               />
             </div>
           </ResizablePanel>

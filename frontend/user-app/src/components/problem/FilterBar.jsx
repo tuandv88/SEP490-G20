@@ -26,7 +26,7 @@ function FilterBar({ filters, setFilters, availableTags, handleTagToggle, handle
             <RotateCcw className='h-3 w-3 mr-1' />
             Reset
           </Button>
-          <Button className='flex-1' onClick={handleSearch}>Search</Button>
+          <Button className='flex-1 bg-primaryButton' onClick={handleSearch}>Search</Button>
         </div>
       </div>
     </div>

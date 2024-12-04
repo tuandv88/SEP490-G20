@@ -11,10 +11,9 @@ import {
   BookOpenText,
   User,
   Map,
-  PieChart,
-  Settings2,
   Code,
-  CircleHelp
+  CircleHelp,
+  MessageSquareMore
 } from 'lucide-react'
 import { NavMain } from '@/components/nav-main'
 import { NavProjects } from '@/components/nav-projects'
@@ -30,7 +29,7 @@ import {
   SidebarMenuItem,
   useSidebar
 } from '@/components/ui/sidebar'
-
+import { Link } from '@tanstack/react-router'
 import {
   COURSE_TABLE_PATH,
   PROBLEM_TABLE_PATH,
@@ -143,6 +142,17 @@ export function AppSidebar({ ...props }) {
             url: DOCUMENT_AI_TABLE_PATH
           }
         ]
+      },
+      {
+        title: 'Community',
+        url: '#',
+        icon: MessageSquareMore,
+        items: [
+          {
+            title: 'Discussion',
+            url: ''
+          }
+        ]
       }
     ]
   }
@@ -153,15 +163,17 @@ export function AppSidebar({ ...props }) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size='lg' asChild>
-              <a href='#'>
-                <div className='flex items-center justify-center rounded-lg aspect-square size-8 bg-sidebar-primary text-sidebar-primary-foreground'>
-                  <Codesandbox className='size-4' />
+              <Link to=''>
+                <div className='flex items-center'>
+                  <div className='flex items-center justify-center rounded-lg aspect-square size-8 bg-sidebar-primary text-sidebar-primary-foreground'>
+                    <Codesandbox className='size-4' />
+                  </div>
+                  <div className='grid flex-1 text-sm leading-tight text-left ml-4'>
+                    <span className='font-semibold truncate'>ICODER</span>
+                    <span className='text-xs truncate'>Technology</span>
+                  </div>
                 </div>
-                <div className='grid flex-1 text-sm leading-tight text-left'>
-                  <span className='font-semibold truncate'>ICODER</span>
-                  <span className='text-xs truncate'>Technology</span>
-                </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem></SidebarMenuItem>

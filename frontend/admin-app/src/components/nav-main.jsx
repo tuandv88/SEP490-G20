@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { ChevronRight, LayoutDashboard } from 'lucide-react'
-
+import { Link } from '@tanstack/react-router'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   SidebarGroup,
@@ -21,10 +21,10 @@ export function NavMain({ items }) {
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton asChild>
-            <a href={DASHBOARD_PATH}>
+            <Link to={DASHBOARD_PATH}>
               <LayoutDashboard className='w-4 h-4 mr-2' />
               <span>Dashboard</span>
-            </a>
+            </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
         {items.map((item) => (
@@ -43,9 +43,11 @@ export function NavMain({ items }) {
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </a>
+                        <Link to={subItem.url}>
+                          <div className='flex items-center'>
+                            <span>{subItem.title}</span>
+                          </div>
+                        </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}

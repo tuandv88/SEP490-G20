@@ -12,9 +12,10 @@ import { Link } from '@tanstack/react-router'
 import { useMatch } from '@tanstack/react-router'
 import { userDetailRoute } from '@/routers/router'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { USER_TABLE_PATH, USER_DETAIL_PATH } from '@/routers/router'
 const breadcrumbs = [
-  { label: 'UserTable', href: '/user-table' },
-  { label: 'UserDetail', href: '/user-detail' }
+  { label: 'UserTable', href: USER_TABLE_PATH },
+  { label: 'UserDetail', href: USER_DETAIL_PATH }
 ]
 const UserDetail = () => {
   const { params } = useMatch(userDetailRoute.id)
@@ -76,11 +77,6 @@ const UserDetail = () => {
   return (
     <PageContainer breadcrumbs={breadcrumbs}>
       <div className='container mx-auto px-4 py-8'>
-        <Button variant='outline' asChild className='mb-6'>
-          <Link to='/user-table'>
-            <ArrowLeft className='mr-2 h-4 w-4' /> Back to Users
-          </Link>
-        </Button>
         <Card className='w-full max-w-4xl mx-auto'>
           <CardHeader className='pb-0'>
             <div className='flex items-center space-x-4'>

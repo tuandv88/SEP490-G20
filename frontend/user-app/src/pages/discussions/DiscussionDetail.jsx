@@ -323,8 +323,6 @@ function DiscussionDetail() {
         updateDiscussionDto.imageDto = discussionImageData;
       }
 
-      console.log(updateDiscussionDto, 1111123);
-
       // Gọi API cập nhật bài viết
       const response = await DiscussApi.updateDiscuss(updateDiscussionDto);
 

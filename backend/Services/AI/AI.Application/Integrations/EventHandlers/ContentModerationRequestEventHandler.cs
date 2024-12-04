@@ -37,6 +37,8 @@ public class ContentModerationRequestEventHandler(IChatService chatService, IMes
         await recommendationRepository.AddAsync(recommendation);
         await publishEndpoint.Publish(new ContentModerationResultEvent() {
             DiscusstionId = @event.DiscussionId,
+            FullName = @event.FullName,
+            Email = @event.Email,
             ViolationLevel = answer.ViolationLevel,
             Reason = answer.Reason, 
         });

@@ -84,7 +84,6 @@ const Description = ({
   const documentFiles = files.filter((file) => file && file.fileType === 'DOCUMENT')
 
   return (
-    // !videoSrc
     <div>
       {loading ? (
         <ChapterLoading />
@@ -149,7 +148,7 @@ const Description = ({
           </div>
           {documentFiles.length > 0 && (
             <div className='document-list mt-5'>
-              <h3 className='text-xl font-bold mb-3'>Tài liệu đính kèm</h3>
+              <h3 className='text-xl font-bold mb-3'>Documents</h3>
               <ul>
                 {documentFiles.map((file, index) => (
                   <li key={index} className='mb-2'>

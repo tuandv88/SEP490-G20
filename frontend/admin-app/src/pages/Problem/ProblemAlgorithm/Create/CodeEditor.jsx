@@ -250,7 +250,8 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
       const hasCompileOrRuntimeErrors = response.codeExecuteDtos.some(dto =>
         dto.compileErrors || dto.runTimeErrors
       );
-  
+      
+      console.log(response)
       if (hasCompileOrRuntimeErrors) {
         toast({
           variant: 'destructive',

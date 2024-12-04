@@ -6,7 +6,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import remarkGfm from 'remark-gfm'
 import PreCoppy from '../ui/PreCoppy'
-import { BookOpenCheck, Frown } from 'lucide-react'
+import { BookOpenCheck, Frown, Smile } from 'lucide-react'
 import DescriptionLoading from '../loading/DescriptionLoading'
 import ChapterLoading from '../loading/ChapterLoading'
 import { Button } from '../ui/button'
@@ -22,14 +22,15 @@ const Description = ({
   handleNextLecture,
   courseId,
   lectureId,
-  files
+  files,
+  lectureScore
 }) => {
   const videoRef = useRef(null)
   const [videoTime, setVideoTime] = useState(0) // Lưu thời gian video khi dừng
   const [isPaused, setIsPaused] = useState(false) // Trạng thái video có tạm dừng hay không
   const [isVideoLoading, setIsVideoLoading] = useState(true)
 
-  console.log(videoSrc)
+  console.log(lectureScore)
 
   // Khôi phục thời gian khi component mount
   useEffect(() => {
@@ -105,12 +106,27 @@ const Description = ({
             </div>
           )}
 
-          <Button
-            onClick={handleComplete}
-            className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-5'
-          >
-            Mark as complete
-          </Button>
+          <div className='flex items-center justify-between rounded-xl py-4 shadow-lg mt-5'>
+            <Button
+              onClick={handleComplete}
+              className='flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg'
+            >
+              <CheckCircle className='w-5 h-5' />
+              <span>Mark as complete</span>
+            </Button>
+
+            <div className='flex items-center space-x-4 mr-10'>
+              
+              <div className='p-3 bg-green-100 rounded-lg'>
+                <GraduationCap className='w-5 h-5 text-green-600' />
+              </div>
+
+              <div className='flex flex-col'>
+                {/* <span className='text-gray-400 text-sm font-medium'>Lecture Score</span> */}
+                <span className='text-white text-3xl font-bold'>{lectureScore}</span>
+              </div>
+            </div>
+          </div>
 
           <div className='p-3 rounded-lg flex items-center mb-10 mt-10 w-full border border-spacing-10'>
             <BookOpenCheck className='inline mr-4' size={40} color='#ffffff' />

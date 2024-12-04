@@ -25,7 +25,7 @@ function CourseDetail() {
   const navigate = useNavigate()
   const setSelectedCourse = useStore((state) => state.setSelectedCourse)
   const [enrolledCourses, setEnrolledCourses] = useState(null)
-
+  const [reviewData, setReviewData] = useState(null)
 
   useEffect(() => {
     setSelectedCourse(id)    
@@ -38,12 +38,14 @@ function CourseDetail() {
       setLoading(true)
       setError(false)
       try {
-        const [courseData, enrolledData] = await Promise.all([
+        const [courseData, enrolledData, reviewData] = await Promise.all([
           LearningAPI.getCoursePreview(id),
-          CourseAPI.getEnrolledCourses(id)
+          CourseAPI.getEnrolledCourses(id),
+          CourseAPI.getCourseReviews(id, 1, 20)
         ])
         setCourseDetail(courseData)     
-        setEnrolledCourses(enrolledData.enrollmentInfo)     
+        setEnrolledCourses(enrolledData.enrollmentInfo)   
+        setReviewData(reviewData)
       } catch (error) {
         console.error('Error fetching data:', error)
         setError(true)
@@ -83,16 +85,12 @@ function CourseDetail() {
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className='w-5 h-5 fill-yellow-400 text-yellow-400' />
                   ))}
-                  <span className='text-gray-600'>4.99 (532 Reviews)</span>
+                  <span className='text-gray-600'>{reviewData?.courseReviews?.averageRating.toFixed(1)} ({reviewData?.courseReviews?.totalReviews} Reviews)</span>
                 </div>
 
                 <div className='flex justify-between items-start'>
                   <h1 className='text-3xl font-bold text-gray-900'>{courseDetail?.course?.title}</h1>
                   <div className='flex gap-4'>
-                    <button className='flex items-center gap-2 text-gray-600 hover:text-gray-900'>
-                      <BookmarkPlus className='w-5 h-5' />
-                      <span>Wishlist</span>
-                    </button>
                     <button className='flex items-center gap-2 text-gray-600 hover:text-gray-900'>
                       <Share2 className='w-5 h-5' />
                       <span>Share</span>
@@ -159,7 +157,7 @@ function CourseDetail() {
                         <CourseContent chapters={courseDetail?.course?.chapters} />
                       </>
                     ) : (
-                      <CourseEvaluate />
+                      <CourseEvaluate reviewData={reviewData} />
                     )}
                   </div>
                 </div>

@@ -66,7 +66,7 @@ const StatsPanel = ({ problemSolved, leaderboardData }) => {
             <div
               className='h-full bg-green-500 rounded-full'
               style={{
-                width: `${(problemSolved.solved.easy.solvedCount / problemSolved.solved.easy.totalCount) * 100}%`
+                width: `${problemSolved.solved.easy.totalCount ? (problemSolved.solved.easy.solvedCount / problemSolved.solved.easy.totalCount) * 100 : 0}%`
               }}
             />
           </div>
@@ -84,7 +84,7 @@ const StatsPanel = ({ problemSolved, leaderboardData }) => {
             <div
               className='h-full bg-yellow-500 rounded-full'
               style={{
-                width: `${(problemSolved.solved.medium.solvedCount / problemSolved.solved.medium.totalCount) * 100}%`
+                width: `${problemSolved.solved.medium.totalCount ? (problemSolved.solved.medium.solvedCount / problemSolved.solved.medium.totalCount) * 100 : 0}%`
               }}
             />
           </div>
@@ -102,7 +102,7 @@ const StatsPanel = ({ problemSolved, leaderboardData }) => {
             <div
               className='h-full bg-red-500 rounded-full'
               style={{
-                width: `${(problemSolved.solved.hard.solvedCount / problemSolved.solved.hard.totalCount) * 100}%`
+                width: `${problemSolved.solved.hard.totalCount ? (problemSolved.solved.hard.solvedCount / problemSolved.solved.hard.totalCount) * 100 : 0}%`
               }}
             />
           </div>

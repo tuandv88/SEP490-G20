@@ -3,7 +3,6 @@ import { formatDistanceToNow, format, parseISO } from 'date-fns'
 import { Check, X } from 'lucide-react'
 
 const SubmissionHistory = ({ submissions }) => {
-  console.log(submissions)
   const formatDate = (dateStr) => {
     const date = parseISO(dateStr)
     const now = new Date()
@@ -16,7 +15,7 @@ const SubmissionHistory = ({ submissions }) => {
   }
 
   const formatMemory = (bytes) => {
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB'
+    return (bytes / 1024).toFixed(2) + ' MB'
   }
 
   const getStatus = (submission) => {

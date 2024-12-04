@@ -3,7 +3,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import Layout from '@/layouts/layout'
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { ChevronRight } from 'lucide-react'
 import CourseLoading from '@/components/loading/CourseLoading'
 import { ProblemSection } from '@/components/problem/ProblemSection'
@@ -34,48 +34,74 @@ const Avatar = ({ src, alt, className, ...props }) => (
 )
 
 function HomePage() {
-  const [courses, setCourses] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
-  const [userInfo, setUserInfo] = useState(null)
-  const [isSurveyOpen, setIsSurveyOpen] = useState(false)
-  const [isAssessmentPromptOpen, setIsAssessmentPromptOpen] = useState(false)
-  const [isQuizOpen, setIsQuizOpen] = useState(false)
-  const [quizAssessment, setQuizAssessment] = useState(null)
-  const [isLoadedQuizAssessment, setIsLoadedQuizAssessment] = useState(false)
+  const initialState = {
+    courses: [],
+    loading: false,
+    error: false,
+    userInfo: null,
+    isSurveyOpen: false,
+    isAssessmentPromptOpen: false,
+    isQuizOpen: false,
+    quizAssessment: null
+  }
+
+  function reducer(state, action) {
+    switch (action.type) {
+      case 'SET_LOADING':
+        return { ...state, loading: action.payload }
+      case 'SET_ERROR':
+        return { ...state, error: action.payload }
+      case 'SET_COURSES':
+        return { ...state, courses: action.payload }
+      case 'SET_USER_INFO':
+        return { ...state, userInfo: action.payload }
+      case 'SET_IS_SURVEY_OPEN':
+        return { ...state, isSurveyOpen: action.payload }
+      case 'SET_IS_ASSESSMENT_PROMPT_OPEN':
+        return { ...state, isAssessmentPromptOpen: action.payload }
+      case 'SET_IS_QUIZ_OPEN':
+        return { ...state, isQuizOpen: action.payload }
+      case 'SET_QUIZ_ASSESSMENT':
+        return { ...state, quizAssessment: action.payload }
+      default:
+        return state
+    }
+  }
+
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchQuizAssessment = async () => {
-      try {
-        setLoading(true)
-        if (userInfo) {
+      if (state.userInfo) {
+        dispatch({ type: 'SET_LOADING', payload: true })
+        try {
           const data = await QuizAPI.getQuizAssessment()
-          setQuizAssessment(data.quiz)
-          setIsLoadedQuizAssessment(true)
+          dispatch({ type: 'SET_QUIZ_ASSESSMENT', payload: data.quiz })
+        } catch (error) {
+          console.error('Error fetching quiz assessment:', error)
+        } finally {
+          dispatch({ type: 'SET_LOADING', payload: false })
         }
-      } catch (error) {
-        console.error('Error fetching quiz assessment:', error)
-      } finally {
-        setLoading(false)
       }
     }
 
     fetchQuizAssessment()
-  }, [userInfo])
+  }, [state.userInfo])
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const user = await authServiceInstance.getUser()
         if (user) {
-          setUserInfo(user.profile)
+          dispatch({ type: 'SET_USER_INFO', payload: user.profile })
+  
           // Kiểm tra điều kiện để hiển thị survey
           const isSurveyCompleted = localStorage.getItem('isSurveyCompleted')
           if (isSurveyCompleted !== 'true' && user.profile.issurvey === 'false') {
-            updateSurveyStatus()
-            setIsSurveyOpen(true)
+            updateSurveyStatus(user.profile.sub)
+            dispatch({ type: 'SET_IS_SURVEY_OPEN', payload: true })
           }
         }
       } catch (error) {
@@ -83,11 +109,12 @@ function HomePage() {
       }
     }
     fetchUserInfo()
-  }, [isSurveyOpen, isLoadedQuizAssessment])
+  }, [])
 
-  async function updateSurveyStatus() {
+  async function updateSurveyStatus(userId) {
     try {
-      await UserAPI.changeSurveyStatus(userInfo.sub)
+      console.log('Updating survey status for user:', userId)
+      await UserAPI.changeSurveyStatus(userId)
       authServiceInstance.refreshToken()
       localStorage.setItem('isSurveyCompleted', 'true')
     } catch (error) {
@@ -97,60 +124,63 @@ function HomePage() {
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
-      setLoading(true)
-      setError(false)
+      dispatch({ type: 'SET_LOADING', payload: true })
+      dispatch({ type: 'SET_ERROR', payload: false })
       try {
         const data = await CourseAPI.getCoursePopular(1, 5)
-        setCourses(data?.courseDtos?.data)
+        dispatch({ type: 'SET_COURSES', payload: data?.courseDtos?.data })
       } catch (error) {
         console.error('Error fetching course detail:', error)
         if (error.response) {
           if (error.response.status >= 500) {
-            setError(true)
+            dispatch({ type: 'SET_ERROR', payload: true })
           } else if (error.response.status === 404) {
-            setCourses(null)
+            dispatch({ type: 'SET_COURSES', payload: null })
           }
         } else {
-          setError(true)
+          dispatch({ type: 'SET_ERROR', payload: true })
         }
       } finally {
-        setLoading(false)
+        dispatch({ type: 'SET_LOADING', payload: false })
       }
     }
 
     fetchCourseDetail()
   }, [])
 
+  // Các hàm xử lý sự kiện khác, cập nhật trạng thái bằng dispatch
+
+  // Ví dụ:
   const handleSurveySubmit = (data) => {
-    // console.log('Survey submitted:', data)
-    setIsSurveyOpen(false)
-    setIsAssessmentPromptOpen(true)
+    // Xử lý submit survey
+    dispatch({ type: 'SET_IS_SURVEY_OPEN', payload: false })
+    dispatch({ type: 'SET_IS_ASSESSMENT_PROMPT_OPEN', payload: true })
   }
 
   const handleAssessmentAccept = () => {
-    setIsAssessmentPromptOpen(false)
-    setIsQuizOpen(true)
+    dispatch({ type: 'SET_IS_ASSESSMENT_PROMPT_OPEN', payload: false })
+    dispatch({ type: 'SET_IS_QUIZ_OPEN', payload: true })
   }
 
   const handleAssessmentDecline = () => {
-    setIsAssessmentPromptOpen(false)
-    //updateUserFirstLogin()
+    dispatch({ type: 'SET_IS_ASSESSMENT_PROMPT_OPEN', payload: false })
+    // updateUserFirstLogin()
   }
 
   const handleQuizComplete = (score) => {
     console.log('Quiz completed with score:', score)
-    setIsQuizOpen(false)
-    //updateUserFirstLogin()
+    dispatch({ type: 'SET_IS_QUIZ_OPEN', payload: false })
+    // updateUserFirstLogin()
   }
 
-  if (loading) {
-    return null
-  }
+  const { loading, courses, userInfo, isSurveyOpen, isAssessmentPromptOpen, isQuizOpen, quizAssessment } = state
+
+  console.log('Loading state:', loading)
 
   return (
     <>
       <Layout>
-        <div className='flex flex-col min-h-screen pt-12'>
+        <div className='flex flex-col min-h-screen pt-12 mt-4'>
           {/* Hero Section */}
           <section className='py-12 text-white bg-gradient-to-r from-primaryButton to-primaryButton md:py-20'>
             <div className='container px-4 mx-auto'>
@@ -164,8 +194,8 @@ function HomePage() {
                     algorithms.
                   </p>
                   <div className='flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4'>
-                    <Button className='text-black bg-white hover:bg-blue-100'>Explore courses</Button>
-                    <Button className='border border-white hover:bg-red-600'>Participate in the algorithm</Button>
+                    <Button onClick={() => navigate(AUTHENTICATION_ROUTERS.COURSELIST)} className='text-black bg-white hover:bg-blue-100'>Explore courses</Button>
+                    <Button onClick={() => navigate(AUTHENTICATION_ROUTERS.PROBLEMS)} className='border border-white hover:bg-red-600'>Participate in the algorithm</Button>
                   </div>
                 </div>
                 <div className='md:w-5/11'>
@@ -183,7 +213,7 @@ function HomePage() {
           <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
               <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Featured Courses</h2>
-              {loading ? <CourseLoading></CourseLoading> : <CourseCarousel courses={courses} />}
+              {loading ? <CourseLoading /> : <CourseCarousel courses={courses} />}
               <div className='mt-8 text-center md:mt-10'>
                 <Button
                   onClick={() => navigate(AUTHENTICATION_ROUTERS.COURSELIST)}
@@ -208,8 +238,7 @@ function HomePage() {
         <SurveyModal
           isOpen={isSurveyOpen}
           onClose={() => {
-            setIsSurveyOpen(false)
-            // updateUserFirstLogin()
+            dispatch({ type: 'SET_IS_SURVEY_OPEN', payload: false })
           }}
           onSubmit={handleSurveySubmit}
         />
@@ -217,8 +246,7 @@ function HomePage() {
         <AssessmentPrompt
           isOpen={isAssessmentPromptOpen}
           onClose={() => {
-            setIsAssessmentPromptOpen(false)
-            // updateUserFirstLogin()
+            dispatch({ type: 'SET_IS_ASSESSMENT_PROMPT_OPEN', payload: false })
           }}
           onAccept={handleAssessmentAccept}
           onDecline={handleAssessmentDecline}
@@ -227,14 +255,11 @@ function HomePage() {
         <QuizModal
           isOpen={isQuizOpen}
           onClose={() => {
-            setIsQuizOpen(false)
-            //updateUserFirstLogin()
+            dispatch({ type: 'SET_IS_QUIZ_OPEN', payload: false })
           }}
           onComplete={handleQuizComplete}
           quiz={quizAssessment}
         />
-
-        {/* <QuizPopup quiz={quizData.quiz} answer={quizData.answer} onComplete={() => handleQuizComplete()} /> */}
       </Layout>
     </>
   )

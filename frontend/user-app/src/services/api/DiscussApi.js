@@ -448,6 +448,52 @@ export const DiscussApi = {
     }
   },
 
+
+  getDiscussionsByUserId: async (pageIndex, pageSize, searchKeyword, tags) => {
+    try {
+      // Kiểm tra các tham số trước khi gọi API
+      if (pageIndex <= 0 || pageSize <= 0) {
+        throw new Error('Page index and page size must be greater than 0.');
+      }
+
+      // Kiểm tra nếu searchKeyword hoặc tags là null hoặc undefined, có thể bỏ qua
+      if (searchKeyword === undefined || searchKeyword === null) {
+        searchKeyword = '';
+      }
+      if (tags === undefined || tags === null) {
+        tags = '';
+      }
+
+      // Mã hóa các tham số vào URL
+      const url = `${API_BASE_URL}/community-service/discussions/byuserid?pageIndex=${pageIndex}&pageSize=${pageSize}&SearchKeyword=${encodeURIComponent(searchKeyword)}&Tags=${encodeURIComponent(tags)}`;
+      console.log('Query URL:', url);
+
+      // Gọi API với header Authorization nếu cần
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+      });
+
+      // Kiểm tra dữ liệu API trả về
+      if (response && response.data) {
+        // Kiểm tra xem response có chứa dữ liệu cần thiết không
+        if (response.data.discussionDetailUserDtos && response.data.discussionDetailUserDtos.data) {
+          console.log('Data Response: ', response.data);
+          return response.data;
+        } else {
+          throw new Error('Invalid data structure in response');
+        }
+      } else {
+        throw new Error('No data received from API');
+      }
+
+    } catch (error) {
+      console.error('Error fetching discussions:', error.message);
+      throw error;  // Ném lỗi ra ngoài để xử lý ở nơi gọi hàm
+    }
+  }
+
 };
 
 // API thứ hai: Lấy thông tin chi tiết của UserIds

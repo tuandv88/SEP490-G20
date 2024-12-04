@@ -78,6 +78,29 @@ public class DiscussionRepository : Repository<Discussion>, IDiscussionRepositor
                        .ToList();
         return discussion;
     }
+
+    public async Task<IQueryable<Discussion>?> GetAllDiscussionByUserIdAsync(Guid userId)
+    {
+        var discussions = _dbContext.Discussions
+                       .AsNoTracking()
+                       .Include(d => d.Comments)
+                       .Include(d => d.Votes)
+                       .AsEnumerable()
+                       .Where(d => d.UserId.Value == userId)
+                       .AsQueryable();
+        return discussions;
+    }
+
+    public async Task<IQueryable<Discussion>?> GetDiscussionsAll()
+    {
+        var discussions = _dbContext.Discussions
+                       .AsNoTracking()
+                       .Include(d => d.Comments)
+                       .Include(d => d.Votes)
+                       .AsEnumerable()
+                       .AsQueryable();
+        return discussions;
+    }
 }
 
 

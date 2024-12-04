@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useContext } from 'react'
-import { Bell, Menu, X } from 'lucide-react'
+import { Bell, BookOpen, Code, Code2, Home, Info, LogIn, Menu, MessageSquare, UserPlus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS as AR } from '@/data/constants'
@@ -9,6 +9,16 @@ import { ModeToggle } from '@/components/mode-toggle'
 import AuthService from '@/oidc/AuthService'
 import { UserContext } from '@/contexts/UserContext'
 import { useNavigate } from "react-router-dom";
+import { NavLink } from '@/components/NavLink'
+
+
+const NAVIGATION_ITEMS = [
+  { to: AR.HOME, label: 'HomePage', icon: Home },
+  { to: AR.COURSELIST, label: 'Course', icon: BookOpen },
+  { to: AR.PROBLEMS, label: 'Problems', icon: Code2 },
+  { to: AR.DISCUSS, label: 'Discuss', icon: MessageSquare },
+  { to: AR.ABOUT, label: 'AboutUs', icon: Info }
+];
 
 export default function Header() {
   const { user, updateUser } = useContext(UserContext)
@@ -88,129 +98,132 @@ export default function Header() {
   }
 
   return (
-    <header
-      className={`bg-background text-foreground shadow-md fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isHidden ? 'hidden' : 'top-0'}`}
+    <header 
+      className={`bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 
+        border-b border-border text-foreground fixed top-0 left-0 w-full z-40 
+        transition-all duration-300 ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
-      <div className='container px-4 py-4 mx-auto'>
+      <div className='container px-4 py-3 mx-auto'>
         <div className='flex items-center justify-between'>
-          <Link to={AR.HOME} className='text-2xl font-bold text-primary'>
+          <Link 
+            to={AR.HOME} 
+            className='text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 
+              bg-clip-text text-transparent flex items-center gap-2 
+              hover:scale-105 transition-transform duration-300 w-10 h-10'
+          >
+            <img className='object-fit' src="https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/frontend/assets/icodervn-logo-removebg-preview.png" alt="Logo" />
             Icoder
           </Link>
+          
           <nav className='hidden md:block'>
-            <ul className='flex space-x-6'>
-              <li>
-                <Link to={AR.HOME} className='text-lg hover:text-primary hover:font-bold'>
-                  HomePage
-                </Link>
-              </li>
-              <li>
-                <Link to={AR.COURSELIST} className='text-lg hover:text-primary hover:font-bold'>
-                  Course
-                </Link>
-              </li>
-              <li>
-                <Link to={AR.PROBLEMS} className='text-lg hover:text-primary hover:font-bold'>
-                  Problems
-                </Link>
-              </li>
-              <li>
-                <Link to={AR.DISCUSS} className='text-lg hover:text-primary hover:font-bold'>
-                  Discuss
-                </Link>
-              </li>
-              <li>
-                <Link to={AR.ABOUT} className='text-lg hover:text-primary hover:font-bold'>
-                  AboutUs
-                </Link>
-              </li>
+            <ul className='flex items-center space-x-8'>
+              {NAVIGATION_ITEMS.map(({ to, label, icon }) => (
+                <li key={to}>
+                  <NavLink to={to} label={label} icon={icon} />
+                </li>
+              ))}
             </ul>
           </nav>
+
           <div className='flex items-center space-x-4'>
             {user ? (
-
               <div className='flex items-center space-x-3'>
-
-                <div className='Notification'>
+                <div className='relative'>
                   <Button
                     variant='ghost'
                     size='icon'
-                    className='hidden md:inline-flex'
+                    className='hidden md:inline-flex relative hover:scale-105 transition-transform'
                     onClick={handleClick}
                   >
                     <Bell className='w-5 h-5' />
+                    <span className='absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full 
+                      animate-ping' />
+                    <span className='absolute -top-1 -right-1 w-2 h-2 bg-primaryButton rounded-full' />
                   </Button>
                 </div>
 
                 <div className='relative flex items-center' ref={dropdownRef}>
-                  <div onClick={toggleDropdown} className='cursor-pointer'>
-                    <Avatar>
-                      <AvatarImage src={user.profile.urlImagePresigned} alt='User Avatar' />
+                  <div 
+                    onClick={toggleDropdown} 
+                    className='cursor-pointer transition-transform hover:scale-105'
+                  >
+                    <Avatar className='w-8 h-8 ring-2 ring-border ring-offset-2 ring-offset-background
+                      hover:ring-primary transition-colors duration-300'>
+                      <AvatarImage src={user?.profile?.urlImagePresigned} alt='User Avatar' />
                       <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                   </div>
                   {isDropdownOpen && (
-                    <div className='absolute left-0 mt-2'>
+                    <div className='absolute right-0 top-full mt-2'>
                       <DropdownMenuUser
                         isOpen={isDropdownOpen}
                         onClose={() => setIsDropdownOpen(false)}
-                        userName={user.profile.firstName + ' ' + user.profile.lastName}
+                        userName={`${user?.profile?.firstName} ${user?.profile?.lastName}`}
                       />
                     </div>
                   )}
                 </div>
               </div>
             ) : (
-              <div className='hidden md:block'>
-                <Button variant='outline' className='mr-2' onClick={handleLogin}>
+              <div className='hidden md:flex items-center space-x-2'>
+                <Button 
+                  variant='ghost' 
+                  className='hover:bg-primary/10 gap-2 group'
+                  onClick={handleLogin}
+                >
+                  <LogIn className="w-4 h-4 transition-transform group-hover:scale-110" />
                   Login
+                </Button>
+                <Button className='gap-2 group'>
+                  <UserPlus className="w-4 h-4 transition-transform group-hover:scale-110" />
+                  Register
                 </Button>
               </div>
             )}
+            
             <ModeToggle />
-            <Button variant='ghost' size='icon' className='md:hidden' onClick={toggleMobileMenu}>
-              {isMobileMenuOpen ? <X className='w-6 h-6' /> : <Menu className='w-6 h-6' />}
+            
+            <Button 
+              variant='ghost' 
+              size='icon' 
+              className='md:hidden hover:bg-primary/10'
+              onClick={toggleMobileMenu}
+            >
+              {isMobileMenuOpen ? (
+                <X className='w-5 h-5 transition-transform hover:rotate-90 duration-300' />
+              ) : (
+                <Menu className='w-5 h-5 transition-transform hover:scale-110 duration-300' />
+              )}
             </Button>
           </div>
         </div>
+
         {isMobileMenuOpen && (
-          <nav className='mt-4 md:hidden'>
-            <ul className='flex flex-col space-y-2'>
-              <li>
-                <Link to={AR.HOME} className='block py-2 text-gray-600 hover:text-primary'>
-                  HomePage
-                </Link>
-              </li>
-              <li>
-                <Link to={AR.COURSELIST} className='block py-2 text-gray-600 hover:text-primary'>
-                  Course
-                </Link>
-              </li>
-              <li>
-                <Link to='/contests' className='block py-2 text-gray-600 hover:text-primary'>
-                  Competition
-                </Link>
-              </li>
-              <li>
-                <Link to='/discuss' className='block py-2 text-gray-600 hover:text-primary'>
-                  Discuss
-                </Link>
-              </li>
-              <li>
-                <Link to={AR.ABOUT} className='block py-2 text-gray-600 hover:text-primary'>
-                  AboutUs
-                </Link>
-              </li>
+          <nav className='md:hidden border-t border-border mt-3 pt-3'>
+            <ul className='flex flex-col space-y-3'>
+              {NAVIGATION_ITEMS.map(({ to, label, icon }) => (
+                <li key={to}>
+                  <NavLink 
+                    to={to} 
+                    label={label}
+                    icon={icon}
+                    className='block py-2 px-3 rounded-md hover:bg-primary/10'
+                  />
+                </li>
+              ))}
               {!user && (
-                <>
-                  <li>
-                    <Button variant='outline' className='w-full' onClick={handleLogin}>
+                <li className='pt-3 border-t border-border'>
+                  <div className='grid gap-2'>
+                    <Button variant='outline' onClick={handleLogin} className='gap-2 group'>
+                      <LogIn className="w-4 h-4 transition-transform group-hover:scale-110" />
                       Login
                     </Button>
-                  </li>
-                  <li>
-                    <Button className='w-full'>Register</Button>
-                  </li>
-                </>
+                    <Button className='gap-2 group'>
+                      <UserPlus className="w-4 h-4 transition-transform group-hover:scale-110" />
+                      Register
+                    </Button>
+                  </div>
+                </li>
               )}
             </ul>
           </nav>

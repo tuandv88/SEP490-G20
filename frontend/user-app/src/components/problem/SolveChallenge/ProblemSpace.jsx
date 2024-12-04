@@ -35,6 +35,7 @@ const ProblemSpace = () => {
     setIsProblemListOpen(!isProblemListOpen)
   }
 
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
     const fetchProblemList = async () => {
@@ -64,6 +65,7 @@ const ProblemSpace = () => {
           setError(true)
         } finally {
           setLoading(false)
+          setIsInitialLoading(false)
         }
       }
 
@@ -80,8 +82,6 @@ const ProblemSpace = () => {
     }
   }, [problemId])
 
-
-
   useEffect(() => {
     const fetchSubmissionHistory = async () => {
         try {
@@ -94,18 +94,16 @@ const ProblemSpace = () => {
       fetchSubmissionHistory()
   }, [activeTab])
 
-
-  if(loading) {
+  if (isInitialLoading || loading) {
     return <ChapterLoading />
   }
 
-  if (!problemDetail) {
-    return <NotFound />
-  }
-
-
   if (error) {
     return <ErrorPage />
+  }
+
+  if (!isInitialLoading && !problemDetail) {
+    return <NotFound />
   }
 
   return (

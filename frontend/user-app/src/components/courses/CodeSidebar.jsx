@@ -5,6 +5,7 @@ import { CourseAPI } from '@/services/api/courseApi'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 import { UserContext } from '@/contexts/UserContext'
 import authServiceInstance from '@/oidc/AuthService'
+import { format } from 'date-fns'
 
 export function CourseSidebar({ enrolledCourses, courseDetail }) {
   const { id } = useParams()
@@ -16,21 +17,19 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
     const fetchCourseData = async () => {
       if (user) {
         try {
-          const courseProgress = await CourseAPI.getCourseProgress(id);
-          const currentLecture = courseProgress.progress.find(lecture => lecture.isCurrent);
-          setFirstLectureId(currentLecture ? currentLecture.lectureId : courseDetail.course.chapters[0].lectures[0].id);         
+          const courseProgress = await CourseAPI.getCourseProgress(id)
+          const currentLecture = courseProgress.progress.find((lecture) => lecture.isCurrent)
+          setFirstLectureId(currentLecture ? currentLecture.lectureId : courseDetail.course.chapters[0].lectures[0].id)
         } catch (error) {
-          console.error('Error fetching course progress:', error);
+          console.error('Error fetching course progress:', error)
         }
       } else {
-        console.log('User not logged in, skipping course progress fetch.');
+        console.log('User not logged in, skipping course progress fetch.')
       }
-    };
+    }
 
-    fetchCourseData();
-  }, [id, user]);
-
-
+    fetchCourseData()
+  }, [id, user])
 
   const handleLearningCourse = () => {
     navigate(AUTHENTICATION_ROUTERS.LEARNINGSPACE.replace(':id', id).replace(':lectureId', firstLectureId))
@@ -39,7 +38,7 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
   const handleEnrollCourse = async () => {
     if (!user) {
       try {
-        await authServiceInstance.login() 
+        await authServiceInstance.login()
       } catch (error) {
         console.error('Error during login:', error)
       }
@@ -52,6 +51,12 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
         console.error('Error enrolling course:', error)
       }
     }
+  }
+
+  const convertToHoursAndMinutes = (minutes) => {
+    const hours = Math.floor(minutes / 60) 
+    const remainingMinutes = minutes % 60
+    return `${hours} hours ${remainingMinutes} minutes`
   }
 
   return (
@@ -97,11 +102,13 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
         </div>
         <div className='flex items-center gap-2'>
           <Clock className='w-5 h-5 text-gray-500' />
-          <span className='text-gray-600'>9 hours 32 minutes Duration</span>
+          <span className='text-gray-600'>Time Estimate: {convertToHoursAndMinutes(courseDetail?.course?.timeEstimation)}</span>
         </div>
         <div className='flex items-center gap-2'>
           <Calendar className='w-5 h-5 text-gray-500' />
-          <span className='text-gray-600'>November 11, 2024 Last Updated</span>
+          <span className='text-gray-600'>
+            {format(new Date(courseDetail?.course?.lastModified), 'MMMM dd, yyyy')} Last Updated
+          </span>
         </div>
         <div className='flex items-center gap-2'>
           <Award className='w-5 h-5 text-gray-500' />

@@ -57,6 +57,8 @@ const CodeEditor = ({
       return
     }
 
+    console.log(code)
+
     const submissionData = {
       createCodeExecuteDto: {
         languageCode: 'Java',

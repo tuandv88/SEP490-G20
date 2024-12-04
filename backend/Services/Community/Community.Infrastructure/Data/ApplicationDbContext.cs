@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Community.Infrastructure.Data {
     public class ApplicationDbContext : DbContext, IApplicationDbContext {
@@ -24,7 +25,23 @@ namespace Community.Infrastructure.Data {
             builder.AddOutboxMessageEntity();
             builder.AddOutboxStateEntity();
 
+            // Tự động chuyển đổi tất cả DateTime thành UTC
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetValueConverter(new ValueConverter<DateTime, DateTime>(
+                            v => v.ToUniversalTime(), // Khi lưu, chuyển thành UTC
+                            v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Khi lấy dữ liệu, đặt DateTimeKind thành UTC
+                        ));
+                    }
+                }
+            }
+
         }
+
         public async new Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class {
             await Set<T>().AddAsync(entity, cancellationToken);
         }

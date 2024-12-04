@@ -53,10 +53,12 @@ export function AlgorithmStats({ problemSolved }) {
               </span>
             </div>
             <div className='w-full bg-gray-200 rounded-full h-2'>
-              <div
-                className={`${stat.color} h-2 rounded-full`}
-                style={{ width: `${(stat.solved / stat.total) * 100}%` }}
-              ></div>
+              {stat.solved !== 0 && (
+                <div
+                  className={`${stat.color} h-2 rounded-full`}
+                  style={{ width: `${(stat.solved / stat.total) * 100}%` }}
+                ></div>
+              )}
             </div>
           </div>
         ))}

@@ -74,7 +74,7 @@ const Discuss = () => {
           }}
         >
           <Alert severity="error">
-            Remove Post Successfully!
+            Remove Discussion Successfully!
           </Alert>
         </Stack>
       )}

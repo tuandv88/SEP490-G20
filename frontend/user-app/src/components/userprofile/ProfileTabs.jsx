@@ -22,9 +22,10 @@ export function ProfileTabs({ activeTab, setActiveTab }) {
             onClick={() => setActiveTab(tab.id)}
             className={`
               group flex items-center w-full px-4 py-2 text-sm font-medium rounded-md
-              ${activeTab === tab.id
-                ? 'bg-primaryButton text-white'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              ${
+                activeTab === tab.id
+                  ? 'bg-primaryButton text-white'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }
             `}
           >

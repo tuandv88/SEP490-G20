@@ -85,7 +85,7 @@ public class ConversationalAIService(
         int maxTokens = context.GetCustomRagMaxTokensOrDefault(_config.AnswerTokens);
         double temperature = context.GetCustomRagTemperatureOrDefault(_config.Temperature);
         double nucleusSampling = context.GetCustomRagNucleusSamplingOrDefault(_config.TopP);
-
+        var rootImageUrl = context.GetCustomContentModerationImageUrlOrDefault("");
         AzureOpenAIPromptExecutionSettings settings = new() {
             MaxTokens = maxTokens,
             Temperature = temperature,
@@ -95,7 +95,7 @@ public class ConversationalAIService(
             StopSequences = _config.StopSequences,
         };
         var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
-        var chatHistory = BuildChatContentModeration(prompt, imageUrl);
+        var chatHistory = await BuildChatContentModeration(prompt, imageUrl, rootImageUrl);
 
         var result = chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory, settings, kernel, token);
         StringBuilder fullMessage = new();
@@ -133,27 +133,21 @@ public class ConversationalAIService(
         return chats;
     }
 
-    public ChatHistory BuildChatContentModeration(string question, string? imageUrl) {
+    public async Task<ChatHistory> BuildChatContentModeration(string question, string? imageUrl, string rootImageUrl) {
         var messageContent = new ChatMessageContent() {
             Role = AuthorRole.User,
             Items = [new TextContent { Text = question }]
         };
         if (!string.IsNullOrEmpty(imageUrl)) {
-            string base64Image = ConvertImageUrlToBase64(imageUrl);
+            string base64Image = await ImageHelper.ConvertImageUrlToBase64Async(imageUrl);
             byte[] imageData = Convert.FromBase64String(base64Image);
-            string mimeType = "image/jpeg";
+            string mimeType = ImageHelper.GetMimeTypeFromUrl(rootImageUrl);
             var imageContent = new ImageContent(imageData, mimeType);
             messageContent.Items.Add(imageContent);
 
         }
         ChatHistory chatHistory = [messageContent];
         return chatHistory;
-    }
-
-    private string ConvertImageUrlToBase64(string imageUrl) {
-        using var httpClient = new HttpClient();
-        var imageBytes = httpClient.GetByteArrayAsync(imageUrl).Result;
-        return Convert.ToBase64String(imageBytes);
     }
 }
 

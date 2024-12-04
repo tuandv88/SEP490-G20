@@ -133,7 +133,7 @@ public class ConversationalAIService(
         return chats;
     }
 
-    public async Task<ChatHistory> BuildChatContentModeration(string question, string? imageUrl, string rootImageUrl) {
+    private async Task<ChatHistory> BuildChatContentModeration(string question, string? imageUrl, string rootImageUrl) {
         var messageContent = new ChatMessageContent() {
             Role = AuthorRole.User,
             Items = [new TextContent { Text = question }]

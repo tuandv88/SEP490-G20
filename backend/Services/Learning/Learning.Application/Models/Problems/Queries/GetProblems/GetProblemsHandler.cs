@@ -27,7 +27,7 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IUserConte
         var totalCount = filteredProblems.Count();
         var problems = filteredProblems
                             .Include(pb => pb.ProblemSubmissions)
-                            .OrderBy(c => c.CreatedAt)
+                            .OrderByDescending(c => c.CreatedAt)
                             .Skip(pageSize * (pageIndex - 1))
                             .Take(pageSize)
                             .ToList();

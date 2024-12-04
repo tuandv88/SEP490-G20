@@ -85,7 +85,7 @@ public class ConversationalAIService(
         int maxTokens = context.GetCustomRagMaxTokensOrDefault(_config.AnswerTokens);
         double temperature = context.GetCustomRagTemperatureOrDefault(_config.Temperature);
         double nucleusSampling = context.GetCustomRagNucleusSamplingOrDefault(_config.TopP);
-
+        var rootImageUrl = context.GetCustomContentModerationImageUrlOrDefault("");
         AzureOpenAIPromptExecutionSettings settings = new() {
             MaxTokens = maxTokens,
             Temperature = temperature,
@@ -95,7 +95,7 @@ public class ConversationalAIService(
             StopSequences = _config.StopSequences,
         };
         var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
-        var chatHistory = await BuildChatContentModeration(prompt, imageUrl);
+        var chatHistory = await BuildChatContentModeration(prompt, imageUrl, rootImageUrl);
 
         var result = chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory, settings, kernel, token);
         StringBuilder fullMessage = new();
@@ -133,7 +133,7 @@ public class ConversationalAIService(
         return chats;
     }
 
-    public async Task<ChatHistory> BuildChatContentModeration(string question, string? imageUrl) {
+    public async Task<ChatHistory> BuildChatContentModeration(string question, string? imageUrl, string rootImageUrl) {
         var messageContent = new ChatMessageContent() {
             Role = AuthorRole.User,
             Items = [new TextContent { Text = question }]
@@ -141,7 +141,7 @@ public class ConversationalAIService(
         if (!string.IsNullOrEmpty(imageUrl)) {
             string base64Image = await ImageHelper.ConvertImageUrlToBase64Async(imageUrl);
             byte[] imageData = Convert.FromBase64String(base64Image);
-            string mimeType = ImageHelper.GetMimeTypeFromUrl(imageUrl);
+            string mimeType = ImageHelper.GetMimeTypeFromUrl(rootImageUrl);
             var imageContent = new ImageContent(imageData, mimeType);
             messageContent.Items.Add(imageContent);
 

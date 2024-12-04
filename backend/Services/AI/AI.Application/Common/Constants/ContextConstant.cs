@@ -29,6 +29,7 @@ public static class ContextConstant {
     }
     public static class ContentModeration {
         public const string Discussion = "discussion";
+        public const string ImageUrl = "image";
     }
 }
 

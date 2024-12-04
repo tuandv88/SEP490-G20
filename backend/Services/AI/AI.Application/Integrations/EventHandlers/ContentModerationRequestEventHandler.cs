@@ -22,6 +22,7 @@ public class ContentModerationRequestEventHandler(IChatService chatService, IMes
         //tạo context
         var messageContext = new Interfaces.MessageContext(new Dictionary<string, object?>() {
             {ContextConstant.ContentModeration.Discussion, discusstionJson},
+            {ContextConstant.ContentModeration.ImageUrl, @event.ImageUrl},
             {ContextConstant.Rag.MaxTokens,  1000}
         });
         var prompt = messageService.BuildPrompt(PromptType.ContentModeration, "", discusstionJson, messageContext);

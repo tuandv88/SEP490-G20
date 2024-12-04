@@ -5,14 +5,24 @@ import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import PreCoppy from '../ui/PreCoppy'
-import { BookOpenCheck, Frown } from 'lucide-react'
+import { BookOpenCheck, CheckCircle, Frown, GraduationCap, Smile, Trophy } from 'lucide-react'
 import DescriptionLoading from '../loading/DescriptionLoading'
 import { Button } from '../ui/button'
 import { LearningAPI } from '@/services/api/learningApi'
 import { CourseAPI } from '@/services/api/courseApi'
 
-const NormalLecture = ({ description, videoSrc, loading, titleProblem, handleNextLecture, courseId, lectureId, files }) => {
-
+const NormalLecture = ({
+  description,
+  videoSrc,
+  loading,
+  titleProblem,
+  handleNextLecture,
+  courseId,
+  lectureId,
+  files,
+  lectureScore
+}) => {
+  console.log(lectureScore)
   const updateProgress = async () => {
     try {
       const response = await CourseAPI.updateCourseProgress(courseId, lectureId)
@@ -22,24 +32,22 @@ const NormalLecture = ({ description, videoSrc, loading, titleProblem, handleNex
   }
 
   const handleComplete = () => {
-    updateProgress();
-    handleNextLecture();
+    updateProgress()
+    handleNextLecture()
   }
 
-  const documentFiles = files.filter(
-    (file) => file && file.fileType === 'DOCUMENT'
-  )
+  const documentFiles = files.filter((file) => file && file.fileType === 'DOCUMENT')
 
   const handleDownload = (e, fileUrl, fileName) => {
-    e.preventDefault();
+    e.preventDefault()
 
     // Tạo một thẻ a ẩn và kích hoạt sự kiện click để tải xuống
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.setAttribute('download', fileName || 'document');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const link = document.createElement('a')
+    link.href = fileUrl
+    link.setAttribute('download', fileName || 'document')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   return (
@@ -55,16 +63,33 @@ const NormalLecture = ({ description, videoSrc, loading, titleProblem, handleNex
                 controls
                 src={videoSrc}
                 title='Lecture Video'
-                preload='auto'                
+                preload='auto'
               >
                 Your browser does not support the video tag.
               </video>
             </div>
           )}
 
-          <Button onClick={handleComplete} className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-5'>
-            Mark as complete
-          </Button>
+          <div className='flex items-center justify-between rounded-xl py-4 shadow-lg mt-5'>
+            <Button
+              onClick={handleComplete}
+              className='flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg'
+            >
+              <CheckCircle className='w-5 h-5' />
+              <span>Mark as complete</span>
+            </Button>
+
+            <div className='flex items-center space-x-4 mr-10'>
+
+              <div className='p-3 bg-green-100 rounded-lg'>
+                <GraduationCap className='w-5 h-5 text-green-600' />
+              </div>
+              <div className='flex flex-col'>
+                {/* <span className='text-gray-400 text-sm font-medium'>Lecture Score</span> */}
+                <span className='text-white text-3xl font-bold'>{lectureScore}</span>
+              </div>
+            </div>
+          </div>
 
           <div className='p-3 rounded-lg flex items-center mb-10 mt-10 w-full border border-spacing-10'>
             <BookOpenCheck className='inline mr-4' size={40} color='#ffffff' />
@@ -118,10 +143,10 @@ const NormalLecture = ({ description, videoSrc, loading, titleProblem, handleNex
                           Download document {index + 1}
                         </a>
                       </li>
-                    );
+                    )
                   } else {
-                    console.warn('File bị thiếu hoặc thiếu presignedUrl:', file);
-                    return null;
+                    console.warn('File bị thiếu hoặc thiếu presignedUrl:', file)
+                    return null
                   }
                 })}
               </ul>

@@ -17,6 +17,7 @@ import CourseDetail from '@/pages/CourseDetail';
 import ProblemSpace from '@/components/problem/SolveChallenge/ProblemSpace';
 import { UserProfile } from '@/pages/UserProfile';
 import ProtectedRoute from './ProtectedRoute';
+import Payment from '@/pages/Payment'
 const Code = lazy(() => import('@/pages/Code'))
 
 export const AppRouter = () => {
@@ -94,6 +95,10 @@ export const AppRouter = () => {
           <NotificationHistory />
         </ProtectedRoute>
       )
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.PAYMENT,
+      element: <Payment />
     }
   ])
   return <RouterProvider router={router} />

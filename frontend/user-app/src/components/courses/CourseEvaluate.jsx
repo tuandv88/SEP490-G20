@@ -1,32 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
-
-const reviews = [
-  {
-    id: 1,
-    author: "Dang Huy Nguyen",
-    avatar: "DN",
-    rating: 5,
-    content: "I am addicted to the knowledge that Mr. Manh does so meticulously and with quality, the only problem is that he releases too little hihi. But listening to what you guys say, I immediately understand the practical knowledge so there is not much, right? Always looking forward to your next knowledge.",
-    timeAgo: "16 hours ago"
-  },
-  {
-    id: 2,
-    author: "Van Soai Phung",
-    avatar: "VS",
-    rating: 5,
-    content: "The easiest Kubernetes course I've ever taken, it's awesome, the knowledge is practical and how to deploy projects. I've applied it to my company and my colleagues also praised me for doing a good job. Mr. Manh teaches with great care. Thank you.",
-    timeAgo: "16 hours ago"
-  }
-];
-
-const ratingStats = [
-  { stars: 5, count: 15 },
-  { stars: 4, count: 0 },
-  { stars: 3, count: 0 },
-  { stars: 2, count: 0 },
-  { stars: 1, count: 0 }
-];
+import { UserAPI } from '@/services/api/userApi';
+import { formatDistanceToNow } from 'date-fns';
+import { CourseEvaluateLoading } from '../loading/CourseEvaluateLoading';
 
 function RatingStars({ rating }) {
   return (
@@ -43,9 +19,56 @@ function RatingStars({ rating }) {
   );
 }
 
-export function CourseEvaluate() {
-  const totalReviews = ratingStats.reduce((acc, curr) => acc + curr.count, 0);
-  const averageRating = "5.0";
+export function CourseEvaluate({ reviewData }) {
+  const [userDetails, setUserDetails] = useState({});
+
+  // Tạo mảng thống kê rating từ 1-5 sao
+  const generateRatingStats = (reviews) => {
+    const stats = Array(5).fill(0);
+    reviews.data.forEach(review => {
+      stats[review.rating - 1]++;
+    });
+    return stats.map((count, index) => ({
+      stars: 5 - index,
+      count
+    }));
+  };
+
+  // Fetch user details cho mỗi review
+  const fetchUserDetails = async (reviews) => {
+    try {
+      const userPromises = reviews.data.map(review => 
+        UserAPI.getUserById(review.submittedBy)
+      );
+      const users = await Promise.all(userPromises);
+      
+      const userMap = {};
+      users.forEach(user => {
+        userMap[user.id] = user;
+      });
+      
+      setUserDetails(userMap);
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (reviewData?.courseReviews?.reviews?.data?.length > 0) {
+      fetchUserDetails(reviewData.courseReviews.reviews);
+    }
+  }, [reviewData]);
+
+  if (reviewData.loading) {
+    return <CourseEvaluateLoading />;
+  }
+
+  if (reviewData.error) {
+    return <div className="text-red-500">{reviewData.error}</div>;
+  }
+
+  const { courseReviews } = reviewData;
+  const ratingStats = generateRatingStats(courseReviews.reviews);
 
   return (
     <div className="space-y-8">
@@ -56,9 +79,13 @@ export function CourseEvaluate() {
           {/* Rating Summary */}
           <div className="space-y-4">
             <div className="text-center md:text-left">
-              <div className="text-7xl font-bold text-gray-900">{averageRating}</div>
-              <RatingStars rating={5} />
-              <div className="text-gray-600 mt-2">Total {totalReviews} Reviews</div>
+              <div className="text-7xl font-bold text-gray-900">
+                {courseReviews.averageRating.toFixed(1)}
+              </div>
+              <RatingStars rating={Math.round(courseReviews.averageRating)} />
+              <div className="text-gray-600 mt-2">
+                Total {courseReviews.totalReviews} Reviews
+              </div>
             </div>
           </div>
 
@@ -71,7 +98,7 @@ export function CourseEvaluate() {
                   <div
                     className="h-full bg-yellow-400 rounded-full"
                     style={{
-                      width: `${(count / totalReviews) * 100}%`
+                      width: `${courseReviews.totalReviews ? (count / courseReviews.totalReviews) * 100 : 0}%`
                     }}
                   />
                 </div>
@@ -84,25 +111,42 @@ export function CourseEvaluate() {
 
       {/* Reviews List */}
       <div className="space-y-6">
-        {reviews.map((review) => (
-          <div key={review.id} className="bg-white rounded-lg p-6 border">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white font-semibold">
-                {review.avatar}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{review.author}</h3>
-                    <div className="text-sm text-gray-500">{review.timeAgo}</div>
+        {courseReviews.reviews.data.map((review, index) => {
+          const userDetail = userDetails[review.submittedBy] || {};
+          const fullName = userDetail.firstName && userDetail.lastName 
+            ? `${userDetail.firstName} ${userDetail.lastName}`
+            : `User ${review.submittedBy.slice(0, 8)}`;
+          
+          return (
+            <div key={index} className="bg-white rounded-lg p-6 border">
+              <div className="flex items-start gap-4">
+                {userDetail.urlProfilePicture ? (
+                  <img 
+                    src={userDetail.urlProfilePicture}
+                    alt={fullName}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white font-semibold">
+                    {(userDetail.firstName?.[0] || '') + (userDetail.lastName?.[0] || '')}
                   </div>
-                  <RatingStars rating={review.rating} />
+                )}
+                <div className="flex-1">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{fullName}</h3>
+                      <div className="text-sm text-gray-500">
+                        {formatDistanceToNow(new Date(review.dateSubmitted), { addSuffix: true })}
+                      </div>
+                    </div>
+                    <RatingStars rating={review.rating} />
+                  </div>
+                  <p className="mt-3 text-gray-700">{review.feedback}</p>
                 </div>
-                <p className="mt-3 text-gray-700">{review.content}</p>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

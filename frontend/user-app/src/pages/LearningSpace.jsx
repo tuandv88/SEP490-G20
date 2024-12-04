@@ -235,6 +235,7 @@ const LearningSpace = () => {
                   courseId={id}
                   lectureId={lectureId}
                   files={files}
+                  lectureScore={lectureDetail?.lectureDetailsDto?.point}
                 />
               )}
               {activeTab === 'submissionResult' && !loading && (
@@ -306,6 +307,7 @@ const LearningSpace = () => {
                 courseId={id}
                 lectureId={lectureId}
                 files={files}
+                lectureScore={lectureDetail?.lectureDetailsDto?.point}
               />
             </div>
           </ResizablePanel>

@@ -39,7 +39,7 @@ export function LearningDashboard() {
         const totalCourses = coursesWithProgress.length
         const inProgress = coursesWithProgress.filter((course) => course.status === 'InProgress').length
         const completed = coursesWithProgress.filter((course) => course.status === 'Completed').length
-
+        
         setStats([
           {
             icon: BookOpen,
@@ -87,7 +87,7 @@ export function LearningDashboard() {
         ))}
       </div>
 
-      {/* Khóa học đang học */}
+      
       <div className='mt-8'>
         <h2 className='text-xl font-semibold mb-4'>In Progress</h2>
         {courses.filter((course) => course.status === 'InProgress').length > 0 ? (

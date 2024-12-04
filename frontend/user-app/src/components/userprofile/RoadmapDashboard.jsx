@@ -7,27 +7,70 @@ import { QuizAPI } from '@/services/api/quizApi'
 import AssessmentPrompt from '../surrvey/AssessmentPromptProps'
 import QuizModal from '../surrvey/QuizModal'
 import { Button } from '../ui/button'
+import { LearningPathCard } from './LearningPathCard'
+import { EditPathModal } from './EditPathModal'
+import { DeleteConfirmModal } from './DeleteConfirmModalProps'
+import UserRoadMapLoading from '../loading/UserRoadMapLoading'
+import { LearningPathAPI } from '@/services/api/learningPathApi'
 
 const RoadmapDashboard = ({ user }) => {
-  const [learningPath, setLearningPath] = useState([])
+  const [learningPaths, setLearningPaths] = useState([])
   const [courseDetails, setCourseDetails] = useState({})
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [selectedPath, setSelectedPath] = useState(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [pathToDelete, setPathToDelete] = useState(null)
   const [isAssessmentPromptOpen, setIsAssessmentPromptOpen] = useState(false)
   const [isQuizOpen, setIsQuizOpen] = useState(false)
   const [quizAssessment, setQuizAssessment] = useState(null)
+  const [availableCourses, setAvailableCourses] = useState([])
+
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true)
-        
-        const [learningResponse, quizResponse] = await Promise.all([
-          LearningAPI.getLearningPath(),
-          QuizAPI.getQuizAssessment()
-        ])
 
-        setLearningPath(learningResponse.learningPathDtos)
-        setQuizAssessment(quizResponse.quiz)
+        // Lấy danh sách Learning Paths
+        const response = await LearningAPI.getLearningPath()
+        const fetchedLearningPaths = response.learningPathDtos
+        setLearningPaths(fetchedLearningPaths)
+
+        // Nếu có người dùng, lấy Quiz Assessment
+        if (user && fetchedLearningPaths.length === 0) {
+          const data = await QuizAPI.getQuizAssessment()
+          setQuizAssessment(data.quiz)
+        }
+
+        // Lấy thông tin chi tiết các khóa học
+        const courseIds = new Set()
+        fetchedLearningPaths.forEach((path) => {
+          path.pathSteps.forEach((step) => {
+            if (!courseDetails[step.courseId]) {
+              courseIds.add(step.courseId)
+            }
+          })
+        })
+
+        const courseDetailsPromises = Array.from(courseIds).map(async (courseId) => {
+          const response = await LearningAPI.getCoursePreview(courseId)
+          return { courseId, course: response.course }
+        })
+
+        const coursesData = await Promise.all(courseDetailsPromises)
+        const newCourseDetails = {}
+        coursesData.forEach(({ courseId, course }) => {
+          newCourseDetails[courseId] = course
+        })
+        setCourseDetails(newCourseDetails)
+
+        // Lấy danh sách tất cả các khóa học và lọc các khóa học có sẵn
+        const allCourses = await LearningAPI.getCourseList(1, 20)
+        const filteredCourses = allCourses.courseDtos.data.filter(
+          (course) => !fetchedLearningPaths.some((path) => path.pathSteps.some((step) => step.courseId === course.id))
+        )
+        setAvailableCourses(filteredCourses)
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
@@ -36,40 +79,48 @@ const RoadmapDashboard = ({ user }) => {
     }
 
     fetchData()
-  }, [])
+  }, [user])
 
-  useEffect(() => {
-    async function fetchCoursePreview(courseId) {
+  const handleEditPath = (path) => {
+    setSelectedPath(path)
+    setIsEditModalOpen(true)
+    console.log(path)
+  }
+
+  const handleDeletePath = async (pathId) => {
+    setIsDeleteModalOpen(true)
+    setPathToDelete(pathId)
+    try {
+      await LearningPathAPI.deleteLearningPath(pathId)
+    } catch (error) {
+      console.error('Error deleting path:', error)
+    }
+  }
+
+  const handleConfirmDelete = async () => {
+    if (pathToDelete) {
       try {
-        setLoading(true)
-        const response = await LearningAPI.getCoursePreview(courseId)
-        setCourseDetails((prevDetails) => ({
-          ...prevDetails,
-          [courseId]: response.course
-        }))
+        await mockApiService.deleteLearningPath(pathToDelete)
+        setLearningPaths((prev) => prev.filter((path) => path.id !== pathToDelete))
       } catch (error) {
-        console.error('Error fetching course data:', error)
-      } finally {
-        setLoading(false)
+        console.error('Error deleting path:', error)
       }
+      setIsDeleteModalOpen(false)
+      setPathToDelete(null)
     }
+  }
 
-    if (Array.isArray(learningPath)) {
-      const courseIds = new Set()
-      learningPath.forEach((path) => {
-        path.pathSteps.forEach((step) => {
-          if (!courseDetails[step.courseId]) {
-            courseIds.add(step.courseId)
-          }
-        })
-      })
-
-      courseIds.forEach((courseId) => fetchCoursePreview(courseId))
+  const handleSavePath = async (updatedPath) => {
+    try {
+      //const savedPath = await mockApiService.updateLearningPath(updatedPath.id, updatedPath)
+      //setLearningPaths((prev) => prev.map((path) => (path.id === savedPath.id ? savedPath : path)))
+      setLearningPaths((prevPaths) => prevPaths.map((path) => (path.id === updatedPath.id ? updatedPath : path)))
+      setIsEditModalOpen(false)
+      setSelectedPath(null)
+      console.log(updatedPath)
+    } catch (error) {
+      console.error('Error saving path:', error)
     }
-  }, [learningPath, user])
-
-  if (loading) {
-    return <ChapterLoading />
   }
 
   const handleGeneratePath = () => {
@@ -92,68 +143,65 @@ const RoadmapDashboard = ({ user }) => {
     //updateUserFirstLogin()
   }
 
-  console.log('Learning Path:', learningPath)
+  if (loading) {
+    return <UserRoadMapLoading />
+  }
 
   return (
     <div className='space-y-6 mt-6'>
       <div className='flex justify-between items-center'>
-        <h2 className='text-xl font-semibold'>Recommended Path</h2>
-        <Button onClick={handleGeneratePath} className='flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors'>
-          <PlusCircle className='w-5 h-5 mr-2' />
-          Generate Path
-        </Button>
+        <h1 className='text-2xl font-bold'>Recommended Path</h1>
+        {!learningPaths.length && (
+          <Button
+            onClick={handleGeneratePath}
+            className='flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors'
+          >
+            <PlusCircle className='w-5 h-5 mr-2' />
+            Generate Path
+          </Button>
+        )}
       </div>
 
-      {Array.isArray(learningPath) && learningPath.length > 0 ? (
-        learningPath.map((path) => (
-          <div key={path.id} className='bg-white rounded-xl overflow-hidden shadow-lg'>
-            <div className='p-6'>
-              <div className='mb-6'>
-                <h3 className='text-2xl font-bold mb-2'>{path.pathName}</h3>
-                <div className='flex flex-wrap gap-4 text-sm text-gray-600'>
-                  <span className='flex items-center gap-1'>
-                    <Calendar size={16} />
-                    {new Date(path.startDate).toLocaleDateString()} - {new Date(path.endDate).toLocaleDateString()}
-                  </span>
-                  <span className='flex items-center gap-1'>
-                    <BarChart2 size={16} />
-                    {path.status}
-                  </span>
-                </div>
-              </div>
+      <div className='space-y-6'>
+        {learningPaths.map((path) => (
+          <LearningPathCard
+            key={path.id}
+            path={path}
+            courseDetails={courseDetails}
+            onEdit={handleEditPath}
+            onDelete={handleDeletePath}
+          />
+        ))}
+      </div>
 
-              <div className='mb-8'>
-                <h4 className='font-semibold mb-3 flex items-center gap-2'>
-                  <ListChecks size={18} className='text-red-500' />
-                  Reasons
-                </h4>
-                <ul className='space-y-2'>
-                  <li className='flex items-start gap-2 text-gray-600'>
-                    <div className='w-1.5 h-1.5 bg-red-500 rounded-full mt-2' />
-                    {path.reason}
-                  </li>
-                </ul>
-              </div>
-
-              <div className='space-y-4'>
-                <h4 className='font-semibold'>Các bước trong lộ trình</h4>
-                {path.pathSteps.map((step, index) => {
-                  const course = courseDetails[step.courseId]
-                  return <CourseStep key={step.id} step={step} index={index} course={course} />
-                })}
-              </div>
-            </div>
-          </div>
-        ))
-      ) : (
-        <div className='text-center text-gray-500 w-full h-full'>No learning paths available.</div>
+      {selectedPath && (
+        <EditPathModal
+          path={selectedPath}
+          courses={Object.values(courseDetails)}
+          availableCoursesList={availableCourses}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false)
+            setSelectedPath(null)
+          }}
+          onSave={handleSavePath}
+        />
       )}
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false)
+          setPathToDelete(null)
+        }}
+        onConfirm={handleConfirmDelete}
+        pathName={learningPaths.find((p) => p.id === pathToDelete)?.pathName || ''}
+      />
 
       <AssessmentPrompt
         isOpen={isAssessmentPromptOpen}
         onClose={() => {
           setIsAssessmentPromptOpen(false)
-          // updateUserFirstLogin()
         }}
         onAccept={handleAssessmentAccept}
         onDecline={handleAssessmentDecline}
@@ -163,7 +211,6 @@ const RoadmapDashboard = ({ user }) => {
         isOpen={isQuizOpen}
         onClose={() => {
           setIsQuizOpen(false)
-          //updateUserFirstLogin()
         }}
         onComplete={handleQuizComplete}
         quiz={quizAssessment}

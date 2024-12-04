@@ -21,6 +21,9 @@ namespace Community.Infrastructure.Data {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(builder);
 
+            builder.AddInboxStateEntity();
+            builder.AddOutboxMessageEntity();
+            builder.AddOutboxStateEntity();
 
             // Tự động chuyển đổi tất cả DateTime thành UTC
             foreach (var entityType in builder.Model.GetEntityTypes())
@@ -37,11 +40,8 @@ namespace Community.Infrastructure.Data {
                 }
             }
 
-            builder.AddInboxStateEntity();
-            builder.AddOutboxMessageEntity();
-            builder.AddOutboxStateEntity();
-
         }
+
         public async new Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class {
             await Set<T>().AddAsync(entity, cancellationToken);
         }

@@ -50,7 +50,6 @@ export function UserProfile() {
         console.error('Error fetching solved problems:', error);
       }
     };
-
     fetchSolvedProblems();
   }, []);
 
@@ -80,7 +79,7 @@ export function UserProfile() {
 
   return (
     <Layout>
-      <ProfileLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+       <ProfileLayout activeTab={activeTab} setActiveTab={setActiveTab}>
         {renderTabContent()}
       </ProfileLayout>
     </Layout>

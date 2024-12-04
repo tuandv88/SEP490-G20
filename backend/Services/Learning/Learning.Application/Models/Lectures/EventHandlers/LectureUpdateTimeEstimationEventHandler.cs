@@ -1,4 +1,4 @@
-﻿using Learning.Domain.Events;
+using Learning.Domain.Events;
 
 namespace Learning.Application.Models.Lectures.EventHandlers;
 public class LectureUpdateTimeEstimationEventHandler(ICourseRepository courseRepository) : INotificationHandler<LectureUpdateTimeEstimationEvent>

@@ -12,12 +12,12 @@ import { useNavigate } from '@tanstack/react-router'
 import { createCourse } from '@/services/api/courseApi'
 import { useToast } from '@/hooks/use-toast'
 import { ArrowLeft, BookOpen, Rocket, AlertCircle, CheckCircle, X } from 'lucide-react'
-import { COURSE_TABLE_PATH } from '@/routers/router'
+import { COURSE_TABLE_PATH, CREATE_COURSE_PATH } from '@/routers/router'
 
 export default function CourseCreator() {
   const breadcrumbs = [
-    { label: 'Course Table', href: '/course-table' },
-    { label: 'Create Course', href: '/create-course' }
+    { label: 'Course Table', href: COURSE_TABLE_PATH },
+    { label: 'Create Course', href: CREATE_COURSE_PATH }
   ]
   const [activeTab, setActiveTab] = useState('step1')
   const [error, setError] = useState(null)
@@ -108,13 +108,6 @@ export default function CourseCreator() {
             </div>
           </CardHeader>
           <CardContent className='w-full'>
-            <div className='mb-6'>
-              <Progress value={activeTab === 'step1' ? 50 : 100} className='w-full' />
-              <div className='flex justify-between mt-2 text-sm text-gray-500'>
-                <span>Step {activeTab === 'step1' ? '1' : '2'} of 2</span>
-                <span>{activeTab === 'step1' ? '50%' : '100%'} Complete</span>
-              </div>
-            </div>
             {error && (
               <Alert variant='destructive' className='mb-6'>
                 <AlertCircle className='h-4 w-4' />

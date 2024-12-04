@@ -45,7 +45,8 @@ import {
   DOCUMENT_AI_TABLE_PATH,
   QUIZ_ASSESSMENT_PATH,
   USER_TABLE_PATH,
-  USER_DETAIL_PATH
+  USER_DETAIL_PATH,
+  DISCUSSION_TABLE_PATH
 } from '@/routers/router'
 
 // This is sample data.
@@ -150,7 +151,7 @@ export function AppSidebar({ ...props }) {
         items: [
           {
             title: 'Discussion',
-            url: ''
+            url: DISCUSSION_TABLE_PATH
           }
         ]
       }

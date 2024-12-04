@@ -22,7 +22,7 @@ export const USER_DETAIL_PATH = '/app/user-detail/$userId'
 export const CREATE_PROBLEM_LECTURE_PATH = '/app/edit-course/$courseId/create-problem-lecture/$lectureId'
 export const UPDATE_PROBLEM_LECTURE_PATH =
   '/app/update-problem-lecture/course/$courseId/lecture/$lectureId/problem/$problemId'
-
+export const DISCUSSION_TABLE_PATH = '/app/discussion-table'
 // Define the main root route with layout
 const rootRoute = createRootRoute({
   component: lazy(() => import('@/components/public-layout'))
@@ -152,6 +152,12 @@ export const userDetailRoute = createRoute({
   component: lazy(() => import('@/pages/User/UserDetail'))
 })
 
+const discussionRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: 'discussion-table',
+  component: lazy(() => import('@/pages/Discussion/DiscussionPage'))
+})
+
 const routeTree = rootRoute.addChildren([
   loginRoute,
   callbackRoute,
@@ -172,7 +178,8 @@ const routeTree = rootRoute.addChildren([
     documentAiTableRoute,
     quizAssessmentRoute,
     userTableRoute,
-    userDetailRoute
+    userDetailRoute,
+    discussionRoute
   ])
 ])
 

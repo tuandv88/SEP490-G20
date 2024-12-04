@@ -6,7 +6,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import remarkGfm from 'remark-gfm'
 import PreCoppy from '../ui/PreCoppy'
-import { BookOpenCheck, Frown, Smile } from 'lucide-react'
+import { BookOpenCheck, CheckCircle, Frown, GraduationCap, Smile } from 'lucide-react'
 import DescriptionLoading from '../loading/DescriptionLoading'
 import ChapterLoading from '../loading/ChapterLoading'
 import { Button } from '../ui/button'
@@ -23,7 +23,8 @@ const Description = ({
   courseId,
   lectureId,
   files,
-  lectureScore
+  lectureScore,
+  updateCourseProgress,
 }) => {
   const videoRef = useRef(null)
   const [videoTime, setVideoTime] = useState(0) // Lưu thời gian video khi dừng
@@ -68,18 +69,14 @@ const Description = ({
     setIsVideoLoading(false) // Video đã sẵn sàng
   }
 
-  const updateProgress = async () => {
+  const handleComplete = async () => {
     try {
-      const response = await CourseAPI.updateCourseProgress(courseId, lectureId)
-      console.log('Progress updated:', response)
+      await CourseAPI.updateCourseProgress(courseId, lectureId)
+      await updateCourseProgress() // Cập nhật state sau khi mark complete
+      handleNextLecture()
     } catch (error) {
       console.error('Error updating progress:', error)
     }
-  }
-
-  const handleComplete = () => {
-    updateProgress()
-    handleNextLecture()
   }
 
   const documentFiles = files.filter((file) => file && file.fileType === 'DOCUMENT')

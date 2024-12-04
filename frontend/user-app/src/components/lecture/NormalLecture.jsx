@@ -20,20 +20,18 @@ const NormalLecture = ({
   courseId,
   lectureId,
   files,
-  lectureScore
+  lectureScore,
+  updateCourseProgress,
 }) => {
   console.log(lectureScore)
-  const updateProgress = async () => {
+  const handleComplete = async () => {
     try {
-      const response = await CourseAPI.updateCourseProgress(courseId, lectureId)
+      await CourseAPI.updateCourseProgress(courseId, lectureId)
+      await updateCourseProgress()
+      handleNextLecture()
     } catch (error) {
       console.error('Error updating progress:', error)
     }
-  }
-
-  const handleComplete = () => {
-    updateProgress()
-    handleNextLecture()
   }
 
   const documentFiles = files.filter((file) => file && file.fileType === 'DOCUMENT')

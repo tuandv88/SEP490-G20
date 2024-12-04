@@ -35,11 +35,12 @@ export const CourseAPI = {
     )
     return response.data
   },
-  getCourseList: async (pageIndex = 1, pageSize = 20, searchString = '') => {
+  getCourseList: async (pageIndex = 1, pageSize = 20, searchString = '', level = '') => {
     const params = new URLSearchParams({
       PageIndex: pageIndex,
       PageSize: pageSize,
-      SearchString: searchString
+      SearchString: searchString,
+      Level: level
     });
 
     const response = await axios.get(`${API_BASE_URL}/learning-service/courses?${params.toString()}`);

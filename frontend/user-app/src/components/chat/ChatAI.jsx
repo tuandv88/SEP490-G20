@@ -3,7 +3,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { Send, Plus, X, History, Square, ArrowUp } from 'lucide-react'
+import { Send, Plus, X, History, Square, ArrowUp, Trash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
@@ -16,6 +16,7 @@ import { Textarea } from '../ui/textarea'
 import { useSignalRConnection } from '../hooks/useSignalRConnection'
 import { ChatAPI } from '@/services/api/chatApi'
 import useStore from '@/data/store'
+import { DeleteConfirmModal } from '../DeleteConfirmModal'
 
 const ChatAI = ({ lectureId, problemId }) => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
@@ -30,6 +31,9 @@ const ChatAI = ({ lectureId, problemId }) => {
   const messagesEndRef = useRef(null)
   const [pageIndex, setPageIndex] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [conversationToDelete, setConversationToDelete] = useState(null)
+  const [totalItems, setTotalItems] = useState(0)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -51,9 +55,14 @@ const ChatAI = ({ lectureId, problemId }) => {
   useEffect(() => {
     const fetchConversation = async () => {
       try {
-        const data = await ChatAPI.getConversation(pageIndex, 20)
-        setChatHistory(data.conversations.data) 
-        console.log('chatHistory', data)
+        const data = await ChatAPI.getConversation(pageIndex, 4)
+        if (pageIndex === 1) {
+          setChatHistory(data.conversations.data)
+        } else {
+          setChatHistory(prev => [...prev, ...data.conversations.data])
+        }
+        setTotalItems(data.conversations.count || 0)
+        setHasMore(data.conversations.data.length > 0)
       } catch (error) {
         console.error('Error fetching conversation:', error)
       }
@@ -61,7 +70,6 @@ const ChatAI = ({ lectureId, problemId }) => {
 
     const fetchMessage = async () => {
       try {
-        console.log('selectedConversationId', selectedConversationId)
         const data = await ChatAPI.getMessage(selectedConversationId)
         setMessages(data.messages.data.reverse())       
         setSelectedConversationId(selectedConversationId)
@@ -70,12 +78,11 @@ const ChatAI = ({ lectureId, problemId }) => {
       }
     }
     
-    
     fetchConversation()
     if(selectedConversationId !== null) {
       fetchMessage()
     }
-  }, [selectedConversationId])
+  }, [selectedConversationId, pageIndex])
 
 
   const handleSend = async () => {
@@ -145,6 +152,32 @@ const ChatAI = ({ lectureId, problemId }) => {
     setMessages([])
   }
 
+  const handleDeleteClick = (e, conversationId) => {
+    e.stopPropagation()
+    setConversationToDelete(conversationId)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await ChatAPI.deleteConversation(conversationToDelete)
+      setChatHistory(chatHistory.filter(chat => chat.id !== conversationToDelete))
+      if (selectedConversationId === conversationToDelete) {
+        setSelectedConversationId(null)
+        setMessages([])
+      }
+    } catch (error) {
+      console.error('Error deleting conversation:', error)
+    } finally {
+      setIsDeleteModalOpen(false)
+      setConversationToDelete(null)
+    }
+  }
+
+  const handleLoadMore = () => {
+    setPageIndex(prev => prev + 1)
+  }
+
   return (
     <div className='flex bg-bGprimary text-white h-[calc(100vh-3rem)]'>
       {/* Chat History Sidebar */}
@@ -171,16 +204,33 @@ const ChatAI = ({ lectureId, problemId }) => {
         </div>
         <ScrollArea className='h-[calc(100vh-120px)] mb-4 scroll-container pb-[200px]'>
           {chatHistory.map((chat) => (
-            <div onClick={() => handleChatClick(chat.id)} key={chat.id} className={`p-4 cursor-pointer border-b border-gray-700 ${selectedConversationId === chat.id ? 'bg-gray-500' : 'hover:bg-[#3D3D3D]'}`}>
-              <div className='flex items-start gap-3'>
-                {/* <Square size={16} className='mt-1' /> */}
-                <div>
+            <div key={chat.id} className={`p-4 cursor-pointer border-b border-gray-700 ${selectedConversationId === chat.id ? 'bg-gray-500' : 'hover:bg-[#3D3D3D]'}`}>
+              <div className='flex items-start gap-3 '>
+                <Trash 
+                  size={16} 
+                  className='mt-1 hover:text-red-500 cursor-pointer' 
+                  onClick={(e) => handleDeleteClick(e, chat.id)}
+                />
+                <div onClick={() => handleChatClick(chat.id)}>
                   <p className='text-sm'>{chat.title}</p>
-                  <span className='text-xs text-gray-400'>Just now</span>
+                  
                 </div>
               </div>
             </div>
           ))}
+
+          {hasMore && chatHistory.length < totalItems && (
+            <div className='flex justify-center p-4'>
+              <Button
+                variant='ghost'
+                onClick={handleLoadMore}
+                className='hover:bg-[#3D3D3D] text-sm'
+              >
+                Load More
+              </Button>
+            </div>
+          )}
+          
           <div className='h-5'></div>
         </ScrollArea>
       </div>
@@ -344,6 +394,14 @@ const ChatAI = ({ lectureId, problemId }) => {
       </div>
         </div>
       </div>
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Conversation"
+        description="Are you sure you want to delete this conversation? This action cannot be undone."
+      />
     </div>
   )
 }

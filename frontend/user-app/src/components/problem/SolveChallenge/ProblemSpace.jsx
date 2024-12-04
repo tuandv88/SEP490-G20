@@ -36,6 +36,7 @@ const ProblemSpace = () => {
   }
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
 
   useEffect(() => {
     const fetchProblemList = async () => {
@@ -94,6 +95,15 @@ const ProblemSpace = () => {
       fetchSubmissionHistory()
   }, [activeTab])
 
+  useEffect(() => {
+    if (problemList.length > 0 && problemId) {
+      const index = problemList.findIndex(problem => problem.problemsId === problemId);
+      if (index !== -1) {
+        setCurrentProblemIndex(index);
+      }
+    }
+  }, [problemId, problemList]);
+
   if (isInitialLoading || loading) {
     return <ChapterLoading />
   }
@@ -109,7 +119,7 @@ const ProblemSpace = () => {
   return (
     <div>
       <div>
-        <HeaderCode onButtonClick={toggleProblemList} toggleProblemRef={toggleProblemRef} header='Problem List' />
+        <HeaderCode onButtonClick={toggleProblemList} toggleCurriculumRef={toggleProblemRef} header='Problem List' currentProblemIndex={currentProblemIndex} problemList={problemList} navigate={navigate} />
       </div>
 
       {problemDetail && (
@@ -148,7 +158,7 @@ const ProblemSpace = () => {
             />
           </ResizablePanel>
         </ResizablePanelGroup>
-      )}
+      )} 
 
       {isProblemListOpen && (
         <div

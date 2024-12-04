@@ -11,7 +11,7 @@ import {
 
 export function CustomConfirmModal({
   isOpen,
-  onClose,
+  onComplete,
   onConfirm,
   title,
   content = 'Are you sure you want to proceed?',
@@ -19,14 +19,14 @@ export function CustomConfirmModal({
   cancelText = 'Cancel'
 }) {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onComplete}>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{content}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant='outline' onClick={onClose}>
+          <Button variant='outline' onClick={onComplete}>
             {cancelText}
           </Button>
           <Button onClick={onConfirm}>{confirmText}</Button>

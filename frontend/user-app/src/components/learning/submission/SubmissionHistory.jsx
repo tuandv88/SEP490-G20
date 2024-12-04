@@ -18,6 +18,8 @@ const SubmissionHistory = ({ submissions }) => {
     return (bytes / 1024).toFixed(2) + ' MB'
   }
 
+  console.log(submissions)
+
   const getStatus = (submission) => {
     if (
       (submission.testCasePassCount === submission.totalTestCase && submission.totalTestCase !== 0) ||
@@ -60,7 +62,7 @@ const SubmissionHistory = ({ submissions }) => {
                 <tr key={index} className='hover:bg-gray-700'>
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <div className={`flex items-center ${statusColor}`}>
-                      {submission === 'Accepted' ? <Check className='w-4 h-4 mr-2' /> : <X className='w-4 h-4 mr-2' />}
+                      {status === 'Accepted' ? <Check className='w-4 h-4 mr-2' /> : <X className='w-4 h-4 mr-2' />}
                       <div className={`flex flex-col items-start ${statusColor}`}>
                         <span className='font-medium text-white'>{status}</span>
                         <span className='text-sm text-gray-400'>{formatDate(submission.submissionDate)}</span>

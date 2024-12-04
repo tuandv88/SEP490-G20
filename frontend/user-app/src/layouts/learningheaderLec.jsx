@@ -41,8 +41,8 @@ const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef, header })
                 <a href='/' className='mr-2 self-center'>
                   <div className='mb-0.5 pl-1'>
                     <img
-                      src='https://static.vecteezy.com/system/resources/previews/008/386/481/non_2x/ic-or-ci-initial-letter-logo-design-vector.jpg'
-                      alt='LeetCode Logo'
+                      src='https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/frontend/assets/icodervn-logo-removebg-preview.png'
+                      alt='Icoder Logo'
                       className='h-12'
                     />
                   </div>

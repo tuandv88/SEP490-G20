@@ -311,8 +311,6 @@ function DiscussionDetail() {
     };
 
     try {
-      // Gọi API cập nhật bài viết
-      const response = await DiscussApi.updateDiscuss(updateDiscussionDto);
 
       // Kiểm tra nếu có ảnh thì thêm vào request
       if (newPost.image && newPost.image.fileName && newPost.image.base64Image && newPost.image.contentType) {
@@ -322,11 +320,13 @@ function DiscussionDetail() {
           contentType: newPost.image.contentType,
         };
 
-        const responseUpdateImg = await DiscussApi.updateDiscussImage(newPost.id, discussionImageData);
-        if (responseUpdateImg) {
-          console.log("Successs", 11122);
-        }
+        updateDiscussionDto.imageDto = discussionImageData;
       }
+
+      console.log(updateDiscussionDto, 1111123);
+
+      // Gọi API cập nhật bài viết
+      const response = await DiscussApi.updateDiscuss(updateDiscussionDto);
 
       if (response) {
 

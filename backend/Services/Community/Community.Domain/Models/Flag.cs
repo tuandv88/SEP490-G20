@@ -21,7 +21,7 @@ public class Flag : Aggregate<FlagId>
 
     public void Update(ViolationLevel violationLevel, string reason, DateTime flaggedDate)
     {
-        ViolationLevel |= violationLevel;
+        ViolationLevel = violationLevel;
         Reason = reason;
         FlaggedDate = flaggedDate;
     }

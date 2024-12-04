@@ -1,4 +1,5 @@
 ﻿using AI.Application.Interfaces;
+using AI.Domain.ValueObjects;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -80,22 +81,73 @@ public class ConversationalAIService(
         return answers;
     }
 
+    public async Task<FlagAnswer> GenerateAnswer(string prompt, string? imageUrl, IMessageContext? context, CancellationToken token = default) {
+        int maxTokens = context.GetCustomRagMaxTokensOrDefault(_config.AnswerTokens);
+        double temperature = context.GetCustomRagTemperatureOrDefault(_config.Temperature);
+        double nucleusSampling = context.GetCustomRagNucleusSamplingOrDefault(_config.TopP);
+        var rootImageUrl = context.GetCustomContentModerationImageUrlOrDefault("");
+        AzureOpenAIPromptExecutionSettings settings = new() {
+            MaxTokens = maxTokens,
+            Temperature = temperature,
+            TopP = nucleusSampling,
+            PresencePenalty = _config.PresencePenalty,
+            FrequencyPenalty = _config.FrequencyPenalty,
+            StopSequences = _config.StopSequences,
+        };
+        var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+        var chatHistory = await BuildChatContentModeration(prompt, imageUrl, rootImageUrl);
+
+        var result = chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory, settings, kernel, token);
+        StringBuilder fullMessage = new();
+        await foreach (var content in result) {
+            fullMessage.Append(content.Content);
+        }
+
+        var answers = new FlagAnswer();
+        try {
+            string cleanedContent = Regex.Replace(fullMessage.ToString(), @"```json[\s\S]*?```", "").Trim();
+            answers = JsonConvert.DeserializeObject<FlagAnswer>(cleanedContent)!;
+        } catch (Exception ex) {
+            logger.LogError(ex, "Error deserializing the flag answer.");
+            answers.Reason = fullMessage.ToString();
+        }
+
+        return answers;
+    }
+
     private async Task<ChatHistory> GetRecentChatHistory(Guid conversationId) {
         int pastMessages = configuration.GetValue("Parameters:PastMessages", 10);
-        ChatHistory chats = new ChatHistory(); 
+        ChatHistory chats = new ChatHistory();
         var conversation = await conversationRepository.GetRecentMessagesAsync(conversationId, pastMessages);
-        if(conversation==null) {
+        if (conversation == null) {
             return chats;
         }
         conversation.Messages.OrderBy(m => m.CreatedAt)
             .ToList().ForEach(m => {
-            if(m.SenderType == SenderType.User) {
-                chats.AddUserMessage(m.Content);
-            } else {
-                chats.AddAssistantMessage(m.Content);
-            }
-        });
+                if (m.SenderType == SenderType.User) {
+                    chats.AddUserMessage(m.Content);
+                } else {
+                    chats.AddAssistantMessage(m.Content);
+                }
+            });
         return chats;
+    }
+
+    private async Task<ChatHistory> BuildChatContentModeration(string question, string? imageUrl, string rootImageUrl) {
+        var messageContent = new ChatMessageContent() {
+            Role = AuthorRole.User,
+            Items = [new TextContent { Text = question }]
+        };
+        if (!string.IsNullOrEmpty(imageUrl)) {
+            string base64Image = await ImageHelper.ConvertImageUrlToBase64Async(imageUrl);
+            byte[] imageData = Convert.FromBase64String(base64Image);
+            string mimeType = ImageHelper.GetMimeTypeFromUrl(rootImageUrl);
+            var imageContent = new ImageContent(imageData, mimeType);
+            messageContent.Items.Add(imageContent);
+
+        }
+        ChatHistory chatHistory = [messageContent];
+        return chatHistory;
     }
 }
 

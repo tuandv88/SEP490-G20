@@ -9,9 +9,12 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
             PromptType.Suggestion => BuidSuggestion(question, facts),
             PromptType.Summarize => BuidSummarize(question, facts),
             PromptType.Pathway => BuidPathway(question, facts, context),
+            PromptType.ContentModeration => BuidContentModeration(question, facts, context),
             _ => throw new ArgumentOutOfRangeException(nameof(promptType), promptType, null)
         };
     }
+
+
 
     public string ExtractMessage(PromptType promptType, string message) {
         return promptType switch {
@@ -19,9 +22,11 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
             PromptType.Suggestion => ExtractSuggestionMessage(message),
             PromptType.Summarize => ExtractSummaryMessage(message),
             PromptType.Pathway => ExtractPathwayMessage(message),
+            PromptType.ContentModeration => ExtractContentModeration(message),
             _ => throw new ArgumentOutOfRangeException(nameof(promptType), promptType, null)
         };
     }
+
 
     private string BuidAnswerWithFacts(string question, string facts, IMessageContext? context) {
         var prompt = promptProvider.ReadPrompt(PromptType.AnswerWithFacts.ToStringValue());
@@ -55,7 +60,14 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
         prompt = prompt.Replace("{{$assessment}}", answers.Trim(), StringComparison.OrdinalIgnoreCase);
         return prompt;
     }
+    private string BuidContentModeration(string question, string facts, IMessageContext? context) {
+        var prompt = promptProvider.ReadPrompt(PromptType.ContentModeration.ToStringValue());
+        var answers = context.GetCustomContentModerationOrDefault("");
 
+        prompt = prompt.Replace("{{discussion}}", facts.Trim(), StringComparison.OrdinalIgnoreCase);
+
+        return prompt;
+    }
     private string ExtractAnswerMessage(string message) {
 
         return "Extracted Answer Message";
@@ -71,6 +83,9 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
         throw new NotImplementedException();
     }
     private string ExtractPathwayMessage(string message) {
+        throw new NotImplementedException();
+    }
+    private string ExtractContentModeration(string message) {
         throw new NotImplementedException();
     }
 

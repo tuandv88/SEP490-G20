@@ -5,11 +5,13 @@ using Community.Infrastructure.Data.Repositories.Bookmarks;
 using Community.Infrastructure.Data.Repositories.Categorys;
 using Community.Infrastructure.Data.Repositories.Comments;
 using Community.Infrastructure.Data.Repositories.Discussions;
+using Community.Infrastructure.Data.Repositories.Flags;
 using Community.Infrastructure.Data.Repositories.NotificationHistories;
 using Community.Infrastructure.Data.Repositories.NotificationTypes;
 using Community.Infrastructure.Data.Repositories.UserDiscussions;
 using Community.Infrastructure.Data.Repositories.UserNotificationSettings;
 using Community.Infrastructure.Data.Repositories.Votes;
+using Community.Infrastructure.Extentions;
 using Community.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -20,12 +22,18 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        services.AddDbContext<ApplicationDbContext>((sp, options) => {
+            options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
+                 npgsqlOptions => {
+                     npgsqlOptions.EnableRetryOnFailure(5);
+                 });
 
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connectionString).LogTo(Console.WriteLine, LogLevel.Information));
+            options.LogTo(Console.WriteLine, LogLevel.Information);
+        });
+        services.AddMassTransitWithRabbitMQ(configuration, typeof(IApplicationDbContext).Assembly);
 
-        services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         //Configuration Repository
         ConfigureRepository(services, configuration);
@@ -69,5 +77,7 @@ public static class DependencyInjection
         services.AddScoped<INotificationHistoryRepository, NotificationHistoryRepository>();
 
         services.AddScoped<IUserNotificationSettingRepository, UserNotificationSettingRepository>();
+
+        services.AddScoped<IFlagRepository, FlagRepository>();
     }
 }

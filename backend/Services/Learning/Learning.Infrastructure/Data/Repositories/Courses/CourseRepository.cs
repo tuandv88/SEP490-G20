@@ -42,7 +42,7 @@ public class CourseRepository : Repository<Course>, ICourseRepository {
         var course = await _dbContext.Courses
             .Include(c => c.Chapters)
             .ThenInclude(c => c.Lectures)
-            .AsNoTracking()
+            //.AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id.Equals(CourseId.Of(id)));
         return course;
     }

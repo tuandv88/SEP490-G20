@@ -10,5 +10,6 @@ public record UpdateDiscussionDto(
     bool Closed,
     bool Pinned,
     long ViewCount,
-    bool EnableNotification
+    bool EnableNotification,
+    ImageDto? ImageDto               // Image 
 );

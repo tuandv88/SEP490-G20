@@ -51,7 +51,7 @@ namespace Community.Domain.Models
         }
 
         // Phương thức cập nhật thông tin của Discussion
-        public void Update(UserId userId, CategoryId categoryId, string title, string description, bool isActive, List<string> tags, bool closed, bool pinned, long viewCount, bool notificationsEnabled)
+        public void Update(UserId userId, CategoryId categoryId, string title, string description, bool isActive, List<string> tags, bool closed, bool pinned, long viewCount, bool notificationsEnabled, string? urlImage = null)
         {
             UserId = userId;
             CategoryId = categoryId;
@@ -64,6 +64,7 @@ namespace Community.Domain.Models
             ViewCount = viewCount;
             DateUpdated = DateTime.UtcNow;
             NotificationsEnabled = notificationsEnabled;
+            ImageUrl = urlImage;
 
             // Thêm sự kiện cập nhật nếu cần thiết
             // AddDomainEvent(new DiscussionUpdatedEvent(this));
@@ -73,7 +74,7 @@ namespace Community.Domain.Models
         public void UpdateImage(string imageUrl)
         {
             ImageUrl = imageUrl;
-            AddDomainEvent(new DiscussionChangedEvent(this));
+            //AddDomainEvent(new DiscussionChangedEvent(this));
         }
 
         public void UpdateStatus(bool isActive) {

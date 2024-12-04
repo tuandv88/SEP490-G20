@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using User.Domain.Enums;
 using User.Domain.Models;
 using User.Domain.ValueObjects;
 
@@ -22,7 +23,9 @@ namespace User.Infrastructure.Data.Configurations
                    dbId => UserId.Of(dbId));
 
             builder.Property(ph => ph.Point).IsRequired();
-            builder.Property(ph => ph.ChangeType).IsRequired();
+            builder.Property(ph => ph.ChangeType)
+                .HasDefaultValue(ChangeType.Deducted)
+                .HasConversion(s => s.ToString(), dbStatus => (ChangeType)Enum.Parse(typeof(ChangeType), dbStatus));
             builder.Property(ph => ph.Source);
             builder.Property(ph => ph.DateReceived).IsRequired();
             builder.Property(ph => ph.LastUpdated).IsRequired();

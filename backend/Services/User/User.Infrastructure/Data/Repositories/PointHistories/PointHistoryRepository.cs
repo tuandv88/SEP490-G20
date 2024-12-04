@@ -1,4 +1,6 @@
 ﻿
+using User.Domain.Enums;
+
 namespace User.Infrastructure.Data.Repositories.PointHistories
 {
     public class PointHistoryRepository : Repository<PointHistory>, IPointHistoryRepository
@@ -37,6 +39,18 @@ namespace User.Infrastructure.Data.Repositories.PointHistories
                 .ToListAsync();
 
             return pointHistories;
+        }
+        public async Task<long> GetTotalRemainingPointsByUserIdAsync(Guid userId)
+        {
+            var userIdObject = new UserId(userId);
+
+            // Tính tổng điểm còn lại theo ChangeType
+            var remainingPoints = await _dbContext.PointHistories
+                .Where(ph => ph.UserId.Equals(userIdObject)) // Lọc theo UserId
+                .SumAsync(ph => ph.ChangeType == ChangeType.Earned ? ph.Point :
+                                ph.ChangeType == ChangeType.Deducted ? -ph.Point : 0); // Tính tổng điểm cộng và trừ
+
+            return remainingPoints;
         }
 
     }

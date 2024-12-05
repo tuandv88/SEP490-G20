@@ -3,6 +3,7 @@ using BuildingBlocks.Messaging.Events.Payments.Sagas.Commands;
 using MassTransit;
 using Payment.Application.Data.Repositories;
 using Payment.Domain.Enums;
+using Payment.Domain.ValueObjects;
 using PayPalCheckoutSdk.Core;
 using PayPalCheckoutSdk.Orders;
 
@@ -10,8 +11,9 @@ namespace Payment.Application.Integrations.Paypals.EventHandlers;
 public class CapturePaymentCommandHandler(ITransactionRepository transactionRepository, PayPalHttpClient _payPalClient, IPublishEndpoint publishEndpoint) : IConsumer<CapturePaymentCommand> {
     public async Task Consume(ConsumeContext<CapturePaymentCommand> context) {
         var message = context.Message;
-        var transaction = await transactionRepository.GetByIdIncludeItems(message.TransactionId);
-        if(transaction == null || transaction.Status == TransactionStatus.Completed || transaction.Status == TransactionStatus.Failed) {
+
+        var transaction = transactionRepository.GetAllAsQueryable().FirstOrDefault(t => t.Id.Equals(TransactionId.Of(message.TransactionId)));
+        if (transaction == null || transaction.Status == TransactionStatus.Completed || transaction.Status == TransactionStatus.Failed) {
             return;
         }
 

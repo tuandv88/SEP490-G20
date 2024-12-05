@@ -13,6 +13,7 @@ using Payment.Infrastructure.Data.Respositories.Transactions;
 using Payment.Infrastructure.Data.Respositories.TransactionLogs;
 using BuildingBlocks.Email.Interfaces;
 using BuildingBlocks.Email.Services;
+using Payment.Infrastructure.Data.Respositories.TransactionItems;
 
 namespace Payment.Infrastructure;
 public static class DependencyInjection {
@@ -42,7 +43,7 @@ public static class DependencyInjection {
 
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<ITransactionLogRepository, TransactionLogRepository>();
-
+        services.AddScoped<ITransactionItemRepository, TransactionItemRepository>();
         services.AddScoped<IEmailService, EmailService>();
         return services;
     }

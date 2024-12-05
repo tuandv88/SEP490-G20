@@ -20,18 +20,19 @@ public class TransactionRepository : Repository<Transaction>, ITransactionReposi
     }
 
     public async Task<Transaction> GetByExternalOrderId(string orderId) {
-        var transaction = await _dbContext.Transactions.FirstOrDefaultAsync(t => t.ExternalOrderId.Equals(orderId));
+        var transaction = await _dbContext.Transactions.Include(t => t.Items)
+            .FirstOrDefaultAsync(t => t.ExternalOrderId.Equals(orderId));
         return transaction;
     }
 
     public async override Task<Transaction?> GetByIdAsync(Guid id) {
-        var transaction = await _dbContext.Transactions.Include(t => t.Items)
+        var transaction = await _dbContext.Transactions
                        .FirstOrDefaultAsync(c => c.Id.Equals(TransactionId.Of(id)));
         return transaction;
     }
 
     public async Task<Transaction> GetByIdIncludeItems(Guid Id) {
-        var transaction = await _dbContext.Transactions
+        var transaction = await _dbContext.Transactions.Include(t => t.Items)
                       .FirstOrDefaultAsync(c => c.Id.Equals(TransactionId.Of(Id)));
         return transaction;
     }

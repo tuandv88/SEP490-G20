@@ -10,7 +10,7 @@ public class DeductPointsCommandHandler(IPointHistoryRepository pointHistoryRepo
     public async Task Consume(ConsumeContext<DeductPointsCommand> context) {
         var message = context.Message;
         var point = await pointHistoryRepository.GetTotalRemainingPointsByUserIdAsync(message.UserId);
-        if (point > message.PointsUsed) {
+        if (point >= message.PointsUsed) {
             if (message.PointsUsed > 0) {
                 var pointHistory = CreateNewPointHistory(message.PointsUsed, message.UserId, message.Source);
                 await pointHistoryRepository.AddAsync(pointHistory);

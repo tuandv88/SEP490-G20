@@ -10,21 +10,17 @@ using Payment.Application.Data.Repositories;
 using Payment.Application.Interfaces;
 
 namespace Payment.Application.Integrations.Paypals.Commands.ApproveOrder;
-public class ApproveOrderHandler(IPaypalClientApi paypalClientApi, ITransactionRepository transactionRepository, IPublishEndpoint publishEndpoint,
-    ILogger<ApproveOrderHandler> logger) : ICommandHandler<ApproveOrderCommand, Unit>
-{
-    public async Task<Unit> Handle(ApproveOrderCommand request, CancellationToken cancellationToken)
-    {
+public class ApproveOrderHandler(IPaypalClientApi paypalClientApi, ITransactionRepository transactionRepository,ITransactionItemRepository transactionItemRepository, IPublishEndpoint publishEndpoint,
+    ILogger<ApproveOrderHandler> logger) : ICommandHandler<ApproveOrderCommand, Unit> {
+    public async Task<Unit> Handle(ApproveOrderCommand request, CancellationToken cancellationToken) {
         var header = request.Headers;
         var body = request.Body;
         var isValidEvent = await paypalClientApi.VerifyEvent(header, body);
 
-        if (isValidEvent)
-        {
+        if (isValidEvent) {
             var webhookEvent = JsonConvert.DeserializeObject<WebHookEvent>(body)!;
             logger.LogDebug(webhookEvent.ToString());
-            switch (webhookEvent.EventType)
-            {
+            switch (webhookEvent.EventType) {
                 case EventTypeConstant.CheckoutOrderApproved:
                     var data = webhookEvent.GetResource<CheckoutOrderResource>();
                     await HandlerEvent(data);
@@ -33,22 +29,21 @@ public class ApproveOrderHandler(IPaypalClientApi paypalClientApi, ITransactionR
         }
         return Unit.Value;
     }
-    private async Task HandlerEvent(CheckoutOrderResource checkoutOrder)
-    {
-        var transaction = await transactionRepository.GetByExternalOrderId(checkoutOrder.Id);
-        if (transaction == null || transaction.Status != Domain.Enums.TransactionStatus.Created)
-        {
+    private async Task HandlerEvent(CheckoutOrderResource checkoutOrder) {
+        var transaction = transactionRepository.GetAllAsQueryable().FirstOrDefault(t => t.ExternalOrderId.Equals(checkoutOrder.Id));
+        
+        if (transaction == null || transaction.Status != Domain.Enums.TransactionStatus.Created) {
             return;
         }
-        await publishEndpoint.Publish(new OrderApprovedEvent()
-        {
+        var transactionItem = transactionItemRepository.GetAllAsQueryable().Where(t => t.TransactionId.Equals(transaction.Id)).ToList();
+        await publishEndpoint.Publish(new OrderApprovedEvent() {
             TransactionId = transaction.Id.Value,
             UserId = transaction.UserId.Value,
             Currency = transaction.Currency,
             PaymentMethod = transaction.PaymentMethod.ToString(),
-            ProductId = Guid.Parse(transaction.Items.FirstOrDefault()!.ProductId),
-            ProductType = transaction.Items.FirstOrDefault()!.ProductType.ToString(),
-            UnitPrice = transaction.Items.FirstOrDefault()!.UnitPrice,
+            ProductId = Guid.Parse(transactionItem.FirstOrDefault()!.ProductId),
+            ProductType = transactionItem.FirstOrDefault()!.ProductType.ToString(),
+            UnitPrice = transactionItem.FirstOrDefault()!.UnitPrice,
             PointsUsed = transaction.PointsUsed,
             PayerEmail = transaction.PayerEmail!,
             Fullname = transaction.Fullname,

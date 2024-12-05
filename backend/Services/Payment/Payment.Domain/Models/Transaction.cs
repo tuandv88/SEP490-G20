@@ -17,7 +17,7 @@ public class Transaction : Aggregate<TransactionId> {
     public string Fullname { get; set; } = string.Empty;
     public int PointsUsed { get; set; } = 0;
     public double DiscountAmount { get; set; } = 0; // số tiền đã giảm khi dùng point
-    public List<TransactionItem> Items { get; set; } = [];
-    public List<TransactionLog> Logs { get; set; } = [];
+    public List<TransactionItem> Items { get; set; } = new();
+    public List<TransactionLog> Logs { get; set; } = new();
 }
 

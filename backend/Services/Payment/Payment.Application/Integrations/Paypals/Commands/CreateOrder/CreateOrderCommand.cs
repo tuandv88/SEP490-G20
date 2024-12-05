@@ -1,9 +1,11 @@
 ﻿using BuildingBlocks.CQRS;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Payment.Application.Integrations.Paypals.Dtos;
 
 namespace Payment.Application.Integrations.Paypals.Commands.CreateOrder;
 
+[Authorize]
 public record CreateOrderCommand(CreateOrderDto Order) : ICommand<CreateOrderResult>;
 public record CreateOrderResult(string OrderId);
 

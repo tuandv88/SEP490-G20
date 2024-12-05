@@ -3,7 +3,7 @@ using Payment.Domain.Models;
 
 namespace Payment.Application.Extensions;
 public static class TransactionExtensions {
-    public static TransactionDto ToTransactionDto(this Transaction transaction) {
+    public static TransactionDto ToTransactionDto(this Transaction transaction, List<TransactionItem> transactionItems) {
         return new TransactionDto(
             transaction.PointsUsed,
             transaction.GrossAmount,
@@ -11,7 +11,7 @@ public static class TransactionExtensions {
             transaction.LastModified!.Value,
             transaction.Status.ToString(),
             transaction.PaymentMethod.ToString(),
-            Items: transaction.Items.Select(i => i.ToTransactionItemDto()).ToList()
+            Items: transactionItems.Select(i => i.ToTransactionItemDto()).ToList()
             );
     }
 }

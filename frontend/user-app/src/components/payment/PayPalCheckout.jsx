@@ -24,6 +24,8 @@ const PayPalCheckout = () => {
   const [orderSummaryState, setOrderSummaryState] = useState(null)
   const [loading, setLoading] = useState(false)
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL
+
   useEffect(() => {
     const fetchUserPoint = async () => {
       try {
@@ -80,7 +82,7 @@ const PayPalCheckout = () => {
   }
 
   const handleCreateOrder = async () => {
-    const response = await fetch("https://localhost:5000/payment-service/checkout/orders", {
+    const response = await fetch(`${API_BASE_URL}/payment-service/checkout/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${Cookies.get('authToken')}` },
       body: JSON.stringify({

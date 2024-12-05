@@ -8,7 +8,7 @@ using PayPalCheckoutSdk.Core;
 using PayPalCheckoutSdk.Orders;
 
 namespace Payment.Application.Integrations.Paypals.EventHandlers;
-public class CapturePaymentCommandHandler(ITransactionRepository transactionRepository, PayPalHttpClient _payPalClient, IPublishEndpoint publishEndpoint) : IConsumer<CapturePaymentCommand> {
+public class CapturePaymentCommandHandler(ITransactionRepository transactionRepository,ITransactionItemRepository transactionItemRepository, PayPalHttpClient _payPalClient, IPublishEndpoint publishEndpoint) : IConsumer<CapturePaymentCommand> {
     public async Task Consume(ConsumeContext<CapturePaymentCommand> context) {
         var message = context.Message;
 
@@ -16,7 +16,7 @@ public class CapturePaymentCommandHandler(ITransactionRepository transactionRepo
         if (transaction == null || transaction.Status == TransactionStatus.Completed || transaction.Status == TransactionStatus.Failed) {
             return;
         }
-
+        var transactionItems = transactionItemRepository.GetAllAsQueryable().Where(t => t.TransactionId.Equals(transaction.Id)).ToList();
         // rút tiền user
         var request = new OrdersCaptureRequest(transaction.ExternalOrderId);
         request.RequestBody(new OrderActionRequest());
@@ -33,11 +33,14 @@ public class CapturePaymentCommandHandler(ITransactionRepository transactionRepo
             transaction.PayerId = result.Payer.PayerId; 
             transaction.PayerEmail = result.Payer.Email;
 
-            transaction.Status = TransactionStatus.Completed;
-            await transactionRepository.UpdateAsync(transaction); 
+            var transactionItem = transactionItems.FirstOrDefault()!;
+            transactionItem.ProductName = message.ProductName;
+            transactionItem.ProductDescription = message.ProductDescription;
 
-            transaction.Status = TransactionStatus.Completed; 
+            transaction.Status = TransactionStatus.Completed;
+            await transactionItemRepository.UpdateAsync(transactionItem);
             await transactionRepository.UpdateAsync(transaction);
+
             await publishEndpoint.Publish(new PaymentCapturedEvent() {
                 TransactionId = message.TransactionId
             }) ;

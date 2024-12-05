@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, UserCircle, Compass, FileText, BookOpen, Code } from 'lucide-react';
+import { User, UserCircle, Compass, FileText, BookOpen, Code, MessageCircle } from 'lucide-react';
 
 export function ProfileTabs({ activeTab, setActiveTab }) {
   const tabs = [
@@ -7,6 +7,8 @@ export function ProfileTabs({ activeTab, setActiveTab }) {
     { id: 'roadmap', label: 'Roadmap', icon: Compass },
     { id: 'learning', label: 'Learning', icon: BookOpen },
     { id: 'algorithm', label: 'Algorithm', icon: Code },
+    { id: 'discussionuserlist', label: 'Discussion', icon: MessageCircle },
+    // { id: 'posts', label: 'Posts', icon: FileText },
     { id: 'transaction', label: 'Transaction', icon: FileText },
   ];
 

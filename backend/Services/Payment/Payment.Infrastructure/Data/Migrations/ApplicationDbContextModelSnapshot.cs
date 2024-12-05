@@ -208,6 +208,9 @@ namespace Payment.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<double>("DiscountAmount")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("ExternalOrderId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -218,6 +221,10 @@ namespace Payment.Infrastructure.Data.Migrations
 
                     b.Property<double>("FeeAmount")
                         .HasColumnType("double precision");
+
+                    b.Property<string>("Fullname")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<double>("GrossAmount")
                         .HasColumnType("double precision");
@@ -246,11 +253,14 @@ namespace Payment.Infrastructure.Data.Migrations
                         .HasColumnType("text")
                         .HasDefaultValue("Paypal");
 
+                    b.Property<int>("PointsUsed")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
-                        .HasDefaultValue("Pending");
+                        .HasDefaultValue("Created");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -311,6 +321,45 @@ namespace Payment.Infrastructure.Data.Migrations
                     b.ToTable("TransactionItems");
                 });
 
+            modelBuilder.Entity("Payment.Domain.Models.TransactionLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TransactionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransactionId");
+
+                    b.ToTable("TransactionLogs");
+                });
+
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
                 {
                     b.HasOne("MassTransit.EntityFrameworkCoreIntegration.OutboxState", null)
@@ -332,9 +381,20 @@ namespace Payment.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Payment.Domain.Models.TransactionLog", b =>
+                {
+                    b.HasOne("Payment.Domain.Models.Transaction", null)
+                        .WithMany("Logs")
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Payment.Domain.Models.Transaction", b =>
                 {
                     b.Navigation("Items");
+
+                    b.Navigation("Logs");
                 });
 #pragma warning restore 612, 618
         }

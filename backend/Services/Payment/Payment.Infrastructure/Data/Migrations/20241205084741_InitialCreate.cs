@@ -59,7 +59,7 @@ namespace Payment.Infrastructure.Data.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<double>(type: "double precision", nullable: false),
                     Currency = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false, defaultValue: "Pending"),
+                    Status = table.Column<string>(type: "text", nullable: false, defaultValue: "Created"),
                     PaymentMethod = table.Column<string>(type: "text", nullable: false, defaultValue: "Paypal"),
                     ExternalOrderId = table.Column<string>(type: "text", nullable: false),
                     ExternalTransactionId = table.Column<string>(type: "text", nullable: false),
@@ -69,6 +69,9 @@ namespace Payment.Infrastructure.Data.Migrations
                     PayerId = table.Column<string>(type: "text", nullable: true),
                     PayerEmail = table.Column<string>(type: "text", nullable: true),
                     PayerPhone = table.Column<string>(type: "text", nullable: true),
+                    Fullname = table.Column<string>(type: "text", nullable: false),
+                    PointsUsed = table.Column<int>(type: "integer", nullable: false),
+                    DiscountAmount = table.Column<double>(type: "double precision", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -149,6 +152,31 @@ namespace Payment.Infrastructure.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TransactionLogs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TransactionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Action = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransactionLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TransactionLogs_Transactions_TransactionId",
+                        column: x => x.TransactionId,
+                        principalTable: "Transactions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_InboxState_Delivered",
                 table: "InboxState",
@@ -185,6 +213,11 @@ namespace Payment.Infrastructure.Data.Migrations
                 name: "IX_TransactionItems_TransactionId",
                 table: "TransactionItems",
                 column: "TransactionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionLogs_TransactionId",
+                table: "TransactionLogs",
+                column: "TransactionId");
         }
 
         /// <inheritdoc />
@@ -195,6 +228,9 @@ namespace Payment.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "TransactionItems");
+
+            migrationBuilder.DropTable(
+                name: "TransactionLogs");
 
             migrationBuilder.DropTable(
                 name: "InboxState");

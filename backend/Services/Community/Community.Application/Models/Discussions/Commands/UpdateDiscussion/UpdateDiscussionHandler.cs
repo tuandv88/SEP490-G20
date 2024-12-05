@@ -1,5 +1,6 @@
 ﻿using Community.Application.Data.Repositories;
 using Community.Application.Interfaces;
+using Community.Application.Models.Discussions.Commands.UpdateImageDiscussion;
 using Community.Application.Models.Discussions.Dtos;
 using Community.Domain.Models;
 using Community.Domain.ValueObjects;
@@ -11,12 +12,18 @@ public class UpdateDiscussionHandler : ICommandHandler<UpdateDiscussionCommand, 
     private readonly IDiscussionRepository _discussionRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUserContextService _userContextService;
+    private readonly IFilesService _filesService;
+    private readonly IBase64Converter _base64Converter;
 
-    public UpdateDiscussionHandler(IDiscussionRepository discussionRepository, ICategoryRepository categoryRepository, IUserContextService userContextService)
+    private static string bucket = StorageConstants.BUCKET;
+
+    public UpdateDiscussionHandler(IDiscussionRepository discussionRepository, ICategoryRepository categoryRepository, IUserContextService userContextService, IFilesService iFilesService, IBase64Converter base64Converter)
     {
         _discussionRepository = discussionRepository;
         _categoryRepository = categoryRepository;
         _userContextService = userContextService;
+        _filesService = iFilesService;
+        _base64Converter = base64Converter;
     }
 
     public async Task<UpdateDiscussionResult> Handle(UpdateDiscussionCommand request, CancellationToken cancellationToken)
@@ -35,9 +42,27 @@ public class UpdateDiscussionHandler : ICommandHandler<UpdateDiscussionCommand, 
             throw new NotFoundException("Discussion not found.", request.UpdateDiscussionDto.Id);
         }
 
+        string imageUrl;
 
+        if (request.UpdateDiscussionDto.ImageDto != null)
+        {
+            imageUrl = await UploadDiscussionImage(request.UpdateDiscussionDto.ImageDto);
 
-        UpdateDiscussionWithNewValues(discussion, request.UpdateDiscussionDto);
+            var oldImageUrl = discussion.ImageUrl;
+
+            if (!String.IsNullOrEmpty(oldImageUrl))
+            {
+                await _filesService.DeleteFileAsync(bucket, oldImageUrl);
+            }
+        }
+        else
+        {
+            imageUrl = null;
+        }
+
+        UpdateDiscussionWithNewValues(discussion, request.UpdateDiscussionDto, imageUrl);
+
+        discussion.DateUpdated = DateTime.UtcNow;
 
         await _discussionRepository.UpdateAsync(discussion);
         await _discussionRepository.SaveChangesAsync(cancellationToken);
@@ -45,7 +70,7 @@ public class UpdateDiscussionHandler : ICommandHandler<UpdateDiscussionCommand, 
         return new UpdateDiscussionResult(true);
     }
 
-    private void UpdateDiscussionWithNewValues(Discussion discussion, UpdateDiscussionDto updateDiscussionDto)
+    private void UpdateDiscussionWithNewValues(Discussion discussion, UpdateDiscussionDto updateDiscussionDto, string? imageUrl)
     {
         // Dữ liệu test UserId
         //var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
@@ -69,6 +94,11 @@ public class UpdateDiscussionHandler : ICommandHandler<UpdateDiscussionCommand, 
 
         var categoryId = CategoryId.Of(updateDiscussionDto.CategoryId);
 
+        if(imageUrl == null)
+        {
+            imageUrl = discussion.ImageUrl ?? string.Empty;
+        }
+
         discussion.Update(
             userId: userId,
             categoryId: categoryId,
@@ -79,8 +109,21 @@ public class UpdateDiscussionHandler : ICommandHandler<UpdateDiscussionCommand, 
             closed: updateDiscussionDto.Closed,
             pinned: updateDiscussionDto.Pinned,
             viewCount: updateDiscussionDto.ViewCount,
-            notificationsEnabled: updateDiscussionDto.EnableNotification
-            
+            notificationsEnabled: updateDiscussionDto.EnableNotification,
+            urlImage: imageUrl
         );
+    }
+    private async Task<string> UploadDiscussionImage(ImageDto imageDto)
+    {
+        var prefix = StorageConstants.IMAGE_COMMUNITY_PATH;
+        var originFileName = imageDto.FileName;
+        var base64Image = imageDto.Base64Image;
+        var contentType = imageDto.ContentType;
+
+        var fileName = await _filesService.UploadFileAsync(_base64Converter.ConvertToMemoryStream(base64Image), originFileName, contentType, bucket, prefix);
+
+        var imageUrl = $"{prefix}/{fileName}";
+
+        return imageUrl;
     }
 }

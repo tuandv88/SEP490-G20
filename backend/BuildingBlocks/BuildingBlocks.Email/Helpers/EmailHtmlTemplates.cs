@@ -417,6 +417,205 @@ public static class EmailHtmlTemplates
         return htmlStr;
     }
 
+
+    public static string DiscussionFlaggedTemplate(string discussionId, string title, string flaggedDate, string violationLevel, string violationLevelClass, string reason, string callbackUrl)
+    {
+        string htmlStr = $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Discussion Flagged Notification - ICoder</title>
+    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap' rel='stylesheet'>
+    <style>
+        body {{
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }}
+
+        .email-container {{
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }}
+
+        .email-wrapper {{
+            background-color: #e5e5e5;
+            padding: 30px;
+            border-radius: 30px;
+        }}
+
+        .logo img {{
+            width: 220px;
+            height: auto;
+            margin-bottom: 30px;
+        }}
+
+        .header {{
+            font-size: 32px;
+            color: #e67e22;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }}
+
+        .message {{
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 40px;
+            text-align: left;
+        }}
+
+        .message p {{
+            margin-bottom: 20px;
+        }}
+
+        .btn {{
+            display: inline-block;
+            background: linear-gradient(45deg, #e67e22, #d35400);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 36px;
+            font-size: 18px;
+            border-radius: 50px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease, transform 0.3s ease;
+        }}
+
+        .btn:hover {{
+            background: linear-gradient(45deg, #d35400, #e67e22);
+            transform: translateY(-4px);
+        }}
+
+        .footer {{
+            font-size: 14px;
+            color: #777;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+            border-radius: 15px;
+        }}
+
+        .footer a {{
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: 500;
+            margin: 0 8px;
+        }}
+
+        .footer p {{
+            margin-bottom: 10px;
+        }}
+
+        .footer .unsubscribe {{
+            font-size: 12px;
+            color: #999;
+        }}
+
+        hr {{
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 30px 0;
+        }}
+
+        .small-text {{
+            font-size: 12px;
+            color: #999;
+        }}
+
+        .low-violation {{
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }}
+
+        .medium-violation {{
+            background-color: #f9e0b7;
+            color: #e67e22;
+            border: 1px solid #f1c40f;
+        }}
+
+        .high-violation {{
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }}
+
+        @media (max-width: 600px) {{
+            .email-container {{
+                padding: 20px;
+            }}
+
+            .header {{
+                font-size: 28px;
+            }}
+
+            .btn {{
+                padding: 14px 30px;
+                font-size: 16px;
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <div class='email-wrapper'>
+        <div class='email-container'>
+            <div class='logo'>
+                <img src='https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/backend/imageidentity/ICoderlogomain.jpg' alt='ICoder Logo' />
+            </div>
+
+            <div class='header'>
+                Discussion Flagged Notification
+            </div>
+
+            <div class='message'>
+                <p>Hi, Have a good day. </p>
+                <p>We would like to inform you that a discussion has been flagged on ICoder.</p>
+                <p><strong>Discussion ID:</strong> {discussionId}</p>
+                <p><strong>Title:</strong> {title}</p>
+                <p><strong>Date Flagged:</strong> {flaggedDate}</p>
+                <p><strong>Violation Level:</strong> <span class='{violationLevelClass}'>{violationLevel}</span></p>
+                <p><strong>Reason for Flagging:</strong> {reason}</p>
+            </div>
+
+            <a href='{callbackUrl}' class='btn'>View Discussion Details</a>
+
+            <p class='small-text'>If you believe this is a mistake, please contact support.</p>
+            <hr>
+
+            <div class='footer'>
+                <p>ICoder Team</p>
+                <p>© 2024 ICoder, All rights reserved.</p>
+                <p>
+                    <a href='#'>Support</a> · 
+                    <a href='#'>Help</a> · 
+                    <a href='#'>Terms</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+";
+        return htmlStr;
+    }
+
+
     public static string PaymentSuccessfullyTemplate(string fullName, string recipientEmail, string courseName, decimal amountPaid, string paymentType, DateTime paymentDate, string transactionId, string callbackUrl)
     {
         string htmlStr = $@"

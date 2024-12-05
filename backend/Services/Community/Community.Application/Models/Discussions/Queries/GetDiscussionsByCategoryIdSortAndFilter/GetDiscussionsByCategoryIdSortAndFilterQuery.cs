@@ -19,15 +19,6 @@ public class GetDiscussionsByCategoryIdSortAndFilterHandler : IQueryHandler<GetD
     {
         var allData = await _repository.GetByCategoryIdIsActiveAsync(query.CategoryId);
 
-        // Tách chuỗi tags thành List<string> nếu nó được truyền dưới dạng chuỗi
-        List<string>? tagList = null;
-        if (!string.IsNullOrEmpty(query.Tags))
-        {
-            tagList = query.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                                .Select(tag => tag.Trim())
-                                .ToList();
-        }
-
         // Lọc và sắp xếp dữ liệu
         allData = ProcessTagsAndSort(query, allData);
 

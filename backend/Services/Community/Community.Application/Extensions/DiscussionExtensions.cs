@@ -42,7 +42,7 @@ public static class DiscussionExtensions
             DateUpdated: discussion.DateUpdated,
             Tags: discussion.Tags,
             ViewCount: (long)discussion.ViewCount,
-            VoteCount: (long) VoteExtensions.CalculateTotalVotes(discussion),
+            VoteCount: (long)VoteExtensions.CalculateTotalVotes(discussion),
             CommentCount: discussion.Comments.Count,
             Pinned: discussion.Pinned,
             Closed: discussion.Closed,
@@ -131,4 +131,60 @@ IFilesService filesService) // Thêm CategoryRepository để truy vấn Categor
         var discussionDtos = await Task.WhenAll(tasks);
         return discussionDtos.ToList();
     }
+
+    public static async Task<List<DiscussionDetailUserDto>> ToDiscussionDetailUserDtoListAsync(this List<Discussion> discussions,
+    ICategoryRepository categoryRepository,
+    IFlagRepository flagRepository)
+    {
+        var discussionDetailUserDtos = new List<DiscussionDetailUserDto>();
+
+        foreach (var discussion in discussions)
+        {
+            // Lấy thông tin danh mục của thảo luận
+            var category = await categoryRepository.GetByIdAsync(discussion.CategoryId.Value);
+            string categoryName = category?.Name ?? "Unknown";  // Tên danh mục hoặc mặc định "Unknown"
+
+            // Kiểm tra xem thảo luận có Flag không
+            Flag flag = null;
+            if (discussion?.FlagId?.Value != null)
+            {
+                flag = await flagRepository.GetByIdAsync(discussion.FlagId.Value);
+            }
+
+            // Nếu có Flag, lấy thông tin từ Flag, nếu không thì sử dụng giá trị mặc định
+            Guid flagId = flag?.Id.Value ?? Guid.Empty;  // Sử dụng Guid.Empty nếu flag là null
+            DateTime? flaggedDate = flag?.FlaggedDate;
+            ViolationLevel violationLevel = flag?.ViolationLevel ?? ViolationLevel.None;
+            string reason = flag?.Reason ?? string.Empty;
+
+            // Chuyển đổi thảo luận thành DiscussionDetailUserDto
+            var dto = new DiscussionDetailUserDto(
+                CategoryId: discussion.CategoryId.Value,
+                NameCategory: categoryName,
+                DiscussionId: discussion.Id.Value,
+                Title: discussion.Title,
+                Description: discussion.Description,
+                DateCreated: discussion.DateCreated,
+                ViewCount: (long)discussion.ViewCount,
+                VoteCount: (long)VoteExtensions.CalculateTotalVotes(discussion),
+                CommentsCount: discussion.Comments.Count,
+                IsActive: discussion.IsActive,
+                Tags: discussion.Tags,
+                NotificationsEnabled: discussion.NotificationsEnabled,
+                FlagId: flagId,
+                FlaggedDate: flaggedDate ?? DateTime.MinValue, 
+                ViolationLevel: violationLevel,
+                Reason: reason
+            );
+
+            discussionDetailUserDtos.Add(dto);
+        }
+
+        return discussionDetailUserDtos;
+    }
+
+
+
+
+
 }

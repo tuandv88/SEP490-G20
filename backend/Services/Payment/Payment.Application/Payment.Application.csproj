@@ -14,7 +14,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Integrations\Paypals\Commands\CaptureOrder\" />
+    <Folder Include="Transactions\Commands\" />
+    <Folder Include="Transactions\Dtos\" />
     <Folder Include="Transactions\Queries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
   </ItemGroup>
 
 </Project>

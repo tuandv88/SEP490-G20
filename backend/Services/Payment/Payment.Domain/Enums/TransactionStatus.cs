@@ -1,7 +1,7 @@
 ﻿namespace Payment.Domain.Enums;
 public enum TransactionStatus {
-    Pending,
     Created,
+    Pending,
     Completed,
     Failed,
     Cancelled

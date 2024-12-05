@@ -1,7 +1,5 @@
 ﻿using MassTransit;
-using Microsoft.EntityFrameworkCore;
 using Payment.Application.Data;
-using Payment.Domain.Models;
 using System.Reflection;
 
 
@@ -12,6 +10,8 @@ namespace Payment.Infrastructure.Data;
     public DbSet<Transaction> Transactions => Set<Transaction>();
 
     public DbSet<TransactionItem> TransactionItems => Set<TransactionItem>();
+
+    public DbSet<TransactionLog> TransactionLogs => Set<TransactionLog>();
 
     public async new Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class {
         await Set<T>().AddAsync(entity, cancellationToken);

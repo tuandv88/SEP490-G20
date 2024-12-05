@@ -15,6 +15,10 @@ public class TransactionRepository : Repository<Transaction>, ITransactionReposi
         }
     }
 
+    public IQueryable<Transaction> GetAllAsQueryable() {
+        return _dbContext.Transactions.AsQueryable();
+    }
+
     public async Task<Transaction> GetByExternalOrderId(string orderId) {
         var transaction = await _dbContext.Transactions.FirstOrDefaultAsync(t => t.ExternalOrderId.Equals(orderId));
         return transaction;

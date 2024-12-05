@@ -1,6 +1,4 @@
-﻿using Carter;
-using MediatR;
-using Payment.Application.Integrations.Paypals.Commands.ApproveOrder;
+﻿using Payment.Application.Integrations.Paypals.Commands.ApproveOrder;
 
 namespace Payment.API.Endpoints;
 public class PaypalWebhookEndpoint : ICarterModule {

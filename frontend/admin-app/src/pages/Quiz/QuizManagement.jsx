@@ -29,6 +29,18 @@ export default function QuizManagement() {
   const [isFullScreenPopupOpen, setIsFullScreenPopupOpen] = useState(false)
 
   useEffect(() => {
+    if (showAddQuestionForm || showCreateQuizForm) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto'
+    }
+  }, [showAddQuestionForm, showCreateQuizForm])
+
+  useEffect(() => {
     const fetchQuizDetail = async () => {
       setIsLoading(true)
       try {

@@ -13,11 +13,7 @@ const formSchema = z.object({
   prerequisites: z.string().min(1, 'Prerequisites are required'),
   description: z.string().min(1, 'Description is required'),
   objectives: z.string().min(1, 'Course objectives are required'),
-  targetAudiences: z.string().min(1, 'Target audiences are required'),
-  timeEstimation: z
-    .number()
-    .min(1, 'Estimated time must be greater than 0')
-    .max(1000, 'Estimated time must not exceed 1000 hours')
+  targetAudiences: z.string().min(1, 'Target audiences are required')
 })
 
 export default function Step1EditForm({ onSubmit, initialData }) {
@@ -87,25 +83,7 @@ export default function Step1EditForm({ onSubmit, initialData }) {
             label='Target Audiences'
             placeholder='Describe the target audiences...'
           />
-          <FormField
-            control={methods.control}
-            name='timeEstimation'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='text-base'>Time Estimation (hours)</FormLabel>
-                <FormControl>
-                  <Input
-                    type='number'
-                    step='0.5'
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                    placeholder='Enter estimated course duration'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
           <Button type='submit'>Next to Step 2</Button>
         </form>
       </Form>

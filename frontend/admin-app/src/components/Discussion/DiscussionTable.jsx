@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
@@ -8,99 +10,162 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import { ArrowUpDown, ChevronDown } from 'lucide-react'
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ViolationDetailsDialog } from './violation-details-dialog'
 
-const columns = [
-  {
-    accessorKey: 'index',
-    header: 'STT',
-    cell: ({ row }) => row.index + 1
-  },
-  {
-    accessorKey: 'title',
-    header: ({ column }) => {
-      return (
-        <Button variant='ghost' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          Title
-          <ArrowUpDown className='ml-2 h-4 w-4' />
-        </Button>
-      )
-    }
-  },
-  {
-    accessorKey: 'nameCategory',
-    header: 'Category'
-  },
-  {
-    accessorKey: 'dateCreated',
-    header: 'Date Created',
-    cell: ({ row }) => new Date(row.getValue('dateCreated')).toLocaleDateString()
-  },
-  {
-    accessorKey: 'viewCount',
-    header: 'View Count'
-  },
-  {
-    accessorKey: 'voteCount',
-    header: 'Vote Count'
-  },
-  {
-    accessorKey: 'commentsCount',
-    header: 'Comment Count'
-  },
-  {
-    accessorKey: 'isActive',
-    header: 'Is Active',
-    cell: ({ row }) => (row.getValue('isActive') ? 'Yes' : 'No')
-  },
-  {
-    accessorKey: 'tags',
-    header: 'Tags',
-    cell: ({ row }) => row.getValue('tags').join(', ')
-  },
-  {
-    accessorKey: 'violationLevel',
-    header: 'Violation',
-    cell: ({ row }) => {
-      const violationLevel = row.getValue('violationLevel')
-      let status = 'None'
-      let color = 'bg-gray-100 text-gray-800'
-
-      switch (violationLevel) {
-        case 1:
-          status = 'Low'
-          color = 'bg-yellow-100 text-yellow-800'
-          break
-        case 2:
-          status = 'Medium'
-          color = 'bg-orange-100 text-orange-800'
-          break
-        case 3:
-          status = 'High'
-          color = 'bg-red-100 text-red-800'
-          break
-      }
-
-      return <span className={`px-2 py-1 rounded-full text-xs font-medium ${color}`}>{status}</span>
-    }
-  }
-]
-
-export function DiscussionTable({ data }) {
+export function DiscussionTable({ data = [] }) {
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
   const [columnVisibility, setColumnVisibility] = React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [violationDetails, setViolationDetails] = React.useState(null)
+
+  const handleViolationClick = (rowData) => {
+    setViolationDetails(rowData)
+  }
+
+  const deleteDiscussion = (id) => {
+    // Implement delete functionality here
+    console.log(`Deleting discussion with id: ${id}`)
+  }
+
+  const columns = [
+    {
+      accessorKey: 'index',
+      header: 'STT',
+      cell: ({ row }) => row.index + 1
+    },
+    {
+      accessorKey: 'title',
+      header: ({ column }) => {
+        return (
+          <Button variant='ghost' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+            Title
+            <ArrowUpDown className='ml-2 h-4 w-4' />
+          </Button>
+        )
+      }
+    },
+    {
+      accessorKey: 'nameCategory',
+      header: 'Category'
+    },
+    {
+      accessorKey: 'dateCreated',
+      header: 'Date Created',
+      cell: ({ row }) => new Date(row.getValue('dateCreated')).toLocaleDateString()
+    },
+    {
+      accessorKey: 'viewCount',
+      header: 'View Count'
+    },
+    {
+      accessorKey: 'voteCount',
+      header: 'Vote Count'
+    },
+    {
+      accessorKey: 'commentsCount',
+      header: 'Comment Count'
+    },
+    {
+      accessorKey: 'isActive',
+      header: 'Status',
+      cell: ({ row }) => (
+        <Badge variant={row.getValue('isActive') ? 'success' : 'destructive'}>
+          {row.getValue('isActive') ? 'Active' : 'Inactive'}
+        </Badge>
+      )
+    },
+    {
+      accessorKey: 'tags',
+      header: 'Tags',
+      cell: ({ row }) => (
+        <div className='flex flex-wrap gap-1'>
+          {row.getValue('tags').map((tag, index) => (
+            <Badge key={index} variant='outline'>
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      )
+    },
+    {
+      accessorKey: 'violationLevel',
+      header: 'Violation',
+      cell: ({ row }) => {
+        const violationLevel = row.getValue('violationLevel')
+        let status = 'None'
+        let color = 'bg-gray-100 text-gray-800'
+
+        switch (violationLevel) {
+          case 1:
+            status = 'Low'
+            color = 'bg-yellow-100 text-yellow-800'
+            break
+          case 2:
+            status = 'Medium'
+            color = 'bg-orange-100 text-orange-800'
+            break
+          case 3:
+            status = 'High'
+            color = 'bg-red-100 text-red-800'
+            break
+        }
+
+        return (
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${color} cursor-pointer`}
+            onClick={() => handleViolationClick(row.original)}
+          >
+            {status}
+          </span>
+        )
+      }
+    },
+    {
+      id: 'actions',
+      cell: ({ row }) => {
+        const discussion = row.original
+        const navigate = useNavigate()
+        const discussionId = discussion.discussionId
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <MoreHorizontal className='h-4 w-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(discussionId)}>
+                Copy discussion ID
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Edit discussion</DropdownMenuItem>
+              <DropdownMenuItem>Delete discussion</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      }
+    }
+  ]
 
   const table = useReactTable({
     data,
@@ -122,8 +187,8 @@ export function DiscussionTable({ data }) {
   })
 
   return (
-    <div className='w-full'>
-      <div className='flex items-center py-4'>
+    <div className='w-full space-y-4'>
+      <div className='flex items-center justify-between'>
         <Input
           placeholder='Filter titles...'
           value={table.getColumn('title')?.getFilterValue() ?? ''}
@@ -132,7 +197,7 @@ export function DiscussionTable({ data }) {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='ml-auto'>
+            <Button variant='outline'>
               Columns <ChevronDown className='ml-2 h-4 w-4' />
             </Button>
           </DropdownMenuTrigger>
@@ -157,16 +222,14 @@ export function DiscussionTable({ data }) {
       </div>
       <div className='rounded-md border'>
         <Table>
-          <TableHeader>
+          <TableHeader className='bg-muted'>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  )
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className='font-bold text-muted-foreground'>
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -182,19 +245,15 @@ export function DiscussionTable({ data }) {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className='h-24 text-center'>
-                  No results.
+                  No discussion found.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <div className='flex items-center justify-end space-x-2 py-4'>
-        <div className='flex-1 text-sm text-muted-foreground'>
-          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
-          selected.
-        </div>
-        <div className='space-x-2'>
+      <div className='flex items-center justify-between'>
+        <div className='flex items-center space-x-2'>
           <Button
             variant='outline'
             size='sm'
@@ -206,8 +265,38 @@ export function DiscussionTable({ data }) {
           <Button variant='outline' size='sm' onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
             Next
           </Button>
+          <span className='text-sm text-muted-foreground'>
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          </span>
+        </div>
+        <div className='flex items-center space-x-2'>
+          <p className='text-sm text-muted-foreground'>Rows per page</p>
+          <Select
+            value={`${table.getState().pagination.pageSize}`}
+            onValueChange={(value) => {
+              table.setPageSize(Number(value))
+            }}
+          >
+            <SelectTrigger className='h-8 w-[70px]'>
+              <SelectValue placeholder={table.getState().pagination.pageSize} />
+            </SelectTrigger>
+            <SelectContent side='top'>
+              {[8, 10, 20, 30, 40, 50].map((pageSize) => (
+                <SelectItem key={pageSize} value={`${pageSize}`}>
+                  {pageSize}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
+      {violationDetails && (
+        <ViolationDetailsDialog
+          isOpen={!!violationDetails}
+          onClose={() => setViolationDetails(null)}
+          details={violationDetails}
+        />
+      )}
     </div>
   )
 }
@@ -225,7 +314,8 @@ export function DiscussionTable({ data }) {
 //       isActive: PropTypes.bool.isRequired,
 //       tags: PropTypes.arrayOf(PropTypes.string).isRequired,
 //       violationLevel: PropTypes.number.isRequired,
-//       reason: PropTypes.string.isRequired
+//       reason: PropTypes.string.isRequired,
+//       flaggedDate: PropTypes.string.isRequired
 //     })
 //   ).isRequired
 // }

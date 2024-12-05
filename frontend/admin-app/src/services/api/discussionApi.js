@@ -8,7 +8,7 @@ export const getAllDiscussions = async () => {
         Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
-    return response.data
+    return response.data.discussionDetailUserDtos.data
   } catch (error) {
     console.error('Error fetching discussions:', error)
     throw error

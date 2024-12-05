@@ -84,11 +84,11 @@ export function AppSidebar({ ...props }) {
           {
             title: 'User Management',
             url: USER_TABLE_PATH
-          },
-          {
-            title: 'Role Management',
-            url: '#'
           }
+          // {
+          //   title: 'Role Management',
+          //   url: '#'
+          // }
         ]
       },
       {

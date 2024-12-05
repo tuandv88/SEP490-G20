@@ -14,6 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { createQuestion } from '@/services/api/questionApi'
 import { useToast } from '@/hooks/use-toast'
 import { Trash2, Plus } from 'lucide-react'
+import CustomMarkdownEditor from '@/components/custom-markdown-editor'
 
 const QUESTION_TYPES = ['MultipleChoice', 'MultipleSelect', 'TrueFalse']
 const QUESTION_LEVELS = ['EASY', 'MEDIUM', 'HARD', 'EXPERT']
@@ -132,7 +133,7 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
   }
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className='max-w-[500px] h-[600px] p-0 overflow-hidden flex flex-col'>
+      <DialogContent className='max-w-[800px] h-[600px] p-0 overflow-hidden flex flex-col'>
         <DialogHeader className='px-6 py-4 border-b'>
           <DialogTitle className='text-xl font-semibold'>Add New Question</DialogTitle>
         </DialogHeader>
@@ -144,7 +145,14 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
               <Controller
                 name='content'
                 control={control}
-                render={({ field }) => <Input id='content' {...field} placeholder='Enter your question here' />}
+                render={({ field }) => (
+                  <CustomMarkdownEditor
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder='Enter your question here'
+                    height={250}
+                  />
+                )}
               />
               {showErrors && errors.content && <p className='text-sm text-red-500'>{errors.content.message}</p>}
             </div>

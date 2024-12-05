@@ -4,7 +4,7 @@ using Payment.Domain.Enums;
 namespace Payment.Application.Sagas;
 public class PaymentSagaInstance : SagaStateMachineInstance, ISagaVersion {
     public string CurrentState { get; set; } = default!;
-    public string PaymentStatus { get; set; } = default!;
+    public string PaymentStatus { get; set; } = string.Empty;
 
     //User details
     public Guid UserId { get; set; }

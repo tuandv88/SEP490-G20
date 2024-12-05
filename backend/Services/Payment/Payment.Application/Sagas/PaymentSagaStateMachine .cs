@@ -62,8 +62,9 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
                     context.Saga.ProductType = context.Message.ProductType;
                     context.Saga.UnitPrice = context.Message.UnitPrice;
                     context.Saga.PointsUsed = context.Message.PointsUsed;
-                    context.Saga.Email = context.Message.PayerEmail;
+                    context.Saga.Email = context.Message.PayerEmail??"";
                     context.Saga.Fullname = context.Message.Fullname;
+                    context.Saga.PaymentStatus = "Start";
                     using var scope = _serviceProvider.CreateScope();
                     var logRepository = scope.ServiceProvider.GetRequiredService<ITransactionLogRepository>();
                     await logRepository.AddLog(context.Message.TransactionId, "OrderApprovedEvent", "Created", "Start Saga");
@@ -118,7 +119,9 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
             When(PointsDeductedEvent)
                 .TransitionTo(PaymentCaptured)
                 .Publish(context => new CapturePaymentCommand() {
-                    TransactionId = context.Message.TransactionId
+                    TransactionId = context.Message.TransactionId,
+                    ProductName = context.Saga.ProductName,
+                    ProductDescription = context.Saga.ProductDescription
                 }) // thu tiền user
             ,
             When(PointsNotSufficientEvent)
@@ -156,7 +159,11 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
         During(NotificationSent,
             When(EmailSentEvent)
                 .TransitionTo(Completed)
-                .Finalize()
+                .Finalize(),
+             When(PaymentSuccessEvent) 
+                .Then(context => {
+                    // không làm gì
+                })
         );
 
         // Handle failures during saga steps

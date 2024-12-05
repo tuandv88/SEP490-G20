@@ -24,6 +24,18 @@ export default function QuizAssessment() {
   const { toast } = useToast()
 
   useEffect(() => {
+    if (showAddQuestionForm || showCreateQuizForm) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto'
+    }
+  }, [showAddQuestionForm, showCreateQuizForm])
+
+  useEffect(() => {
     fetchQuizAssessment()
   }, [])
 

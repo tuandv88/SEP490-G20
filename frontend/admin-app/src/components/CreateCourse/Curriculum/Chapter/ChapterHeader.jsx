@@ -49,13 +49,13 @@ export default function ChapterHeader({ chapter, onEdit, onDelete }) {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <span
+        {/* <span
           className={`px-2 py-1 rounded ${
             chapter.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
           }`}
         >
           {chapter.isActive ? 'Active' : 'Inactive'}
-        </span>
+        </span> */}
       </div>
     </div>
   )

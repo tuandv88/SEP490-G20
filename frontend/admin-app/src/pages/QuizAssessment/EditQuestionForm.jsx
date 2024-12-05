@@ -14,6 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useToast } from '@/hooks/use-toast'
 import { Trash2, Plus } from 'lucide-react'
 import { updateQuestionById } from '@/services/api/questionApi'
+import CustomMarkdownEditor from '@/components/custom-markdown-editor'
 
 const QUESTION_TYPES = ['MultipleChoice', 'MultipleSelect', 'TrueFalse']
 const QUESTION_LEVELS = ['EASY', 'MEDIUM', 'HARD', 'EXPERT']
@@ -140,7 +141,7 @@ export function EditQuestionForm({ quizId, question, onSave, onCancel, onQuestio
 
   return (
     <Dialog open={true} onOpenChange={onCancel}>
-      <DialogContent className='max-w-[500px] h-[600px] p-0 overflow-hidden flex flex-col'>
+      <DialogContent className='max-w-[800px] h-[600px] p-0 overflow-hidden flex flex-col'>
         <DialogHeader className='px-6 py-4 border-b'>
           <DialogTitle className='text-xl font-semibold'>Edit Question</DialogTitle>
         </DialogHeader>
@@ -148,11 +149,17 @@ export function EditQuestionForm({ quizId, question, onSave, onCancel, onQuestio
         <ScrollArea className='flex-grow px-6 py-4'>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
             <div className='space-y-2'>
-              <Label htmlFor='content'>Question Content</Label>
               <Controller
                 name='content'
                 control={control}
-                render={({ field }) => <Input id='content' {...field} placeholder='Enter your question here' />}
+                render={({ field }) => (
+                  <CustomMarkdownEditor
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder='Enter your question here'
+                    height={250}
+                  />
+                )}
               />
               {showErrors && errors.content && <p className='text-sm text-red-500'>{errors.content.message}</p>}
             </div>

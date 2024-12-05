@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { ArrowUpDown, MoreHorizontal, Check, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,10 +23,11 @@ import {
 } from '@/components/ui/dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { getAllRoles, updateUserRole } from '@/services/api/userApi'
+import { updateUserRole } from '@/services/api/userApi'
 import { useToast } from '@/hooks/use-toast'
 import { Link } from '@tanstack/react-router'
 import { LockAccountDialog } from './LockAccountDialog'
+import { USER_DETAIL_PATH } from '@/routers/router'
 
 export const columns = [
   {
@@ -86,67 +89,54 @@ export const columns = [
   {
     accessorKey: 'roles',
     header: () => <div className='font-bold text-primary'>Roles</div>,
-    cell: ({ row, onDataChange }) => {
-      const [allRoles, setAllRoles] = useState([])
-      const [loading, setLoading] = useState(false)
-      const [error, setError] = useState(null)
+    cell: ({ row, roles }) => {
       const [isDialogOpen, setIsDialogOpen] = useState(false)
       const [selectedRole, setSelectedRole] = useState(null)
-      const userRoles = row.getValue('roles')
-      const userId = row.original.id
-
-      useEffect(() => {
-        const fetchRoles = async () => {
-          setLoading(true)
-          setError(null)
-          try {
-            const roles = await getAllRoles()
-            setAllRoles(roles)
-          } catch (err) {
-            setError(err.message)
-            toast({
-              title: 'Error',
-              description: 'Failed to load roles. Please try again later.',
-              variant: 'destructive'
-            })
-          } finally {
-            setLoading(false)
-          }
-        }
-
-        fetchRoles()
-      }, [])
+      const queryClient = useQueryClient()
       const { toast } = useToast()
-      const handleRoleChange = async () => {
-        setLoading(true)
-        try {
-          await updateUserRole(userId, selectedRole.id)
+      const user = row.original
+      const userRoles = user.roles // Giả sử roles là một mảng tên vai trò
+
+      // Sử dụng useMutation để cập nhật vai trò người dùng
+      const mutation = useMutation({
+        mutationFn: (newRoleId) => updateUserRole(user.id, newRoleId),
+        onMutate: async (newRoleId) => {
+          await queryClient.cancelQueries(['users'])
+
+          const previousUsers = queryClient.getQueryData(['users'])
+
+          queryClient.setQueryData(['users'], (oldUsers) =>
+            oldUsers.map((u) => (u.id === user.id ? { ...u, roles: [selectedRole.name] } : u))
+          )
+
+          setIsDialogOpen(false)
           toast({
             title: 'Success',
-            description: 'User role updated successfully.'
+            description: 'Update role successfully.',
+            duration: 1500
           })
-          const updatedUser = { ...row.original, roles: [selectedRole.name] }
-          onDataChange(updatedUser)
-        } catch (err) {
+
+          return { previousUsers }
+        },
+        onError: (error, newRoleId, context) => {
+          queryClient.setQueryData(['users'], context.previousUsers)
           toast({
             title: 'Error',
-            description: 'Failed to update user role. Please try again.',
+            description: error.response?.data?.message || error.message || 'Có lỗi xảy ra, vui lòng thử lại.',
+            duration: 1500,
             variant: 'destructive'
           })
-        } finally {
-          setLoading(false)
-          setIsDialogOpen(false)
+        },
+        onSettled: () => {
+          queryClient.invalidateQueries(['users'])
+        }
+      })
+
+      const handleRoleChange = () => {
+        if (selectedRole) {
+          mutation.mutate(selectedRole.id)
         }
       }
-
-      if (loading) {
-        return <div>Loading roles...</div>
-      }
-
-      if (error) {
-        return <div>Error: {error}</div>
-      }
-
       return (
         <>
           <DropdownMenu>
@@ -163,18 +153,23 @@ export const columns = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
               <DropdownMenuRadioGroup
-                value={userRoles[0]} // Assuming only one role per user
+                value={userRoles[0]} // Giả sử mỗi người dùng chỉ có một vai trò
                 onValueChange={(value) => {
-                  const selectedRole = allRoles.find((role) => role.name === value)
-                  if (selectedRole) {
-                    setSelectedRole(selectedRole)
+                  const selected = roles.find((role) => role.name === value)
+                  if (selected) {
+                    setSelectedRole(selected)
                     setIsDialogOpen(true)
                   }
                 }}
               >
-                {allRoles.map((role) => (
-                  <DropdownMenuRadioItem key={role.id} value={role.name}>
+                {roles.map((role) => (
+                  <DropdownMenuRadioItem
+                    key={role.id}
+                    value={role.name}
+                    disabled={userRoles.includes(role.name)} // Disable nếu là vai trò hiện tại
+                  >
                     {role.name}
+                    {userRoles.includes(role.name)} {/* Hiển thị nhãn "Hiện tại" */}
                     {userRoles.includes(role.name) && <Check className='ml-auto h-4 w-4' />}
                   </DropdownMenuRadioItem>
                 ))}
@@ -194,8 +189,8 @@ export const columns = [
                 <Button variant='outline' onClick={() => setIsDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleRoleChange} disabled={loading}>
-                  {loading ? 'Updating...' : 'Confirm'}
+                <Button onClick={handleRoleChange} disabled={mutation.isLoading}>
+                  {mutation.isLoading ? 'Updating...' : 'Confirm'}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -274,11 +269,13 @@ export const columns = [
               <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id)}>Copy User ID</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <Link to={`/user-detail/${user.id}`}>View user details</Link>
+                <Link to={USER_DETAIL_PATH} params={{ userId: user.id }}>
+                  View user details
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className='text-red-600' disabled={true}>
+              {/* <DropdownMenuItem className='text-red-600' disabled={true}>
                 Delete user
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Edit, Trash2, Code, FileQuestion, Info } from 'lucide-react'
 import { getProblemById } from '@/services/api/problemApi'
@@ -24,6 +26,18 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
   const [problem, setProblem] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isUpdateProblemQuiz, setIsUpdateProblemQuiz] = useState(false)
+
+  useEffect(() => {
+    if (isEditing) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto'
+    }
+  }, [isEditing])
 
   useEffect(() => {
     if (question.questionType === 'CodeSnippet' && question.problemId) {
@@ -95,7 +109,11 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
               ) : (
                 <FileQuestion className='h-5 w-5 text-green-500 flex-shrink-0' />
               )}
-              <CardTitle className='text-base sm:text-lg font-semibold line-clamp-2'>{question.content}</CardTitle>
+              <CardTitle className='text-base sm:text-lg font-semibold line-clamp-2'>
+                <div className='prose prose-sm sm:prose-base max-w-none'>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{question.content}</ReactMarkdown>
+                </div>
+              </CardTitle>
             </div>
             <div className='flex items-center space-x-2'>
               <TooltipProvider>

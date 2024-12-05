@@ -65,7 +65,7 @@ export default function ChapterForm({ chapter, onSave, onCancel }) {
               placeholder='Enter chapter description...'
             />
 
-            <FormField
+            {/* <FormField
               control={methods.control}
               name='isActive'
               render={({ field }) => (
@@ -78,7 +78,7 @@ export default function ChapterForm({ chapter, onSave, onCancel }) {
                   </FormControl>
                 </FormItem>
               )}
-            />
+            /> */}
           </div>
           <div className='flex justify-end mt-4 space-x-2'>
             <Button type='button' variant='outline' onClick={() => onCancel()}>

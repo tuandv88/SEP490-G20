@@ -13,7 +13,7 @@ export function LockAccountDialog({ isOpen, onClose, userId, onLockAccount }) {
   const minDateTime = new Date(Date.now() + 30 * 60 * 1000).toISOString().slice(0, 16)
 
   const validateLockoutTime = (time) => {
-    if (!time) return true // Không kiểm tra nếu không có giá trị
+    if (!time) return false
     const selectedTime = new Date(time).getTime()
     const minTime = new Date(minDateTime).getTime()
     return selectedTime >= minTime

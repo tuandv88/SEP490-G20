@@ -282,29 +282,29 @@ export default function useCourseTable() {
   }
 
   const columns = [
-    {
-      id: 'select',
-      header: ({ table }) => (
-        <div className='px-1'>
-          <Checkbox
-            checked={table.getIsAllPageRowsSelected()}
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label='Select all'
-          />
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div className='px-1'>
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label='Select row'
-          />
-        </div>
-      ),
-      enableSorting: false,
-      enableHiding: false
-    },
+    // {
+    //   id: 'select',
+    //   header: ({ table }) => (
+    //     <div className='px-1'>
+    //       <Checkbox
+    //         checked={table.getIsAllPageRowsSelected()}
+    //         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+    //         aria-label='Select all'
+    //       />
+    //     </div>
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className='px-1'>
+    //       <Checkbox
+    //         checked={row.getIsSelected()}
+    //         onCheckedChange={(value) => row.toggleSelected(!!value)}
+    //         aria-label='Select row'
+    //       />
+    //     </div>
+    //   ),
+    //   enableSorting: false,
+    //   enableHiding: false
+    // },
     {
       accessorKey: 'title',
       header: ({ column }) => (
@@ -319,22 +319,22 @@ export default function useCourseTable() {
       ),
       cell: ({ row }) => <div className='pl-4'>{row.getValue('title')}</div>
     },
-    {
-      accessorKey: 'timeEstimation',
-      header: ({ column }) => (
-        <div className='text-right'>
-          <Button
-            variant='ghost'
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className='px-0 font-semibold hover:bg-transparent'
-          >
-            Time Estimate
-            <ArrowUpDown className='w-4 h-4 ml-1' />
-          </Button>
-        </div>
-      ),
-      cell: ({ row }) => <div className='text-right pr-4'>{row.getValue('timeEstimation')} hours</div>
-    },
+    // {
+    //   accessorKey: 'timeEstimation',
+    //   header: ({ column }) => (
+    //     <div className='text-right'>
+    //       <Button
+    //         variant='ghost'
+    //         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+    //         className='px-0 font-semibold hover:bg-transparent'
+    //       >
+    //         Time Estimate
+    //         <ArrowUpDown className='w-4 h-4 ml-1' />
+    //       </Button>
+    //     </div>
+    //   ),
+    //   cell: ({ row }) => <div className='text-right pr-4'>{row.getValue('timeEstimation')} hours</div>
+    // },
     {
       accessorKey: 'scheduledPublishDate',
       header: ({ column }) => (

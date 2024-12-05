@@ -79,7 +79,7 @@ namespace User.Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Point = table.Column<long>(type: "bigint", nullable: false),
-                    ChangeType = table.Column<string>(type: "text", nullable: false, defaultValue: "Deducted"),
+                    ChangeType = table.Column<string>(type: "text", nullable: false, defaultValue: "Earned"),
                     Source = table.Column<string>(type: "text", nullable: false),
                     DateReceived = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

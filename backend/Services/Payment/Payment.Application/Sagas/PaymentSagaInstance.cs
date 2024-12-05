@@ -22,7 +22,7 @@ public class PaymentSagaInstance : SagaStateMachineInstance, ISagaVersion {
     //
     public double Amount { get; set; }
     public string Currency { get; internal set; } = "USD";
-    public string PaymentMethod { get; internal set; } = "PayPal";
+    public string PaymentMethod { get; internal set; } = "Paypal";
 
     // point
     public int PointsUsed { get; set; }

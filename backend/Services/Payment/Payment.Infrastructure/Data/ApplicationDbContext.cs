@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Payment.Application.Data;
+using Payment.Application.Sagas;
 using System.Reflection;
 
 
@@ -12,6 +13,7 @@ namespace Payment.Infrastructure.Data;
     public DbSet<TransactionItem> TransactionItems => Set<TransactionItem>();
 
     public DbSet<TransactionLog> TransactionLogs => Set<TransactionLog>();
+    public DbSet<PaymentSagaInstance> PaymentSagaInstances => Set<PaymentSagaInstance>();
 
     public async new Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class {
         await Set<T>().AddAsync(entity, cancellationToken);
@@ -26,7 +28,7 @@ namespace Payment.Infrastructure.Data;
     protected override void OnModelCreating(ModelBuilder builder) {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(builder);
-
+        builder.Entity<PaymentSagaInstance>().HasKey(p => p.CorrelationId);
         builder.AddInboxStateEntity();
         builder.AddOutboxMessageEntity();
         builder.AddOutboxStateEntity();

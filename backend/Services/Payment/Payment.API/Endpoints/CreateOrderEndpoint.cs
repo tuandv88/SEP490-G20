@@ -1,7 +1,4 @@
-﻿using Carter;
-using Mapster;
-using MediatR;
-using Payment.Application.Integrations.Paypals.Commands.CreateOrder;
+﻿using Payment.Application.Integrations.Paypals.Commands.CreateOrder;
 using Payment.Application.Integrations.Paypals.Dtos;
 
 namespace Payment.API.Endpoints;

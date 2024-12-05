@@ -12,7 +12,7 @@ using Payment.Infrastructure.Data;
 namespace Payment.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241205100447_InitialCreate")]
+    [Migration("20241205202848_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

@@ -10,7 +10,7 @@ using PayPalCheckoutSdk.Orders;
 
 namespace Payment.Application.Integrations.Paypals.Commands.CreateOrder;
 public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextService userContext, ITransactionRepository transactionRepository,
-    ILogger<CreateOrderHandler> logger) : ICommandHandler<CreateOrderCommand, CreateOrderResult> {
+    ITransactionItemRepository transactionItemRepository, ILogger<CreateOrderHandler> logger) : ICommandHandler<CreateOrderCommand, CreateOrderResult> {
     public async Task<CreateOrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken) {
         var order = request.Order;
         if (!Enum.TryParse(order.PaymentMethod, true, out Domain.Enums.PaymentMethod paymentMethod) && paymentMethod != Domain.Enums.PaymentMethod.Paypal) {
@@ -29,11 +29,10 @@ public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextS
 
         double discount = 0;
         if (point > 0) {
-            discount = point / 1000.0; // 1000 points = 1 dollar discount
+            discount = Math.Round(point / 1000.0, 2); // 1000 points = 1 dollar discount, rounded to 2 decimal places
             discount = Math.Min(discount, itemAmount);
-            itemAmount = Math.Max(0, itemAmount - discount);
+            itemAmount = Math.Max(0, Math.Round(itemAmount - discount, 2)); // Ensure the result is also rounded to 2 decimal places
         }
-
 
         purchaseUnits.Add(new PurchaseUnitRequest {
             AmountWithBreakdown = new AmountWithBreakdown {
@@ -76,18 +75,16 @@ public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextS
             DiscountAmount = discount,
             PayerEmail = email,
             Fullname = fullname,
-            Items = new List<TransactionItem> {
-                new TransactionItem {
-                    Id = TransactionItemId.Of(Guid.NewGuid()),
-                    TransactionId = transactionId,
-                    ProductId = order.Item.ProductId,
-                    ProductType = productType,
-                    Quantity = order.Item.Quantity,
-                    UnitPrice = order.Item.UnitPrice
-                }
-            }
         };
-
+        var transactionItem = new TransactionItem {
+            Id = TransactionItemId.Of(Guid.NewGuid()),
+            TransactionId = transactionId,
+            ProductId = order.Item.ProductId,
+            ProductType = productType,
+            Quantity = order.Item.Quantity,
+            UnitPrice = order.Item.UnitPrice
+        };
+        await transactionItemRepository.AddAsync(transactionItem);
         await transactionRepository.AddAsync(transaction);
         await transactionRepository.SaveChangesAsync(cancellationToken);
 

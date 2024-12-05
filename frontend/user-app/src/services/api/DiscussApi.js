@@ -493,7 +493,6 @@ export const DiscussApi = {
       throw error;  // Ném lỗi ra ngoài để xử lý ở nơi gọi hàm
     }
   }
-
 };
 
 // API thứ hai: Lấy thông tin chi tiết của UserIds

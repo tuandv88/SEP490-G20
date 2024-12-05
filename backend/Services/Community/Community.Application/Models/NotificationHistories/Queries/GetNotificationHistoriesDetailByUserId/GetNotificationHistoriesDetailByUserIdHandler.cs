@@ -44,8 +44,18 @@ public class GetNotificationHistoriesDetailByUserIdHandler : IQueryHandler<GetNo
             throw new NotFoundException("Not Found NotifiactionHistories.");
         }
 
+
+        Console.WriteLine("----------1 1 1--------");
+
         // Lấy thông tin NotificationType cho tất cả các NotificationHistory (tạo dictionary để tối ưu)
-        var notificationTypeIds = allData.Select(n => n.NotificationTypeId.Value).Distinct();
+        var notificationTypeIds = allData.Select(n => n.NotificationTypeId.Value);
+
+        Console.WriteLine(notificationTypeIds);
+        foreach (var notificationTypeId in notificationTypeIds)
+        {
+            Console.WriteLine(notificationTypeId);
+            Console.WriteLine("---------------------");
+        }
         var notificationTypes = await _notificationTypeRepository.GetByIdsAsync(notificationTypeIds.ToList());
 
         if (notificationTypes == null || !notificationTypes.Any())

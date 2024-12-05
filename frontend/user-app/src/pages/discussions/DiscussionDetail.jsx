@@ -25,6 +25,10 @@ import MarkdownEditor from "react-markdown-editor-lite";  // Thư viện Markdow
 import "react-markdown-editor-lite/lib/index.css";  // Style của editor
 import Alert from '@mui/material/Alert';
 import CheckIcon from '@mui/icons-material/Check';
+import { BookmarkAdd, BookmarkRemove } from "@mui/icons-material";
+import { FaRegBookmark } from "react-icons/fa";
+
+import { NotificationApi } from "@/services/api/notificationApi";
 
 function DiscussionDetail() {
   const { id } = useParams();
@@ -32,10 +36,12 @@ function DiscussionDetail() {
   const [discussion, setDiscussion] = useState(null);
   const [currentView, setCurrentView] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadingNotification, setLoadingNotification] = useState(false);
   const [error, setError] = useState(null);
   const [transitioning, setTransitioning] = useState(false); // Trạng thái chuyển tiếp
   const htmlToReactParser = new ReactHtmlParser.Parser();
   const [currentUser, setCurrentUser] = useState(null);
+  const [fullNameCurrentUser, setFullNameCurrentUser] = useState(null);
   const [isOwnerDiscussion, setOwnerDiscussion] = useState(null);
   const [enableNotification, setEnableNotification] = useState(false);
   const [tooltipContent, setTooltipContent] = useState('Share');
@@ -44,6 +50,8 @@ function DiscussionDetail() {
   const [loadingVoteComment, setloadingVoteComment] = useState(false);
 
   const [categories, setCategories] = useState([]);
+
+  const [userNotificationSettings, setUserNotificationSettings] = useState('d725fa00-46ef-48e3-815e-d89e08ed7bbd');
 
   // Khai báo state cần thiết
   const [newPost, setNewPost] = useState({
@@ -97,6 +105,7 @@ function DiscussionDetail() {
 
         if (userTmp) {
           const currentUserId = userTmp.profile.sub;
+          setFullNameCurrentUser(userTmp.profile.firstName + ' ' + userTmp.profile.lastName);
           if (currentUserId === data.userId) {
             setOwnerDiscussion(true);
           } else {
@@ -198,15 +207,21 @@ function DiscussionDetail() {
   // Hàm Toggle Notification
   const handleToggleNotification = async () => {
     try {
-      setLoading(true); // Bật loading khi gọi API
+      setLoadingNotification(true); // Bật loading khi gọi API
       // Gọi API để cập nhật trạng thái thông báo
       await DiscussApi.updateStatusNotificationDiscussionById({ discussionId: id });
       // Nếu bạn vẫn muốn reload trang, có thể dùng navigate(0)
-      navigate(0);
+      //navigate(0);
+
+      // Cập nhật giá trị trạng thái trực tiếp mà không cần reload trang
+      setDiscussion(prevDiscussion => ({
+        ...prevDiscussion,
+        enableNotification: !prevDiscussion.enableNotification,
+      }));
     } catch (error) {
       console.error("Error updating status notification discussion:", error.message);
     } finally {
-      setLoading(false); // Tắt trạng thái loading
+      setLoadingNotification(false); // Tắt trạng thái loading
     }
   };
 
@@ -240,6 +255,29 @@ function DiscussionDetail() {
     }
   };
 
+  // Phương thức nhận vào tên loại thông báo và trả về id của loại đó
+  const getNotificationTypeIdByName = async (notificationName) => {
+    try {
+      // Gọi API để lấy danh sách các loại thông báo
+      const { pagination, updatedNotificationTypes } = await NotificationApi.getNotificationTypes({ pageIndex: 1, pageSize: 10 });
+
+      //console.log(updatedNotificationTypes);
+
+      // Tìm loại thông báo có tên trùng với notificationName
+      const notificationType = updatedNotificationTypes.find(type => type.name === notificationName);
+
+      // Nếu tìm thấy loại thông báo, trả về id của nó
+      if (notificationType) {
+        return notificationType.id;
+      } else {
+        throw new Error(`Notification type with name '${notificationName}' not found.`);
+      }
+    } catch (error) {
+      console.error('Error fetching notification type by name:', error);
+      throw error;
+    }
+  };
+
   const handleVote = async (voteType) => {
     try {
 
@@ -257,6 +295,26 @@ function DiscussionDetail() {
       if (response) {
         // Cập nhật lại số lượng vote sau khi thực hiện hành động
         setVoteCount(prevCount => voteType === 'Like' ? prevCount + 1 : prevCount - 1);
+
+        const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote');
+        console.log(discussion);
+        // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+        const notificationData = {
+          userId: discussion.userId, // Lấy từ context hoặc props nếu cần
+          notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+          userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+          message: `
+                  <div class="text-sm text-muted-foreground mb-2 break-words">
+                  <p> <strong>${fullNameCurrentUser}</strong> Voted your post.</p>
+                  <p><a href="/discussion/${discussion.id}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
+                  </div> `,
+          sentVia: 'Web', // Hoặc 'Email' nếu cần
+          status: 'Sent', // Trạng thái gửi
+        };
+
+        // Gọi API để tạo lịch sử thông báo
+        const response = await NotificationApi.createNotificationHistory(notificationData);
+
       }
     } catch (error) {
       console.log(error);
@@ -322,8 +380,6 @@ function DiscussionDetail() {
 
         updateDiscussionDto.imageDto = discussionImageData;
       }
-
-      console.log(updateDiscussionDto, 1111123);
 
       // Gọi API cập nhật bài viết
       const response = await DiscussApi.updateDiscuss(updateDiscussionDto);
@@ -449,7 +505,7 @@ function DiscussionDetail() {
                 <button
                   className="icon-button-on"
                   onClick={handleToggleNotification}
-                  disabled={loading} // Disable nút khi đang loading
+                  disabled={loadingNotification} // Disable nút khi đang loading
                 >
                   <FontAwesomeIcon icon={faBell} />
                 </button>
@@ -457,7 +513,7 @@ function DiscussionDetail() {
                 <button
                   className="icon-button-off"
                   onClick={handleToggleNotification}
-                  disabled={loading} // Disable nút khi đang loading
+                  disabled={loadingNotification} // Disable nút khi đang loading
                 >
                   <FontAwesomeIcon icon={faBellSlash} />
                 </button>
@@ -670,7 +726,7 @@ function DiscussionDetail() {
 
         {/* Comments List Section */}
         <div className="comment-section" ref={commentSectionRef} >
-          <CommentList discussionId={id} />
+          <CommentList discussionId={id} userIdDiscussion={discussion.userId} />
         </div>
       </div>
       <style jsx={true}>{`

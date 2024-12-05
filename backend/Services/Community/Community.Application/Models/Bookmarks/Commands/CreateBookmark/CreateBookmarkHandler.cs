@@ -1,4 +1,5 @@
-﻿using Community.Application.Models.Bookmarks.Commands.CreateBookmark;
+﻿using Community.Application.Interfaces;
+using Community.Application.Models.Bookmarks.Commands.CreateBookmark;
 using Community.Application.Models.Bookmarks.Dtos;
 using Community.Domain.Models;
 using Community.Domain.ValueObjects;
@@ -8,22 +9,42 @@ namespace Community.Application.Models.Bookmarks.Commands.CreateBookmark;
 public class CreateBookmarkHandler : ICommandHandler<CreateBookmarkCommand, CreateBookmarkResult>
 {
     private readonly IBookmarkRepository _bookmarkRepository;
+    private readonly IUserContextService _userContextService;
 
-    public CreateBookmarkHandler(IBookmarkRepository bookmarkRepository)
+    public CreateBookmarkHandler(IBookmarkRepository bookmarkRepository, IUserContextService userContextService)
     {
         _bookmarkRepository = bookmarkRepository;
+        _userContextService = userContextService;
     }
 
     public async Task<CreateBookmarkResult> Handle(CreateBookmarkCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            var bookmark = await CreateNewBookmark(request.CreateBookmarkDto);
+            // Lấy UserId từ UserContextService
+            var currentUserId = _userContextService.User.Id;
 
-            await _bookmarkRepository.AddAsync(bookmark);
+            if (currentUserId == null)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            var userId = UserId.Of(currentUserId);
+
+
+            var bookmark = await _bookmarkRepository.GetByIdDiscussionAndUserIdAsync(request.CreateBookmarkDto.DiscussionId, userId.Value);
+
+            if( bookmark != null ) 
+            {
+                return new CreateBookmarkResult(bookmark.Id.Value, false);
+            }
+
+            var bookmarkNew = await CreateNewBookmark(request.CreateBookmarkDto, userId);
+
+            await _bookmarkRepository.AddAsync(bookmarkNew);
             await _bookmarkRepository.SaveChangesAsync(cancellationToken);
 
-            return new CreateBookmarkResult(bookmark.Id.Value, true);
+            return new CreateBookmarkResult(bookmarkNew.Id.Value, true);
         }
         catch (Exception ex)
         {
@@ -31,28 +52,8 @@ public class CreateBookmarkHandler : ICommandHandler<CreateBookmarkCommand, Crea
         }
     }
 
-    private async Task<Bookmark> CreateNewBookmark(CreateBookmarkDto createBookmarkDto)
+    private async Task<Bookmark> CreateNewBookmark(CreateBookmarkDto createBookmarkDto, UserId userId)
     {
-        // Dữ liệu test UserId
-        var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
-
-        if (!Guid.TryParse(userContextTest, out var currentUserIdTest))
-        {
-            throw new UnauthorizedAccessException("Invalid user ID.");
-        }
-
-        var userId = UserId.Of(currentUserIdTest);
-
-        // Lấy UserId từ UserContextService
-        //var currentUserId = _userContextService.User.Id;
-
-        //if (currentUserId == null)
-        //{
-        //    throw new UnauthorizedAccessException("User is not authenticated.");
-        //}
-
-        //var userId = UserId.Of(currentUserId.Value);
-
         var discussionId = DiscussionId.Of(createBookmarkDto.DiscussionId);
 
         return Bookmark.Create(

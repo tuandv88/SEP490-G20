@@ -22,6 +22,10 @@ public class CreateCommentHandler : ICommandHandler<CreateCommentCommand, Create
             var comment = await CreateNewComment(request.CreateCommentDto);
 
             await _commentRepository.AddAsync(comment);
+
+
+
+
             await _commentRepository.SaveChangesAsync(cancellationToken);
 
             return new CreateCommentResult(comment.Id.Value, true);

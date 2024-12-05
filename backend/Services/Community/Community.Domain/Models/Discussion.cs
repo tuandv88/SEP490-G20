@@ -20,7 +20,7 @@ namespace Community.Domain.Models
         public DateTime DateUpdated { get; set; }                // Thời gian cập nhật gần nhất
         public bool Closed { get; set; }                         // Đánh dấu nếu thảo luận đã đóng
         public bool Pinned { get; set; }                         // Đánh dấu nếu thảo luận được ghim
-        public bool NotificationsEnabled { get; set; } = true;  // Mặc định là tắt thông báo
+        public bool NotificationsEnabled { get; set; } = true;   // Mặc định là tắt thông báo
 
         public FlagId? FlagId { get; set; } = null;               // 1 - 1
 
@@ -45,7 +45,6 @@ namespace Community.Domain.Models
                 NotificationsEnabled = true // Gán giá trị
             };
 
-            //discussion.AddDomainEvent(new DiscussionCreatedEvent(discussion));
             discussion.AddDomainEvent(new DiscussionChangedEvent(discussion));
             return discussion;
         }
@@ -67,7 +66,6 @@ namespace Community.Domain.Models
             ImageUrl = urlImage;
 
             // Thêm sự kiện cập nhật nếu cần thiết
-            // AddDomainEvent(new DiscussionUpdatedEvent(this));
             AddDomainEvent(new DiscussionChangedEvent(this));
         }
 

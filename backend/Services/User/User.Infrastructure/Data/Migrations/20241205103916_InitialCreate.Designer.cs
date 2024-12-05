@@ -12,7 +12,7 @@ using User.Infrastructure.Data;
 namespace User.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241205100836_InitialCreate")]
+    [Migration("20241205103916_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -290,7 +290,7 @@ namespace User.Infrastructure.Data.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
-                        .HasDefaultValue("Deducted");
+                        .HasDefaultValue("Earned");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");

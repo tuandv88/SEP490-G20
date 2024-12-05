@@ -44,7 +44,7 @@ export default function BasicInfoStep({ form, form2 }) {
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-10'>
         <div className='border-2 border-dashed border-gray-300 rounded-md p-4'>
-          <h3 className='mb-6 text-xl font-semibold'>Step 1: Create Question Content</h3>
+          <h3 className='mb-6 text-xl font-semibold'>Create Question Content</h3>
 
           <MarkdownFormField
             control={form2.control}
@@ -128,7 +128,7 @@ export default function BasicInfoStep({ form, form2 }) {
           </div>
         </div>
         <div className='border-2 border-dashed border-gray-300 rounded-md p-4'>
-          <h3 className='mb-6 text-xl font-semibold'>Step 2: Create Problem Code</h3>
+          <h3 className='mb-6 text-xl font-semibold'>Create Problem Code</h3>
 
           <div className='mb-6'>
             <FormField

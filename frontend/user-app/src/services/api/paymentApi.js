@@ -10,7 +10,8 @@ export const PaymentAPI = {
           Authorization: `Bearer ${Cookies.get('authToken')}`
         }
       })
-      return response.data
+      console.log(response)
+      return response.json()
     } catch (error) {
       console.error('Error creating order:', error)
       throw error

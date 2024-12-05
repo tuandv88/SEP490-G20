@@ -11,7 +11,7 @@ import { ToastAction } from '@/components/ui/toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { questionSchema, problemSchema } from './basic-info-step'
 
-const CreateProblemQuiz = ({ onClose, quizId }) => {
+const CreateProblemQuiz = ({ onClose, quizId, isUpdate, setIsUpdate }) => {
   console.log(quizId)
   const [activeTab, setActiveTab] = useState('basic')
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
@@ -76,6 +76,7 @@ const CreateProblemQuiz = ({ onClose, quizId }) => {
     try {
       setIsLoadingSubmit(true)
       const response = await createProblemQuestion(quizId, problemData)   
+      setIsUpdate(!isUpdate)
       onClose()
       toast({
         variant: 'success',

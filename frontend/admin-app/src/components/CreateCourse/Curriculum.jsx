@@ -19,6 +19,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
   const [isAddLectureOpen, setIsAddLectureOpen] = useState(false)
   const [addingLectureToChapter, setAddingLectureToChapter] = useState(null)
   const [editingLecture, setEditingLecture] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   // Thêm useEffect để khôi phục trạng thái cuộn
   useEffect(() => {
@@ -128,6 +129,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         ...newChapter
       }
     }
+    setIsLoading(true)
     try {
       const response = await createChapter(chapterCreate, courseId)
       toast({
@@ -139,6 +141,8 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
       // Optionally, navigate to another page or show a success message
     } catch (error) {
       // Optionally, show an error message to the user
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -179,6 +183,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         ...newLecture
       }
     }
+    setIsLoading(true)
     try {
       const response = await createLecture(chapterId, lectureCreate)
       toast({
@@ -198,6 +203,8 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         duration: 1500
       })
       // Optionally, show an error message to the user
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -239,6 +246,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         isOpen={isAddLectureOpen}
         onClose={() => setIsAddLectureOpen(false)}
         onSave={(lecture) => addLecture(addingLectureToChapter, lecture)}
+        isLoading={isLoading}
       />
       {editingChapter && (
         <EditChapterDialog
@@ -269,6 +277,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
           <ChapterForm
             onSave={(newChapter) => addChapter(newChapter, courseId)}
             onCancel={() => setIsAddChapterOpen(false)}
+            isLoading={isLoading}
           />
         </DialogContent>
       </Dialog>

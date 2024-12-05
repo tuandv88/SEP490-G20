@@ -72,6 +72,7 @@ const PayPalCheckout = () => {
     : null
 
   const handleCreateOrder = async () => {
+    console.log("IN")
     try {
       const orderData = {
         order: {
@@ -87,9 +88,10 @@ const PayPalCheckout = () => {
       }
 
       const response = await PaymentAPI.createOrder(orderData)
-      setOrderId(response.id)
+      setOrderId(response.data.orderId)
       setPaymentStatus('Order created! Awaiting payment...')
-      return response.id
+      console.log(response.data.orderId)
+      return response.data.orderId
     } catch (error) {
       console.error('Error creating order:', error)
       setPaymentStatus('Error creating order. Please try again.')

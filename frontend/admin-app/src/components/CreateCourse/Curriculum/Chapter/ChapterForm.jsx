@@ -15,7 +15,9 @@ const formSchema = z.object({
   isActive: z.boolean()
 })
 
-export default function ChapterForm({ chapter, onSave, onCancel }) {
+export default function ChapterForm({ chapter, onSave, onCancel, isLoading}) {
+  
+
   const methods = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: chapter || {
@@ -84,7 +86,9 @@ export default function ChapterForm({ chapter, onSave, onCancel }) {
             <Button type='button' variant='outline' onClick={() => onCancel()}>
               Cancel
             </Button>
-            <Button type='submit'>Save Chapter</Button>
+            <Button type='submit' disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save Chapter'}
+            </Button>
           </div>
         </form>
       </Form>

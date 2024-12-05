@@ -12,7 +12,7 @@ import FormTabs from './FormTabs'
 import BottomTabs from './BottomTabs'
 import { updateProblemQuestion } from '@/services/api/quizApi'
 
-const UpdateProblemQuiz = ({ onClose, quizId, question, problem }) => {
+const UpdateProblemQuiz = ({ onClose, quizId, question, problem, setIsUpdate, isUpdate }) => {
   const { toast } = useToast()
 
   // UI States
@@ -145,7 +145,9 @@ const UpdateProblemQuiz = ({ onClose, quizId, question, problem }) => {
         description: 'Question updated successfully'
       })
 
+      setIsUpdate(!isUpdate)
       onClose()
+      
     } catch (error) {
       console.error('Error updating question:', error)
       toast({

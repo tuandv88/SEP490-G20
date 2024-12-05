@@ -106,6 +106,9 @@ export default function useCourseTable() {
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [newStatus, setNewStatus] = useState('')
 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [courseToDelete, setCourseToDelete] = useState(null)
+
   const fetchCourses = useCallback(async () => {
     setIsLoading(true)
     try {
@@ -156,20 +159,21 @@ export default function useCourseTable() {
       return false
     }
   }
-  const handleDeleteCourse = async (courseId) => {
+  const handleDeleteCourse = async () => {
     try {
-      await deleteCourse(courseId)
+      await deleteCourse(courseToDelete)
       toast({
         title: 'Course deleted',
         description: 'The course has been deleted successfully.',
         variant: 'default',
         duration: 1500
       })
+      setIsDeleteDialogOpen(false)
       await fetchCourses()
     } catch (error) {
       console.error('Error deleting course:', error)
       toast({
-        title: 'Error',
+        title: 'Error', 
         description: 'An error occurred while deleting the course.',
         variant: 'destructive',
         duration: 1500
@@ -279,6 +283,11 @@ export default function useCourseTable() {
         duration: 1500
       })
     }
+  }
+
+  const handleShowDeleteDialog = (courseId) => {
+    setCourseToDelete(courseId)
+    setIsDeleteDialogOpen(true)
   }
 
   const columns = [
@@ -530,7 +539,7 @@ export default function useCourseTable() {
                       <Edit className='mr-2 h-4 w-4' />
                       <span>Edit Basic course</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDeleteCourse(course.id)}>
+                    <DropdownMenuItem onClick={() => handleShowDeleteDialog(course.id)}>
                       <Trash className='mr-2 h-4 w-4' />
                       <span>Delete course</span>
                     </DropdownMenuItem>
@@ -590,6 +599,10 @@ export default function useCourseTable() {
     selectedCourse,
     newStatus,
     columns,
-    handleLevelChange
+    handleLevelChange,
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
+    handleShowDeleteDialog,
+    handleDeleteCourse
   }
 }

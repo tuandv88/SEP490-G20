@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
   flexRender,
@@ -23,9 +23,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton'
 import { PROBLEM_TABLE_PATH, CREATE_PROBLEM_PATH } from '@/routers/router'
 import { columns } from './columns'
-import { getProblemAg, getProblems } from '@/services/api/problemApi'
+import { deleteProblemAg, getProblemAg, getProblems } from '@/services/api/problemApi'
+import DeleteConfirmDialog from '@/components/DeleteConfirmDialog'
+import { useToast } from '@/hooks/use-toast'
 
 export default function ProblemsTable() {
+  const { toast } = useToast()
   const search = useSearch({ from: PROBLEM_TABLE_PATH })
   const navigate = useNavigate()
   const pageFromUrl = React.useMemo(() => {
@@ -50,6 +53,10 @@ export default function ProblemsTable() {
     pageSize: 3
   })
 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [problemToDelete, setProblemToDelete] = useState(null)
+  const [isUpdate, setIsUpdate] = useState(false)
+
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -67,7 +74,7 @@ export default function ProblemsTable() {
     }
 
     fetchData()
-  }, [pagination.pageIndex, pagination.pageSize])
+  }, [pagination.pageIndex, pagination.pageSize, isUpdate])
 
   React.useEffect(() => {
     navigate(
@@ -79,10 +86,37 @@ export default function ProblemsTable() {
       },
       { replace: true }
     )
-  }, [pagination.pageIndex, navigate])
+  }, [pagination.pageIndex, navigate, isUpdate])
 
   const handleAddNewProblem = () => {
     navigate({ to: CREATE_PROBLEM_PATH })
+  }
+
+  const handleShowDeleteDialog = (problemId) => {
+    setProblemToDelete(problemId)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleDeleteProblem = async () => {
+    try {
+      await deleteProblemAg(problemToDelete)
+      toast({
+        title: 'Problem deleted',
+        description: 'The problem has been deleted successfully.',
+        variant: 'default',
+        duration: 1500
+      })
+      setIsDeleteDialogOpen(false)
+      setIsUpdate(!isUpdate)
+    } catch (error) {
+      console.error('Error deleting problem:', error)
+      toast({
+        title: 'Error',
+        description: 'An error occurred while deleting the problem.',
+        variant: 'destructive',
+        duration: 1500
+      })
+    }
   }
 
   const table = useReactTable({
@@ -105,7 +139,10 @@ export default function ProblemsTable() {
       rowSelection,
       pagination
     },
-    manualPagination: true
+    manualPagination: true,
+    meta: {
+      handleShowDeleteDialog
+    }
   })
 
   const isFiltered = table.getState().columnFilters.length > 0
@@ -272,6 +309,13 @@ export default function ProblemsTable() {
           </Button>
         </div>
       </div>
+      <DeleteConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDeleteProblem}
+        title="Delete Problem"
+        description="Are you sure you want to delete this problem? This action cannot be undone."
+      />
     </div>
   )
 }

@@ -21,14 +21,14 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { UpdateProblemQuizModal } from './UpdateProblemQuizModal'
-export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizId }) {
+export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizId, isUpdate, setIsUpdate }) {
   const [isEditing, setIsEditing] = useState(false)
   const [problem, setProblem] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isUpdateProblemQuiz, setIsUpdateProblemQuiz] = useState(false)
 
   useEffect(() => {
-    if (isEditing) {
+    if (isEditing || isUpdateProblemQuiz) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'auto'
@@ -37,7 +37,7 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
     return () => {
       document.body.style.overflow = 'auto'
     }
-  }, [isEditing])
+  }, [isEditing, isUpdateProblemQuiz])
 
   useEffect(() => {
     if (question.questionType === 'CodeSnippet' && question.problemId) {
@@ -171,10 +171,10 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
                           <Edit className='h-3 w-3 mr-1' />
                           Edit
                         </Button>
-                        <Button variant='ghost' size='sm' onClick={handleProblemDelete} className='h-8'>
+                        {/* <Button variant='ghost' size='sm' onClick={handleProblemDelete} className='h-8'>
                           <Trash2 className='h-3 w-3 mr-1' />
                           Delete
-                        </Button>
+                        </Button> */}
                       </div>
                     </CardHeader>
                   </Card>
@@ -230,6 +230,8 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
           quizId={quizId}
           question={question}
           problem={problem}
+          setIsUpdate={setIsUpdate}
+          isUpdate={isUpdate}
         />
       )}
     </>

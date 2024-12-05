@@ -29,9 +29,10 @@ export default function QuizManagement() {
   const navigate = useNavigate()
   const { toast } = useToast()
   const [isFullScreenPopupOpen, setIsFullScreenPopupOpen] = useState(false)
+  const [showCreateQuizForm, setShowCreateQuizForm] = useState(false)
 
   useEffect(() => {
-    if (showAddQuestionForm || showCreateQuizForm) {
+    if (showAddQuestionForm || showCreateQuizForm || isFullScreenPopupOpen) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'auto'
@@ -40,7 +41,7 @@ export default function QuizManagement() {
     return () => {
       document.body.style.overflow = 'auto'
     }
-  }, [showAddQuestionForm, showCreateQuizForm])
+  }, [showAddQuestionForm, showCreateQuizForm, isFullScreenPopupOpen])
 
   useEffect(() => {
     const fetchQuizDetail = async () => {
@@ -223,17 +224,17 @@ export default function QuizManagement() {
         {/* <Button className='mt-4 w-full' onClick={() => setShowAddQuestionForm(true)}>
           Add Question Normal
         </Button> */}
-        <Button className='mt-4 w-full' onClick={() => setIsFullScreenPopupOpen(true)}>
-          Create Problem Quiz
-        </Button>
+        <div className='flex items-center gap-4 justify-start'>
+          <Button onClick={() => setShowAddQuestionForm(true)}>
+            <Plus className='h-4 w-4 mr-2' />
+            Add Question
+          </Button>
+          <Button onClick={() => setIsFullScreenPopupOpen(true)}>Create Problem Quiz</Button>
+        </div>
 
         <Card className='md:col-span-2'>
           <CardHeader className='flex flex-row items-center justify-between'>
             <CardTitle>Questions</CardTitle>
-            <Button onClick={() => setShowAddQuestionForm(true)}>
-              <Plus className='h-4 w-4 mr-2' />
-              Add Question
-            </Button>
           </CardHeader>
           <CardContent>
             <div className='space-y-4'>
@@ -245,7 +246,9 @@ export default function QuizManagement() {
                     question={question}
                     onEdit={handleEditQuestion}
                     onDelete={handleDeleteQuestion}
-                    onToggleActive={handleToggleActive}                   
+                    onToggleActive={handleToggleActive}
+                    setIsUpdate={setIsUpdate}
+                    isUpdate={isUpdate}
                   />
                 ))
               ) : (
@@ -281,9 +284,10 @@ export default function QuizManagement() {
           isOpen={isFullScreenPopupOpen}
           onClose={() => setIsFullScreenPopupOpen(false)}
           quizId={quizId}
+          isUpdate={isUpdate}
+          setIsUpdate={setIsUpdate}
         />
       )}
-      
     </div>
   )
 }

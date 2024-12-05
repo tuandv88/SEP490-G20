@@ -2,7 +2,6 @@ import React from 'react';
 import TransactionStatus from './TransactionStatus';
 import { Coins } from 'lucide-react';
 
-
 const TransactionTable = ({ transactions }) => {
   return (
     <div className="overflow-x-auto">
@@ -17,28 +16,30 @@ const TransactionTable = ({ transactions }) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {transactions.map((transaction) => (
-            <tr key={transaction.id} className="hover:bg-gray-50">
+          {transactions.map((transaction, index) => (
+            <tr key={index} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{transaction.courseName}</div>
-                <div className="text-sm text-gray-500">ID: {transaction.id}</div>
+                <div className="text-sm font-medium text-gray-900">
+                  {transaction.items[0]?.productName || 'Unnamed Course'}
+                </div>
+                <div className="text-sm text-gray-500">ID: {transaction.items[0]?.productId}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {new Date(transaction.date).toLocaleDateString()}
+                {new Date(transaction.dateTime).toLocaleDateString()}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="space-y-1">
                   <div className="text-sm text-gray-900">
-                    Original: ${transaction.amount.toFixed(2)}
+                    Original: ${transaction.items[0]?.unitPrice.toFixed(2)}
                   </div>
                   {transaction.pointsUsed > 0 && (
                     <div className="flex items-center gap-1 text-sm text-indigo-600">
                       <Coins className="w-4 h-4" />
-                      <span>-${transaction.pointsValue.toFixed(2)} ({transaction.pointsUsed} points)</span>
+                      <span>-${transaction.discountAmount.toFixed(2)} ({transaction.pointsUsed} points)</span>
                     </div>
                   )}
                   <div className="text-sm font-medium text-green-600">
-                    Final: ${transaction.finalAmount.toFixed(2)}
+                    Final: ${transaction.grossAmount.toFixed(2)}
                   </div>
                 </div>
               </td>

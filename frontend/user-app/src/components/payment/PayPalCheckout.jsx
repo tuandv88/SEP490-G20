@@ -5,13 +5,14 @@ import OrderItem from './OrderItem'
 import PaymentMethod from './PaymentMethod'
 import OrderSummary from './OrderSummary'
 import PaymentStatus from './PaymentStatus'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { LearningAPI } from '@/services/api/learningApi'
 import { Switch } from '@mui/material'
 import { UserAPI } from '@/services/api/userApi'
 import { PaymentAPI } from '@/services/api/paymentApi'
 import { Loading } from '../ui/overlay'
 import Cookies from 'js-cookie'
+import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 
 const PayPalCheckout = () => {
   const { id } = useParams()
@@ -23,6 +24,7 @@ const PayPalCheckout = () => {
   const [userPoint, setUserPoint] = useState(0)
   const [orderSummaryState, setOrderSummaryState] = useState(null)
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
   const API_BASE_URL = import.meta.env.VITE_API_URL
 
@@ -80,6 +82,8 @@ const PayPalCheckout = () => {
   if (loading) {
     return <Loading />
   }
+   
+  
 
   const handleCreateOrder = async () => {
     const response = await fetch(`${API_BASE_URL}/payment-service/checkout/orders`, {
@@ -109,6 +113,7 @@ const PayPalCheckout = () => {
       const result = await capturePayPalOrder(data.orderID)
       console.log('Capture result', result)
       setPaymentStatus('Payment successful! Thank you for your purchase.')
+      navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', id))
     } catch (error) {
       console.error('Error capturing order:', error)
       setPaymentStatus('Error processing payment. Please try again.')

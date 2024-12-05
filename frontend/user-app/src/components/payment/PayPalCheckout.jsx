@@ -16,6 +16,7 @@ const PayPalCheckout = () => {
   const [paymentStatus, setPaymentStatus] = useState(null)
   const [paymentMethod, setPaymentMethod] = useState('paypal')
   const [courseDetail, setCourseDetail] = useState(null)
+  const [usePoints, setUsePoints] = useState(false)
   const [userPoint, setUserPoint] = useState(0)
 
   useEffect(() => {
@@ -86,6 +87,25 @@ const PayPalCheckout = () => {
     setPaymentStatus('Payment was canceled.')
   }
 
+  const handleTogglePoints = () => {
+    setUsePoints(!usePoints)
+    if (!usePoints) {
+      const pointValue = userPoint * (1/3)
+      const newTotal = Math.max(0, courseDetail.price - pointValue)
+      setOrderSummary(prev => ({
+        ...prev,
+        discountRate: pointValue,
+        total: newTotal
+      }))
+    } else {
+      setOrderSummary(prev => ({
+        ...prev,
+        discountRate: 0,
+        total: courseDetail.price
+      }))
+    }
+  }
+
   return (
     <div className='max-w-5xl mx-auto px-4'>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
@@ -101,16 +121,18 @@ const PayPalCheckout = () => {
                 <div className='flex items-center space-x-2'>
                   <span className='text-sm font-medium text-gray-700'>Use Points</span>
                   <span className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800'>
-                    10000 points available
+                    {userPoint} points available
                   </span>
                 </div>
-                <p className='text-sm text-gray-500'>Value: 33333</p>
+                <p className='text-sm text-gray-500'>
+                  Value: ${(userPoint * (1/3)).toFixed(2)}
+                </p>
               </div>
-              {/* <Switch
+              <Switch
                 checked={usePoints}
-                // onChange={setUsePoints}
+                onChange={handleTogglePoints}
                 className='relative inline-flex h-6 w-11 items-center rounded-full'
-              /> */}
+              />
             </div>
           </div>
 

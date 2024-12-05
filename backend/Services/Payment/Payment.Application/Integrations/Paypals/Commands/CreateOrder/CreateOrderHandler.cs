@@ -78,6 +78,7 @@ public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextS
             Fullname = fullname,
             Items = new List<TransactionItem> {
                 new TransactionItem {
+                    Id = TransactionItemId.Of(Guid.NewGuid()),
                     TransactionId = transactionId,
                     ProductId = order.Item.ProductId,
                     ProductType = productType,

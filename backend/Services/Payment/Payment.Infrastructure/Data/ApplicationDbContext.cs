@@ -1,7 +1,5 @@
 ﻿using MassTransit;
-using Microsoft.EntityFrameworkCore;
 using Payment.Application.Data;
-using Payment.Domain.Models;
 using System.Reflection;
 
 

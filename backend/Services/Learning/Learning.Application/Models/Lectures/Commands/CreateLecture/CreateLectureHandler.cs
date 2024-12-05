@@ -3,7 +3,7 @@
 namespace Learning.Application.Models.Lectures.Commands.CreateLecture;
 public class CreateLectureHandler(IChapterRepository chapterRepository, ILectureRepository lectureRepository) : ICommandHandler<CreateLectureCommand, CreateLectureResult> {
     public async Task<CreateLectureResult> Handle(CreateLectureCommand request, CancellationToken cancellationToken) {
-        var chapter = await chapterRepository.GetByIdAsync(request.ChapterId);
+        var chapter = await chapterRepository.GetByIdDetailAsync(request.ChapterId);
         if (chapter == null) {
             throw new NotFoundException("Chapter", request.ChapterId);
         }

@@ -18,12 +18,12 @@ builder.Services.AddReverseProxy()
           });
       });
 
-builder.Services.AddRateLimiter(rateLimiterOptions => {
-    rateLimiterOptions.AddFixedWindowLimiter("fixed", options => {
-        options.Window = TimeSpan.FromSeconds(1);
-        options.PermitLimit = 5;
-    });
-});
+//builder.Services.AddRateLimiter(rateLimiterOptions => {
+//    rateLimiterOptions.AddFixedWindowLimiter("fixed", options => {
+//        options.Window = TimeSpan.FromSeconds(1);
+//        options.PermitLimit = 5;
+//    });
+//});
 
 builder.Services.AddCors(options => {
     options.AddPolicy("CombinedPolicy", b => {
@@ -46,7 +46,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions {
 app.UseCors("CombinedPolicy");
 app.UseRejectWebsocketOverHttp2WhileUnsupported();
 // Configure the HTTP request pipeline.
-app.UseRateLimiter();
+//app.UseRateLimiter();
 
 app.MapReverseProxy();
 

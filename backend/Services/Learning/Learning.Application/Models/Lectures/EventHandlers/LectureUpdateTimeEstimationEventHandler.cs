@@ -1,12 +1,10 @@
 ﻿using Learning.Domain.Events;
-using MassTransit;
 
 namespace Learning.Application.Models.Lectures.EventHandlers;
-public class LectureUpdateTimeEstimationEventHandler(ICourseRepository courseRepository) : IConsumer<LectureUpdateTimeEstimationEvent>
-{
-    public async Task Consume(ConsumeContext<LectureUpdateTimeEstimationEvent> context)
-    {
-        var courseId = context.Message.CourseId;
+public class LectureUpdateTimeEstimationEventHandler(ICourseRepository courseRepository) : INotificationHandler<LectureUpdateTimeEstimationEvent> {
+
+    public async Task Handle(LectureUpdateTimeEstimationEvent notification, CancellationToken cancellationToken) {
+        var courseId = notification.CourseId;
         var course = await courseRepository.GetByIdDetailAsync(courseId.Value);
         if (course == null)
         {
@@ -16,7 +14,6 @@ public class LectureUpdateTimeEstimationEventHandler(ICourseRepository courseRep
         course.UpdateTimeEstimation(timeEstimation);
 
         await courseRepository.UpdateAsync(course);
-        await courseRepository.SaveChangesAsync();
     }
 }
 

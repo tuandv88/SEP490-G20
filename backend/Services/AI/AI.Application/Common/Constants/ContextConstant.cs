@@ -1,5 +1,8 @@
 ﻿namespace AI.Application.Common.Constants;
 public static class ContextConstant {
+    public static class User {
+        public const string FullName = "full_name";
+    }
     public static class Learning {
         public const string LectureId = "lecture_id";
         public const string ProblemId = "problem_id";
@@ -23,6 +26,10 @@ public static class ContextConstant {
     }
     public static class Pathway {
         public const string Answer = "answers";
+    }
+    public static class ContentModeration {
+        public const string Discussion = "discussion";
+        public const string ImageUrl = "image";
     }
 }
 

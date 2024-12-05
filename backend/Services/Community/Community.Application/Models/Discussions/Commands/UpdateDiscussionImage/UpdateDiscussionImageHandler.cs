@@ -36,8 +36,7 @@ public class UpdateDiscussionImageHandler: ICommandHandler<UpdateDiscussionImage
         await _discussionRepository.UpdateAsync(discussion);
         await _discussionRepository.SaveChangesAsync(cancellationToken);
 
-        if (!String.IsNullOrEmpty(oldImageUrl))
-        {
+        if (!String.IsNullOrEmpty(oldImageUrl)) {
             await _filesService.DeleteFileAsync(bucket, oldImageUrl);
         }
 

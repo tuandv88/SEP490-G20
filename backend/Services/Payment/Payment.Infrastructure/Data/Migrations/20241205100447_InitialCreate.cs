@@ -52,6 +52,33 @@ namespace Payment.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PaymentSagaInstances",
+                columns: table => new
+                {
+                    CorrelationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CurrentState = table.Column<string>(type: "text", nullable: false),
+                    PaymentStatus = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Fullname = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    TransactionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductType = table.Column<string>(type: "text", nullable: false),
+                    ProductName = table.Column<string>(type: "text", nullable: false),
+                    ProductDescription = table.Column<string>(type: "text", nullable: false),
+                    UnitPrice = table.Column<double>(type: "double precision", nullable: false),
+                    Amount = table.Column<double>(type: "double precision", nullable: false),
+                    Currency = table.Column<string>(type: "text", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "text", nullable: false),
+                    PointsUsed = table.Column<int>(type: "integer", nullable: false),
+                    Version = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentSagaInstances", x => x.CorrelationId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Transactions",
                 columns: table => new
                 {
@@ -225,6 +252,9 @@ namespace Payment.Infrastructure.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "OutboxMessage");
+
+            migrationBuilder.DropTable(
+                name: "PaymentSagaInstances");
 
             migrationBuilder.DropTable(
                 name: "TransactionItems");

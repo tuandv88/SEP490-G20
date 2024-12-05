@@ -38,7 +38,7 @@ public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
 
     // Custom validation for payment method (if needed)
     private bool BeAValidPaymentMethod(string paymentMethod) {
-        var validMethods = new[] { "PayPal" }; 
+        var validMethods = new[] { "Paypal" }; 
         return validMethods.Contains(paymentMethod);
     }
 }

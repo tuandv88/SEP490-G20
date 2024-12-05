@@ -16,8 +16,6 @@
   <ItemGroup>
     <Folder Include="Integrations\Paypals\Commands\CaptureOrder\" />
     <Folder Include="Transactions\Commands\" />
-    <Folder Include="Transactions\Dtos\" />
-    <Folder Include="Transactions\Queries\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom'
 import { LearningAPI } from '@/services/api/learningApi'
 import { Switch } from '@mui/material'
 import { UserAPI } from '@/services/api/userApi'
+import { PaymentAPI } from '@/services/api/paymentApi'
 
 const PayPalCheckout = () => {
   const { id } = useParams()
@@ -18,6 +19,23 @@ const PayPalCheckout = () => {
   const [courseDetail, setCourseDetail] = useState(null)
   const [usePoints, setUsePoints] = useState(false)
   const [userPoint, setUserPoint] = useState(0)
+  const [orderSummaryState, setOrderSummaryState] = useState(null)
+
+  console.log(userPoint)
+
+  useEffect(() => {
+    const fetchUserPoint = async () => {
+      try {
+        const response = await UserAPI.getUserPoint()
+        setUserPoint(response.totalPoints)
+      } catch (error) {
+        console.error('Error fetching user points:', error)
+        setUserPoint(0)
+      }
+    }
+    fetchUserPoint()
+  }, [])
+
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
@@ -31,14 +49,17 @@ const PayPalCheckout = () => {
     fetchCourseDetail()
   }, [id])
 
+
   useEffect(() => {
-    const fetchUserPoint = async () => {
-      const response = await UserAPI.getUserPoint()
-      setUserPoint(response)
-      console.log(response)
+    if (courseDetail) {
+      setOrderSummaryState({
+        originalPrice: courseDetail.price,
+        discountRate: 0,
+        total: courseDetail.price,
+        itemCount: 1
+      })
     }
-    fetchUserPoint()
-  }, [])
+  }, [courseDetail])
 
   const orderItem = courseDetail
     ? {
@@ -50,21 +71,25 @@ const PayPalCheckout = () => {
       }
     : null
 
-  const orderSummary = courseDetail
-    ? {
-        originalPrice: courseDetail.price,
-        discountRate: 0,
-        total: courseDetail.price,
-        itemCount: 1
-      }
-    : null
-
   const handleCreateOrder = async () => {
     try {
-      const data = await createPayPalOrder()
-      setOrderId(data.id)
+      const orderData = {
+        order: {
+          paymentMethod: "Paypal",
+          point: usePoints ? userPoint : 0,
+          item: {
+            productId: courseDetail.id,
+            productType: "Course",
+            quantity: 1,
+            unitPrice: courseDetail.price
+          }
+        }
+      }
+
+      const response = await PaymentAPI.createOrder(orderData)
+      setOrderId(response.id)
       setPaymentStatus('Order created! Awaiting payment...')
-      return data.id
+      return response.id
     } catch (error) {
       console.error('Error creating order:', error)
       setPaymentStatus('Error creating order. Please try again.')
@@ -88,21 +113,25 @@ const PayPalCheckout = () => {
   }
 
   const handleTogglePoints = () => {
+    if (!courseDetail) return;
+    
     setUsePoints(!usePoints)
     if (!usePoints) {
-      const pointValue = userPoint * (1/3)
+      const pointValue = (userPoint / 1000)
       const newTotal = Math.max(0, courseDetail.price - pointValue)
-      setOrderSummary(prev => ({
-        ...prev,
+      setOrderSummaryState({
+        originalPrice: courseDetail.price,
         discountRate: pointValue,
-        total: newTotal
-      }))
+        total: newTotal,
+        itemCount: 1
+      })
     } else {
-      setOrderSummary(prev => ({
-        ...prev,
+      setOrderSummaryState({
+        originalPrice: courseDetail.price,
         discountRate: 0,
-        total: courseDetail.price
-      }))
+        total: courseDetail.price,
+        itemCount: 1
+      })
     }
   }
 
@@ -125,7 +154,7 @@ const PayPalCheckout = () => {
                   </span>
                 </div>
                 <p className='text-sm text-gray-500'>
-                  Value: ${(userPoint * (1/3)).toFixed(2)}
+                  Value: ${(userPoint / 1000).toFixed(2)}
                 </p>
               </div>
               <Switch
@@ -159,7 +188,9 @@ const PayPalCheckout = () => {
           </div>
         </div>
 
-        <div className='md:col-span-1'>{courseDetail && <OrderSummary summary={orderSummary} />}</div>
+        <div className='md:col-span-1'>
+          {courseDetail && orderSummaryState && <OrderSummary summary={orderSummaryState} />}
+        </div>
       </div>
     </div>
   )

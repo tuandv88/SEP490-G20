@@ -15,6 +15,7 @@ import { LearningAPI } from '@/services/api/learningApi'
 import { LoadingState } from '@/components/loading/CourseDetailLoading/LoadingState'
 import Cookies from 'js-cookie'
 import ChapterLoading from '@/components/loading/ChapterLoading'
+import { UserAPI } from '@/services/api/userApi'
 
 function CourseDetail() {
   const [activeTab, setActiveTab] = useState('introduce')
@@ -30,7 +31,6 @@ function CourseDetail() {
   useEffect(() => {
     setSelectedCourse(id)    
   }, [])
-
 
 
   useEffect(() => {

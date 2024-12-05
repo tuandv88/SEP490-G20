@@ -11,8 +11,7 @@ export default function Payment({ courseId, price, onClose }) {
           options={{ 'client-id': 'ATncYgnc0VHRxHwgBByz3OLk3Nuw4SG4KXA3sLJZkwmYVxTxXFoxlEBt-UoBmZ-U0xKTY0dBZ18li-GA' }}
         >
           <PayPalCheckout />
-        </PayPalScriptProvider>
-        <button onClick={onClose}>Close Payment</button>
+        </PayPalScriptProvider>       
       </div>
     </Layout>
   )

@@ -24,7 +24,6 @@ builder.Host.UseSerilog(SeriLogger.Configure)
         });
     });
 
-
 var app = builder.Build();
 if (app.Environment.IsDevelopment()) {
     app.UseSwagger();

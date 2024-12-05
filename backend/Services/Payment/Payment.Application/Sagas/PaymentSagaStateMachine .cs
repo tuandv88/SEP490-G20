@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Messaging.Events.Payments.Sagas;
 using BuildingBlocks.Messaging.Events.Payments.Sagas.Commands;
 using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
 using Payment.Application.Data.Repositories;
 
 namespace Payment.Application.Sagas;
@@ -28,9 +29,9 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
     public Event<PaymentFailedEvent> PaymentFailedEvent { get; private set; } = default!;
     public Event<EmailFailedEvent> EmailFailedEvent { get; private set; } = default!;
 
-    private readonly ITransactionLogRepository _log;
-    public PaymentSagaStateMachine(ITransactionLogRepository log) {
-        _log = log;
+    private readonly IServiceProvider _serviceProvider;
+    public PaymentSagaStateMachine(IServiceProvider serviceProvider) {
+        _serviceProvider = serviceProvider;
 
         InstanceState(x => x.CurrentState);
 
@@ -63,7 +64,9 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
                     context.Saga.PointsUsed = context.Message.PointsUsed;
                     context.Saga.Email = context.Message.PayerEmail;
                     context.Saga.Fullname = context.Message.Fullname;
-                    await _log.AddLog(context.Message.TransactionId, "OrderApprovedEvent", "Created", "Start Saga");
+                    using var scope = _serviceProvider.CreateScope();
+                    var logRepository = scope.ServiceProvider.GetRequiredService<ITransactionLogRepository>();
+                    await logRepository.AddLog(context.Message.TransactionId, "OrderApprovedEvent", "Created", "Start Saga");
                 })
                 .TransitionTo(OrderApproved)
                 .Publish(context => new ValidateProductCommand {
@@ -83,7 +86,9 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
                       .ThenAsync(async context => {
                           context.Saga.ProductName = context.Message.ProductName;
                           context.Saga.ProductDescription = context.Message.ProductDescription;
-                          await _log.AddLog(context.Message.TransactionId, "ProductValidationEvent", "Created", "ProductValidated Success");
+                          using var scope = _serviceProvider.CreateScope();
+                          var logRepository = scope.ServiceProvider.GetRequiredService<ITransactionLogRepository>();
+                          await logRepository.AddLog(context.Message.TransactionId, "ProductValidationEvent", "Created", "ProductValidated Success");
                       })
                       .Publish(context => new DeductPointsCommand {
                           TransactionId = context.Message.TransactionId,
@@ -95,7 +100,9 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
                 .If(context => !context.Message.IsValid, x =>
                     x.TransitionTo(Failed)
                       .ThenAsync(async context => {
-                         await _log.AddLog(context.Message.TransactionId, "ProductValidationEvent", "Created", "ProductValidated Fail");
+                          using var scope = _serviceProvider.CreateScope();
+                          var logRepository = scope.ServiceProvider.GetRequiredService<ITransactionLogRepository>();
+                          await logRepository.AddLog(context.Message.TransactionId, "ProductValidationEvent", "Created", "ProductValidated Fail");
                       })
                       .Publish(context => new ProductValidationFailedEvent {
                           TransactionId = context.Saga.TransactionId,

@@ -14,7 +14,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction> {
         builder.Property(t => t.Amount);
         builder.Property(t => t.Currency);
         builder.Property(t => t.Status)
-           .HasDefaultValue(TransactionStatus.Pending)
+           .HasDefaultValue(TransactionStatus.Created)
            .HasConversion(
                s => s.ToString(), dbStatus => (TransactionStatus)Enum.Parse(typeof(TransactionStatus), dbStatus));
 
@@ -31,8 +31,14 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction> {
         builder.Property(t => t.PayerId);
         builder.Property(t => t.PayerEmail);
         builder.Property(t => t.PayerPhone);
+        builder.Property(t => t.PointsUsed);
+        builder.Property(t => t.DiscountAmount);
 
         builder.HasMany(t => t.Items)
+            .WithOne()
+            .HasForeignKey(t => t.TransactionId);
+
+        builder.HasMany(t => t.Logs)
             .WithOne()
             .HasForeignKey(t => t.TransactionId);
 

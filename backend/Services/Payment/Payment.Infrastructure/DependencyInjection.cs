@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Payment.Application.Data;
 using Payment.Infrastructure.Extentions;
 using Payment.Infrastructure.Data.Interceptors;
+using Payment.Infrastructure.Services;
 
 namespace Payment.Infrastructure;
 public static class DependencyInjection {
@@ -29,8 +30,10 @@ public static class DependencyInjection {
         services.AddHttpContextAccessor();
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
-        
 
+        services.AddPaypal(configuration);
+
+        services.AddScoped<IPaypalClientApi, PaypalClientApi>();
         return services;
     }
 }

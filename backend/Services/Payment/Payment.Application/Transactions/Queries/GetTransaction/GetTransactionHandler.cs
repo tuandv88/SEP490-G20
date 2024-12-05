@@ -30,10 +30,10 @@ public class GetTransactionHandler(ITransactionRepository repository, IUserConte
 
         var totalCount = await filteredData.CountAsync(cancellationToken);
 
-        var transactions = await filteredData.OrderByDescending(c => c.LastModified)
+        var transactions = filteredData.OrderByDescending(c => c.LastModified)
                                     .Skip(pageSize * (pageIndex - 1))
                                     .Take(pageSize)
-                                    .ToListAsync(cancellationToken);
+                                    .ToList();
 
         var transactionDto = transactions.Select(t => t.ToTransactionDto()).ToList();
 

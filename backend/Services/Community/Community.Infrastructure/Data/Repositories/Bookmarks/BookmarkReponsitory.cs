@@ -34,4 +34,12 @@ public class BookmarkReponsitory : Repository<Bookmark>, IBookmarkRepository
     {
         return null;
     }
+
+    public async Task<Bookmark?> GetByIdDiscussionAndUserIdAsync(Guid idDiscussion, Guid idUser)
+    {
+        var bookmark = _dbContext.Bookmarks
+                       .AsEnumerable()
+                       .FirstOrDefault(c => c.UserId.Value == idUser && c.DiscussionId.Value == idDiscussion);
+        return bookmark;
+    }
 }

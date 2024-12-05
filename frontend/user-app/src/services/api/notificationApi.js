@@ -85,6 +85,74 @@ export const NotificationApi = {
             console.error("Lỗi khi gọi API getNotificationHistories:", error.message);
             throw error;
         }
+    },
+    getNotificationTypes: async ({ pageIndex, pageSize }) => {
+        try {
+            // Gửi yêu cầu GET tới API với header Authorization
+            const response = await axios.get(`${API_BASE_URL}/community-service/notificationtypes`, {
+                params: { pageIndex, pageSize },
+                ...getAuthHeaders(), // Thêm header xác thực vào yêu cầu
+            });
+
+            // Kiểm tra nếu có dữ liệu loại thông báo
+            if (response && response.data && response.data.notificationTypeDtos && response.data.notificationTypeDtos.data && response.data.notificationTypeDtos.data.length > 0) {
+                const notificationTypes = response.data.notificationTypeDtos.data;
+
+                // Cập nhật thông tin loại thông báo
+                const updatedNotificationTypes = notificationTypes.map(notification => ({
+                    id: notification.id,
+                    name: notification.name,
+                    description: notification.description,
+                    canSendEmail: notification.canSendEmail,
+                    canSendWebsite: notification.canSendWebsite,
+                    priority: notification.priority,
+                }));
+
+                const pagination = {
+                    pageIndex: response.data.notificationTypeDtos.pageIndex,
+                    pageSize: response.data.notificationTypeDtos.pageSize,
+                    totalCount: response.data.notificationTypeDtos.count,
+                };
+
+                return { pagination, updatedNotificationTypes };
+            } else {
+                // Trả về mảng data rỗng nếu không có loại thông báo
+                return { updatedNotificationTypes: [], pagination: { pageIndex: 0, pageSize: 0, totalCount: 0 } };
+            }
+        } catch (error) {
+            console.error('Lỗi khi gọi API getNotificationTypes:', error.message);
+            throw error;
+        }
+    },
+
+    createNotificationHistory: async ({ userId, notificationTypeId, userNotificationSettingId, message, sentVia, status, subject = null }) => {
+        try {
+            // Gửi yêu cầu POST tới API để tạo lịch sử thông báo
+            const response = await axios.post(
+                `${API_BASE_URL}/community-service/notificationhistory`,
+                {
+                    UserId: userId,
+                    NotificationTypeId: notificationTypeId,
+                    UserNotificationSettingId: userNotificationSettingId,
+                    Message: message,
+                    SentVia: sentVia,
+                    Status: status,
+                    Subject: subject,  // Nếu có subject thì gửi, nếu không thì truyền null
+                },
+                getAuthHeaders()  // Thêm headers với token
+            );
+
+            // Kiểm tra nếu yêu cầu thành công
+            if (response && response.data) {
+                //console.log('Notification history created successfully:', response.data);
+                return response.data;
+            } else {
+                throw new Error('Failed to create notification history');
+            }
+        } catch (error) {
+            //console.error('Error creating notification history:', error);
+            throw error;
+        }
     }
 };
 

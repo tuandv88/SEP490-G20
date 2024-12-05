@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { DiscussApi } from "@/services/api/DiscussApi";
+import { NotificationApi } from "@/services/api/notificationApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp, faComment, faCommentAlt, faComments, faEdit, faRepeat, faReply, faReplyAll, faShareFromSquare, faShower, faThumbsDown, faThumbsUp, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Pagination from '@mui/material/Pagination';
@@ -14,7 +15,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, Button, CircularProg
 import AuthService from '../../oidc/AuthService'; // Import để lấy dữ liệu Auth...
 
 
-function CommentList({ discussionId }) {
+function CommentList({ discussionId, userIdDiscussion }) {
   const [isPreview, setIsPreview] = useState(false);
   const textAreaRef = useRef(null);
   const [newComment, setNewComment] = useState("");
@@ -40,8 +41,10 @@ function CommentList({ discussionId }) {
 
   const [currentUser, setCurrentUser] = useState(null);
   const [idCurrentUser, setIdCurrentUser] = useState(null);
+  const [fullNameCurrentUser, setFullNameCurrentUser] = useState(null);
   const [isAuth, setIsAuthor] = useState(false);
 
+  const [userNotificationSettings, setUserNotificationSettings] = useState('d725fa00-46ef-48e3-815e-d89e08ed7bbd');
   const [openRemoveDialog, setOpenRemoveDialog] = useState(false);  // Trạng thái mở/đóng dialog
   const [commentIdToDelete, setCommentIdToDelete] = useState(null); // Lưu ID comment cần xóa
 
@@ -53,6 +56,7 @@ function CommentList({ discussionId }) {
       setLoading(true);
       setError(null);
       try {
+
         const { updatedComments, pagination: newPagination, totalComments } =
           await DiscussApi.getCommentsByDiscussionId(
             discussionId,
@@ -72,11 +76,10 @@ function CommentList({ discussionId }) {
         if (userTmp) {
           setCurrentUser(userTmp);
           setIdCurrentUser(userTmp.profile.sub);
+          setFullNameCurrentUser(userTmp.profile.firstName + ' ' + userTmp.profile.lastName);
           setIsAuthor(true);
         }
 
-        // Lấy các bình luận con (replies) - cập nhập vào Array: replies {}
-        const allReplies = {}; // Dùng để lưu tất cả các bình luận con cho từng commentId (Array...)
         // Dùng hàm loadReplies để tải replies
         for (let comment of updatedComments) {
           await loadReplies(comment.id); // Gọi hàm loadReplies để tải replies
@@ -130,7 +133,32 @@ function CommentList({ discussionId }) {
       setNewComment("");
 
       if (commentData) {
-        console.log(commentData);
+        //console.log(commentData);
+      }
+
+      const notificationTypeIdTmp = await getNotificationTypeIdByName('New Comment');
+
+      // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+      const notificationData = {
+        userId: userIdDiscussion, // Lấy từ context hoặc props nếu cần
+        notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+        userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+        message: `
+                <div class="text-sm text-muted-foreground mb-2 break-words">
+                <p> <strong>${fullNameCurrentUser}</strong> commented on your discussion post: <strong>${newComment}</strong></p>
+                <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion</a></p>
+                </div> `,
+        sentVia: 'Web', // Hoặc 'Email' nếu cần
+        status: 'Sent', // Trạng thái gửi
+      };
+
+      // Gọi API để tạo lịch sử thông báo
+      const response = await NotificationApi.createNotificationHistory(notificationData);
+
+      //console.log(notificationData);
+
+      if (response) {
+        //console.log("Success Notify", response);
       }
 
     } catch (err) {
@@ -313,6 +341,29 @@ function CommentList({ discussionId }) {
   };
 
 
+  // Phương thức nhận vào tên loại thông báo và trả về id của loại đó
+  const getNotificationTypeIdByName = async (notificationName) => {
+    try {
+      // Gọi API để lấy danh sách các loại thông báo
+      const { pagination, updatedNotificationTypes } = await NotificationApi.getNotificationTypes({ pageIndex: 1, pageSize: 10 });
+
+      //console.log(updatedNotificationTypes);
+
+      // Tìm loại thông báo có tên trùng với notificationName
+      const notificationType = updatedNotificationTypes.find(type => type.name === notificationName);
+
+      // Nếu tìm thấy loại thông báo, trả về id của nó
+      if (notificationType) {
+        return notificationType.id;
+      } else {
+        throw new Error(`Notification type with name '${notificationName}' not found.`);
+      }
+    } catch (error) {
+      console.error('Error fetching notification type by name:', error);
+      throw error;
+    }
+  };
+
   // if (loading) {
   //   return (
   //     <>
@@ -440,6 +491,48 @@ function CommentList({ discussionId }) {
         handleKeepShowReplies(parentCommentId);
 
         //console.log("Success!", newComment);
+
+        if (depth == 2) {
+          const notificationTypeIdTmp = await getNotificationTypeIdByName('New Reply Comment');
+
+          // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+          const notificationData = {
+            userId: userIdDiscussion, // Lấy từ context hoặc props nếu cần
+            notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+            userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+            message: `
+                    <div class="text-sm text-muted-foreground mb-2 break-words">
+                    <p> <strong>${fullNameCurrentUser}</strong> Replied to comment on your post: <strong>${contentCheck}</strong></p>
+                    <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the comment</a></p>
+                    </div> `,
+            sentVia: 'Web', // Hoặc 'Email' nếu cần
+            status: 'Sent', // Trạng thái gửi
+          };
+
+          // Gọi API để tạo lịch sử thông báo
+          const response = await NotificationApi.createNotificationHistory(notificationData);
+        } else if (depth == 3) {
+          const notificationTypeIdTmp = await getNotificationTypeIdByName('New Reply To Reply');
+
+          // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+          const notificationData = {
+            userId: userIdDiscussion, // Lấy từ context hoặc props nếu cần
+            notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+            userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+            message: `
+                    <div class="text-sm text-muted-foreground mb-2 break-words">
+                    <p> <strong>${fullNameCurrentUser}</strong> Replied to reply on your post: <strong>${contentCheck}</strong></p>
+                    <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the comment</a></p>
+                    </div> `,
+            sentVia: 'Web', // Hoặc 'Email' nếu cần
+            status: 'Sent', // Trạng thái gửi
+          };
+
+          // Gọi API để tạo lịch sử thông báo
+          const response = await NotificationApi.createNotificationHistory(notificationData);
+        }
+
+
       }
     } catch (error) {
       console.error("Error submitting reply:", error);

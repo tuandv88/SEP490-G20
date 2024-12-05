@@ -37,16 +37,7 @@ namespace Community.Application.Models.NotificationHistories.Commands.CreateNoti
                 throw new ConflictException("Invalid Status value.");
             }
 
-            var notificationHistory = await CreateNewNotificationHistory(request.CreateNotificationHistoryDto, sentVia, status);
 
-            await _notificationHistoryRepository.AddAsync(notificationHistory);
-            await _notificationHistoryRepository.SaveChangesAsync(cancellationToken);
-
-            return new CreateNotificationHistoryResult(notificationHistory.Id.Value, true);
-        }
-
-        private async Task<NotificationHistory> CreateNewNotificationHistory(CreateNotificationHistoryDto createNotificationHistoryDto, SentVia sentVia, Status status)
-        {
             // Lấy UserId từ UserContextService
             var currentUserId = _userContextService.User.Id;
 
@@ -58,25 +49,41 @@ namespace Community.Application.Models.NotificationHistories.Commands.CreateNoti
             // Chuyển đổi UserId
             var userId = UserId.Of(currentUserId);
 
+            if(currentUserId == request.CreateNotificationHistoryDto.UserId)
+            {
+                return new CreateNotificationHistoryResult(null, false);
+            }
+
+            var notificationHistory = await CreateNewNotificationHistory(request.CreateNotificationHistoryDto, sentVia, status, userId);
+
+            await _notificationHistoryRepository.AddAsync(notificationHistory);
+            await _notificationHistoryRepository.SaveChangesAsync(cancellationToken);
+
+            return new CreateNotificationHistoryResult(notificationHistory.Id.Value, true);
+        }
+
+        private async Task<NotificationHistory> CreateNewNotificationHistory(CreateNotificationHistoryDto createNotificationHistoryDto, SentVia sentVia, Status status, UserId userId)
+        {
             // Lấy NotificationTypeId từ DTO
+            var userIdd = UserId.Of(createNotificationHistoryDto.UserId);
             var notificationTypeId = NotificationTypeId.Of(createNotificationHistoryDto.NotificationTypeId);
             var userNotificationId = UserNotificationSettingId.Of(createNotificationHistoryDto.UserNotificationSettingId);
 
             // Tạo NotificationHistory mới
             var notificationHistory = NotificationHistory.Create(
                 notificationHistoryId: NotificationHistoryId.Of(Guid.NewGuid()),
-                userId,
+                userId: userIdd,
                 notificationTypeId: notificationTypeId,
                 userNotificationSettingId: userNotificationId,
                 createNotificationHistoryDto.Message,
                 sentVia,
-                status
+                status,
+                senderId: userId.Value
             );
 
             // Cập nhật các trường bổ sung
             notificationHistory.DateCreated = DateTime.UtcNow; // Thời gian tạo thông báo
             notificationHistory.Subject = createNotificationHistoryDto.Subject; // Nếu có Subject
-            notificationHistory.SenderId = createNotificationHistoryDto.SenderId; // Gán SenderId từ user hiện tại
 
             return notificationHistory;
         }

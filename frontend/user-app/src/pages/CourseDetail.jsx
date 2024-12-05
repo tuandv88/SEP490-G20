@@ -148,7 +148,7 @@ function CourseDetail() {
                       </button>
                     </div>
                   </div>
-
+                          
                   {/* Tab Content */}
                   <div>
                     {activeTab === 'introduce' ? (

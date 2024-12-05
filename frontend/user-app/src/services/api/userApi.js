@@ -5,11 +5,15 @@ const API_BASE_URL = import.meta.env.VITE_AUTH_URL
 
 export const UserAPI = {
   changeSurveyStatus: async (userId) => {
-    const response = await axios.put(`${API_BASE_URL}/users/updateissurvey`, {userId}, {
-      headers: {
-        Authorization: `Bearer ${Cookies.get('authToken')}`
+    const response = await axios.put(
+      `${API_BASE_URL}/users/updateissurvey`,
+      { userId },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
       }
-    })
+    )
     console.log(response.data)
     return response.data
   },
@@ -21,5 +25,13 @@ export const UserAPI = {
       console.error('Error fetching user:', error)
       throw error
     }
+  },
+  getUserPoint: async () => {
+    const response = await axios.get(`${API_BASE_URL}/user-service/total-points`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
   }
 }

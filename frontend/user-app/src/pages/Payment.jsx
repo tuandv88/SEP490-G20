@@ -3,7 +3,7 @@ import Layout from '@/layouts/layout'
 import { PayPalScriptProvider } from '@paypal/react-paypal-js'
 import { useEffect } from 'react'
 
-export default function Payment() {
+export default function Payment({ courseId, price, onClose }) {
   return (
     <Layout>
       <div className='min-h-screen bg-gray-100 py-12 mt-[70px]'>
@@ -12,6 +12,7 @@ export default function Payment() {
         >
           <PayPalCheckout />
         </PayPalScriptProvider>
+        <button onClick={onClose}>Close Payment</button>
       </div>
     </Layout>
   )

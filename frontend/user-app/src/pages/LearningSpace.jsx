@@ -24,6 +24,7 @@ import SubmissionResult from '@/components/learning/submission/SubmissionResult'
 import HeaderCode from '@/layouts/learningheaderLec'
 import CourseLoadingDetail from '@/components/loading/CourseLoadingDetail'
 import { CourseAPI } from '@/services/api/courseApi'
+import { UserAPI } from '@/services/api/userApi'
 
 
 
@@ -49,6 +50,7 @@ const LearningSpace = () => {
   const [currentCode, setCurrentCode] = useState(null)
   const [activeLectureId, setActiveLectureId] = useState(lectureId) 
   const [courseProgress, setCourseProgress] = useState([])
+  const [userPoint, setUserPoint] = useState(0)
   //courseId
   
   const toggleProblemList = () => {
@@ -192,6 +194,19 @@ const LearningSpace = () => {
     }
   }
 
+  useEffect(() => {
+    const fetchUserPoint = async () => {
+      try {
+        const response = await UserAPI.getUserPoint()
+        setUserPoint(response.totalPoints)
+      } catch (error) {
+        console.error('Error fetching user points:', error)
+        setUserPoint(0)
+      }
+    }
+    fetchUserPoint()
+  }, [lectureId])
+
   if (loading) {
     return <CourseLoadingDetail />
   }
@@ -215,6 +230,8 @@ const LearningSpace = () => {
           onChatClick={togglePanelLayout}
           toggleCurriculumRef={toggleCurriculumRef}
           header='Chapter List'
+          userPoint={userPoint}
+          lectureScore={lectureDetail?.lectureDetailsDto?.point}
         />
       </div>
       {lectureDetail?.lectureDetailsDto?.problem && (

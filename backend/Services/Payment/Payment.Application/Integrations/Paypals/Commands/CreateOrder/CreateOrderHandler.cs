@@ -18,9 +18,9 @@ public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextS
         }
         var user = userContext.User;
         var purchaseUnits = new List<PurchaseUnitRequest>();
-        var userId = Guid.NewGuid();// user.Id;
-        var email = "buivantruong16082002@gmail.com"; //user.Email;
-        var fullname = "trường bùi";// $"{user.FirstName} {user.LastName}";
+        var userId = user.Id;
+        var email = user.Email;
+        var fullname = $"{user.FirstName} {user.LastName}";
         var itemAmount = order.Item.Quantity * order.Item.UnitPrice;
         var point = order.Point;
         if (!Enum.TryParse(order.Item.ProductType, true, out Domain.Enums.ProductType productType) && productType != Domain.Enums.ProductType.Course) {

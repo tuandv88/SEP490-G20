@@ -11,6 +11,7 @@ import { Switch } from '@mui/material'
 import { UserAPI } from '@/services/api/userApi'
 import { PaymentAPI } from '@/services/api/paymentApi'
 import { Loading } from '../ui/overlay'
+import Cookies from 'js-cookie'
 
 const PayPalCheckout = () => {
   const { id } = useParams()
@@ -81,7 +82,7 @@ const PayPalCheckout = () => {
   const handleCreateOrder = async () => {
     const response = await fetch("https://localhost:5000/payment-service/checkout/orders", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${Cookies.get('authToken')}` },
       body: JSON.stringify({
         Order: { 
           PaymentMethod: "Paypal",

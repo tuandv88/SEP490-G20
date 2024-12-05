@@ -51,6 +51,8 @@ public record ContentModerationResultEventHandler(IDiscussionRepository discussi
             //Trạng thái không an toàn (nội dung không phù hợp)
             //gửi mail ở đây
             discusstion.UpdateStatus(false);
+            var fullname = message.FullName;
+            var email = message.Email;
         }
         await discussionRepository.UpdateAsync(discusstion);
         await discussionRepository.SaveChangesAsync();

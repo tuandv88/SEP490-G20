@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { PlusCircle, ChevronDown, GraduationCap } from 'lucide-react'
+import { PlusCircle, ChevronDown, GraduationCap, Trash } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuCheckboxItem
+  DropdownMenuCheckboxItem,
+  DropdownMenuItem
 } from '@/components/ui/dropdown-menu'
 import { flexRender } from '@tanstack/react-table'
 import MultiSelect from './MultiSelect'
@@ -18,6 +19,7 @@ import useCourseTable from '@/hooks/useCourseTable'
 
 import SchedulePublishDialog from '@/components/SchedulePublishDialog'
 import { CREATE_COURSE_PATH } from '@/routers/router'
+import DeleteConfirmDialog from '@/components/DeleteConfirmDialog'
 
 function CourseTable() {
   const navigate = useNavigate()
@@ -42,7 +44,11 @@ function CourseTable() {
     handleStatusChange,
     selectedCourse,
     newStatus,
-    handleLevelChange
+    handleLevelChange,
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
+    handleShowDeleteDialog,
+    handleDeleteCourse
   } = useCourseTable()
 
   const handleNewCourse = () => {
@@ -171,8 +177,8 @@ center gap-4 py-4'
 
       <div className='flex items-center justify-between py-4'>
         <div className='flex-1 text-sm text-muted-foreground'>
-          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
-          selected.
+          {/* {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
+          selected. */}
         </div>
         <div className='flex items-center space-x-2'>
           <Button
@@ -229,6 +235,14 @@ center gap-4 py-4'
         open={isStatusChangeDialogOpen}
         onOpenChange={setIsStatusChangeDialogOpen}
         onConfirm={handleScheduledStatusConfirm}
+      />
+
+      <DeleteConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDeleteCourse}
+        title="Delete Course"
+        description="Are you sure you want to delete this course? This action cannot be undone."
       />
     </div>
   )

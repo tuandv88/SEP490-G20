@@ -17,13 +17,6 @@ export default function LectureList({
 }) {
   return (
     <>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button className='mt-2' onClick={onAddLecture}>
-            <PlusIcon className='mr-2' /> Add Lecture
-          </Button>
-        </DialogTrigger>
-      </Dialog>
       {lectures.map((lecture, lectureIndex) => (
         <LectureItem
           chapterId={chapterId}
@@ -36,6 +29,13 @@ export default function LectureList({
           isUpdateLecture={isUpdate}
         />
       ))}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button className='mt-2' onClick={onAddLecture}>
+            <PlusIcon className='mr-2' /> Add Lecture
+          </Button>
+        </DialogTrigger>
+      </Dialog>
     </>
   )
 }

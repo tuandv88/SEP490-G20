@@ -8,59 +8,36 @@ const axiosInstanceAuth = axios.create({
     'Content-Type': 'application/json'
   }
 })
-export const getAllUsersDetail = async (signal) => {
+export const getAllUsersDetail = async () => {
   try {
-    const token = Cookies.get('authToken')
-    if (!token) {
-      throw new Error('No authentication token found')
-    }
-
     const response = await axiosInstanceAuth.get('/users/alldetails', {
       headers: {
-        Authorization: `Bearer ${token}`
-      },
-      signal: signal // Pass signal to request
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
     })
-
     return response.data
   } catch (error) {
-    if (error.code === 'ERR_CANCELED') {
-      throw error
-    }
-
-    if (error.response) {
-      throw new Error(error.response.data.message || 'Server error')
-    } else if (error.request) {
-      throw new Error('No response from server')
-    } else {
-      throw new Error('An error occurred while sending the request')
-    }
+    console.error('Error changing course status:', error)
+    throw error
   }
 }
 
 export const getAllRoles = async () => {
   try {
-    const token = Cookies.get('authToken')
-    if (!token) {
-      throw new Error('No authentication token found')
-    }
     const response = await axiosInstanceAuth.get('/roles/all', {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
     return response.data
   } catch (error) {
-    throw new Error(error.response.data.message || 'Server error')
+    console.error('Error changing course status:', error)
+    throw error
   }
 }
 
 export const updateUserRole = async (userId, roleId) => {
   try {
-    const token = Cookies.get('authToken')
-    if (!token) {
-      throw new Error('No authentication token found')
-    }
     const response = await axiosInstanceAuth.put(
       `roles/updateroleuser`,
       {
@@ -69,7 +46,7 @@ export const updateUserRole = async (userId, roleId) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${Cookies.get('authToken')}`
         }
       }
     )
@@ -81,13 +58,9 @@ export const updateUserRole = async (userId, roleId) => {
 
 export const getUserById = async (userId) => {
   try {
-    const token = Cookies.get('authToken')
-    if (!token) {
-      throw new Error('No authentication token found')
-    }
     const response = await axiosInstanceAuth.get(`/users/${userId}`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
     return response.data
@@ -98,10 +71,6 @@ export const getUserById = async (userId) => {
 
 export const lockAccountUser = async (userId, lockoutTimeUtc) => {
   try {
-    const token = Cookies.get('authToken')
-    if (!token) {
-      throw new Error('No authentication token found')
-    }
     const response = await axiosInstanceAuth.put(
       `/users/lockaccount`,
       {
@@ -110,7 +79,7 @@ export const lockAccountUser = async (userId, lockoutTimeUtc) => {
       },
       {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${Cookies.get('authToken')}`
         }
       }
     )

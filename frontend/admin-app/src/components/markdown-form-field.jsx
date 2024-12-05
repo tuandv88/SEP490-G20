@@ -1,11 +1,8 @@
 import React from 'react'
-import { useFormContext, Controller } from 'react-hook-form'
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import CustomMarkdownEditor from './custom-markdown-editor'
 
-const MarkdownFormField = ({ name, label, placeholder }) => {
-  const { control } = useFormContext()
-
+const MarkdownFormField = ({ control, name, label, placeholder }) => {
   return (
     <FormField
       control={control}
@@ -18,8 +15,8 @@ const MarkdownFormField = ({ name, label, placeholder }) => {
           <FormControl>
             <CustomMarkdownEditor
               value={field.value || ''}
-              onChange={(value) => {
-                field.onChange(value)
+              onChange={(value) => {              
+                field.onChange(value);
               }}
               placeholder={placeholder}
             />

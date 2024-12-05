@@ -19,6 +19,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
   const [isAddLectureOpen, setIsAddLectureOpen] = useState(false)
   const [addingLectureToChapter, setAddingLectureToChapter] = useState(null)
   const [editingLecture, setEditingLecture] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   // Thêm useEffect để khôi phục trạng thái cuộn
   useEffect(() => {
@@ -128,6 +129,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         ...newChapter
       }
     }
+    setIsLoading(true)
     try {
       const response = await createChapter(chapterCreate, courseId)
       toast({
@@ -139,6 +141,8 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
       // Optionally, navigate to another page or show a success message
     } catch (error) {
       // Optionally, show an error message to the user
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -160,13 +164,15 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
       handleUpdateChapter()
       toast({
         title: 'Chapter deleted successfully',
-        description: 'The chapter has been removed.'
+        description: 'The chapter has been removed.',
+        duration: 1500
       })
     } catch (error) {
       toast({
         title: 'Error',
         description: 'Failed to delete the chapter. Please try again.',
-        variant: 'destructive'
+        variant: 'destructive',
+        duration: 1500
       })
     }
   }
@@ -177,17 +183,28 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         ...newLecture
       }
     }
+    setIsLoading(true)
     try {
       const response = await createLecture(chapterId, lectureCreate)
       toast({
         title: 'Lecture created successfully',
-        description: 'Lecture created successfully'
+        description: 'Lecture created successfully',
+        variant: 'default',
+        duration: 1500
       })
       setIsAddLectureOpen(false)
       handleUpdateChapter()
       // Optionally, navigate to another page or show a success message
     } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to create the lecture. Please try again.',
+        variant: 'destructive',
+        duration: 1500
+      })
       // Optionally, show an error message to the user
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -209,22 +226,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
   return (
     <div className='w-full'>
       <h3 className='mb-4 text-2xl font-semibold'>Curriculum</h3>
-      <Dialog open={isAddChapterOpen} onOpenChange={setIsAddChapterOpen}>
-        <DialogTrigger asChild>
-          <Button className='mb-4' onClick={() => setIsAddChapterOpen(true)}>
-            <PlusIcon className='mr-2' /> Add Chapter
-          </Button>
-        </DialogTrigger>
-        <DialogContent className='w-[95vw] max-w-[1000px] max-h-[90vh] overflow-y-auto'>
-          <DialogHeader>
-            <DialogTitle>Add New Chapter</DialogTitle>
-          </DialogHeader>
-          <ChapterForm
-            onSave={(newChapter) => addChapter(newChapter, courseId)}
-            onCancel={() => setIsAddChapterOpen(false)}
-          />
-        </DialogContent>
-      </Dialog>
+
       <ChapterList
         setIsUpdate={setIsUpdate}
         isUpdate={isUpdate}
@@ -244,6 +246,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         isOpen={isAddLectureOpen}
         onClose={() => setIsAddLectureOpen(false)}
         onSave={(lecture) => addLecture(addingLectureToChapter, lecture)}
+        isLoading={isLoading}
       />
       {editingChapter && (
         <EditChapterDialog
@@ -261,6 +264,23 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
           saveLecture(updatedLecture, editingLecture.chapterIndex, editingLecture.lectureIndex)
         }
       />
+      <Dialog open={isAddChapterOpen} onOpenChange={setIsAddChapterOpen}>
+        <DialogTrigger asChild>
+          <Button className='mb-4' onClick={() => setIsAddChapterOpen(true)}>
+            <PlusIcon className='mr-2' /> Add Chapter
+          </Button>
+        </DialogTrigger>
+        <DialogContent className='w-[95vw] max-w-[1000px] max-h-[90vh] overflow-y-auto'>
+          <DialogHeader>
+            <DialogTitle>Add New Chapter</DialogTitle>
+          </DialogHeader>
+          <ChapterForm
+            onSave={(newChapter) => addChapter(newChapter, courseId)}
+            onCancel={() => setIsAddChapterOpen(false)}
+            isLoading={isLoading}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

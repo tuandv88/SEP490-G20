@@ -6,12 +6,17 @@ import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 import { UserContext } from '@/contexts/UserContext'
 import authServiceInstance from '@/oidc/AuthService'
 import { format } from 'date-fns'
+import Payment from '@/pages/Payment'
 
 export function CourseSidebar({ enrolledCourses, courseDetail }) {
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useContext(UserContext)
   const [firstLectureId, setFirstLectureId] = useState(null)
+
+
+  console.log(courseDetail.course.price)
+
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -53,6 +58,23 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
     }
   }
 
+  const handlePayment = async () => {
+    if (!user) {
+      try {
+        await authServiceInstance.login()
+      } catch (error) {
+        console.error('Error during login:', error)
+      }
+    } else {
+      navigate(AUTHENTICATION_ROUTERS.PAYMENT.replace(':id', id), {
+        state: { 
+          courseId: id,
+          price: courseDetail.course.price
+        }
+      })
+    }
+  }
+
   const convertToHoursAndMinutes = (minutes) => {
     const hours = Math.floor(minutes / 60) 
     const remainingMinutes = minutes % 60
@@ -84,13 +106,29 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
           </>
         ) : (
           <>
-            <button
-              onClick={() => handleEnrollCourse()}
-              className='w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors mb-4'
-            >
-              Enroll Now
-            </button>
-            <p className='text-center text-gray-600 text-sm'>Join the course for free</p>
+            {courseDetail.course.price === 0 ? (
+              <>
+                <button
+                  onClick={() => handleEnrollCourse()}
+                  className='w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors mb-4'
+                >
+                  Enroll Now
+                </button>
+                <p className='text-center text-gray-600 text-sm'>Join the course for free</p>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => handlePayment()}
+                  className='w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors mb-4'
+                >
+                  Pay Now
+                </button>
+                <p className='text-center text-gray-600 text-sm'>
+                  Join the course for ${courseDetail.course.price}
+                </p>
+              </>
+            )}
           </>
         )}
       </div>

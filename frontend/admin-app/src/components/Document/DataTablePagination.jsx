@@ -59,7 +59,7 @@ export function DataTablePagination({ table, setPageIndex, setPageSize, isLoadin
           >
             <Link
               to={DOCUMENT_AI_TABLE_PATH}
-              search={(prev) => ({ ...prev, page: Math.max(1, Number(prev.page) - 1) })}
+              search={(prev) => ({ ...prev, page: Math.max(1, (parseInt(prev?.page) || 1) - 1) })}
               aria-label='Previous page'
             >
               <ChevronLeft className='h-4 w-4' />
@@ -74,7 +74,7 @@ export function DataTablePagination({ table, setPageIndex, setPageSize, isLoadin
           >
             <Link
               to={DOCUMENT_AI_TABLE_PATH}
-              search={(prev) => ({ ...prev, page: Math.min(table.getPageCount(), Number(prev.page) + 1) })}
+              search={(prev) => ({ ...prev, page: Math.min(table.getPageCount(), (parseInt(prev?.page) || 1) + 1) })}
               aria-label='Next page'
             >
               <ChevronRight className='h-4 w-4' />

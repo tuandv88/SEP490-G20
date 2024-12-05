@@ -26,11 +26,9 @@ const EditCourse = () => {
     const fetchCourseDetails = async () => {
       try {
         const courseData = await getCourseDetails(courseId)
-        console.log(courseData)
         setCourseIdToBack(courseId)
         setCourse(courseData.courseDetailsDto.courseDto)
         setChapter(courseData.courseDetailsDto.chapterDetailsDtos)
-        console.log(courseData.courseDetailsDto.chapterDetailsDtos)
       } catch (error) {
         console.error('Failed to fetch course details:', error)
       }
@@ -41,12 +39,6 @@ const EditCourse = () => {
 
   const handleUpdateChapter = () => {
     setUpdateChapter(!updateChapter)
-  }
-
-  const handleEditInfo = () => {
-    console.log('Edit info button clicked')
-    // You can replace this with your desired edit functionality
-    alert('Edit course info functionality to be implemented')
   }
 
   if (!course) return <Loading />
@@ -71,10 +63,6 @@ const EditCourse = () => {
                 </div>
                 <Separator />
                 <p className='text-sm lg:text-base text-muted-foreground'>{course.headline}</p>
-                {/* Add Edit Info button */}
-                <Button onClick={handleEditInfo} className='w-full mt-4'>
-                  Edit Info
-                </Button>
               </CardContent>
             </Card>
           </div>

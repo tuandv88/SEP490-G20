@@ -58,3 +58,18 @@ export const createQuizAssessment = async (quizData) => {
     throw error
   }
 }
+
+export const updateProblemQuestion = async (quizId, questionId, quizData) => {
+  try {
+    const response = await axiosInstance.put(`/learning-service/quizs/${quizId}/questions/${questionId}`, quizData, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error updating quiz:', error)
+    throw error
+  }
+}
+

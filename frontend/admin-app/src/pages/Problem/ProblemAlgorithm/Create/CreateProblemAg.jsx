@@ -8,6 +8,9 @@ import FormTabs from './FormTabs'
 import { createProblemAg } from '@/services/api/problemApi'
 import { PROBLEM_TABLE_PATH } from '@/routers/router'
 import { useNavigate } from '@tanstack/react-router'
+import { ToastAction } from '@/components/ui/toast'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { basicInfoSchema } from './basic-info-step'
 
 const CreateProblemAg = ({}) => {
   const navigate = useNavigate()
@@ -20,9 +23,11 @@ const CreateProblemAg = ({}) => {
   console.log(isSaveTemplate)
 
   const form = useForm({
+    resolver: zodResolver(basicInfoSchema),
     defaultValues: {
       title: '',
       description: '',
+      language: 'Java',
       problemType: 'Challenge',
       difficultyType: 'Medium',
       cpuTimeLimit: 2,

@@ -1,45 +1,6 @@
 import { lazy } from 'react'
 import React from 'react'
 import { createRouter, createRoute, createRootRoute, useNavigate } from '@tanstack/react-router'
-import authServiceInstance from '@/oidc/AuthService'
-import { useState, useEffect } from 'react'
-
-// Tạo một Higher-Order Component để kiểm tra xác thực
-function withAuth(Component) {
-  return function AuthenticatedComponent(props) {
-    const navigate = useNavigate()
-    const [isAuthorized, setIsAuthorized] = useState(null)
-
-    useEffect(() => {
-      authServiceInstance.getUser().then((user) => {
-        if (user && !user.expired) {
-          // Kiểm tra vai trò
-          const userRoles = user.profile.role || user.profile.roles || []
-          if (Array.isArray(userRoles) ? userRoles.includes('admin') : userRoles === 'admin') {
-            setIsAuthorized(true)
-          } else {
-            setIsAuthorized(false)
-            navigate({ to: '/unauthorized' }) // Chuyển hướng đến trang thông báo không có quyền
-          }
-        } else {
-          setIsAuthorized(false)
-          navigate({ to: '/' }) // Chuyển hướng đến trang đăng nhập
-        }
-      })
-    }, [])
-
-    if (isAuthorized === null) {
-      return <div>Loading...</div>
-    }
-
-    if (isAuthorized === false) {
-      return <div>Bạn không có quyền truy cập trang này.</div>
-    }
-
-    return <Component {...props} />
-  }
-}
-
 export const DASHBOARD_PATH = '/app/dashboard'
 export const COURSE_TABLE_PATH = '/app/course-table'
 export const PROBLEM_TABLE_PATH = '/app/problem-table'
@@ -57,11 +18,11 @@ export const UPDATE_PROBLEM_AG_PATH = '/app/update-problem/$problemId'
 export const DOCUMENT_AI_TABLE_PATH = '/app/document-ai-table'
 export const QUIZ_ASSESSMENT_PATH = '/app/quiz-assessment'
 export const USER_TABLE_PATH = '/app/user-table'
-export const USER_DETAIL_PATH = '/app/user-detail'
+export const USER_DETAIL_PATH = '/app/user-detail/$userId'
 export const CREATE_PROBLEM_LECTURE_PATH = '/app/edit-course/$courseId/create-problem-lecture/$lectureId'
 export const UPDATE_PROBLEM_LECTURE_PATH =
   '/app/update-problem-lecture/course/$courseId/lecture/$lectureId/problem/$problemId'
-
+export const DISCUSSION_TABLE_PATH = '/app/discussion-table'
 // Define the main root route with layout
 const rootRoute = createRootRoute({
   component: lazy(() => import('@/components/public-layout'))
@@ -91,7 +52,7 @@ const unauthorizedRoute = createRoute({
 const protectedRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: 'app',
-  component: withAuth(lazy(() => import('@/components/layout')))
+  component: lazy(() => import('@/components/layout'))
 })
 
 // Define other routes as children of the main root route
@@ -129,12 +90,6 @@ const createCourseRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: 'create-course',
   component: lazy(() => import('@/pages/Course/CreateCourse'))
-})
-
-const createCodeProblemRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: 'create-code-problem',
-  component: lazy(() => import('@/pages/CodeProblem/CreateCodeProblem'))
 })
 
 const createAgProblemRoute = createRoute({
@@ -191,6 +146,12 @@ export const userDetailRoute = createRoute({
   component: lazy(() => import('@/pages/User/UserDetail'))
 })
 
+const discussionRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: 'discussion-table',
+  component: lazy(() => import('@/pages/Discussion/DiscussionPage'))
+})
+
 const routeTree = rootRoute.addChildren([
   loginRoute,
   callbackRoute,
@@ -201,7 +162,6 @@ const routeTree = rootRoute.addChildren([
     createCourseRoute,
     editCurriculumCourseRoute,
     editBasicCourseRoute,
-    createCodeProblemRoute,
     createProblemLectureRoute,
     updateAgProblemRoute,
     quizManagementRoute,
@@ -211,7 +171,8 @@ const routeTree = rootRoute.addChildren([
     documentAiTableRoute,
     quizAssessmentRoute,
     userTableRoute,
-    userDetailRoute
+    userDetailRoute,
+    discussionRoute
   ])
 ])
 

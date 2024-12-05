@@ -2,12 +2,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare, ThumbsUp } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 export function DiscussionList({ discussions }) {
+  const navigate = useNavigate()
   return (
     <div className="space-y-4">
       {discussions.map((discussion) => (
-        <Card className="hover:shadow-md transition-all cursor-pointer">
+        <Card className="hover:shadow-md transition-all cursor-pointer" onClick={() => navigate(`/discussion/${discussion.id}`)}>
         <CardContent className="p-4">
           <div className="flex gap-3">
             <Avatar className="h-8 w-8">

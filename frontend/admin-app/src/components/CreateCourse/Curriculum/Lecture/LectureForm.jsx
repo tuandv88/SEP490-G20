@@ -21,7 +21,7 @@ const formSchema = z.object({
   isFree: z.boolean()
 })
 
-export default function LectureForm({ lecture, onSave, onCancel }) {
+export default function LectureForm({ lecture, onSave, onCancel, isLoading }) {
   const methods = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: lecture || {
@@ -129,7 +129,9 @@ export default function LectureForm({ lecture, onSave, onCancel }) {
             <Button type='button' variant='outline' onClick={onCancel}>
               Cancel
             </Button>
-            <Button type='submit'>Save Lecture</Button>
+            <Button type='submit' disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save Lecture'}
+            </Button>
           </div>
         </form>
       </Form>

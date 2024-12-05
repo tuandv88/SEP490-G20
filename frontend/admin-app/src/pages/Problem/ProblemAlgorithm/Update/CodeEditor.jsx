@@ -25,7 +25,12 @@ import { Input } from '@/components/ui/input'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/hooks/use-toast'
 import { runCode } from '@/services/api/codeApi'
-import { reverseTransformTestScript, transformTestCases, transformTestCasesUpdate, transformTestScriptUpdate } from '@/lib/utils'
+import {
+  reverseTransformTestScript,
+  transformTestCases,
+  transformTestCasesUpdate,
+  transformTestScriptUpdate
+} from '@/lib/utils'
 import TestResultLoading from '@/components/loading/TestResultLoading'
 import { ToastAction } from '@/components/ui/toast'
 import TestCaseGen from './TestCaseGen'
@@ -122,7 +127,7 @@ const SolutionResult = ({ result }) => (
 )
 
 const CodeEditor = ({ form, setIsRunSuccess, testCaseUpdate, solutionUpdate }) => {
-  const [files, setFiles] = React.useState([{id: null, name: 'Solution.java', content: '' }])
+  const [files, setFiles] = React.useState([{ id: null, name: 'Solution.java', content: '' }])
   const [activeFile, setActiveFile] = React.useState('Solution.java')
   const [testContent, setTestContent] = React.useState('')
   const [testCaseTab, setTestCaseTab] = React.useState('testcase')
@@ -133,41 +138,34 @@ const CodeEditor = ({ form, setIsRunSuccess, testCaseUpdate, solutionUpdate }) =
   const [testResults, setTestResults] = React.useState(null)
   const [isRunning, setIsRunning] = React.useState(false)
 
-
-
-  
-
   const { toast } = useToast()
   const { setValue } = form
 
   React.useEffect(() => {
     if (testCaseUpdate) {
       // Chuyển đổi ngược dữ liệu test case
-      const originalTestCases = reverseTransformTestScript(testCaseUpdate);
+      const originalTestCases = reverseTransformTestScript(testCaseUpdate)
       // Gán dữ liệu đã chuyển đổi ngược vào state
-      setTestCases(originalTestCases);
+      setTestCases(originalTestCases)
     }
-  }, [testCaseUpdate]);
-
-
-
+  }, [testCaseUpdate])
 
   React.useEffect(() => {
     if (solutionUpdate.solutions && solutionUpdate.solutions.length > 0) {
       // Chuyển đổi dữ liệu solution từ API về định dạng cần thiết
-      const updatedFiles = solutionUpdate.solutions.map((solution, index) => ({       
+      const updatedFiles = solutionUpdate.solutions.map((solution, index) => ({
         id: solution.id,
-        name:  index === 0 ? 'Solution.java' : `Solution${index}.java`, // Đặt tên file theo định dạng Solution{index}.java
+        name: index === 0 ? 'Solution.java' : `Solution${index}.java`, // Đặt tên file theo định dạng Solution{index}.java
         content: solution.solutionCode
-      }));
-      setFiles(updatedFiles);
-      setActiveFile(updatedFiles[0].name); // Đặt file đầu tiên làm file hoạt động
+      }))
+      setFiles(updatedFiles)
+      setActiveFile(updatedFiles[0].name) // Đặt file đầu tiên làm file hoạt động
     }
 
     if (solutionUpdate.testCode) {
-      setTestContent(solutionUpdate.testCode);
+      setTestContent(solutionUpdate.testCode)
     }
-  }, [solutionUpdate]);
+  }, [solutionUpdate])
 
   const handleAddFile = () => {
     const lastFileNumber = Math.max(
@@ -220,12 +218,14 @@ const CodeEditor = ({ form, setIsRunSuccess, testCaseUpdate, solutionUpdate }) =
       toast({
         variant: 'destructive',
         title: 'Empty Code or Test Content',
-        description: 'Your code or test content is empty, please check again',       
+        description: 'Your code or test content is empty, please check again'
       })
       return
     }
+
     setIsRunning(true)
-    setTestCaseTab('result')    
+    setTestCaseTab('result')
+    setTestResults(null)
 
     const values = form.getValues()
 
@@ -240,7 +240,6 @@ const CodeEditor = ({ form, setIsRunSuccess, testCaseUpdate, solutionUpdate }) =
         maxFileSize: values.maxFileSize * 1024
       }
     }
-
 
     const testCase = transformTestCasesUpdate(testCases)
 
@@ -279,50 +278,49 @@ const CodeEditor = ({ form, setIsRunSuccess, testCaseUpdate, solutionUpdate }) =
 
     try {
       const response = await runCode(createCode)
-      setTestResults(response.codeExecuteDtos)
-      const hasCompileOrRuntimeErrors = response.codeExecuteDtos.some(dto =>
-        dto.compileErrors || dto.runTimeErrors
-      );
-  
+      const hasCompileOrRuntimeErrors = response.codeExecuteDtos.some((dto) => dto.compileErrors || dto.runTimeErrors)
+
       if (hasCompileOrRuntimeErrors) {
         toast({
           variant: 'destructive',
           title: 'Runcode Result',
           description: 'There are compile or runtime errors. Please check your code.'
-        });
+        })
         setIsRunSuccess(false)
-        return;
+        setTestResults(response.codeExecuteDtos)
+        return
       }
 
-      const hasFailedTestCase = response.codeExecuteDtos.some(dto =>
-        dto.testResults.some(testResult => !testResult.isPass)
-      );
-  
+      const hasFailedTestCase = response.codeExecuteDtos.some((dto) =>
+        dto.testResults.some((testResult) => !testResult.isPass)
+      )
+
       if (hasFailedTestCase) {
         toast({
           variant: 'destructive',
           title: 'Runcode Result',
           description: 'Some test cases failed, please check your code again'
         })
-        setIsRunSuccess(false)  
+        setIsRunSuccess(false)
       } else {
         toast({
           variant: 'success',
           title: 'Runcode Result',
           description: 'All test cases passed successfully!'
         })
-        setIsRunSuccess(true)       
-      }     
+        setIsRunSuccess(true)
+      }
+      setTestResults(response.codeExecuteDtos)
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Runcode Result',
         description: 'There was a problem with your request.',
-        action: <ToastAction altText='Try again'>Try again</ToastAction>           
+        action: <ToastAction altText='Try again'>Try again</ToastAction>
       })
-      setIsRunSuccess(false)  
+      setIsRunSuccess(false)
       console.error('Error creating course:', error)
-    } finally {      
+    } finally {
       setIsRunning(false)
     }
   }
@@ -512,7 +510,7 @@ const CodeEditor = ({ form, setIsRunSuccess, testCaseUpdate, solutionUpdate }) =
                             key={index}
                             type='button'
                             variant={selectedCaseIndex === index ? 'default' : 'outline'}
-                            className='bg-emerald-100 hover:bg-emerald-200 text-emerald-700'
+                            className={`bg-emerald-100 hover:bg-emerald-200 text-emerald-700 ${selectedCaseIndex === index ? 'border-2 border-blue-500' : ''}`}
                             onClick={() => setSelectedCaseIndex(index)}
                           >
                             Case {index + 1}
@@ -536,10 +534,10 @@ const CodeEditor = ({ form, setIsRunSuccess, testCaseUpdate, solutionUpdate }) =
                     </div>
                   </TabsContent>
                   <TabsContent value='result' className='p-4'>
-                    {!testResults ? (
-                      <div className='text-center text-lg font-medium text-gray-500'>Please run Code First</div>
-                    ) : isRunning ? (
+                    {isRunning ? (
                       <TestResultLoading />
+                    ) : !testResults ? (
+                      <div className='text-center text-lg font-medium text-gray-500'>Please run Code First</div>
                     ) : (
                       <div className='space-y-6'>
                         <SolutionSelector

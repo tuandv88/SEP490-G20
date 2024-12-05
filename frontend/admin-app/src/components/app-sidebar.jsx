@@ -11,10 +11,9 @@ import {
   BookOpenText,
   User,
   Map,
-  PieChart,
-  Settings2,
   Code,
-  CircleHelp
+  CircleHelp,
+  MessageSquareMore
 } from 'lucide-react'
 import { NavMain } from '@/components/nav-main'
 import { NavProjects } from '@/components/nav-projects'
@@ -30,7 +29,7 @@ import {
   SidebarMenuItem,
   useSidebar
 } from '@/components/ui/sidebar'
-
+import { Link } from '@tanstack/react-router'
 import {
   COURSE_TABLE_PATH,
   PROBLEM_TABLE_PATH,
@@ -46,7 +45,8 @@ import {
   DOCUMENT_AI_TABLE_PATH,
   QUIZ_ASSESSMENT_PATH,
   USER_TABLE_PATH,
-  USER_DETAIL_PATH
+  USER_DETAIL_PATH,
+  DISCUSSION_TABLE_PATH
 } from '@/routers/router'
 
 // This is sample data.
@@ -84,11 +84,11 @@ export function AppSidebar({ ...props }) {
           {
             title: 'User Management',
             url: USER_TABLE_PATH
-          },
-          {
-            title: 'Role Management',
-            url: '#'
           }
+          // {
+          //   title: 'Role Management',
+          //   url: '#'
+          // }
         ]
       },
       {
@@ -143,6 +143,17 @@ export function AppSidebar({ ...props }) {
             url: DOCUMENT_AI_TABLE_PATH
           }
         ]
+      },
+      {
+        title: 'Community',
+        url: '#',
+        icon: MessageSquareMore,
+        items: [
+          {
+            title: 'Discussion',
+            url: DISCUSSION_TABLE_PATH
+          }
+        ]
       }
     ]
   }
@@ -153,15 +164,17 @@ export function AppSidebar({ ...props }) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size='lg' asChild>
-              <a href='#'>
-                <div className='flex items-center justify-center rounded-lg aspect-square size-8 bg-sidebar-primary text-sidebar-primary-foreground'>
-                  <Codesandbox className='size-4' />
+              <Link to=''>
+                <div className='flex items-center'>
+                  <div className='flex items-center justify-center rounded-lg aspect-square size-8 bg-sidebar-primary text-sidebar-primary-foreground'>
+                    <Codesandbox className='size-4' />
+                  </div>
+                  <div className='grid flex-1 text-sm leading-tight text-left ml-4'>
+                    <span className='font-semibold truncate'>ICODER</span>
+                    <span className='text-xs truncate'>Technology</span>
+                  </div>
                 </div>
-                <div className='grid flex-1 text-sm leading-tight text-left'>
-                  <span className='font-semibold truncate'>ICODER</span>
-                  <span className='text-xs truncate'>Technology</span>
-                </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem></SidebarMenuItem>

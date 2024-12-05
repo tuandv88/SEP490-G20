@@ -4,6 +4,36 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import MarkdownFormField from '@/components/markdown-form-field'
 import { Switch } from '@/components/ui/switch'
+import * as z from 'zod'
+
+// Schema cho form câu hỏi
+export const questionSchema = z.object({
+  content: z.string().min(10, "Question content must be at least 10 characters"),
+  questionLevel: z.string().min(1, "Question level is required"),
+  mark: z.number()
+    .min(0.5, "Mark must be at least 0.5")
+    .max(10, "Mark must not exceed 10"),
+  isActive: z.boolean()
+})
+
+// Schema cho form problem
+export const problemSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().default('This is a description for the Quiz Problem'),
+  language: z.string().min(1, 'Language is required'),
+  problemType: z.string().default('Assessment'),
+  difficultyType: z.string().min(1, 'Difficulty type is required'),
+  cpuTimeLimit: z.number().min(0.1, 'CPU time limit must be at least 0.1').max(20, 'CPU time limit must not exceed 20'),
+  cpuExtraTime: z.number().min(0, 'CPU extra time must be at least 0').max(5, 'CPU extra time must not exceed 5'),
+  memoryLimit: z.number().min(50, 'Memory limit must be at least 50MB').max(500, 'Memory limit must not exceed 500MB'),
+  stackLimit: z.number().min(30, 'Stack limit must be at least 30MB').max(125, 'Stack limit must not exceed 125MB'),
+  maxThread: z.number().min(20, 'Max thread must be at least 20').max(120, 'Max thread must not exceed 120'),
+  maxFileSize: z.number().min(1, 'Max file size must be at least 1MB').max(20, 'Max file size must not exceed 20MB'),
+  enableNetwork: z.boolean(),
+  isActive: z.boolean(),
+  testCases: z.any(),
+  createTestScriptDto: z.array(z.any()).optional()
+})
 
 export default function BasicInfoStep({ form, form2 }) {
   return (
@@ -14,7 +44,7 @@ export default function BasicInfoStep({ form, form2 }) {
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-10'>
         <div className='border-2 border-dashed border-gray-300 rounded-md p-4'>
-          <h3 className='mb-6 text-xl font-semibold'>Step 1: Create Question Content</h3>
+          <h3 className='mb-6 text-xl font-semibold'>Create Question Content</h3>
 
           <MarkdownFormField
             control={form2.control}
@@ -55,7 +85,18 @@ export default function BasicInfoStep({ form, form2 }) {
                 <FormItem>
                   <FormLabel className='text-base font-semibold'>Mark</FormLabel>
                   <FormControl>
-                    <Input type='number' placeholder='Enter mark' {...field} value={field.value} />
+                    <Input
+                      type='number'
+                      min={0.5}
+                      max={10}
+                      step='0.5'
+                      placeholder='Enter mark'
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? '' : Number(e.target.value)
+                        field.onChange(value)
+                      }}
+                      value={field.value === '' ? '' : field.value}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -87,7 +128,7 @@ export default function BasicInfoStep({ form, form2 }) {
           </div>
         </div>
         <div className='border-2 border-dashed border-gray-300 rounded-md p-4'>
-          <h3 className='mb-6 text-xl font-semibold'>Step 2: Create Problem Code</h3>
+          <h3 className='mb-6 text-xl font-semibold'>Create Problem Code</h3>
 
           <div className='mb-6'>
             <FormField
@@ -165,13 +206,16 @@ export default function BasicInfoStep({ form, form2 }) {
                   <FormLabel className='text-base font-semibold'>CPU Time Limit</FormLabel>
                   <FormControl>
                     <Input
+                      type='number'
                       min={0.1}
                       max={20}
-                      type='number'
                       step='0.1'
                       placeholder='Enter CPU Time Limit'
-                      {...field}
-                      value={field.value || 2}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? '' : Number(e.target.value)
+                        field.onChange(value)
+                      }}
+                      value={field.value === '' ? '' : field.value}
                     />
                   </FormControl>
                   <FormMessage />
@@ -188,13 +232,16 @@ export default function BasicInfoStep({ form, form2 }) {
                   <FormLabel className='text-base font-semibold'>CPU Extra Time</FormLabel>
                   <FormControl>
                     <Input
+                      type='number'
                       min={0}
                       max={5}
-                      type='number'
                       step='0.1'
                       placeholder='Enter CPU Extra Time'
-                      {...field}
-                      value={field.value || 2.5}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? '' : Number(e.target.value)
+                        field.onChange(value)
+                      }}
+                      value={field.value === '' ? '' : field.value}
                     />
                   </FormControl>
                   <FormMessage />
@@ -211,13 +258,16 @@ export default function BasicInfoStep({ form, form2 }) {
                   <FormLabel className='text-base font-semibold'>Memory Limit (MB)</FormLabel>
                   <FormControl>
                     <Input
+                      type='number'
                       min={50}
                       max={500}
-                      type='number'
                       step='1'
                       placeholder='Enter Memory Limit'
-                      {...field}
-                      value={field.value || 250}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? '' : Number(e.target.value)
+                        field.onChange(value)
+                      }}
+                      value={field.value === '' ? '' : field.value}
                     />
                   </FormControl>
                   <FormMessage />
@@ -234,13 +284,16 @@ export default function BasicInfoStep({ form, form2 }) {
                   <FormLabel className='text-base font-semibold'>Stack Limit (MB)</FormLabel>
                   <FormControl>
                     <Input
+                      type='number'
                       min={30}
                       max={125}
-                      type='number'
                       step='1'
                       placeholder='Enter Stack Limit'
-                      {...field}
-                      value={field.value || 64}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? '' : Number(e.target.value)
+                        field.onChange(value)
+                      }}
+                      value={field.value === '' ? '' : field.value}
                     />
                   </FormControl>
                   <FormMessage />
@@ -257,13 +310,16 @@ export default function BasicInfoStep({ form, form2 }) {
                   <FormLabel className='text-base font-semibold'>Max Thread</FormLabel>
                   <FormControl>
                     <Input
+                      type='number'
                       min={20}
                       max={120}
-                      type='number'
-                      step='0.1'
+                      step='1'
                       placeholder='Enter Max Thread'
-                      {...field}
-                      value={field.value || 70}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? '' : Number(e.target.value)
+                        field.onChange(value)
+                      }}
+                      value={field.value === '' ? '' : field.value}
                     />
                   </FormControl>
                   <FormMessage />
@@ -280,13 +336,16 @@ export default function BasicInfoStep({ form, form2 }) {
                   <FormLabel className='text-base font-semibold'>Max File Size (MB)</FormLabel>
                   <FormControl>
                     <Input
+                      type='number'
                       min={1}
                       max={20}
-                      type='number'
                       step='1'
                       placeholder='Enter Max File Size'
-                      {...field}
-                      value={field.value || 10}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? '' : Number(e.target.value)
+                        field.onChange(value)
+                      }}
+                      value={field.value === '' ? '' : field.value}
                     />
                   </FormControl>
                   <FormMessage />

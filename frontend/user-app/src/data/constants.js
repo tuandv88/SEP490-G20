@@ -19,7 +19,7 @@ export const AUTHENTICATION_ROUTERS = {
   USERPROFILE: '/user-profile',
   PROBLEMSPACE: '/problem-solve/:problemId',
   NOTIFICATION: '/notifications/history',
-  PAYMENT: '/payment'
+  PAYMENT: '/payment/:id'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

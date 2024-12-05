@@ -11,6 +11,9 @@ import { useMatch, useNavigate } from '@tanstack/react-router'
 import { updateLectureProblemRoute } from '@/routers/router'
 import { Loading } from '@/components/ui/overlay'
 import { EDIT_CURRICULUM_COURSE_PATH } from '@/routers/router'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { updateBasicInfoSchema } from './basic-info-step'
+
 const UpdateProblemAg = ({}) => {
   const [activeTab, setActiveTab] = useState('basic')
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
@@ -28,10 +31,11 @@ const UpdateProblemAg = ({}) => {
   console.log('problemId', problemId)
 
   const form = useForm({
+    resolver: zodResolver(updateBasicInfoSchema),
     defaultValues: {
       title: '',
-      description: '',
-      problemType: 'Challenge',
+      description: 'This is a problem description for Lecture',
+      problemType: 'Practice',
       difficultyType: 'Medium',
       cpuTimeLimit: 2,
       cpuExtraTime: 2.5,
@@ -42,7 +46,7 @@ const UpdateProblemAg = ({}) => {
       enableNetwork: false,
       isActive: true,
       testCases: {},
-      createTestScriptDto: []
+      testcripts: []
     }
   })
 

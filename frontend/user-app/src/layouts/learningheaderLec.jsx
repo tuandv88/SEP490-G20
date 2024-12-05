@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import React, { useState } from 'react'
 
-const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef, header }) => {
+const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef, header, userPoint, lectureScore }) => {
   const [isRunning, setIsRunning] = useState(false)
   const [isPopupOpen, setIsPopupOpen] = useState(false)
 
@@ -88,7 +88,6 @@ const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef, header })
 
               <div className='flex items-center space-x-4 mr-10 relative'>
                 <div className='rounded-lg bg-yellow-500 p-2 cursor-pointer' onClick={() => setIsPopupOpen(!isPopupOpen)}>
-                  {/* <Trophy className='w-5 h-5 text-white' color='yellow' /> */}
                   <Medal className='w-5 h-5 text-white' color='#dee114' />
                 </div>
                 {isPopupOpen && (
@@ -101,7 +100,7 @@ const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef, header })
                           </div>
                           <div>
                             <p className='text-sm text-gray-500'>Your Score</p>
-                            <p className='text-lg font-bold text-gray-900'>24</p>
+                            <p className='text-lg font-bold text-gray-900'>{userPoint}</p>
                           </div>
                         </div>
 
@@ -111,7 +110,7 @@ const HeaderCode = ({ onButtonClick, onChatClick, toggleCurriculumRef, header })
                           </div>
                           <div>
                             <p className='text-sm text-gray-500'>Lecture Score</p>
-                            <p className='text-lg font-bold text-gray-900'>12</p>
+                            <p className='text-lg font-bold text-gray-900'>{lectureScore}</p>
                           </div>
                         </div>
                       </div>

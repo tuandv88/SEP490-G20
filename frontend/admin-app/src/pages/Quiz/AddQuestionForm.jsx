@@ -14,6 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { createQuestion } from '@/services/api/questionApi'
 import { useToast } from '@/hooks/use-toast'
 import { Trash2, Plus } from 'lucide-react'
+import CustomMarkdownEditor from '@/components/custom-markdown-editor'
 
 const QUESTION_TYPES = ['MultipleChoice', 'MultipleSelect', 'TrueFalse']
 const QUESTION_LEVELS = ['EASY', 'MEDIUM', 'HARD', 'EXPERT']
@@ -42,6 +43,7 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
   const [questionType, setQuestionType] = useState('MultipleChoice')
   const { toast } = useToast()
   const [showErrors, setShowErrors] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     control,
@@ -93,26 +95,30 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
     }
   }, [watchQuestionOptions, trigger])
 
+  useEffect(() => {
+    if (watchQuestionType === 'TrueFalse') {
+      setValue('questionOptions', [
+        { content: 'True', isCorrect: true },
+        { content: 'False', isCorrect: false }
+      ]);
+    }
+  }, [watchQuestionType, setValue]);
+
   const onSubmit = async (data) => {
-    setShowErrors(true)
-    console.log('Form errors:', errors) // Add this line
-    if (Object.keys(errors).length > 0) {
-      return // Ngăn form submit nếu có lỗi
-    }
-
-    const updatedQuestionOptions = data.questionOptions.map((option, index) => ({
-      ...option,
-      orderIndex: index
-    }))
-
-    const createQues = {
-      createQuestionDto: {
-        ...data,
-        questionOptions: updatedQuestionOptions
-      }
-    }
-
     try {
+      setIsLoading(true)
+      const updatedQuestionOptions = data.questionOptions.map((option, index) => ({
+        ...option,
+        orderIndex: index
+      }))
+
+      const createQues = {
+        createQuestionDto: {
+          ...data,
+          questionOptions: updatedQuestionOptions
+        }
+      }
+
       await createQuestion(createQues, quizId)
       setIsUpdate(!isUpdate)
       toast({
@@ -128,11 +134,13 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
         variant: 'destructive',
         duration: 1500
       })
+    } finally {
+      setIsLoading(false)
     }
   }
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className='max-w-[500px] h-[600px] p-0 overflow-hidden flex flex-col'>
+      <DialogContent className='max-w-[800px] h-[600px] p-0 overflow-hidden flex flex-col'>
         <DialogHeader className='px-6 py-4 border-b'>
           <DialogTitle className='text-xl font-semibold'>Add New Question</DialogTitle>
         </DialogHeader>
@@ -144,7 +152,14 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
               <Controller
                 name='content'
                 control={control}
-                render={({ field }) => <Input id='content' {...field} placeholder='Enter your question here' />}
+                render={({ field }) => (
+                  <CustomMarkdownEditor
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder='Enter your question here'
+                    height={250}
+                  />
+                )}
               />
               {showErrors && errors.content && <p className='text-sm text-red-500'>{errors.content.message}</p>}
             </div>
@@ -300,19 +315,15 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
                 <Controller
                   name='questionOptions'
                   control={control}
-                  defaultValue={[
-                    { content: 'True', isCorrect: true },
-                    { content: 'False', isCorrect: false }
-                  ]}
                   render={({ field }) => (
                     <Select
+                      value={field.value?.[0]?.isCorrect ? 'True' : 'False'}
                       onValueChange={(value) =>
                         field.onChange([
                           { content: 'True', isCorrect: value === 'True' },
                           { content: 'False', isCorrect: value === 'False' }
                         ])
                       }
-                      defaultValue='True'
                     >
                       <SelectTrigger>
                         <SelectValue placeholder='Select correct answer' />
@@ -340,12 +351,19 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
               Cancel
             </Button>
             <Button
-              onClick={() => {
-                setShowErrors(true)
-                handleSubmit(onSubmit)()
-              }}
+              disabled={isLoading}
+              onClick={handleSubmit(
+                (data) => {
+                  setShowErrors(true)
+                  onSubmit(data)
+                },
+                (errors) => {
+                  setShowErrors(true)
+                  console.log('Validation errors:', errors)
+                }
+              )}
             >
-              Add Question
+              {isLoading ? 'Loading...' : 'Add Question'}
             </Button>
           </div>
         </DialogFooter>

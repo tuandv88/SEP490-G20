@@ -1,2 +1,0 @@
-import{u as o,r as t,a as l,R as r}from"./index--0QK1py9.js";function n(){console.log("Callback method....");const e=o();return t.useEffect(()=>{l.handleCallback().then(()=>{console.log("Verify Auth Code - Get Access_Token & Save Storage.."),e({to:"/"})}).catch(a=>{console.error("Error handling callback:",a),console.error("Verify Auth Code Failed."),e({to:"/login"})})},[e]),r.createElement("div",null,"Loading...")}export{n as default};
-//# sourceMappingURL=Callback-CJnqz4Oy.js.map

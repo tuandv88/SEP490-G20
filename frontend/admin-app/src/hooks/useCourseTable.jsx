@@ -106,6 +106,9 @@ export default function useCourseTable() {
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [newStatus, setNewStatus] = useState('')
 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [courseToDelete, setCourseToDelete] = useState(null)
+
   const fetchCourses = useCallback(async () => {
     setIsLoading(true)
     try {
@@ -156,20 +159,21 @@ export default function useCourseTable() {
       return false
     }
   }
-  const handleDeleteCourse = async (courseId) => {
+  const handleDeleteCourse = async () => {
     try {
-      await deleteCourse(courseId)
+      await deleteCourse(courseToDelete)
       toast({
         title: 'Course deleted',
         description: 'The course has been deleted successfully.',
         variant: 'default',
         duration: 1500
       })
+      setIsDeleteDialogOpen(false)
       await fetchCourses()
     } catch (error) {
       console.error('Error deleting course:', error)
       toast({
-        title: 'Error',
+        title: 'Error', 
         description: 'An error occurred while deleting the course.',
         variant: 'destructive',
         duration: 1500
@@ -281,30 +285,35 @@ export default function useCourseTable() {
     }
   }
 
+  const handleShowDeleteDialog = (courseId) => {
+    setCourseToDelete(courseId)
+    setIsDeleteDialogOpen(true)
+  }
+
   const columns = [
-    {
-      id: 'select',
-      header: ({ table }) => (
-        <div className='px-1'>
-          <Checkbox
-            checked={table.getIsAllPageRowsSelected()}
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label='Select all'
-          />
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div className='px-1'>
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label='Select row'
-          />
-        </div>
-      ),
-      enableSorting: false,
-      enableHiding: false
-    },
+    // {
+    //   id: 'select',
+    //   header: ({ table }) => (
+    //     <div className='px-1'>
+    //       <Checkbox
+    //         checked={table.getIsAllPageRowsSelected()}
+    //         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+    //         aria-label='Select all'
+    //       />
+    //     </div>
+    //   ),
+    //   cell: ({ row }) => (
+    //     <div className='px-1'>
+    //       <Checkbox
+    //         checked={row.getIsSelected()}
+    //         onCheckedChange={(value) => row.toggleSelected(!!value)}
+    //         aria-label='Select row'
+    //       />
+    //     </div>
+    //   ),
+    //   enableSorting: false,
+    //   enableHiding: false
+    // },
     {
       accessorKey: 'title',
       header: ({ column }) => (
@@ -319,22 +328,22 @@ export default function useCourseTable() {
       ),
       cell: ({ row }) => <div className='pl-4'>{row.getValue('title')}</div>
     },
-    {
-      accessorKey: 'timeEstimation',
-      header: ({ column }) => (
-        <div className='text-right'>
-          <Button
-            variant='ghost'
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className='px-0 font-semibold hover:bg-transparent'
-          >
-            Time Estimate
-            <ArrowUpDown className='w-4 h-4 ml-1' />
-          </Button>
-        </div>
-      ),
-      cell: ({ row }) => <div className='text-right pr-4'>{row.getValue('timeEstimation')} hours</div>
-    },
+    // {
+    //   accessorKey: 'timeEstimation',
+    //   header: ({ column }) => (
+    //     <div className='text-right'>
+    //       <Button
+    //         variant='ghost'
+    //         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+    //         className='px-0 font-semibold hover:bg-transparent'
+    //       >
+    //         Time Estimate
+    //         <ArrowUpDown className='w-4 h-4 ml-1' />
+    //       </Button>
+    //     </div>
+    //   ),
+    //   cell: ({ row }) => <div className='text-right pr-4'>{row.getValue('timeEstimation')} hours</div>
+    // },
     {
       accessorKey: 'scheduledPublishDate',
       header: ({ column }) => (
@@ -530,7 +539,7 @@ export default function useCourseTable() {
                       <Edit className='mr-2 h-4 w-4' />
                       <span>Edit Basic course</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleDeleteCourse(course.id)}>
+                    <DropdownMenuItem onClick={() => handleShowDeleteDialog(course.id)}>
                       <Trash className='mr-2 h-4 w-4' />
                       <span>Delete course</span>
                     </DropdownMenuItem>
@@ -590,6 +599,10 @@ export default function useCourseTable() {
     selectedCourse,
     newStatus,
     columns,
-    handleLevelChange
+    handleLevelChange,
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
+    handleShowDeleteDialog,
+    handleDeleteCourse
   }
 }

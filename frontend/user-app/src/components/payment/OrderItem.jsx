@@ -11,10 +11,7 @@ const OrderItem = ({ item }) => {
       <div className="flex-1">
         <h3 className="font-medium text-gray-900">{item.name}</h3>
         <div className="flex items-center space-x-2 mt-1">
-          <span className="font-bold">₫{item.price.toLocaleString()}</span>
-          <span className="text-gray-500 line-through text-sm">
-            ₫{item.originalPrice.toLocaleString()}
-          </span>
+          <span className="font-bold text-3xl">${item.price.toLocaleString()}</span>
         </div>
       </div>
     </div>

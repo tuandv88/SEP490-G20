@@ -79,10 +79,12 @@ export const columns = [
   }),
   columnHelper.display({
     id: 'actions',
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const problem = row.original
       const navigate = useNavigate()
       const problemId = problem.problemsId
+      const { handleShowDeleteDialog } = table.options.meta
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -100,7 +102,9 @@ export const columns = [
             <DropdownMenuItem onClick={() => navigate({ to: UPDATE_PROBLEM_AG_PATH, params: { problemId } })}>
               Edit problem
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => deleteProblemAg(problem.problemsId)}>Delete problem</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleShowDeleteDialog(problemId)}>
+              Delete problem
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

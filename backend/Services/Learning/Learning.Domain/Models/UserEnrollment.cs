@@ -1,4 +1,6 @@
-﻿namespace Learning.Domain.Models;
+﻿using Learning.Domain.Events;
+
+namespace Learning.Domain.Models;
 public class UserEnrollment : Aggregate<UserEnrollmentId> {
     public UserId UserId { get; set; } = default!;
     public List<LectureProgress> LectureProgress = new();
@@ -20,6 +22,7 @@ public class UserEnrollment : Aggregate<UserEnrollmentId> {
     }
     public void AddProgress(LectureProgress progress) {
         LectureProgress.Add(progress);
+        progress.AddDomainEvent(new LectureCompletedEvent(progress));
         // thêm event vào đây
     }
     public void AddReview(int rating, string feedback) {

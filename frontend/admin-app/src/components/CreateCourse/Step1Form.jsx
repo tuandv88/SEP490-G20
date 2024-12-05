@@ -11,16 +11,12 @@ import MarkdownFormField from '@/components/markdown-form-field'
 import { Clock, Book, Users, ChevronRight, FileText, Target } from 'lucide-react'
 
 const formSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(100, 'Title must not exceed 100 characters'),
-  headline: z.string().min(1, 'Headline is required').max(200, 'Headline must not exceed 200 characters'),
+  title: z.string().min(1, 'Title is required').max(50, 'Title must not exceed 50 characters'),
+  headline: z.string().min(1, 'Headline is required').max(50, 'Headline must not exceed 50 characters'),
   prerequisites: z.string().min(1, 'Prerequisites are required'),
   description: z.string().min(1, 'Description is required'),
   objectives: z.string().min(1, 'Course objectives are required'),
-  targetAudiences: z.string().min(1, 'Target audiences are required'),
-  timeEstimation: z
-    .number()
-    .min(1, 'Estimated time must be greater than 0')
-    .max(1000, 'Estimated time must not exceed 1000 hours')
+  targetAudiences: z.string().min(1, 'Target audiences are required')
 })
 
 export default function Step1Form({ onSubmit, initialData }) {
@@ -111,32 +107,6 @@ export default function Step1Form({ onSubmit, initialData }) {
               />
 
               <Separator className='my-6' />
-
-              <FormField
-                control={methods.control}
-                name='timeEstimation'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-base font-semibold'>
-                      Estimated Course Duration (hours)<span className='text-red-500'>*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className='flex items-center'>
-                        <Clock className='w-5 h-5 text-muted-foreground mr-2' />
-                        <Input
-                          type='number'
-                          step='0.5'
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                          placeholder='Enter estimated course duration'
-                          className='w-full'
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </CardContent>
             <CardFooter className='flex justify-end'>
               <Button type='submit' className='w-full sm:w-auto'>

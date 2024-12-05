@@ -1,8 +1,10 @@
 /** @type {import('tailwindcss').Config} */
+import plugin from '@tailwindcss/typography'
 import { fontFamily } from 'tailwindcss/defaultTheme'
 export default {
   darkMode: ['class'],
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  plugin: [require('@tailwindcss/typography')],
   theme: {
     extend: {
       fontFamily: {

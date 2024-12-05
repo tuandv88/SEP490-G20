@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Events\Payments\Sagas\" />
     <Folder Include="MassTransit\" />
   </ItemGroup>
 

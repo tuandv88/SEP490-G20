@@ -1,25 +1,25 @@
-﻿using Carter;
-using Mapster;
-using MediatR;
+﻿using Payment.Application.Integrations.Paypals.Commands.CreateOrder;
+using Payment.Application.Integrations.Paypals.Dtos;
 
 namespace Payment.API.Endpoints;
-public record CreateOrderRequest();
+public record CreateOrderRequest(CreateOrderDto Order);
+public record CreateOrderResponse(string OrderId);
 public class CreateOrderEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
 
-        //app.MapPost("/orders", async (CreateOrderRequest request, ISender sender) => {
-        //    var command = request.Adapt<CreateCourseCommand>();
+        app.MapPost("/checkout/orders", async (CreateOrderRequest request, ISender sender) => {
+            var command = request.Adapt<CreateOrderCommand>();
 
-        //    var result = await sender.Send(command);
+            var result = await sender.Send(command);
 
-        //    var response = result.Adapt<CreateCourseResponse>();
+            var response = result.Adapt<CreateOrderResponse>();
 
-        //    return Results.Created($"/courses/{response.Id}", response);
-        //})
-        //.WithName("CreateCourse")
-        //.Produces<CreateCourseResponse>(StatusCodes.Status201Created)
-        //.ProducesProblem(StatusCodes.Status400BadRequest)
-        //.WithSummary("Create course");
+            return Results.Created($"/checkout/orders/{response.OrderId}", response);
+        })
+        .WithName("CreateOrder")
+        .Produces<CreateOrderResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithSummary("Create order");
     }
 }
 

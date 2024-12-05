@@ -7,11 +7,18 @@ using Microsoft.Extensions.Logging;
 using Payment.Application.Data;
 using Payment.Infrastructure.Extentions;
 using Payment.Infrastructure.Data.Interceptors;
+using Payment.Infrastructure.Services;
+using Payment.Application.Data.Repositories;
+using Payment.Infrastructure.Data.Respositories.Transactions;
+using Payment.Infrastructure.Data.Respositories.TransactionLogs;
+using BuildingBlocks.Email.Interfaces;
+using BuildingBlocks.Email.Services;
+using Payment.Infrastructure.Data.Respositories.TransactionItems;
 
 namespace Payment.Infrastructure;
 public static class DependencyInjection {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration) {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
         services.AddDbContext<ApplicationDbContext>((sp, options) => {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
@@ -21,6 +28,8 @@ public static class DependencyInjection {
 
             options.LogTo(Console.WriteLine, LogLevel.Information);
         });
+
+        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddMassTransitWithRabbitMQ(configuration, typeof(IApplicationDbContext).Assembly);
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
@@ -28,9 +37,14 @@ public static class DependencyInjection {
 
         services.AddHttpContextAccessor();
 
-        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
-        
+        services.AddPaypal(configuration);
 
+        services.AddScoped<IPaypalClientApi, PaypalClientApi>();
+
+        services.AddScoped<ITransactionRepository, TransactionRepository>();
+        services.AddScoped<ITransactionLogRepository, TransactionLogRepository>();
+        services.AddScoped<ITransactionItemRepository, TransactionItemRepository>();
+        services.AddScoped<IEmailService, EmailService>();
         return services;
     }
 }

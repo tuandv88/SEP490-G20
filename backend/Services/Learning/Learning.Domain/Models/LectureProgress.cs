@@ -1,5 +1,5 @@
 ﻿namespace Learning.Domain.Models;
-public class LectureProgress : Entity<LectureProgressId>{
+public class LectureProgress : Aggregate<LectureProgressId>{
     public UserEnrollmentId UserEnrollmentId { get; set; } = default!;
     public LectureId LectureId { get; set; } = default!;
     public DateTime? CompletionDate { get; set; }

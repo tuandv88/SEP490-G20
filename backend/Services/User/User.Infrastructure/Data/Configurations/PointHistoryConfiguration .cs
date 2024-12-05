@@ -24,7 +24,7 @@ namespace User.Infrastructure.Data.Configurations
 
             builder.Property(ph => ph.Point).IsRequired();
             builder.Property(ph => ph.ChangeType)
-                .HasDefaultValue(ChangeType.Deducted)
+                .HasDefaultValue(ChangeType.Earned)
                 .HasConversion(s => s.ToString(), dbStatus => (ChangeType)Enum.Parse(typeof(ChangeType), dbStatus));
             builder.Property(ph => ph.Source);
             builder.Property(ph => ph.DateReceived).IsRequired();

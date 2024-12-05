@@ -17,15 +17,14 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 
-export function DataTable({ columns, data }) {
+export function DataTable({ columns, data, roles }) {
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
   const [rowSelection, setRowSelection] = useState({})
-  const [userData, setUserData] = useState(data)
 
   const table = useReactTable({
-    data: userData,
+    data: data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -42,10 +41,6 @@ export function DataTable({ columns, data }) {
       rowSelection
     }
   })
-
-  const handleDataChange = (updatedUser) => {
-    setUserData((prevData) => prevData.map((user) => (user.id === updatedUser.id ? updatedUser : user)))
-  }
 
   return (
     <div className='space-y-4'>
@@ -102,7 +97,7 @@ export function DataTable({ columns, data }) {
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, {
                         ...cell.getContext(),
-                        onDataChange: handleDataChange
+                        roles: roles
                       })}
                     </TableCell>
                   ))}

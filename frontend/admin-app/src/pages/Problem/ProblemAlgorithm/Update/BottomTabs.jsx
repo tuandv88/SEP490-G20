@@ -2,6 +2,8 @@ import { FileText, Code, BookOpen, ArrowLeft, ArrowRight, Loader2 } from 'lucide
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { ControlledAlertDialog } from '@/components/alert/ControlledAlertDialog'
+import { useFormContext } from 'react-hook-form'
+import { toast } from '@/hooks/use-toast'
 
 const tabs = [
   { id: 'basic', label: 'Basic Info', icon: FileText },
@@ -10,6 +12,7 @@ const tabs = [
 ]
 
 export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, isRunSuccess, isLoadingSubmit }) {
+  const { trigger, formState: { errors } } = useFormContext()
   const currentTabIndex = tabs.findIndex((tab) => tab.id === activeTab)
   const isLastTab = currentTabIndex === tabs.length - 1
   const isFirstTab = currentTabIndex === 0
@@ -29,8 +32,37 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, is
     }
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!isLastTab) {
+      if (activeTab === 'basic') {
+        // Validate basic info form
+        const isValid = await trigger([
+          'title',
+          'description',
+          'difficultyType',
+          'cpuTimeLimit',
+          'cpuExtraTime',
+          'memoryLimit',
+          'stackLimit',
+          'maxThread',
+          'maxFileSize'
+        ])
+
+        if (!isValid) {
+          toast({
+            variant: "destructive",
+            title: "Validation Error",
+            description: "Please fill in all required fields correctly"
+          })
+          return
+        }
+      }
+
+      if (activeTab === 'code' && !isRunSuccess) {
+        openDialog()
+        return
+      }
+
       setActiveTab(tabs[currentTabIndex + 1].id)
     }
   }

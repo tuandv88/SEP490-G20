@@ -11,6 +11,9 @@ import { useMatch, useNavigate } from '@tanstack/react-router'
 import { updateAgProblemRoute } from '@/routers/router'
 import { Loading } from '@/components/ui/overlay'
 import { PROBLEM_TABLE_PATH } from '@/routers/router'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { updateBasicInfoSchema } from './basic-info-step'
+
 const UpdateProblemAg = ({}) => {
   const [activeTab, setActiveTab] = useState('basic')
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
@@ -26,6 +29,7 @@ const UpdateProblemAg = ({}) => {
   const navigate = useNavigate()
 
   const form = useForm({
+    resolver: zodResolver(updateBasicInfoSchema),
     defaultValues: {
       title: '',
       description: '',
@@ -40,7 +44,7 @@ const UpdateProblemAg = ({}) => {
       enableNetwork: false,
       isActive: true,
       testCases: {},
-      createTestScriptDto: []
+      testcripts: []
     }
   })
 
@@ -95,6 +99,7 @@ const UpdateProblemAg = ({}) => {
       problem: updatedData
     }
 
+    console.log(problemData)
     setIsLoadingSubmit(true)
     try {
       const response = await updateProblemAg(problemData, problemId)

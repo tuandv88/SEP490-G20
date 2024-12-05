@@ -85,14 +85,14 @@ export default function LectureItem({
       document.body.style.height = 'auto'
     }
 
-    if (!isQuizFormOpen) {
+    if (!isQuizFormOpen && !isEditDialogOpen) {
       restoreScroll()
     }
 
     return () => {
       restoreScroll()
     }
-  }, [isQuizFormOpen])
+  }, [isQuizFormOpen, isEditDialogOpen])
   const { control, handleSubmit } = methods
 
   const handleFileUpload = async (lectureId, file, fileType) => {
@@ -153,10 +153,6 @@ export default function LectureItem({
     }
   }
   const handleEditCodeProblem = (problem) => {
-    console.log(problem.id)
-    console.log(courseId)
-    console.log(lecture.id)
-    // navigate({ to: `/create-code-problem/${problem.id}` })
     navigate({ to: UPDATE_PROBLEM_LECTURE_PATH, params: { courseId, lectureId: lecture.id, problemId: problem.id } })
   }
   const handleDeleteCodeProblem = async (problemId) => {
@@ -188,8 +184,6 @@ export default function LectureItem({
     navigate({
       to: CREATE_PROBLEM_LECTURE_PATH,
       params: { courseId, lectureId: lecture.id }
-
-      // to: `/edit-course/${courseId}/create-problem-lecture/${lecture.id}`
     })
   }
 
@@ -529,7 +523,7 @@ export default function LectureItem({
       )}
       {lecture.lectureType === 'Quiz' && (
         <div className='mt-2'>
-          <Button onClick={handleQuizFormOpen} size='sm' className='w-full sm:w-auto'>
+          <Button onClick={handleQuizFormOpen} size='sm' className='w-full sm:w-auto' disabled={createdQuiz}>
             <QuestionMarkCircledIcon className='w-4 h-4 mr-2' /> Create Quiz
           </Button>
           {createdQuiz && (

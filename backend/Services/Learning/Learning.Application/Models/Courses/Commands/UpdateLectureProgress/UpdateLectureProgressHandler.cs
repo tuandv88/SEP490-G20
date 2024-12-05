@@ -28,7 +28,7 @@ public class UpdateLectureProgressHandler(IUserEnrollmentRepository repository, 
         var existingProgress = userCourse.LectureProgress.FirstOrDefault(l => l.LectureId.Equals(lectureId));
 
         if (existingProgress != null) {
-            userCourse.LectureProgress.Remove(existingProgress);
+            return new UpdateLectureProgressResult(true);
         } else {
             var newProgress = LectureProgress.Create(
                     LectureProgressId.Of(Guid.NewGuid()),
@@ -41,25 +41,10 @@ public class UpdateLectureProgressHandler(IUserEnrollmentRepository repository, 
             userCourse.AddProgress(newProgress);
         }
 
-        var latestProgress = userCourse.LectureProgress
-            .OrderByDescending(p => p.CompletionDate ?? DateTime.MinValue)
-            .FirstOrDefault();
-
-        foreach (var progress in userCourse.LectureProgress) {
-            progress.IsCurrent = progress == latestProgress;
-        }
-
-        //kiểm tra trạng thái completed
         var totalLectures = course.Chapters.SelectMany(ch => ch.Lectures).Count();
         var completedLectures = userCourse.LectureProgress.Count;
-
-        var newStatus = completedLectures == totalLectures
-            ? UserEnrollmentStatus.Completed
-            : UserEnrollmentStatus.InProgress;
-
-        userCourse.UpdateStatus(newStatus);
-
-        if (userCourse.UserEnrollmentStatus == UserEnrollmentStatus.Completed && userCourse.CompletionDate == null) {
+        if(completedLectures == totalLectures) {
+            userCourse.UpdateStatus(UserEnrollmentStatus.Completed);
             userCourse.CompletionDate = DateTime.UtcNow;
         }
 

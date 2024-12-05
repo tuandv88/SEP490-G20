@@ -4,8 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 export default function SelectedFilters({ column, table }) {
-  const selectedValues = table.getColumn(column)?.getFilterValue()
-  if (!selectedValues || selectedValues.length === 0) return null
+  const selectedValues = table.getColumn(column)?.getFilterValue() ?? []
 
   return (
     <div className='flex flex-wrap gap-2 mt-2'>

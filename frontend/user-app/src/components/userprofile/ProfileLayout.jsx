@@ -16,7 +16,7 @@ export function ProfileLayout({ children, activeTab, setActiveTab }) {
         <div className='flex'>
           {/* Sidebar bên trái */}
 
-          <div className='w-1/4'>
+          <div className='w-1/5'>
             <div className='flex items-center mb-8'>
               <div className='flex items-center space-x-4'>
                 <div className='h-16 w-16 rounded-full bg-primaryButton flex items-center justify-center text-white text-2xl font-bold'>
@@ -34,7 +34,7 @@ export function ProfileLayout({ children, activeTab, setActiveTab }) {
             <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
           </div>
           {/* Nội dung bên phải */}
-          <div className='w-3/4 ml-8'>{children}</div>
+          <div className='w-4/5 ml-8'>{children}</div>
         </div>
       </div>
     </div>

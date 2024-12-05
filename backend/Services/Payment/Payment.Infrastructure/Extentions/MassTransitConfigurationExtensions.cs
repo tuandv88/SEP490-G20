@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Payment.Infrastructure.Data;
+using Payment.Application.Sagas;
+using System;
 namespace Payment.Infrastructure.Extentions;
 public static class MassTransitConfigurationExtensions {
     public static void AddMassTransitWithRabbitMQ(this IServiceCollection services, IConfiguration configuration, Assembly? assembly = null) {
@@ -11,6 +13,11 @@ public static class MassTransitConfigurationExtensions {
             if (assembly != null)
                 x.AddConsumers(assembly);
 
+            x.AddSagaStateMachine<PaymentSagaStateMachine, PaymentSagaInstance>()
+            .EntityFrameworkRepository(r =>{
+                r.ExistingDbContext<ApplicationDbContext>();
+                r.UsePostgres();
+            });
             x.AddEntityFrameworkOutbox<ApplicationDbContext>(o => {
                 o.UsePostgres();
                 o.UseBusOutbox();

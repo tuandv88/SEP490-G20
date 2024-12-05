@@ -1,17 +1,25 @@
-.custom-list li {
+.custom-list ol {
+    list-style-type: decimal;
+    /* Hiển thị số thứ tự */
+    margin-left: 20px;
+    /* Khoảng cách lề trái */
     color: black;
-    /* Màu chữ đỏ */
-    list-style: disc;
+    /* Màu chữ */
+}
+
+.custom-list ul {
+    list-style-type: disc;
     /* Hiển thị dấu bullet */
+    margin-left: 20px;
+    /* Khoảng cách lề trái */
+    color: black;
+    /* Màu chữ */
 }
 
 .custom-list li::marker {
     color: black;
-    /* Màu của dấu bullet */
+    /* Màu của dấu bullet và số thứ tự */
 }
-
-
-
 
 * {
     scroll-behavior: smooth;

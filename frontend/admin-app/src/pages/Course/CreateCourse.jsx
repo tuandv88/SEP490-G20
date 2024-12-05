@@ -12,11 +12,12 @@ import { useNavigate } from '@tanstack/react-router'
 import { createCourse } from '@/services/api/courseApi'
 import { useToast } from '@/hooks/use-toast'
 import { ArrowLeft, BookOpen, Rocket, AlertCircle, CheckCircle, X } from 'lucide-react'
+import { COURSE_TABLE_PATH, CREATE_COURSE_PATH } from '@/routers/router'
 
 export default function CourseCreator() {
   const breadcrumbs = [
-    { label: 'Course Table', href: '/course-table' },
-    { label: 'Create Course', href: '/create-course' }
+    { label: 'Course Table', href: COURSE_TABLE_PATH },
+    { label: 'Create Course', href: CREATE_COURSE_PATH }
   ]
   const [activeTab, setActiveTab] = useState('step1')
   const [error, setError] = useState(null)
@@ -25,7 +26,6 @@ export default function CourseCreator() {
     title: '',
     description: '',
     headline: '',
-    timeEstimation: 0,
     prerequisites: '',
     objectives: '',
     targetAudiences: '',
@@ -38,12 +38,6 @@ export default function CourseCreator() {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const navigate = useNavigate()
-
-  const handleBackToCourseList = () => {
-    if (window.confirm('Are you sure you want to leave? Your progress will be lost.')) {
-      navigate({ to: '/course-table' })
-    }
-  }
 
   const handleStep1Submit = (data) => {
     setCourseData((prevData) => ({ ...prevData, ...data }))
@@ -73,7 +67,7 @@ export default function CourseCreator() {
         description: 'Your new course has been added to the course list.',
         duration: 3000
       })
-      navigate({ to: '/course-table' })
+      navigate({ to: COURSE_TABLE_PATH })
     } catch (error) {
       console.error('Error creating course:', error)
       setError('There was a problem creating your course. Please try again.')
@@ -111,20 +105,9 @@ export default function CourseCreator() {
                 <CardTitle className='text-2xl sm:text-3xl font-bold'>Create New Course</CardTitle>
                 <CardDescription className='mt-1'>Fill in the details to create your new course</CardDescription>
               </div>
-              <Button variant='outline' onClick={handleBackToCourseList} className='w-full sm:w-auto'>
-                <ArrowLeft className='w-4 h-4 mr-2' />
-                Back to Course List
-              </Button>
             </div>
           </CardHeader>
           <CardContent className='w-full'>
-            <div className='mb-6'>
-              <Progress value={activeTab === 'step1' ? 50 : 100} className='w-full' />
-              <div className='flex justify-between mt-2 text-sm text-gray-500'>
-                <span>Step {activeTab === 'step1' ? '1' : '2'} of 2</span>
-                <span>{activeTab === 'step1' ? '50%' : '100%'} Complete</span>
-              </div>
-            </div>
             {error && (
               <Alert variant='destructive' className='mb-6'>
                 <AlertCircle className='h-4 w-4' />

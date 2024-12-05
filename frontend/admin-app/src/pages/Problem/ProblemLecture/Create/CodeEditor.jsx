@@ -192,8 +192,10 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
       })
       return
     }
+
     setIsRunning(true)
     setTestCaseTab('result')    
+    setTestResults(null)
 
     const values = form.getValues()
 
@@ -243,14 +245,14 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
     ]
 
     setValue('createTestScriptDto', testScriptDto)
-
+    console.log(testScriptDto)
     try {
       const response = await runCode(createCode)
-      setTestResults(response.codeExecuteDtos)
       const hasCompileOrRuntimeErrors = response.codeExecuteDtos.some(dto =>
         dto.compileErrors || dto.runTimeErrors
       );
-  
+      
+      console.log(response)
       if (hasCompileOrRuntimeErrors) {
         toast({
           variant: 'destructive',
@@ -258,6 +260,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
           description: 'There are compile or runtime errors. Please check your code.'
         });
         setIsRunSuccess(false)
+        setTestResults(response.codeExecuteDtos)
         return;
       }
 
@@ -281,6 +284,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
         })
         setIsRunSuccess(true)       
       }     
+      setTestResults(response.codeExecuteDtos)
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -296,7 +300,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
   }
 
   const getDisplayFields = (testCase) => {
-    return Object.keys(testCase).filter((key) => key !== 'isHidden')
+    return Object.keys(testCase).filter((key) => key !== 'expectedOutput' && key !== 'isHidden')
   }
 
   const currentSolutionResult = testResults && testResults[selectedSolutionIndex]
@@ -480,7 +484,7 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
                             key={index}
                             type='button'
                             variant={selectedCaseIndex === index ? 'default' : 'outline'}
-                            className='bg-emerald-100 hover:bg-emerald-200 text-emerald-700'
+                            className={`bg-emerald-100 hover:bg-emerald-200 text-emerald-700 ${selectedCaseIndex === index ? 'border-2 border-blue-500' : ''}`}
                             onClick={() => setSelectedCaseIndex(index)}
                           >
                             Case {index + 1}
@@ -504,10 +508,10 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
                     </div>
                   </TabsContent>
                   <TabsContent value='result' className='p-4'>
-                    {!testResults ? (
-                      <div className='text-center text-lg font-medium text-gray-500'>Please run Code First</div>
-                    ) : isRunning ? (
+                    {isRunning ? (
                       <TestResultLoading />
+                    ) : !testResults ? (
+                      <div className='text-center text-lg font-medium text-gray-500'>Please run Code First</div>
                     ) : (
                       <div className='space-y-6'>
                         <SolutionSelector
@@ -542,5 +546,6 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
     </div>
   )
 }
+
 
 export default React.memo(CodeEditor)

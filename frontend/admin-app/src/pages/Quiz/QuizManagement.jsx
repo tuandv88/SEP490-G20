@@ -15,6 +15,8 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FileQuestion, Award } from 'lucide-react'
 import { EDIT_CURRICULUM_COURSE_PATH } from '@/routers/router'
+import { FullScreenPopup } from './FullScreenPopup'
+import { UpdateProblemQuizModal } from './UpdateProblemQuizModal'
 
 export default function QuizManagement() {
   const { params } = useMatch(quizManagementRoute.id)
@@ -34,7 +36,6 @@ export default function QuizManagement() {
       try {
         const response = await getFullQuizDetail(quizId)
         setQuizDetail(response)
-        console.log(response)
       } catch (error) {
         console.error('Error fetching quiz detail:', error)
         toast({
@@ -209,10 +210,10 @@ export default function QuizManagement() {
         </Card>
         {/* <Button className='mt-4 w-full' onClick={() => setShowAddQuestionForm(true)}>
           Add Question Normal
-        </Button>
+        </Button> */}
         <Button className='mt-4 w-full' onClick={() => setIsFullScreenPopupOpen(true)}>
           Create Problem Quiz
-        </Button> */}
+        </Button>
 
         <Card className='md:col-span-2'>
           <CardHeader className='flex flex-row items-center justify-between'>
@@ -232,7 +233,7 @@ export default function QuizManagement() {
                     question={question}
                     onEdit={handleEditQuestion}
                     onDelete={handleDeleteQuestion}
-                    onToggleActive={handleToggleActive}
+                    onToggleActive={handleToggleActive}                   
                   />
                 ))
               ) : (
@@ -262,6 +263,15 @@ export default function QuizManagement() {
           </div>
         </div>
       )}
+
+      {isFullScreenPopupOpen && (
+        <FullScreenPopup
+          isOpen={isFullScreenPopupOpen}
+          onClose={() => setIsFullScreenPopupOpen(false)}
+          quizId={quizId}
+        />
+      )}
+      
     </div>
   )
 }

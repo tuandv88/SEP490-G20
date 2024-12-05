@@ -131,12 +131,6 @@ const createCourseRoute = createRoute({
   component: lazy(() => import('@/pages/Course/CreateCourse'))
 })
 
-const createCodeProblemRoute = createRoute({
-  getParentRoute: () => protectedRoute,
-  path: 'create-code-problem',
-  component: lazy(() => import('@/pages/CodeProblem/CreateCodeProblem'))
-})
-
 const createAgProblemRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: 'create-problem',
@@ -201,7 +195,6 @@ const routeTree = rootRoute.addChildren([
     createCourseRoute,
     editCurriculumCourseRoute,
     editBasicCourseRoute,
-    createCodeProblemRoute,
     createProblemLectureRoute,
     updateAgProblemRoute,
     quizManagementRoute,

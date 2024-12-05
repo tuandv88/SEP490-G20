@@ -94,8 +94,7 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
   }, [watchQuestionOptions, trigger])
 
   const onSubmit = async (data) => {
-    setShowErrors(true)
-    console.log('Form errors:', errors) // Add this line
+    setShowErrors(true)   
     if (Object.keys(errors).length > 0) {
       return // Ngăn form submit nếu có lỗi
     }

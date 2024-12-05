@@ -10,6 +10,8 @@ import { useMatch, useNavigate } from '@tanstack/react-router'
 import { createProblemLectureRoute } from '@/routers/router'
 import { ToastAction } from '@/components/ui/toast'
 import { EDIT_CURRICULUM_COURSE_PATH } from '@/routers/router'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { basicInfoSchema } from './basic-info-step'
 
 const CreateProblemLecture = ({}) => {
   //new
@@ -33,9 +35,11 @@ const CreateProblemLecture = ({}) => {
   }, [lectureId])
 
   const form = useForm({
+    resolver: zodResolver(basicInfoSchema),
     defaultValues: {
       title: '',
-      description: '',
+      description: 'This is a problem description for Lecture',
+      language: 'Java',
       problemType: 'Practice',
       difficultyType: 'Medium',
       cpuTimeLimit: 2,

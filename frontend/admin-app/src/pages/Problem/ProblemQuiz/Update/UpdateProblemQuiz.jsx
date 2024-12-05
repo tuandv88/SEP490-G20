@@ -1,39 +1,38 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
-import Header from './Header'
-import BottomTabs from './BottomTabs'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useToast } from '@/hooks/use-toast'
-import FormTabs from './FormTabs'
-import { getProblemDetail, updateProblemAg } from '@/services/api/problemApi'
-import { ToastAction } from '@/components/ui/toast'
-import { useMatch, useNavigate } from '@tanstack/react-router'
-import { updateAgProblemRoute } from '@/routers/router'
-import { Loading } from '@/components/ui/overlay'
-import { PROBLEM_TABLE_PATH } from '@/routers/router'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { updateBasicInfoSchema } from './basic-info-step'
+import { ToastAction } from '@/components/ui/toast'
+import { Loading } from '@/components/overlay'
+import { getProblemDetail } from '@/services/api/problemApi'
 
-const UpdateProblemAg = ({}) => {
+import { questionSchema, problemSchema } from './basic-info-step'
+import FormTabs from './FormTabs'
+import BottomTabs from './BottomTabs'
+import { updateProblemQuestion } from '@/services/api/quizApi'
+
+const UpdateProblemQuiz = ({ onClose, quizId, question, problem }) => {
+  const { toast } = useToast()
+
+  // UI States
   const [activeTab, setActiveTab] = useState('basic')
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
-  const { toast } = useToast()
   const [isRunSuccess, setIsRunSuccess] = useState(false)
+
+  // Data & Loading States
   const [problemDetail, setProblemDetail] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
 
-  const { params } = useMatch(updateAgProblemRoute.id)
-  const { problemId } = params
-
-  const navigate = useNavigate()
-
+  // Forms
   const form = useForm({
-    resolver: zodResolver(updateBasicInfoSchema),
+    resolver: zodResolver(problemSchema),
     defaultValues: {
       title: '',
-      description: '',
-      problemType: 'Challenge',
+      description: 'This is a description for the problem',
+      language: 'Java',
+      problemType: 'Assessment',
       difficultyType: 'Medium',
       cpuTimeLimit: 2,
       cpuExtraTime: 2.5,
@@ -48,25 +47,60 @@ const UpdateProblemAg = ({}) => {
     }
   })
 
+  const form2 = useForm({
+    resolver: zodResolver(questionSchema),
+    defaultValues: {
+      content: '',
+      questionType: 'CodeSnippet',
+      questionLevel: 'Easy',
+      mark: 1,
+      isActive: true,
+      questionOptions: []
+    }
+  })
+
+  // Fetch problem details
   useEffect(() => {
     const fetchProblemDetail = async () => {
       try {
-        const response = await getProblemDetail(problemId)
+        setIsLoading(true)
+        const response = await getProblemDetail(problem.problemDto.id)
         setProblemDetail(response.problemDetailsDto)
-        setIsLoading(false)
       } catch (error) {
-        console.error('Error get problem detail:', error)
+        console.error('Error fetching problem detail:', error)
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to fetch problem details'
+        })
+      } finally {
         setIsLoading(false)
       }
     }
     fetchProblemDetail()
-  }, [])
+  }, [problem.problemDto.id])
 
+  // Initialize form2 with question data
+  useEffect(() => {
+    if (question) {
+      form2.reset({
+        content: question.content,
+        questionType: question.questionType,
+        questionLevel: question.questionLevel,
+        mark: question.mark,
+        isActive: question.isActive,
+        questionOptions: question.questionOptions
+      })
+    }
+  }, [question, form2])
+
+  // Initialize form with problem data
   useEffect(() => {
     if (problemDetail) {
       form.reset({
         title: problemDetail.title || '',
         description: problemDetail.description || '',
+        language: 'Java',
         problemType: problemDetail.problemType || 'Challenge',
         difficultyType: problemDetail.difficultyType || 'Medium',
         cpuTimeLimit: problemDetail.cpuTimeLimit || 2,
@@ -83,57 +117,63 @@ const UpdateProblemAg = ({}) => {
     }
   }, [problemDetail, form])
 
-  if (isLoading) {
-    return <Loading />
-  }
-
-  const onSubmit = async (data) => {
-    const updatedData = { ...data }
-
-    // Quy đổi memoryLimit từ MB sang KB
-    updatedData.memoryLimit = updatedData.memoryLimit * 1024
-    updatedData.maxFileSize = updatedData.maxFileSize * 1024
-    updatedData.stackLimit = updatedData.stackLimit * 1024
-
-    const problemData = {
-      problem: updatedData
-    }
-
-    console.log(problemData)
-    setIsLoadingSubmit(true)
+  const handleSubmit = async (data) => {
     try {
-      const response = await updateProblemAg(problemData, problemId)
+      setIsLoadingSubmit(true)
+
+      const updatedData = {
+        ...data,
+        memoryLimit: data.memoryLimit * 1024,
+        maxFileSize: data.maxFileSize * 1024,
+        stackLimit: data.stackLimit * 1024
+      }
+
+      const problemData = {
+        question: {
+          ...form2.getValues(),
+          problemId: problem.problemDto.id,
+          problem: updatedData
+        }
+      }
+
+
+      await updateProblemQuestion(quizId, question.id, problemData)
+
       toast({
         variant: 'success',
-        title: 'Update problem successfully',
-        description: 'Update problem successfully'
+        title: 'Success',
+        description: 'Question updated successfully'
       })
-      navigate({ to: PROBLEM_TABLE_PATH })
+
+      onClose()
     } catch (error) {
+      console.error('Error updating question:', error)
       toast({
         variant: 'destructive',
-        title: 'Oops! Something went wrong',
-        description: 'Please try again!',
+        title: 'Error',
+        description: 'Failed to update question',
         action: (
-          <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>
+          <ToastAction altText='Try again' onClick={() => handleSubmit(data)}>
             Try again
           </ToastAction>
         )
       })
-      console.error('Error updating problem:', error)
     } finally {
       setIsLoadingSubmit(false)
     }
   }
 
+  if (isLoading) return <Loading />
+  if (!problemDetail) return null
+
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <Header backTo='Back to Curriculum' />
+    <div className='min-h-screen bg-gray-50 h-full'>
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
           <FormTabs
             activeTab={activeTab}
             form={form}
+            form2={form2}
             setIsSaveTemplate={setIsSaveTemplate}
             setIsRunSuccess={setIsRunSuccess}
             testCaseUpdate={problemDetail?.testCases}
@@ -144,6 +184,7 @@ const UpdateProblemAg = ({}) => {
             setActiveTab={setActiveTab}
             isSaveTemplate={isSaveTemplate}
             isRunSuccess={isRunSuccess}
+            form2={form2}
             isLoadingSubmit={isLoadingSubmit}
           />
         </form>
@@ -152,4 +193,4 @@ const UpdateProblemAg = ({}) => {
   )
 }
 
-export default React.memo(UpdateProblemAg)
+export default React.memo(UpdateProblemQuiz)

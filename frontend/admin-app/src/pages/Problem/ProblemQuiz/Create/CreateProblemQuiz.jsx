@@ -8,20 +8,23 @@ import FormTabs from './FormTabs'
 import { createProblemQuestion } from '@/services/api/questionApi'
 import { useStore } from '@/data/store'
 import { ToastAction } from '@/components/ui/toast'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { questionSchema, problemSchema } from './basic-info-step'
 
 const CreateProblemQuiz = ({ onClose, quizId }) => {
-  const { quizIdToCreateProblem } = useStore()
-  console.log(quizIdToCreateProblem)
   console.log(quizId)
   const [activeTab, setActiveTab] = useState('basic')
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
   const { toast } = useToast()
   const [isRunSuccess, setIsRunSuccess] = useState(false)
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
 
   const form = useForm({
+    resolver: zodResolver(problemSchema),
     defaultValues: {
       title: '',
       description: 'This is a description for the problem',
+      language: 'Java',
       problemType: 'Assessment',
       difficultyType: 'Medium',
       cpuTimeLimit: 2,
@@ -38,6 +41,7 @@ const CreateProblemQuiz = ({ onClose, quizId }) => {
   })
 
   const form2 = useForm({
+    resolver: zodResolver(questionSchema),
     defaultValues: {
       content: '',
       questionType: 'CodeSnippet',
@@ -49,6 +53,10 @@ const CreateProblemQuiz = ({ onClose, quizId }) => {
   })
 
   const onSubmit = async (data) => {
+    const form2Values = form2.getValues();
+    console.log('Form2 values:', form2Values); // Debug
+    console.log('Content value:', form2Values.content); // Debug
+
     const updatedData = { ...data }
 
     // Quy đổi memoryLimit từ MB sang KB
@@ -65,23 +73,26 @@ const CreateProblemQuiz = ({ onClose, quizId }) => {
 
     console.log(problemData)
 
-    // try {
-    //   const response = await createProblemQuestion(quizId, problemData)   
-    //   onClose()
-    //   toast({
-    //     variant: 'success',
-    //     title: 'Create question successfully T',
-    //     description: 'Create question successfully'
-    //   })
-    // } catch (error) {
-    //   toast({
-    //     variant: 'destructive',
-    //     title: 'Oops! Something went wrong',
-    //     description: 'Please try again!',
-    //     action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
-    //   })
-    //   console.error('Error creating question:', error)
-    // }
+    try {
+      setIsLoadingSubmit(true)
+      const response = await createProblemQuestion(quizId, problemData)   
+      onClose()
+      toast({
+        variant: 'success',
+        title: 'Create question successfully T',
+        description: 'Create question successfully'
+      })
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Oops! Something went wrong',
+        description: 'Please try again!',
+        action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
+      })
+      console.error('Error creating question:', error)
+    } finally {
+      setIsLoadingSubmit(false)
+    }
   }
 
   return (
@@ -100,6 +111,8 @@ const CreateProblemQuiz = ({ onClose, quizId }) => {
             setActiveTab={setActiveTab}
             isSaveTemplate={isSaveTemplate}
             isRunSuccess={isRunSuccess}
+            form2={form2}
+            isLoadingSubmit={isLoadingSubmit}
           />
         </form>
       </FormProvider>

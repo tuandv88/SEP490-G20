@@ -18,16 +18,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
+import { UpdateProblemQuizModal } from './UpdateProblemQuizModal'
 export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizId }) {
   const [isEditing, setIsEditing] = useState(false)
   const [problem, setProblem] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isUpdateProblemQuiz, setIsUpdateProblemQuiz] = useState(false)
 
   useEffect(() => {
     if (question.questionType === 'CodeSnippet' && question.problemId) {
       const fetchProblemById = async () => {
         try {
           const problem = await getProblemById(question.problemId)
+         
           setProblem(problem)
         } catch (error) {
           console.error('Error fetching problem details:', error)
@@ -59,7 +62,7 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
   }
 
   const handleProblemEdit = () => {
-    console.log('Editing problem:', problem.id)
+    setIsUpdateProblemQuiz(true)
   }
 
   const handleProblemDelete = () => {
@@ -201,6 +204,16 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {isUpdateProblemQuiz && (
+        <UpdateProblemQuizModal
+          isOpen={isUpdateProblemQuiz}
+          onClose={() => setIsUpdateProblemQuiz(false)}
+          quizId={quizId}
+          question={question}
+          problem={problem}
+        />
+      )}
     </>
   )
 }

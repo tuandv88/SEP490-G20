@@ -32,7 +32,7 @@ export const problemSchema = z.object({
   enableNetwork: z.boolean(),
   isActive: z.boolean(),
   testCases: z.any(),
-  createTestScriptDto: z.array(z.any()).optional()
+  testcripts: z.array(z.any()).optional()
 })
 
 export default function BasicInfoStep({ form, form2 }) {

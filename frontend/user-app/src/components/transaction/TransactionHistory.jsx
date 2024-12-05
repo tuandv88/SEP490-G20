@@ -1,11 +1,34 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { History } from 'lucide-react'
 import TransactionTable from './TransactionTable'
 import { transactions } from './mockTransactions'
+import TransactionSkeleton from '../loading/TransactionSkeleton'
 
 const TransactionHistory = () => {
   const totalPointsUsed = transactions.reduce((sum, t) => sum + t.pointsUsed, 0)
   const totalPointsValue = transactions.reduce((sum, t) => sum + t.pointsValue, 0)
+
+  const [loading, setLoading] = useState(true)
+  // const [transactions, setTransactions] = useState([])
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setLoading(true)
+        //const response = await paymentApi.getTransactions(1, 20)
+        //console.log(response)
+      } catch (error) {
+        console.error('Error fetching transactions:', error)
+      } finally {
+        setLoading(true)
+      }
+    }
+    fetchTransactions()
+  }, [])
+
+  if (loading) {
+    return <TransactionSkeleton />
+  }
 
   return (
     <div className='min-h-screen py-8 px-4 sm:px-6 lg:px-8'>

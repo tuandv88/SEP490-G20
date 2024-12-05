@@ -10,6 +10,7 @@ import { LearningAPI } from '@/services/api/learningApi'
 import { Switch } from '@mui/material'
 import { UserAPI } from '@/services/api/userApi'
 import { PaymentAPI } from '@/services/api/paymentApi'
+import { Loading } from '../ui/overlay'
 
 const PayPalCheckout = () => {
   const { id } = useParams()
@@ -20,8 +21,7 @@ const PayPalCheckout = () => {
   const [usePoints, setUsePoints] = useState(false)
   const [userPoint, setUserPoint] = useState(0)
   const [orderSummaryState, setOrderSummaryState] = useState(null)
-
-  console.log(userPoint)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const fetchUserPoint = async () => {
@@ -39,11 +39,14 @@ const PayPalCheckout = () => {
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
+      setLoading(true)
       try {
         const response = await LearningAPI.getCoursePreview(id)
         setCourseDetail(response.course)
       } catch (error) {
         console.error('Error fetching course detail:', error)
+      } finally {
+        setLoading(false)
       }
     }
     fetchCourseDetail()
@@ -71,32 +74,31 @@ const PayPalCheckout = () => {
       }
     : null
 
-  const handleCreateOrder = async () => {
-    console.log("IN")
-    try {
-      const orderData = {
-        order: {
-          paymentMethod: "Paypal",
-          point: usePoints ? userPoint : 0,
-          item: {
-            productId: courseDetail.id,
-            productType: "Course",
-            quantity: 1,
-            unitPrice: courseDetail.price
-          }
-        }
-      }
+  if (loading) {
+    return <Loading />
+  }
 
-      const response = await PaymentAPI.createOrder(orderData)
-      setOrderId(response.data.orderId)
-      setPaymentStatus('Order created! Awaiting payment...')
-      console.log(response.data.orderId)
-      return response.data.orderId
-    } catch (error) {
-      console.error('Error creating order:', error)
-      setPaymentStatus('Error creating order. Please try again.')
-      throw error
-    }
+  const handleCreateOrder = async () => {
+    const response = await fetch("https://localhost:5000/payment-service/checkout/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        Order: { 
+          PaymentMethod: "Paypal",
+          Point: usePoints ? userPoint : 0,
+          Item: { 
+            ProductId: courseDetail.id,
+            ProductType: "Course", 
+            Quantity: 1,
+            UnitPrice: courseDetail.price 
+          } 
+        } 
+      }), 
+    });
+    const data = await response.json();
+    setOrderId(data.orderId); 
+    setPaymentStatus("Order created! Awaiting payment...");
+    return data.orderId; 
   }
 
   const handleApprove = async (data) => {
@@ -120,10 +122,10 @@ const PayPalCheckout = () => {
     setUsePoints(!usePoints)
     if (!usePoints) {
       const pointValue = (userPoint / 1000)
-      const newTotal = Math.max(0, courseDetail.price - pointValue)
+      const newTotal = Math.max(0, courseDetail.price - pointValue).toFixed(2)
       setOrderSummaryState({
         originalPrice: courseDetail.price,
-        discountRate: pointValue,
+        discountRate: pointValue.toFixed(2),
         total: newTotal,
         itemCount: 1
       })

@@ -7,7 +7,7 @@ namespace Community.Application.Models.Discussions.Queries.GetDiscussionsByCateg
 public record GetDiscussionsByCategoryIdSortAndFilterResult(PaginatedResult<DiscussionDto> DiscussionDtos);
 
 // Query yêu cầu danh sách Discussion theo Category Id với phân trang, sắp xếp và lọc theo tags
-public record GetDiscussionsByCategoryIdSortAndFilterQuery(Guid CategoryId, PaginationRequest PaginationRequest, string? OrderBy, string? Tags) : IQuery<GetDiscussionsByCategoryIdSortAndFilterResult>;
+public record GetDiscussionsByCategoryIdSortAndFilterQuery(Guid CategoryId, PaginationRequest PaginationRequest, string? OrderBy,string? keySearch, string? Tags) : IQuery<GetDiscussionsByCategoryIdSortAndFilterResult>;
 
 // Validator để kiểm tra các giá trị của query
 public class GetDiscussionByCateIdValidator : AbstractValidator<GetDiscussionsByCategoryIdSortAndFilterQuery>

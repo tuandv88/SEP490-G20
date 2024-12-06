@@ -1036,9 +1036,8 @@ function CommentList({ discussionId, userIdDiscussion }) {
           padding: 8px 16px;
           background-color: #ffffff;
           border-radius: 8px;
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
           flex-wrap: nowrap; /* Đảm bảo tất cả phần tử con ở trên một dòng */
-          margin-top: 6px;
         }
 
         .counts-comment {
@@ -1058,7 +1057,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
   height: auto;
   margin: 0 auto;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   position: relative;
@@ -1121,7 +1120,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-weight: 500;
   color: #f9f9f9;
-  background: #1e334a; 
+  background: #0a192f;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
@@ -1135,7 +1134,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .comment-button:hover,
 .toggle-preview-button:hover {
   color: #ffffff; /* White text on hover */
-  background: rgba(30, 51, 74, 0.1); /* Nền xanh nhạt khi hover */
+  background: #1e3a5f; /* Nền xanh nhạt khi hover */
   border-color: #b0b0b0; /* Viền đậm hơn khi hover */
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ khi hover */
 }
@@ -1204,7 +1203,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
           font-size: 10px;
           font-family: "Helvetica Neue", Arial, sans-serif;
           font-weight: bold;
-          color: #14212b;
+          color: #0a192f;
           background: #ffffff;
           border-radius: 8px;
           box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
@@ -1215,14 +1214,14 @@ function CommentList({ discussionId, userIdDiscussion }) {
         }
 
         .comment-list__pagination .MuiPaginationItem-root:hover {
-          background: #14212b;
+          background: #0a192f;
           color: #ffffff;
           box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
           transform: translateY(-2px);
         }
 
         .comment-list__pagination .MuiPaginationItem-root.Mui-selected {
-          background: #14212b;
+          background: #0a192f;
           color: #ffffff;
           box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
           transform: translateY(0);
@@ -1287,7 +1286,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .comment-item__username {
   font-weight: 600;
   font-size: 1rem;
-  color: #2c3e50;
+  color: #0a192f;
 }
 
 .comment-item__timestamp {
@@ -1305,7 +1304,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 /* Comment content */
 .comment-item__content {
   font-size: 0.9rem;
-  color: #34495e;
+  color: #0a192f;
   line-height: 1.5;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -1335,7 +1334,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .vote-icon {
   background: transparent;
   border: none;
-  color: #bdc3c7;
+  color: #bec0c2;
   cursor: pointer;
   transition: all 0.2s ease;
   margin: 0 4px;
@@ -1345,7 +1344,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 }
 
 .vote-icon:hover {
-  color: #3498db;
+  color: #0a192f;
 }
 
 .comment-item__vote-count {
@@ -1369,7 +1368,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .comment-item__show-reply {
   background: transparent;
   border: none;
-  color: #354f6c;
+  color: #0a192f;
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s ease;
@@ -1384,7 +1383,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .comment-item__share-edit {
   background: transparent;
   border: none;
-  color: #354f6c;
+  color: #0a192f;
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s ease;
@@ -1400,7 +1399,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 }
 
 .comment-item__share {
-  background: #425870;
+  background: #0a192f;
   color: white;
 }
 
@@ -1540,7 +1539,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .comment-item__username_replies {
   font-weight: 600;
   font-size: 1rem;
-  color: #2c3e50;
+  color: #0a192f;
   margin-top: -20px;
   margin-left: 5px;
 }

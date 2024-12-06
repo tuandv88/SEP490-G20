@@ -16,12 +16,20 @@ const getAuthHeaders = () => {
 
 export const DiscussApi = {
   // API: Lấy danh sách discussions và thêm urlProfilePicture
-  getDiscussionOptions: async ({ discussionId, pageIndex, pageSize, orderBy, tags }) => {
+  getDiscussionOptions: async ({ discussionId, pageIndex, pageSize, orderBy, keySearch, tags }) => {
     try {
+      // Tạo đối tượng params
+      const params = { pageIndex, pageSize, orderBy, keySearch, tags };
+
+      // Tạo URL với params từ đối tượng
+      const url = `${API_BASE_URL}/community-service/discussions/${discussionId}/options?` +
+        new URLSearchParams(params).toString();
+
+      // In ra URL để kiểm tra
+      console.log(url);
+
       // Gửi yêu cầu GET tới API với header Authorization
-      const response = await axios.get(`${API_BASE_URL}/community-service/discussions/${discussionId}/options`, {
-        params: { pageIndex, pageSize, orderBy, tags }
-      });
+      const response = await axios.get(url);
 
       // Kiểm tra xem có thảo luận nào không
       if (response && response.data && response.data.discussionDtos && response.data.discussionDtos.data && response.data.discussionDtos.data.length > 0) {

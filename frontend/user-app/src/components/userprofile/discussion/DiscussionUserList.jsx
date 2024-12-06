@@ -476,7 +476,7 @@ const DiscussionUserList = () => {
                                         size="sm"
                                         onClick={() => handlePageChange(pageNumber)}
                                         disabled={isLoading}
-                                        className={`w-8 h-8 ${pageNumber === pageIndex ? 'animate-pulse' : ''}`}
+                                    //className={`w-8 h-8 ${pageNumber === pageIndex ? 'animate-pulse' : ''}`}
                                     >
                                         {pageNumber}
                                     </Button>

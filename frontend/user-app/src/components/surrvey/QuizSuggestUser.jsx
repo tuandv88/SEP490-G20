@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
 import { X, ChevronLeft, ChevronRight, Send } from 'lucide-react'
 import { JAVA_LANGUAGE_CONFIG, JAVA_LANGUAGE_EXT_POINT, JAVA_LANGUAGE_ID } from '@/lib/code-editor/constants'
-import ReactMarkdown from 'react-markdown'
+
 import { motion, AnimatePresence } from 'framer-motion'
 import { ProblemAPI } from '@/services/api/problemApi'
 import lodash, { isEmpty } from 'lodash'
@@ -424,13 +424,7 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
               >
                 <RadioGroupItem value={option.id} id={option.id} />
                 <Label htmlFor={option.id} className='flex-grow cursor-pointer'>
-                  <ReactMarkdown
-                    components={{
-                      code: CodeBlock
-                    }}
-                  >
-                    {option.content}
-                  </ReactMarkdown>
+                  {option.content}
                 </Label>
               </div>
             ))}
@@ -452,13 +446,7 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
                   }}
                 />
                 <Label htmlFor={option.id} className='flex-grow cursor-pointer'>
-                <ReactMarkdown
-                      components={{
-                        code: CodeBlock
-                      }}
-                    >
-                      {option.content}
-                    </ReactMarkdown>
+                  {option.content}
                 </Label>
               </div>
             ))}
@@ -505,17 +493,13 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
                 transition={{ duration: 0.3 }}
                 className='space-y-4 h-full flex flex-col'
               >
-                {currentQuestion.questionType !== 'CodeSnippet' && (
-                  <div className='prose dark:prose-invert max-w-none mb-4'>
-                    <ReactMarkdown
-                      components={{
-                        code: CodeBlock
-                      }}
-                    >
-                      {currentQuestion.content}
-                    </ReactMarkdown>
-                  </div>
-                )}
+                <div className='prose max-w-none mb-4'>
+                  {currentQuestion.questionType !== 'CodeSnippet' && (
+                    <div className='prose max-w-none mb-4'>
+                      <div dangerouslySetInnerHTML={{ __html: currentQuestion.content }} />
+                    </div>
+                  )}
+                </div>
                 <div className='flex-grow h-[100%]'>{renderQuestion()}</div>
               </motion.div>
             </AnimatePresence>

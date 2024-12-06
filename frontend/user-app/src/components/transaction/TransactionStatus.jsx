@@ -4,24 +4,31 @@ import { CheckCircle, Clock, XCircle } from 'lucide-react';
 
 const TransactionStatus = ({ status }) => {
   const getStatusConfig = () => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'completed':
         return {
           icon: <CheckCircle className="w-5 h-5" />,
           color: 'text-green-600 bg-green-50',
           text: 'Completed'
         };
+      case 'created':
       case 'pending':
         return {
           icon: <Clock className="w-5 h-5" />,
           color: 'text-yellow-600 bg-yellow-50',
-          text: 'Pending'
+          text: status
         };
       case 'failed':
         return {
           icon: <XCircle className="w-5 h-5" />,
           color: 'text-red-600 bg-red-50',
           text: 'Failed'
+        };
+      default:
+        return {
+          icon: <Clock className="w-5 h-5" />,
+          color: 'text-gray-600 bg-gray-50',
+          text: status
         };
     }
   };

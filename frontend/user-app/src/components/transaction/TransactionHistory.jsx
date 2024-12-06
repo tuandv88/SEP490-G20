@@ -1,26 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import { History } from 'lucide-react'
 import TransactionTable from './TransactionTable'
-import { transactions } from './mockTransactions'
 import TransactionSkeleton from '../loading/TransactionSkeleton'
+import { PaymentAPI } from '../../services/api/paymentApi'
 
 const TransactionHistory = () => {
-  const totalPointsUsed = transactions.reduce((sum, t) => sum + t.pointsUsed, 0)
-  const totalPointsValue = transactions.reduce((sum, t) => sum + t.pointsValue, 0)
-
   const [loading, setLoading] = useState(true)
-  // const [transactions, setTransactions] = useState([])
+  const [transactionData, setTransactionData] = useState({
+    totalPointUsed: 0,
+    transactions: {
+      data: [],
+      count: 0
+    }
+  })
+  
+  console.log(transactionData)
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
         setLoading(true)
-        //const response = await paymentApi.getTransactions(1, 20)
-        //console.log(response)
+        const response = await PaymentAPI.getTransactions(1, 20)
+        setTransactionData(response)
       } catch (error) {
         console.error('Error fetching transactions:', error)
       } finally {
-        setLoading(true)
+        setLoading(false)
       }
     }
     fetchTransactions()
@@ -29,6 +34,11 @@ const TransactionHistory = () => {
   if (loading) {
     return <TransactionSkeleton />
   }
+
+  // const totalPointsValue = transactionData?.transactions?.data?.reduce(
+  //   (sum, t) => sum + (t?.grossAmount || 0),
+  //   0
+  // ) || 0
 
   return (
     <div className='min-h-screen py-8 px-4 sm:px-6 lg:px-8'>
@@ -47,20 +57,22 @@ const TransactionHistory = () => {
           <div className='px-6 py-4 bg-indigo-50'>
             <div className='flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4'>
               <div className='text-sm text-indigo-800'>
-                <span className='font-medium'>Total Points Used:</span> {totalPointsUsed} points
+                <span className='font-medium'>Total Points Used:</span> {transactionData?.totalPointUsed || 0} points
               </div>
-              <div className='text-sm text-indigo-800'>
+              {/* <div className='text-sm text-indigo-800'>
                 <span className='font-medium'>Total Points Value:</span> ${totalPointsValue.toFixed(2)}
-              </div>
+              </div> */}
             </div>
           </div>
 
           <div className='p-6'>
-            <TransactionTable transactions={transactions} />
+            <TransactionTable transactions={transactionData.transactions.data} />
           </div>
 
           <div className='px-6 py-4 bg-gray-50 border-t border-gray-200'>
-            <p className='text-sm text-gray-600'>Showing {transactions.length} transactions</p>
+            <p className='text-sm text-gray-600'>
+              Showing {transactionData.transactions.count} transactions
+            </p>
           </div>
         </div>
       </div>

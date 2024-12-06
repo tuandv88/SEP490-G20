@@ -5,7 +5,7 @@ import OrderItem from './OrderItem'
 import PaymentMethod from './PaymentMethod'
 import OrderSummary from './OrderSummary'
 import PaymentStatus from './PaymentStatus'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { LearningAPI } from '@/services/api/learningApi'
 import { Switch } from '@mui/material'
 import { UserAPI } from '@/services/api/userApi'
@@ -13,9 +13,12 @@ import { PaymentAPI } from '@/services/api/paymentApi'
 import { Loading } from '../ui/overlay'
 import Cookies from 'js-cookie'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
+import { useNavigate } from 'react-router-dom'
+import { CourseAPI } from '@/services/api/courseApi'
 
 const PayPalCheckout = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [orderId, setOrderId] = useState(null)
   const [paymentStatus, setPaymentStatus] = useState(null)
   const [paymentMethod, setPaymentMethod] = useState('paypal')
@@ -24,7 +27,6 @@ const PayPalCheckout = () => {
   const [userPoint, setUserPoint] = useState(0)
   const [orderSummaryState, setOrderSummaryState] = useState(null)
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
 
   const API_BASE_URL = import.meta.env.VITE_API_URL
 
@@ -41,7 +43,6 @@ const PayPalCheckout = () => {
     fetchUserPoint()
   }, [])
 
-
   useEffect(() => {
     const fetchCourseDetail = async () => {
       setLoading(true)
@@ -56,7 +57,6 @@ const PayPalCheckout = () => {
     }
     fetchCourseDetail()
   }, [id])
-
 
   useEffect(() => {
     if (courseDetail) {
@@ -82,38 +82,58 @@ const PayPalCheckout = () => {
   if (loading) {
     return <Loading />
   }
-   
-  
 
   const handleCreateOrder = async () => {
     const response = await fetch(`${API_BASE_URL}/payment-service/checkout/orders`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${Cookies.get('authToken')}` },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${Cookies.get('authToken')}` },
       body: JSON.stringify({
-        Order: { 
-          PaymentMethod: "Paypal",
-          Point: usePoints ? userPoint : 0,
-          Item: { 
+        Order: {
+          PaymentMethod: 'Paypal',
+          Point: userPoint ? userPoint : 0,
+          Item: {
             ProductId: courseDetail.id,
-            ProductType: "Course", 
+            ProductType: 'Course',
             Quantity: 1,
-            UnitPrice: courseDetail.price 
-          } 
-        } 
-      }), 
-    });
-    const data = await response.json();
-    setOrderId(data.orderId); 
-    setPaymentStatus("Order created! Awaiting payment...");
-    return data.orderId; 
+            UnitPrice: courseDetail.price
+          }
+        }
+      })
+    })
+    const data = await response.json()
+    setOrderId(data.orderId)
+    setPaymentStatus('Order created! Awaiting payment...')
+    return data.orderId
   }
 
   const handleApprove = async (data) => {
     try {
-      const result = await capturePayPalOrder(data.orderID)
-      console.log('Capture result', result)
-      setPaymentStatus('Payment successful! Thank you for your purchase.')
-      navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', id))
+      const pollForEnrolledCourses = async () => {
+        try {
+          const enrolledCourses = await CourseAPI.getEnrolledCourses(id)
+          if (enrolledCourses && enrolledCourses.enrollmentInfo !== null) {
+            clearInterval(intervalId)
+            clearTimeout(timeoutId)
+            setPaymentStatus('Payment successful! Thank you for your purchase.')
+            navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', id))
+          }
+        } catch (error) {
+          console.error('Error fetching enrolled courses:', error)
+        }
+      }
+
+      // Gọi API mỗi 1 giây
+      const intervalId = setInterval(pollForEnrolledCourses, 1000)
+
+      // Đặt giới hạn tối đa (ví dụ: 30 giây)
+      const timeoutId = setTimeout(() => {
+        clearInterval(intervalId)
+        setPaymentStatus('Timeout. Please try again.')
+        navigate(AUTHENTICATION_ROUTERS.COURSELIST)
+      }, 10000)
+
+      // const result = await capturePayPalOrder(data.orderID)
+      // console.log('Capture result', result)
     } catch (error) {
       console.error('Error capturing order:', error)
       setPaymentStatus('Error processing payment. Please try again.')
@@ -125,11 +145,11 @@ const PayPalCheckout = () => {
   }
 
   const handleTogglePoints = () => {
-    if (!courseDetail) return;
-    
+    if (!courseDetail) return
+
     setUsePoints(!usePoints)
     if (!usePoints) {
-      const pointValue = (userPoint / 1000)
+      const pointValue = userPoint / 1000
       const newTotal = Math.max(0, courseDetail.price - pointValue).toFixed(2)
       setOrderSummaryState({
         originalPrice: courseDetail.price,
@@ -165,9 +185,7 @@ const PayPalCheckout = () => {
                     {userPoint} points available
                   </span>
                 </div>
-                <p className='text-sm text-gray-500'>
-                  Value: ${(userPoint / 1000).toFixed(2)}
-                </p>
+                <p className='text-sm text-gray-500'>Value: ${(userPoint / 1000).toFixed(2)}</p>
               </div>
               <Switch
                 checked={usePoints}

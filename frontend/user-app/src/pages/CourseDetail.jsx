@@ -46,6 +46,7 @@ function CourseDetail() {
         setCourseDetail(courseData)     
         setEnrolledCourses(enrolledData.enrollmentInfo)   
         setReviewData(reviewData)
+        console.log(enrolledData)
       } catch (error) {
         console.error('Error fetching data:', error)
         setError(true)

@@ -62,11 +62,19 @@ const TestcaseInterfaceQuiz = ({ response, loading, testCase }) => {
   const activeTabTestcase = useStore((state) => state.activeTabTestcase)
   const setActiveTabTestcase = useStore((state) => state.setActiveTabTestcase)
 
+  const isEmptyTestCase = (testCase) => {
+    return Object.keys(testCase).length === 1 && Object.keys(testCase['0']).length === 0
+  }
+
+
   useEffect(() => {
     if (testCase) {
       setTestCases(testCase)
+      setActiveTestCase(0)
     }
   }, [testCase])
+
+
 
   const handleAddTestCase = () => {
     const newId = Object.keys(testCases).length.toString()
@@ -112,17 +120,23 @@ const TestcaseInterfaceQuiz = ({ response, loading, testCase }) => {
   }
 
   useEffect(() => {
-    //console.log('Received result in TestcaseInterface:', response)
-    //setData(testCases)
     setStoreTestCasesQuiz(Object.values(testCases).map((inputs) => ({ inputs }))) // Cập nhật dữ liệu trong store
   }, [response, setStoreTestCasesQuiz, testCases])
 
+  useEffect(() => {
+    if (response) {
+      setActiveTestResult(0);
+    }
+  }, [response]);
+
   return (
-    <div className='bg-[#111827] p-4 shadow-md w-full h-auto '>
+    <div className='bg-[#111827] p-4 shadow-md w-full h-full '>
       <div className='flex mb-4 border-b border-gray-600'>
         <button
           className={`px-4 py-2 text-sm font-bold ${
-            activeTabTestcase === 'Testcase' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-gray-200'
+            activeTabTestcase === 'Testcase'
+              ? 'text-blue-400 border-b-2 border-blue-400'
+              : 'text-gray-400 hover:text-gray-200'
           }`}
           onClick={() => setActiveTabTestcase('Testcase')}
         >
@@ -159,49 +173,58 @@ const TestcaseInterfaceQuiz = ({ response, loading, testCase }) => {
               </svg>
               <span className='font-semibold text-white'>Testcase</span>
             </div>
-            <div className='flex mb-4 flex-wrap'>
-              {Object.keys(testCases).map((caseId, index) => (
-                <div key={caseId} className='relative mr-2 mb-2'>
-                  <Button
-                    variant={activeTestCase === index ? 'secondary' : 'outline'}
-                    size='sm'
-                    className='pr-6'
-                    onClick={() => setActiveTestCase(index)}
-                  >
-                    Case {parseInt(caseId) + 1}
+
+            {isEmptyTestCase(testCases) ? (
+              <div className='bg-gray-100 rounded-md p-4'>
+                <p className='text-gray-700 text-center font-medium'>No testcase available</p>
+              </div>
+            ) : (
+              <>
+                <div className='flex mb-4 flex-wrap'>
+                  {Object.keys(testCases).map((caseId, index) => (
+                    <div key={caseId} className='relative mr-2 mb-2'>
+                      <Button
+                        variant={activeTestCase === index ? 'secondary' : 'outline'}
+                        size='sm'
+                        className='pr-6'
+                        onClick={() => setActiveTestCase(index)}
+                      >
+                        Case {parseInt(caseId) + 1}
+                      </Button>
+                      {Object.keys(testCases).length > 1 && (
+                        <Button
+                          variant='destructive'
+                          size='icon'
+                          className='absolute -top-1 -right-1 h-5 w-5 rounded-full p-0'
+                          onClick={() => handleRemoveTestCase(caseId)}
+                        >
+                          <X size={12} />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button variant='outline' size='icon' className='h-9 w-9' onClick={handleAddTestCase}>
+                    <Plus size={16} />
                   </Button>
-                  {Object.keys(testCases).length > 1 && (
-                    <Button
-                      variant='destructive'
-                      size='icon'
-                      className='absolute -top-1 -right-1 h-5 w-5 rounded-full p-0'
-                      onClick={() => handleRemoveTestCase(caseId)}
-                    >
-                      <X size={12} />
-                    </Button>
-                  )}
                 </div>
-              ))}
-              <Button variant='outline' size='icon' className='h-9 w-9' onClick={handleAddTestCase}>
-                <Plus size={16} />
-              </Button>
-            </div>
-            <div className='bg-gray-100 rounded-md p-4'>
-              {Object.entries(testCases[activeTestCase.toString()]).map(([param, value]) => (
-                <div key={param} className='mb-4 last:mb-0'>
-                  <Label htmlFor={`${param}-${activeTestCase}`} className='text-gray-700 mb-2 block'>
-                    {param} =
-                  </Label>
-                  <Input
-                    id={`${param}-${activeTestCase}`}
-                    value={value}
-                    onChange={(e) => handleInputChange(activeTestCase.toString(), param, e.target.value)}
-                    className='bg-white p-2 rounded-md w-full'
-                    placeholder={`Enter value for ${param}`}
-                  />
+                <div className='bg-gray-100 rounded-md p-4'>
+                  {Object.entries(testCases[activeTestCase.toString()]).map(([param, value]) => (
+                    <div key={param} className='mb-4 last:mb-0'>
+                      <Label htmlFor={`${param}-${activeTestCase}`} className='text-gray-700 mb-2 block'>
+                        {param} =
+                      </Label>
+                      <Input
+                        id={`${param}-${activeTestCase}`}
+                        value={value}
+                        onChange={(e) => handleInputChange(activeTestCase.toString(), param, e.target.value)}
+                        className='bg-white p-2 rounded-md w-full'
+                        placeholder={`Enter value for ${param}`}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
           </div>
         </>
       )}
@@ -214,9 +237,17 @@ const TestcaseInterfaceQuiz = ({ response, loading, testCase }) => {
                 {response.codeExecuteDto.testResults.map((result, index) => (
                   <div key={index} className='relative mr-2 mb-2'>
                     <Button
-                      variant={activeTestResult === index ? 'secondary' : 'outline'}
+                      variant='outline'
                       size='sm'
-                      className={`${response.codeExecuteDto.testResults[activeTestResult].isPass ? 'bg-green-400' : 'bg-red-100'}`}
+                      className={`${
+                        activeTestResult === index
+                          ? result.isPass
+                            ? 'border border-green-500'
+                            : 'border border-red-500'
+                          : result.isPass
+                            ? 'bg-green-400'
+                            : 'bg-red-400'
+                      }`}
                       onClick={() => setActiveTestResult(index)}
                     >
                       Case {index + 1}
@@ -268,10 +299,8 @@ const TestcaseInterfaceQuiz = ({ response, loading, testCase }) => {
           )}
 
           {!loading && response === null && (
-            <div>
-              <pre className='bg-red-100 p-4 rounded-md text-gray-700 whitespace-pre-wrap'>
-                You must run your code first
-              </pre>
+            <div className='bg-gray-100 rounded-md p-4'>
+              <p className='text-gray-700 text-center font-medium'>You must run your code first</p>
             </div>
           )}
         </div>

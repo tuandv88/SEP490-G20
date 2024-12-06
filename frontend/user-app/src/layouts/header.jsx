@@ -174,10 +174,10 @@ export default function Header() {
                   <LogIn className="w-4 h-4 transition-transform group-hover:scale-110" />
                   Login
                 </Button>
-                <Button className='gap-2 group'>
+                {/* <Button className='gap-2 group'>
                   <UserPlus className="w-4 h-4 transition-transform group-hover:scale-110" />
                   Register
-                </Button>
+                </Button> */}
               </div>
             )}
             

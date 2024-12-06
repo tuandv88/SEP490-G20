@@ -20,8 +20,29 @@ import Popup from '../ui/popup'
 import { LearningAPI } from '@/services/api/learningApi'
 import { QuizAPI } from '@/services/api/quizApi'
 import { CustomConfirmModal } from '../ui/button-confirm-modal'
+import ReactMarkdown from 'react-markdown'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
-export default function QuizPopup({ quiz, answer, onClose }) {
+const CodeBlock = ({ node, inline, className, children, ...props }) => {
+  const match = /language-(\w+)/.exec(className || '')
+  return !inline && match ? (
+    <SyntaxHighlighter
+      style={vscDarkPlus}
+      language={match[1]}
+      PreTag="div"
+      {...props}
+    >
+      {String(children).replace(/\n$/, '')}
+    </SyntaxHighlighter>
+  ) : (
+    <code className={className} {...props}>
+      {children}
+    </code>
+  )
+}
+
+export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLimit }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [idCodeSnippetQuestions, setIdCodeSnippetQuestions] = useState()
@@ -42,6 +63,10 @@ export default function QuizPopup({ quiz, answer, onClose }) {
   const [problemIds, setProblemIds] = useState({})
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const [timeLeft, setTimeLeft] = useState(timeLimit * 60);
+
+  const [testCaseMap, setTestCaseMap] = useState({});
 
   useEffect(() => {
     if (answer && answer.questionAnswers) {
@@ -77,7 +102,6 @@ export default function QuizPopup({ quiz, answer, onClose }) {
 
     setCodeRunPro(value)
     setCodeRunQuiz(value)
-    console.log('value: ', value)
   }, 500)
 
   useEffect(() => {
@@ -143,14 +167,26 @@ export default function QuizPopup({ quiz, answer, onClose }) {
     const data = await ProblemAPI.getProblem(problemId)
     setCodeSnippetQuestion(data)
     setTemplates(data?.problemDto?.templates?.Java)
-    handleArrayToDictionary(data?.problemDto?.testCases)
-    // setCodeRunPro(data?.problemDto?.templates?.Java)
+    
+    if (data?.problemDto?.testCases) {
+      const testCaseDict = handleArrayToDictionary(data?.problemDto?.testCases)
+      setTestCaseMap(prev => ({
+        ...prev,
+        [problemId]: testCaseDict
+      }))
+    }
   }
 
-  //   const handleEditorChange = lodash.debounce((value) => {
-  //     setCodeRunPro(value)
-  //     setCodeRunQuiz(value)
-  //   }, 500)
+  const handleArrayToDictionary = (inputArray) => {
+    if (!Array.isArray(inputArray)) {
+      return {}
+    }
+
+    return inputArray.reduce((acc, item, index) => {
+      acc[index] = item.inputs
+      return acc
+    }, {})
+  }
 
   const handleAnswerChange = (value, isMultipleSelect = false) => {
     const currentQuestion = quiz.questions[currentQuestionIndex]
@@ -181,27 +217,6 @@ export default function QuizPopup({ quiz, answer, onClose }) {
       }))
     }
   }
-
-  const handleArrayToDictionary = (inputArray) => {
-    if (!Array.isArray(inputArray)) {
-      return
-    }
-
-    const dictionary = inputArray.reduce((acc, item, index) => {
-      acc[index] = item.inputs
-      return acc
-    }, {})
-    setTestCase(dictionary)
-  }
-
-
-
-  //   const handleNext = () => {
-  //     if (currentQuestionIndex < quiz.questions.length - 1) {
-  //       setCurrentQuestionIndex((prev) => prev + 1)
-  //     }
-
-  //   }
 
   const [previousAnswers, setPreviousAnswers] = useState({})
   const [previousCodeRunPro, setPreviousCodeRunPro] = useState('')
@@ -297,23 +312,30 @@ export default function QuizPopup({ quiz, answer, onClose }) {
     }
   }
 
-  const handleSubmit = async () => {
-    setIsConfirmOpen(true); // Hiển thị hộp thoại xác nhận
-    };
+  const handleSubmit = () => {
+    setIsConfirmOpen(true);
+  };
 
   const handleSubmitConfirm = async () => {
-    handleNext()
+    handleNext();
     try {
-      const response = await QuizAPI.submitQuiz(answer.quizSubmissionId)
-      console.log('Quiz submitted successfully')
-      onClose()
+      const response = await QuizAPI.submitQuiz(answer.quizSubmissionId);
+      console.log('Quiz submitted successfully');
+      setIsConfirmOpen(false);
+      onClose(true);
     } catch (error) {
-      console.error('Error submitting quiz:', error)
+      console.error('Error submitting quiz:', error);
+      setIsConfirmOpen(false);
     }
-  }
+  };
+
+  const handleCancelSubmit = () => {
+    setIsConfirmOpen(false);
+  };
 
   const handleRunCode = async () => {
     if (isEmpty(codeRunPro)) {
+      console.log('codeRunPro: ', codeRunPro)
       setIsOpen(true)
       return
     }
@@ -327,6 +349,8 @@ export default function QuizPopup({ quiz, answer, onClose }) {
         testCases: testCasesQuiz
       }
     }
+
+    console.log('submissionData: ', submissionData)
     setLoading(true)
     try {
       const data = await LearningAPI.excuteCode(idCodeSnippetQuestions, submissionData)
@@ -348,7 +372,7 @@ export default function QuizPopup({ quiz, answer, onClose }) {
             {templates && (
               <ResizablePanelGroup direction='horizontal'>
                 <ResizablePanel defaultSize={40}>
-                  <div className='h-full w-full overflow-auto'>
+                  <div className='h-full w-full overflow-auto bg-[#1b2a32]'>
                     <DescriptionQuizProblem description={currentQuestion?.content} />
                   </div>
                 </ResizablePanel>
@@ -388,7 +412,11 @@ export default function QuizPopup({ quiz, answer, onClose }) {
                     <ResizableHandle withHandle className='h-[3px] resize-sha overflow-hidden bg-slate-300' />
                     <ResizablePanel defaultSize={40}>
                       <div className='h-full w-full overflow-auto'>
-                        <TestcaseInterfaceQuiz response={response} loading={loading} testCase={testCase} />
+                        <TestcaseInterfaceQuiz 
+                          response={response} 
+                          loading={loading} 
+                          testCase={testCaseMap[idCodeSnippetQuestions]} 
+                        />
                       </div>
                     </ResizablePanel>
                   </ResizablePanelGroup>
@@ -400,46 +428,89 @@ export default function QuizPopup({ quiz, answer, onClose }) {
       case 'TrueFalse':
       case 'MultipleChoice':
         return (
-          <RadioGroup value={selectedAnswer || ''} onValueChange={handleAnswerChange} className='space-y-2'>
-            {currentQuestion.questionOptions.map((option) => (
-              <div
-                key={option.id}
-                className='flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors'
-              >
-                <RadioGroupItem value={option.id} id={option.id} />
-                <Label htmlFor={option.id} className='flex-grow cursor-pointer'>
-                  {option.content}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
+          <div className='space-y-4'>
+            <RadioGroup value={selectedAnswer || ''} onValueChange={handleAnswerChange} className='space-y-2'>
+              {currentQuestion.questionOptions.map((option) => (
+                <div
+                  key={option.id}
+                  className='flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors'
+                >
+                  <RadioGroupItem value={option.id} id={option.id} />
+                  <Label htmlFor={option.id} className='flex-grow cursor-pointer'>
+                    <ReactMarkdown
+                      components={{
+                        code: CodeBlock
+                      }}
+                    >
+                      {option.content}
+                    </ReactMarkdown>
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
         )
       case 'MultipleSelect':
         return (
-          <div className='space-y-2'>
-            {currentQuestion.questionOptions.map((option) => (
-              <div
-                key={option.id}
-                className='flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors'
-              >
-                <Checkbox
-                  id={option.id}
-                  checked={selectedAnswers[option.id] || false}
-                  onCheckedChange={(checked) => {
-                    handleAnswerChange({ [option.id]: checked }, true)
-                  }}
-                />
-                <Label htmlFor={option.id} className='flex-grow cursor-pointer'>
-                  {option.content}
-                </Label>
-              </div>
-            ))}
+          <div className='space-y-4'>
+            <div className='space-y-2'>
+              {currentQuestion.questionOptions.map((option) => (
+                <div
+                  key={option.id}
+                  className='prose flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors'
+                >
+                  <Checkbox
+                    id={option.id}
+                    checked={selectedAnswers[option.id] || false}
+                    onCheckedChange={(checked) => {
+                      handleAnswerChange({ [option.id]: checked }, true)
+                    }}
+                  />
+                  <Label htmlFor={option.id} className='flex-grow cursor-pointer'>
+                    <ReactMarkdown
+                      components={{
+                        code: CodeBlock
+                      }}
+                    >
+                      {option.content}
+                    </ReactMarkdown>
+                  </Label>
+                </div>
+              ))}
+            </div>
           </div>
         )
       default:
         return <p>Unsupported question type: {currentQuestion.questionType}</p>
     }
   }
+
+  useEffect(() => {
+    let timer;
+    if (hasTimeLimit && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            // Khi hết giờ, tự động nộp bài
+            handleSubmitConfirm();
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
+  }, [hasTimeLimit, timeLeft]);
+
+  const handleClose = () => {
+    onClose(false);
+  };
 
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
@@ -450,11 +521,18 @@ export default function QuizPopup({ quiz, answer, onClose }) {
               variant='ghost'
               size='icon'
               className='absolute right-4 top-4'
-              onClick={onClose}
+              onClick={handleClose}
               aria-label='Close quiz'
             >
               <X className='h-4 w-4' />
             </Button>
+            <div className='flex justify-center items-center mt-2'>
+              {hasTimeLimit && (
+                <p className='text-lg font-semibold'>
+                  Time left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')} minutes
+                </p>
+              )}
+            </div>
             <CardTitle className='text-2xl font-bold text-indigo-700'>
               Question {currentQuestionIndex + 1} of {quiz.questions.length}
             </CardTitle>
@@ -472,13 +550,17 @@ export default function QuizPopup({ quiz, answer, onClose }) {
                 transition={{ duration: 0.3 }}
                 className='space-y-4 h-full flex flex-col'
               >
-                <div className='prose max-w-none mb-4'>
-                  {currentQuestion.questionType !== 'CodeSnippet' && (
-                    <div className='prose max-w-none mb-4'>
-                      <div dangerouslySetInnerHTML={{ __html: currentQuestion.content }} />
-                    </div>
-                  )}
-                </div>
+                {currentQuestion.questionType !== 'CodeSnippet' && (
+                  <div className='prose dark:prose-invert max-w-none mb-4'>
+                    <ReactMarkdown
+                      components={{
+                        code: CodeBlock
+                      }}
+                    >
+                      {currentQuestion.content}
+                    </ReactMarkdown>
+                  </div>
+                )}
                 <div className='flex-grow h-[100%]'>{renderQuestion()}</div>
               </motion.div>
             </AnimatePresence>
@@ -518,7 +600,7 @@ export default function QuizPopup({ quiz, answer, onClose }) {
       />
       <CustomConfirmModal
         isOpen={isConfirmOpen}
-        onClose={() => setIsConfirmOpen(false)}
+        onComplete={handleCancelSubmit}
         onConfirm={handleSubmitConfirm}
         title='Submit Quiz'
         content='Are you sure you want to submit your answer?'

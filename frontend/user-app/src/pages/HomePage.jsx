@@ -16,6 +16,7 @@ import QuizModal from '@/components/surrvey/QuizModal'
 import { QuizAPI } from '@/services/api/quizApi'
 import { UserAPI } from '@/services/api/userApi'
 import { CourseAPI } from '@/services/api/courseApi'
+import { useToast } from '@/hooks/use-toast'
 
 const Button = ({ children, className, ...props }) => (
   <button className={`px-4 py-2 rounded ${className}`} {...props}>
@@ -34,6 +35,8 @@ const Avatar = ({ src, alt, className, ...props }) => (
 )
 
 function HomePage() {
+  const { toast } = useToast()
+
   const initialState = {
     courses: [],
     loading: false,
@@ -168,9 +171,7 @@ function HomePage() {
   }
 
   const handleQuizComplete = (score) => {
-    console.log('Quiz completed with score:', score)
     dispatch({ type: 'SET_IS_QUIZ_OPEN', payload: false })
-    // updateUserFirstLogin()
   }
 
   const { loading, courses, userInfo, isSurveyOpen, isAssessmentPromptOpen, isQuizOpen, quizAssessment } = state

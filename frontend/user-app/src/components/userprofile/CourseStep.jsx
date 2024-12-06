@@ -25,10 +25,10 @@ export default function CourseStep({ step, index, course }) {
           </div>
         </div>
       </div>
-      <button className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-red-500 transition-colors">
+      {/* <button className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-red-500 transition-colors">
         <Eye size={16} />
         View
-      </button>
+      </button> */}
     </div>
   )
 }

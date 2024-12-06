@@ -63,6 +63,8 @@ const CodeEditor = ({
         testCases: testCases
       }
     }
+
+    console.log('submissionData: ', submissionData)
     setActiveTabTestcase('Test Result')
     setLoading(true)
     try {

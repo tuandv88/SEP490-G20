@@ -670,8 +670,18 @@ namespace AuthServer.Controllers
                         await _userManager.AddClaimAsync(user, new Claim("issurvey", "false"));
                     }
 
-                    // Đăng nhập thành công, chuyển đến trang tiếp theo
-                    return RedirectToAction("Index", "Profile");
+                    Console.WriteLine(returnUrl);
+                    if (_interactionService.IsValidReturnUrl(returnUrl))
+                    {
+                        Console.WriteLine($"Redirecting to returnUrl: {returnUrl}");
+                        return Redirect(returnUrl);
+                    }
+                    else
+                    {
+                        // Đăng nhập thành công, chuyển đến trang tiếp theo
+                        Console.WriteLine($"Redirecting to Profile Index.");
+                        return RedirectToAction("Index", "Profile");
+                    }
                 }
                 else if (signInResult.RequiresTwoFactor)
                 {

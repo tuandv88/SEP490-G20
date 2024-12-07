@@ -23,20 +23,20 @@ public static class SeriLogger
                    .Enrich.WithExceptionDetails()
                    .WriteTo.Debug()
                    .WriteTo.Console()
-                   .WriteTo.Elasticsearch(new[] { new Uri(elasticUri!) }, opts =>
-                   {
-                       opts.DataStream = new DataStreamName($"applogs-{context.HostingEnvironment.ApplicationName?.ToLower().Replace(".", "-")}-{context.HostingEnvironment.EnvironmentName?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}");
-                       opts.BootstrapMethod = BootstrapMethod.Failure;
-                       //opts.ConfigureChannel = channelOpts => {
-                       //    channelOpts.BufferOptions = new BufferOptions {
+                   //.WriteTo.Elasticsearch(new[] { new Uri(elasticUri!) }, opts =>
+                   //{
+                   //    opts.DataStream = new DataStreamName($"applogs-{context.HostingEnvironment.ApplicationName?.ToLower().Replace(".", "-")}-{context.HostingEnvironment.EnvironmentName?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}");
+                   //    opts.BootstrapMethod = BootstrapMethod.Failure;
+                   //    //opts.ConfigureChannel = channelOpts => {
+                   //    //    channelOpts.BufferOptions = new BufferOptions {
 
-                       //    };
-                       //};
-                   }, transport =>
-                   {
-                       transport.Authentication(new BasicAuthentication(username!, password!));
-                       transport.ServerCertificateValidationCallback((sender, certificate, chain, sslPolicyErrors) => true);
-                   })
+                   //    //    };
+                   //    //};
+                   //}, transport =>
+                   //{
+                   //    transport.Authentication(new BasicAuthentication(username!, password!));
+                   //    transport.ServerCertificateValidationCallback((sender, certificate, chain, sslPolicyErrors) => true);
+                   //})
                    .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
                    .Enrich.WithProperty("Application", context.HostingEnvironment.ApplicationName)
                    .ReadFrom.Configuration(context.Configuration);

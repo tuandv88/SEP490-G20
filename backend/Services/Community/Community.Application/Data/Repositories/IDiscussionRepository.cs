@@ -3,6 +3,7 @@
 public interface IDiscussionRepository : IRepository<Discussion>
 {
     public Task<List<Discussion>?> GetAllDetailIAsync();
+    public Task<List<Discussion>?> GetAllDetailIsActiveAsync();
     public Task<Discussion?> GetByIdDetailAsync(Guid id);
     public Task<IQueryable<Discussion>?> GetByCategoryIdAsync(Guid id);
     public Task<IQueryable<Discussion>?> GetByCategoryIdIsActiveAsync(Guid id);

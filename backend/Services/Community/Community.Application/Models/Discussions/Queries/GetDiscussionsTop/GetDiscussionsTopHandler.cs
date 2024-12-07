@@ -24,7 +24,7 @@ public class GetDiscussionsTopHandler : IQueryHandler<GetDiscussionsTopQuery, Ge
 
     public async Task<GetDiscussionsTopResult> Handle(GetDiscussionsTopQuery query, CancellationToken cancellationToken)
     {
-        var discussions = await _repository.GetAllDetailIAsync();
+        var discussions = await _repository.GetAllDetailIsActiveAsync();
 
         var topDiscussions = discussions.OrderByDescending(d => d.DateCreated).Take(5).ToList();
 

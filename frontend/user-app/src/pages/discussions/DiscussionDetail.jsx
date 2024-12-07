@@ -49,6 +49,7 @@ function DiscussionDetail() {
   const [reloadComponentCurrent, setReloadComponentCurrent] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const commentSectionRef = useRef(null);
+  const [currentStatusDiscussion, setCurrentStatusDiscussion] = useState(false);
 
   useEffect(() => {
     const fetchDiscussion = async () => {
@@ -68,6 +69,7 @@ function DiscussionDetail() {
         setDiscussion(data);
         setCurrentView(currentViewTmp.currentTotalView);
         setVoteCount(data.voteCount);
+        setCurrentStatusDiscussion(data.isActive);
 
         if (userTmp) {
           const currentUserId = userTmp.profile.sub;
@@ -319,6 +321,18 @@ function DiscussionDetail() {
         </div>
       </Layout>
     );
+  }
+
+
+  if ((!isOwnerDiscussion || !currentUser) && !currentStatusDiscussion) {
+    return (
+
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center text-red-600 text-xl">
+          <p>{"The discussion has been deleted or you do not have permission to view this discussion."}</p>
+        </div>
+      </div>
+    )
   }
 
   return (

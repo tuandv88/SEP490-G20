@@ -10,7 +10,7 @@ import AuthService from '@/oidc/AuthService'
 import { UserContext } from '@/contexts/UserContext'
 import { useNavigate } from "react-router-dom";
 import { NavLink } from '@/components/NavLink'
-
+import PopupNotification from '@/components/notifications/NotificationPopup'
 
 const NAVIGATION_ITEMS = [
   { to: AR.HOME, label: 'HomePage', icon: Home },
@@ -98,15 +98,15 @@ export default function Header() {
   }
 
   return (
-    <header 
+    <header
       className={`bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 
         border-b border-border text-foreground fixed top-0 left-0 w-full z-40 
         transition-all duration-300 ${isHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
       <div className='container px-4 py-3 mx-auto'>
         <div className='flex items-center justify-between'>
-          <Link 
-            to={AR.HOME} 
+          <Link
+            to={AR.HOME}
             className='text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 
               bg-clip-text text-transparent flex items-center gap-2 
               hover:scale-105 transition-transform duration-300 w-10 h-10'
@@ -114,7 +114,7 @@ export default function Header() {
             <img className='object-fit' src="https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/frontend/assets/icodervn-logo-removebg-preview.png" alt="Logo" />
             Icoder
           </Link>
-          
+
           <nav className='hidden md:block'>
             <ul className='flex items-center space-x-8'>
               {NAVIGATION_ITEMS.map(({ to, label, icon }) => (
@@ -129,22 +129,12 @@ export default function Header() {
             {user ? (
               <div className='flex items-center space-x-3'>
                 <div className='relative'>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className='hidden md:inline-flex relative hover:scale-105 transition-transform'
-                    onClick={handleClick}
-                  >
-                    <Bell className='w-5 h-5' />
-                    <span className='absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full 
-                      animate-ping' />
-                    <span className='absolute -top-1 -right-1 w-2 h-2 bg-primaryButton rounded-full' />
-                  </Button>
+                  <PopupNotification />
                 </div>
 
                 <div className='relative flex items-center' ref={dropdownRef}>
-                  <div 
-                    onClick={toggleDropdown} 
+                  <div
+                    onClick={toggleDropdown}
                     className='cursor-pointer transition-transform hover:scale-105'
                   >
                     <Avatar className='w-8 h-8 ring-2 ring-border ring-offset-2 ring-offset-background
@@ -166,8 +156,8 @@ export default function Header() {
               </div>
             ) : (
               <div className='hidden md:flex items-center space-x-2'>
-                <Button 
-                  variant='ghost' 
+                <Button
+                  variant='ghost'
                   className='hover:bg-primary/10 gap-2 group'
                   onClick={handleLogin}
                 >
@@ -180,12 +170,12 @@ export default function Header() {
                 </Button>
               </div>
             )}
-            
+
             <ModeToggle />
-            
-            <Button 
-              variant='ghost' 
-              size='icon' 
+
+            <Button
+              variant='ghost'
+              size='icon'
               className='md:hidden hover:bg-primary/10'
               onClick={toggleMobileMenu}
             >
@@ -203,8 +193,8 @@ export default function Header() {
             <ul className='flex flex-col space-y-3'>
               {NAVIGATION_ITEMS.map(({ to, label, icon }) => (
                 <li key={to}>
-                  <NavLink 
-                    to={to} 
+                  <NavLink
+                    to={to}
                     label={label}
                     icon={icon}
                     className='block py-2 px-3 rounded-md hover:bg-primary/10'

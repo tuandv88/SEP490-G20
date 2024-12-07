@@ -31,6 +31,7 @@ function timeAgo(date) {
 
 export default function NotificationHistory() {
     const [notificationHistories, setNotificationHistories] = useState([]);
+    const [totalNotification, setTotalNotification] = useState(0);
     const [pagination, setPagination] = useState({
         pageIndex: 1,
         pageSize: 5,
@@ -76,11 +77,12 @@ export default function NotificationHistory() {
                 const newPagination = response.pagination || pagination;
                 setPagination(newPagination);
                 setHasMore(newPagination.pageIndex * newPagination.pageSize < newPagination.totalCount);
+                setTotalNotification(pagination.totalCount);
             } else {
                 setHasMore(false);
             }
         } catch (err) {
-            setError('An error occurred while loading data!');
+            //setError('An error occurred while loading data!');
             setHasMore(false);
         } finally {
             setLoading(false);
@@ -102,7 +104,7 @@ export default function NotificationHistory() {
                                 Notifications
                             </CardTitle>
                             <Badge variant="secondary" className="text-sm bg-primary-foreground text-primary">
-                                {notificationHistories.length} New
+                                {totalNotification} New
                             </Badge>
                         </div>
                     </CardHeader>

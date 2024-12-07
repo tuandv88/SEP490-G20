@@ -61,7 +61,7 @@ namespace AuthServer.Controllers
             {
                 // Lấy URL ảnh đại diện
                 var imageUrl = await _filesService.GetFileAsync(StorageConstants.BUCKET, user.ProfilePicture, 60);
-                Console.WriteLine(imageUrl.PresignedUrl);
+                //Console.WriteLine(imageUrl.PresignedUrl);
                 // Truyền vào ViewData để sử dụng trong Razor view
 
                 ViewData["imageUrl"] = imageUrl.PresignedUrl;

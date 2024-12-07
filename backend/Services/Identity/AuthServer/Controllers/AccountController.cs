@@ -76,6 +76,20 @@ namespace AuthServer.Controllers
                     Address = string.Empty,
                 };
 
+                if (model.ExternalLogin)
+                {
+                    // Lấy email gốc từ TempData 
+                    var emailFromGoogle = TempData["GoogleEmail"] as string;
+
+                    // Kiểm tra nếu email trên form khác với email gốc từ Google
+                    if (!String.IsNullOrEmpty(emailFromGoogle) && model.Email != emailFromGoogle)
+                    {
+                        // Nếu email đã thay đổi, yêu cầu xác thực lại email
+                        ModelState.AddModelError("Email", "You have changed your email. Please verify again.");
+                        return View(model);
+                    }
+                }
+
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
@@ -93,6 +107,8 @@ namespace AuthServer.Controllers
 
                         var info = await _signInManager.GetExternalLoginInfoAsync();
                         await _userManager.AddLoginAsync(user, info);
+
+                        TempData["GoogleEmail"] = "";
 
                         // Đăng nhập ngay mà không cần xác nhận email
                         await _signInManager.SignInAsync(user, isPersistent: false);
@@ -625,6 +641,9 @@ namespace AuthServer.Controllers
                     Dob = DateTime.TryParse(info.Principal.FindFirstValue("birthdate"), out var birthDate) ? birthDate : DateTime.MinValue,
                     ExternalLogin = true  // Đánh dấu là đăng ký qua dịch vụ ngoài
                 };
+
+                var emailFromGoogle = info.Principal.FindFirstValue(ClaimTypes.Email);
+                TempData["GoogleEmail"] = emailFromGoogle;
 
                 // Chuyển hướng đến trang Register để người dùng hoàn tất thông tin
                 return View("Register", model);

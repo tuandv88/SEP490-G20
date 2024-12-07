@@ -79,6 +79,18 @@ public class DiscussionRepository : Repository<Discussion>, IDiscussionRepositor
         return discussion;
     }
 
+    public async Task<List<Discussion>?> GetAllDetailIsActiveAsync()
+    {
+        var discussion = _dbContext.Discussions
+                       .AsNoTracking()
+                       .Include(d => d.Comments)
+                       .Include(d => d.Votes)
+                       .AsEnumerable()
+                       .Where(d => d.IsActive)
+                       .ToList();
+        return discussion;
+    }
+
     public async Task<IQueryable<Discussion>?> GetAllDiscussionByUserIdAsync(Guid userId)
     {
         var discussions = _dbContext.Discussions

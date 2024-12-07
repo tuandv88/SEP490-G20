@@ -146,4 +146,9 @@ public class CachedDiscussionRepository : IDiscussionRepository
     {
         throw new NotImplementedException();
     }
+
+    public Task<List<Discussion>?> GetAllDetailIsActiveAsync()
+    {
+        throw new NotImplementedException();
+    }
 }

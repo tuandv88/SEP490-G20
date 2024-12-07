@@ -15,21 +15,25 @@ export default function QuizComponent({ quiz }) {
   const [quizData, setQuizData] = useState(null)
   const [quizSubmission, setQuizSubmission] = useState(null)
 
-  console.log('q: ', quiz)
+  const fetchQuizSubmission = async () => {
+    try {
+      const quizSubmission = await QuizAPI.getQuizSubmission(quiz.id)
+      setQuizSubmission(quizSubmission.quizSubmissions)
+    } catch (error) {
+      console.error('Error fetching quiz submission:', error)
+    }
+  }
 
   useEffect(() => {
-    const fetchQuizSubmission = async () => {
-      //if (!isQuizStarted) return // Chỉ gọi khi quiz đã bắt đầu
-      try {
-        const quizSubmission = await QuizAPI.getQuizSubmission(quiz.id)
-        console.log('Quiz Submission: ', quizSubmission.quizSubmissions)
-        setQuizSubmission(quizSubmission.quizSubmissions)
-      } catch (error) {
-        console.error('Error fetching quiz submission:', error)
-      }
-    }
     fetchQuizSubmission()
-  }, [isQuizStarted]) // Chỉ chạy khi `isQuizStarted` thay đổi
+  }, [quiz.id])
+
+  const handleQuizComplete = async (submitted = false) => {
+    if (submitted) {
+      await fetchQuizSubmission()
+    }
+    setIsQuizStarted(false)
+  }
 
   const startQuiz = async () => {
     try {
@@ -96,7 +100,13 @@ export default function QuizComponent({ quiz }) {
       </div>
 
       {isQuizStarted && quizData && (
-        <QuizPopup quiz={quizData.quiz} answer={quizData.answer} onClose={() => handleCloseQuiz()} />
+        <QuizPopup 
+          quiz={quizData.quiz} 
+          answer={quizData.answer} 
+          timeLimit={quiz.timeLimit} 
+          hasTimeLimit={quiz.hasTimeLimit}
+          onClose={(submitted) => handleQuizComplete(submitted)}
+        />
       )}
     </div>
   )

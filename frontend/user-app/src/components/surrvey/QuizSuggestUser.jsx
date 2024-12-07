@@ -21,7 +21,7 @@ import Popup from '../ui/popup'
 import PreferenceNavQuizProblem from '../quiz/PreferenceNavQuizProblem'
 import DescriptionQuizProblem from '../quiz/DescriptionQuizProblem'
 import TestcaseInterfaceQuiz from '../quiz/TestcaseInterfaceQuiz'
-
+import { useToast } from '@/hooks/use-toast'
 export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
@@ -41,6 +41,8 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
   const [selectedAnswers, setSelectedAnswers] = useState({})
   const [codeSnippets, setCodeSnippets] = useState({})
   const [problemIds, setProblemIds] = useState({})
+
+  const { toast } = useToast()
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
 
@@ -315,6 +317,11 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
     try {
       const response = await QuizAPI.submitQuiz(answer.quizSubmissionId)
       console.log('Quiz submitted successfully')
+      toast({
+        title: 'Quiz completed successfully!',
+        description:
+          'You will receive a schedule from the system for a moment, check in your profile in the Roadmap section.'
+      })
       onComplete()
     } catch (error) {
       console.error('Error submitting quiz:', error)

@@ -457,6 +457,12 @@ namespace AuthServer.Controllers
                     Console.WriteLine("Deleted Username and Password cookies.");
                 }
 
+                // Reset failed login attempts khi đăng nhập thành công
+                if (user != null)
+                {
+                    await _userManager.ResetAccessFailedCountAsync(user);  // Reset số lần đăng nhập sai
+                }
+
                 if (_interactionService.IsValidReturnUrl(returnUrl))
                 {
                     Console.WriteLine($"Redirecting to returnUrl: {returnUrl}");

@@ -129,7 +129,7 @@ export const NotificationApi = {
         try {
             // Gửi yêu cầu POST tới API để tạo lịch sử thông báo
             const response = await axios.post(
-                `${API_BASE_URL}/community-service/notificationhistory`,
+                `${API_BASE_URL}/community-service/notificationhistory/create`,
                 {
                     UserId: userId,
                     NotificationTypeId: notificationTypeId,

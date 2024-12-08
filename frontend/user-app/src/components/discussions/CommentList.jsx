@@ -152,6 +152,8 @@ function CommentList({ discussionId, userIdDiscussion }) {
         status: 'Sent', // Trạng thái gửi
       };
 
+      console.log(notificationData);
+
       // Gọi API để tạo lịch sử thông báo
       const response = await NotificationApi.createNotificationHistory(notificationData);
 
@@ -202,6 +204,8 @@ function CommentList({ discussionId, userIdDiscussion }) {
   const handleVote = async (voteType, commentId, replyId = null) => {
     try {
 
+      if (!currentUser) return;
+
       if (replyId) {
         // Nếu đang trong trạng thái loading thì không cho phép vote nữa
         if (loadingVoteComment) return;
@@ -223,7 +227,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
         isActive: true, // Hoặc false nếu cần
       });
 
-      console.log(response)
+      //console.log(response)
 
       if (response) {
 
@@ -247,7 +251,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
         }
       }
     } catch (error) {
-      console.log(error);
+      //console.log(error);
     } finally {
       if (replyId) {
         setloadingVoteComment(false); // Tắt loading khi hoàn thành
@@ -1449,7 +1453,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .reply-form button {
   align-self: flex-end;
   padding: 7px 13px;
-  background: #354f6c;
+  background: #0a192f;
   color: white;
   border-radius: 4px;
   border: none;
@@ -1459,7 +1463,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 }
 
 .reply-form button:hover {
-  background: #3a5675;
+  background: #1e3a5f;
 }
 
 /* Reply form */
@@ -1497,7 +1501,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .reply-form-edit button {
   align-self: flex-end;
   padding: 7px 13px;
-  background: #354f6c;
+  background: #0a192f;
   color: white;
   border-radius: 4px;
   border: none;
@@ -1507,7 +1511,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 }
 
 .reply-form-edit button:hover {
-  background: #3a5675;
+  background: #1e3a5f;
 }
 
 /* Replies list */

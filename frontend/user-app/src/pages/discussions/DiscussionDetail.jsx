@@ -208,7 +208,7 @@ function DiscussionDetail() {
       if (response) {
         setVoteCount(prevCount => voteType === 'Like' ? prevCount + 1 : prevCount - 1);
         // Notification.
-        const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote');
+        const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Discussion');
 
         // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
         const notificationData = {

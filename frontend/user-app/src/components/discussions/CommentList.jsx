@@ -354,7 +354,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
       //console.log(updatedNotificationTypes);
 
       // Tìm loại thông báo có tên trùng với notificationName
-      const notificationType = updatedNotificationTypes.find(type => type.name === notificationName);
+      const notificationType = updatedNotificationTypes.find(type => type.name.toLowerCase() === notificationName.toLowerCase());
 
       // Nếu tìm thấy loại thông báo, trả về id của nó
       if (notificationType) {

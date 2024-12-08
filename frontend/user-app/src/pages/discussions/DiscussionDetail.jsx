@@ -146,11 +146,14 @@ function DiscussionDetail() {
   const handleToggleNotification = async () => {
     try {
       setLoadingNotification(true);
-      await DiscussApi.updateStatusNotificationDiscussionById({ discussionId: id });
-      setDiscussion(prevDiscussion => ({
-        ...prevDiscussion,
-        enableNotification: !prevDiscussion.enableNotification,
-      }));
+      const response = await DiscussApi.updateStatusNotificationDiscussionById({ discussionId: id });
+
+      if (response) {
+        setDiscussion(prevDiscussion => ({
+          ...prevDiscussion,
+          enableNotification: !prevDiscussion.enableNotification,
+        }));
+      }
     } catch (error) {
       console.error("Error updating status notification discussion:", error.message);
     } finally {
@@ -207,24 +210,27 @@ function DiscussionDetail() {
 
       if (response) {
         setVoteCount(prevCount => voteType === 'Like' ? prevCount + 1 : prevCount - 1);
-        // Notification.
-        const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Discussion');
 
-        // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
-        const notificationData = {
-          userId: discussion.userId, // Lấy từ context hoặc props nếu cần
-          notificationTypeId: notificationTypeIdTmp, // Loại thông báo
-          userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
-          message: `
+        // Notification.
+        const dataApiDiscussion = await DiscussApi.getDiscussionDetails(discussion.id);
+        if (dataApiDiscussion && dataApiDiscussion.enableNotification) {
+          const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Discussion');
+          // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+          const notificationData = {
+            userId: discussion.userId, // Lấy từ context hoặc props nếu cần
+            notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+            userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+            message: `
                   <div class="text-sm text-muted-foreground mb-2 break-words">
                   <p> <strong>${fullNameCurrentUser}</strong> Voted your post.</p>
                   <p><a href="/discussion/${discussion.id}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
                   </div> `,
-          sentVia: 'Web', // Hoặc 'Email' nếu cần
-          status: 'Sent', // Trạng thái gửi
-        };
-        // Gọi API để tạo lịch sử thông báo
-        const response = await NotificationApi.createNotificationHistory(notificationData);
+            sentVia: 'Web', // Hoặc 'Email' nếu cần
+            status: 'Sent', // Trạng thái gửi
+          };
+          // Gọi API để tạo lịch sử thông báo
+          const response = await NotificationApi.createNotificationHistory(notificationData);
+        }
       }
     } catch (error) {
       //console.error(error);
@@ -375,7 +381,7 @@ function DiscussionDetail() {
     <Layout>
       <div className="bg-gray-100 min-h-screen pt-20 pb-12 ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden"
+          <div className="bg-white rounded-sm shadow-lg overflow-hidden"
             style={{ boxShadow: '0 2px 3px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.1)' }}>
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
@@ -429,14 +435,14 @@ function DiscussionDetail() {
                       </Tooltip>
                     </>
                   )}
-                  <Tooltip title="Bookmark" arrow>
+                  {/* <Tooltip title="Bookmark" arrow>
                     <IconButton
                       className="text-yellow-500 p-1"
                       size="small"
                     >
                       <FontAwesomeIcon icon={faBookmark} className="h-4 w-4" />
                     </IconButton>
-                  </Tooltip>
+                  </Tooltip> */}
                   <Tooltip title="Go to comments" arrow>
                     <IconButton
                       onClick={() => commentSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}

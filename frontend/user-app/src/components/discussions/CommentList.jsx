@@ -454,7 +454,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
   };
 
   // Xử lý khi người dùng gửi phản hồi (đối với bình luận gốc hoặc reply)
-  const handleReplyCommentSubmit = async (parentCommentId, depth) => {
+  const handleReplyCommentSubmit = async (parentCommentId, depth, idReceiveNotification = null) => {
     try {
 
       const contentCheck = depth === 2 ? contentReplyFromComment : contentReplyFromReply;
@@ -518,9 +518,11 @@ function CommentList({ discussionId, userIdDiscussion }) {
         } else if (depth == 3) {
           const notificationTypeIdTmp = await getNotificationTypeIdByName('New Reply To Reply');
 
+          console.log(idReceiveNotification);
+
           // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
           const notificationData = {
-            userId: userIdDiscussion, // Lấy từ context hoặc props nếu cần
+            userId: idReceiveNotification, // Lấy từ context hoặc props nếu cần
             notificationTypeId: notificationTypeIdTmp, // Loại thông báo
             userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
             message: `
@@ -583,12 +585,12 @@ function CommentList({ discussionId, userIdDiscussion }) {
     }
   };
 
-  const handleCreateReplyNestedButtonClick = (parentCommentId, depth) => {
+  const handleCreateReplyNestedButtonClick = (parentCommentId, depth, idReceiveNotification = null) => {
     if (!isAuth) {
       setShowAlertCheckIsCreateComment(true);
       setTimeout(() => setShowAlertCheckIsCreateComment(false), 5000);
     } else {
-      handleReplyCommentSubmit(parentCommentId, depth)
+      handleReplyCommentSubmit(parentCommentId, depth, idReceiveNotification)
     }
   };
 
@@ -959,7 +961,9 @@ function CommentList({ discussionId, userIdDiscussion }) {
                                 value={contentReplyFromReply}
                                 onChange={(e) => setContentReplyFromReply(e.target.value)}
                               />
-                              <button onClick={() => handleCreateReplyNestedButtonClick(comment.id, 3)}>Reply Now</button>
+                              <h1>{reply.userId}</h1>
+
+                              <button onClick={() => handleCreateReplyNestedButtonClick(comment.id, 3, reply.userId)}>Reply Now</button>
                             </div>
                           )}
 

@@ -13,6 +13,7 @@ using BuildingBlocks.Email.Models;
 using BuildingBlocks.Email.Helpers;
 using BuidingBlocks.Storage;
 using BuildingBlocks.Email.Constants;
+using Microsoft.AspNetCore.Http;
 
 namespace AuthServer.Controllers
 {
@@ -79,7 +80,7 @@ namespace AuthServer.Controllers
                 if (model.ExternalLogin)
                 {
                     // Lấy email gốc từ TempData 
-                    var emailFromGoogle = TempData["GoogleEmail"] as string;
+                    var emailFromGoogle = HttpContext.Session.GetString("GoogleEmail");
 
                     // Kiểm tra nếu email trên form khác với email gốc từ Google
                     if (!String.IsNullOrEmpty(emailFromGoogle) && model.Email != emailFromGoogle)
@@ -108,7 +109,7 @@ namespace AuthServer.Controllers
                         var info = await _signInManager.GetExternalLoginInfoAsync();
                         await _userManager.AddLoginAsync(user, info);
 
-                        TempData["GoogleEmail"] = "";
+                        HttpContext.Session.Remove("GoogleEmail");
 
                         // Đăng nhập ngay mà không cần xác nhận email
                         await _signInManager.SignInAsync(user, isPersistent: false);
@@ -649,7 +650,10 @@ namespace AuthServer.Controllers
                 };
 
                 var emailFromGoogle = info.Principal.FindFirstValue(ClaimTypes.Email);
-                TempData["GoogleEmail"] = emailFromGoogle;
+                if (!String.IsNullOrEmpty(emailFromGoogle))
+                {
+                    HttpContext.Session.SetString("GoogleEmail", emailFromGoogle);
+                }
 
                 // Chuyển hướng đến trang Register để người dùng hoàn tất thông tin
                 return View("Register", model);

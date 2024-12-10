@@ -165,7 +165,6 @@ namespace Community.Infrastructure.Extensions
     {
         Id = new UserNotificationSettingId(Guid.NewGuid()),
         UserId = Users[0].Id,
-        NotificationTypeId = NotificationTypes[0].Id,
         IsNotificationEnabled = true,
         IsEmailEnabled = true,
         IsWebsiteEnabled = true,
@@ -175,7 +174,6 @@ namespace Community.Infrastructure.Extensions
     {
         Id = new UserNotificationSettingId(Guid.NewGuid()),
         UserId = Users[1].Id,
-        NotificationTypeId = NotificationTypes[1].Id,
         IsNotificationEnabled = true,
         IsEmailEnabled = false,
         IsWebsiteEnabled = true,

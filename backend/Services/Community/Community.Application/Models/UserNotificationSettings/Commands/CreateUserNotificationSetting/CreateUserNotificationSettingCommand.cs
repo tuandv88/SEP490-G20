@@ -10,9 +10,6 @@ public class CreateUserNotificationSettingCommandValidator : AbstractValidator<C
 {
     public CreateUserNotificationSettingCommandValidator()
     {
-        RuleFor(x => x.CreateUserNotificationSettingDto.NotificationTypeId)
-            .NotEmpty().WithMessage("NotificationTypeId must not be empty.");
-
         RuleFor(x => x.CreateUserNotificationSettingDto.IsNotificationEnabled)
             .NotNull().WithMessage("IsNotificationEnabled must not be null.");
 

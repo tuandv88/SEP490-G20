@@ -213,11 +213,11 @@ function CommentList({ discussionId, userIdDiscussion }) {
 
       const currentCommentId = replyId ? replyId : commentId;
 
-      const currentIdDiscussion = discussionId;
+      //const currentIdDiscussion = discussionId;
 
       // Gọi API để tạo phiếu bầu
       const response = await DiscussApi.createVoteComment({
-        discussionId: currentIdDiscussion, // Thêm discussionId nếu cần
+        discussionId: null, // Thêm discussionId nếu cần
         commentId: currentCommentId,
         voteType: voteType,
         isActive: true, // Hoặc false nếu cần

@@ -10,7 +10,6 @@ public static class UserNotificationSettingExtensions
         return new UserNotificationSettingDto(
             setting.Id.Value,
             setting.UserId.Value,
-            setting.NotificationTypeId.Value,
             setting.IsNotificationEnabled,
             setting.IsEmailEnabled,
             setting.IsWebsiteEnabled,

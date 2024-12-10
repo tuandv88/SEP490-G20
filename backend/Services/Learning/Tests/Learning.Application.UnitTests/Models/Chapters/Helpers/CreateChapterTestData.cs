@@ -18,7 +18,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Helpers
                 CreateChapterDto = new CreateChapterDto(
                     Title: "Valid Title",
                     Description: "Valid Description",
-                    TimeEstimation: 10,
                     IsActive: true // Giá trị mặc định
                 )
             };
@@ -32,7 +31,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Helpers
                 CreateChapterDto = new CreateChapterDto(
                     Title: null, // Null title
                     Description: "Valid Description",
-                    TimeEstimation: 10,
                     IsActive: true
                 )
             };
@@ -46,7 +44,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Helpers
                 CreateChapterDto = new CreateChapterDto(
                     Title: "", // Empty title
                     Description: "Valid Description",
-                    TimeEstimation: 10,
                     IsActive: true
                 )
             };
@@ -60,7 +57,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Helpers
                 CreateChapterDto = new CreateChapterDto(
                     Title: "Valid Title",
                     Description: null, // Null description
-                    TimeEstimation: 10,
                     IsActive: true
                 )
             };

@@ -30,7 +30,7 @@ public class PathwayGeneratedEventHandler(ILearningPathRepository pathRepository
         int step = 1;
         DateTime now = DateTime.UtcNow;
         foreach (var pathStep in @event.PathSteps) {
-            now = now + pathStep.EstimatedCompletionTime;
+            now += pathStep.EstimatedCompletionTime;
             var newPathStep = PathStep.Create(
                     learningPath.Id,
                     CourseId.Of(pathStep.CourseId),

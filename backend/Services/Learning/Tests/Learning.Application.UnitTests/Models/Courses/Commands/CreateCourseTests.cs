@@ -73,15 +73,6 @@ public class CreateCourseTests
               .WithErrorMessage("CourseLevel must be a valid value (Basic, Intermediate, Advanced, Expert).");
     }
 
-    [Test]
-    public void Validator_ShouldFail_WhenTimeEstimationIsZero()
-    {
-        var command = CreateCourseTestData.GetInvalidCreateCourseCommand_ZeroTimeEstimation();
-        var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.CreateCourseDto.TimeEstimation)
-              .WithErrorMessage("TimeEstimation must be greater than zero.");
-    }
-
     // Handler Tests
     [Test]
     public async Task Handler_ShouldCreateCourse_WhenValidRequest()

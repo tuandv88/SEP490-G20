@@ -750,7 +750,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
       {/* Comment Navbar Counts*/}
       <div className="comment-list_navbar-extension">
         <div className="counts-comment">
-          <FontAwesomeIcon icon={faComments} style={{ color: '#32679b' }} />
+          <FontAwesomeIcon icon={faComments} style={{ color: '#6b7280' }} />
           <p>Comments:</p>
           <p>{totalCommnents}</p>
         </div>

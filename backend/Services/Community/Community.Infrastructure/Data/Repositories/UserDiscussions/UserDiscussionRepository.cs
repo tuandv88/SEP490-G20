@@ -30,4 +30,11 @@ public class UserDiscussionRepository : Repository<UserDiscussion>, IUserDiscuss
         return null;
     }
 
+    public async Task<UserDiscussion?> GetByUserIdAnDiscussionId(Guid userId, Guid discussionId)
+    {
+        var userDiscussion = _dbContext.UserDiscussions
+                        .AsEnumerable()
+                        .FirstOrDefault(uc => uc.UserId.Value == userId && uc.DiscussionId.Value == discussionId);
+        return userDiscussion;
+    }
 }

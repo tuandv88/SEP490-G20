@@ -403,18 +403,22 @@ function DiscussionDetail() {
                       <FontAwesomeIcon icon={faShareFromSquare} className="h-4 w-4" />
                     </IconButton>
                   </Tooltip>
+
+                  {currentUser &&
+                    (<Tooltip title={discussion.enableNotification ? "Disable notifications" : "Enable notifications"} arrow>
+                      <IconButton
+                        onClick={handleToggleNotification}
+                        disabled={loadingNotification}
+                        className={`${discussion.enableNotification ? 'text-green-500' : 'text-gray-500'} p-1`}
+                        size="small"
+                      >
+                        <FontAwesomeIcon icon={discussion.enableNotification ? faBell : faBellSlash} className="h-4 w-4" />
+                      </IconButton>
+                    </Tooltip>)}
+
                   {isOwnerDiscussion && (
                     <>
-                      <Tooltip title={discussion.enableNotification ? "Disable notifications" : "Enable notifications"} arrow>
-                        <IconButton
-                          onClick={handleToggleNotification}
-                          disabled={loadingNotification}
-                          className={`${discussion.enableNotification ? 'text-green-500' : 'text-gray-500'} p-1`}
-                          size="small"
-                        >
-                          <FontAwesomeIcon icon={discussion.enableNotification ? faBell : faBellSlash} className="h-4 w-4" />
-                        </IconButton>
-                      </Tooltip>
+
                       <Tooltip title="Edit discussion" arrow>
                         <IconButton
                           onClick={() => setOpenDialog(true)}

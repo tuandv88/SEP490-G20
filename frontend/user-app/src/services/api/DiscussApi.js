@@ -487,7 +487,7 @@ export const DiscussApi = {
       if (response && response.data) {
         // Kiểm tra xem response có chứa dữ liệu cần thiết không
         if (response.data.discussionDetailUserDtos && response.data.discussionDetailUserDtos.data) {
-          console.log('Data Response: ', response.data);
+          //console.log('Data Response: ', response.data);
           return response.data;
         } else {
           throw new Error('Invalid data structure in response');

@@ -69,13 +69,13 @@ namespace Community.Application.Extensions
         public static int CalculateTotalVotes(Discussion discussion)
         {
             // Tính tổng số votes từ danh sách phiếu bầu
-            return discussion.Votes.Where(v => v.IsActive).Sum(v => v.VoteType == VoteType.Like ? 1 : -1);
+            return discussion.Votes.Where(v => v.IsActive).Sum(v => v.VoteType == VoteType.Like ? 1 : VoteType.Dislike == v.VoteType ? -1 : 0);
         }
 
         public static int CalculateTotalVotes(Comment comment)
         {
             // Tính tổng số votes từ danh sách phiếu bầu
-            return comment.Votes.Where(v => v.IsActive).Sum(v => v.VoteType == VoteType.Like ? 1 : -1);
+            return comment.Votes.Where(v => v.IsActive).Sum(v => v.VoteType == VoteType.Like ? 1 : VoteType.Dislike == v.VoteType ? -1 : 0);
         }
 
     }

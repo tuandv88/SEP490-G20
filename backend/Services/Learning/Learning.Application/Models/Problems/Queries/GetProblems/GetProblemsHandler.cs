@@ -1,5 +1,6 @@
 ﻿using Amazon.S3.Model;
 using Learning.Application.Models.Problems.Dtos;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Learning.Application.Models.Problems.Queries.GetProblems;
 public class GetProblemsHandler(IProblemRepository problemRepository, IUserContextService userContext) : IQueryHandler<GetProblemsQuery, GetProblemsResult> {
@@ -14,12 +15,15 @@ public class GetProblemsHandler(IProblemRepository problemRepository, IUserConte
 
         var filter = request.Filter;
         var titleSearch = filter.SearchString ?? "";
-
+        var difficultyType = filter.DifficultyType;
         // Lọc dữ liệu: Chỉ admin mới thấy được các problem chưa active
         var filteredProblems = allDataProblem.Where(p =>
                 (isAdmin || (p.IsActive && p.ProblemType == ProblemType.Challenge)) &&
-                p.Title.ToLower().Contains(titleSearch.ToLower())); 
+                p.Title.ToLower().Contains(titleSearch.ToLower()));
 
+        if (!difficultyType.IsNullOrEmpty()) {
+            filteredProblems = filteredProblems.Where(p => p.DifficultyType.ToString().Equals(difficultyType));
+        }
         //Phân trang
         var pageIndex = request.PaginationRequest.PageIndex;
         var pageSize = request.PaginationRequest.PageSize;

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Community.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241202220238_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241209204228_InitialCreateClone")]
+    partial class InitialCreateClone
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -490,15 +490,10 @@ namespace Community.Infrastructure.Data.Migrations
                     b.Property<int>("NotificationFrequency")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("NotificationTypeId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId", "NotificationTypeId");
 
                     b.ToTable("UserNotificationSettings");
                 });

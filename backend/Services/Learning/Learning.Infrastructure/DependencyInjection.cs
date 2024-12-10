@@ -56,8 +56,6 @@ public static class DependencyInjection {
         //Configuration Service
         services.AddScoped<ISourceCombiner, SourceCombiner>();
 
-        services.AddScoped<IManagementStateService, ManagementStateService>();
-
         //Configuration Repository
         ConfigureRepository(services, configuration);
 

@@ -1,6 +1,4 @@
 ﻿using Community.Application.Extensions;
-using Community.Application.Models.NotificationTypes.Dtos;
-using Community.Application.Models.NotificationTypes.Queries.GetNotificationTypesPaging;
 using Community.Application.Models.UserNotificationSettings.Dtos;
 
 namespace Community.Application.Models.UserNotificationSettings.Queries.GetUserNotificationSettings;

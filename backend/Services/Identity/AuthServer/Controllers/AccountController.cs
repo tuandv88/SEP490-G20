@@ -13,21 +13,28 @@ using BuildingBlocks.Email.Models;
 using BuildingBlocks.Email.Helpers;
 using BuidingBlocks.Storage;
 using BuildingBlocks.Email.Constants;
+using Microsoft.AspNetCore.Http;
 
 namespace AuthServer.Controllers
 {
     public class AccountController : Controller
     {
         private readonly IIdentityServerInteractionService _interactionService;
+        // Là 1 services trong identityserver4 dùng để: Quản lí thông tin xác thực giữa client và identityServer và các hành động để 2 bên tương tác qua lại.
+        // Thông tin: đăng nhập, xác thực, và các hành động trong giao diện người dùng.
+        // Quản lí: Quản lý yêu cầu xác thực và authorization,
+        //          Xác định và xử lý thông tin đăng nhập.
+        //          Hỗ trợ logic xác thực theo OpenID Connect (OIDC)
+        //          Giao diện giữa server và client: Đảm bảo tương tác hợp lý giữa server và các yêu cầu của client.
+
         private readonly IDataProtector _protector;
         private readonly SignInManager<Users> _signInManager;
         private readonly UserManager<Users> _userManager;
         private readonly IEmailService _emailService;
         private readonly UrlEncoder _urlEncoder;
-        private readonly IIdentityServerInteractionService _interaction;
         public AccountController(IIdentityServerInteractionService interactionService, IDataProtectionProvider provider,
                                   SignInManager<Users> signInManager, UserManager<Users> userManager, 
-                                  IEmailService emailService, UrlEncoder urlEncoder, IIdentityServerInteractionService interaction)
+                                  IEmailService emailService, UrlEncoder urlEncoder)
         {
             _interactionService = interactionService;
             _protector = provider.CreateProtector("AuthServer.Cookies");
@@ -39,7 +46,6 @@ namespace AuthServer.Controllers
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
 
             _urlEncoder = urlEncoder;
-            _interaction = interaction;
         }
 
         public IActionResult Index()
@@ -79,7 +85,7 @@ namespace AuthServer.Controllers
                 if (model.ExternalLogin)
                 {
                     // Lấy email gốc từ TempData 
-                    var emailFromGoogle = TempData["GoogleEmail"] as string;
+                    var emailFromGoogle = HttpContext.Session.GetString("GoogleEmail");
 
                     // Kiểm tra nếu email trên form khác với email gốc từ Google
                     if (!String.IsNullOrEmpty(emailFromGoogle) && model.Email != emailFromGoogle)
@@ -108,10 +114,13 @@ namespace AuthServer.Controllers
                         var info = await _signInManager.GetExternalLoginInfoAsync();
                         await _userManager.AddLoginAsync(user, info);
 
-                        TempData["GoogleEmail"] = "";
+                        HttpContext.Session.Remove("GoogleEmail");
 
                         // Đăng nhập ngay mà không cần xác nhận email
                         await _signInManager.SignInAsync(user, isPersistent: false);
+
+
+
                         return RedirectToAction("Index", "Profile");
                     }
                     else
@@ -457,6 +466,12 @@ namespace AuthServer.Controllers
                     Console.WriteLine("Deleted Username and Password cookies.");
                 }
 
+                // Reset failed login attempts khi đăng nhập thành công
+                if (user != null)
+                {
+                    await _userManager.ResetAccessFailedCountAsync(user);  // Reset số lần đăng nhập sai
+                }
+
                 if (_interactionService.IsValidReturnUrl(returnUrl))
                 {
                     Console.WriteLine($"Redirecting to returnUrl: {returnUrl}");
@@ -643,7 +658,10 @@ namespace AuthServer.Controllers
                 };
 
                 var emailFromGoogle = info.Principal.FindFirstValue(ClaimTypes.Email);
-                TempData["GoogleEmail"] = emailFromGoogle;
+                if (!String.IsNullOrEmpty(emailFromGoogle))
+                {
+                    HttpContext.Session.SetString("GoogleEmail", emailFromGoogle);
+                }
 
                 // Chuyển hướng đến trang Register để người dùng hoàn tất thông tin
                 return View("Register", model);
@@ -664,8 +682,18 @@ namespace AuthServer.Controllers
                         await _userManager.AddClaimAsync(user, new Claim("issurvey", "false"));
                     }
 
-                    // Đăng nhập thành công, chuyển đến trang tiếp theo
-                    return RedirectToAction("Index", "Profile");
+                    Console.WriteLine(returnUrl);
+                    if (_interactionService.IsValidReturnUrl(returnUrl))
+                    {
+                        Console.WriteLine($"Redirecting to returnUrl: {returnUrl}");
+                        return Redirect(returnUrl);
+                    }
+                    else
+                    {
+                        // Đăng nhập thành công, chuyển đến trang tiếp theo
+                        Console.WriteLine($"Redirecting to Profile Index.");
+                        return RedirectToAction("Index", "Profile");
+                    }
                 }
                 else if (signInResult.RequiresTwoFactor)
                 {
@@ -720,6 +748,8 @@ namespace AuthServer.Controllers
                 if (result)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
+
+
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -977,7 +1007,7 @@ namespace AuthServer.Controllers
             await _signInManager.SignOutAsync();
 
             // Lấy thông tin context logout từ IdentityServer
-            var logoutContext = await _interaction.GetLogoutContextAsync(logoutId);
+            var logoutContext = await _interactionService.GetLogoutContextAsync(logoutId);
 
             // Gọi front_channel_logout_uri nếu có
             //if (!string.IsNullOrEmpty(logoutContext?.SignOutIFrameUrl))

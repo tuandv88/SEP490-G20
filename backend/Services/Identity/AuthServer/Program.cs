@@ -49,7 +49,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 
     // Cấu hình Lockout - khóa user
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);       // Khóa 5 phút
-    options.Lockout.MaxFailedAccessAttempts = 3;                            // Thất bại 3 lần thì khóa
+    options.Lockout.MaxFailedAccessAttempts = 5;                            // Thất bại 3 lần thì khóa
     options.Lockout.AllowedForNewUsers = true;
 
     // Cấu hình về User.
@@ -131,13 +131,14 @@ builder.Services.AddAuthentication(options =>
 //    });
 //});
 
+builder.Services.AddSession();
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin", policy => policy.RequireRole("admin"));
     options.AddPolicy("Moderator", policy => policy.RequireRole("moderator"));
     options.AddPolicy("Learner", policy => policy.RequireRole("learner"));
 });
-
 
 // Đọc danh sách các URL từ appsettings.json
 // Lấy cấu hình từ appsettings.json (nếu bạn đang dùng appsettings)
@@ -159,6 +160,8 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+
+
 
 // Đọc cấu hình từ appsettings.json
 builder.Configuration.GetSection("ApiSettings").Get<ApiSettings>();
@@ -236,7 +239,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 // Sử dụng chính sách CORS
 app.UseCors("AllowSpecificOrigin");
 

@@ -99,7 +99,7 @@ function HomePage() {
         const user = await authServiceInstance.getUser()
         if (user) {
           dispatch({ type: 'SET_USER_INFO', payload: user.profile })
-  
+
           // Kiểm tra điều kiện để hiển thị survey
           const isSurveyCompleted = localStorage.getItem('isSurveyCompleted')
           if (isSurveyCompleted !== 'true' && user.profile.issurvey === 'false') {
@@ -176,7 +176,7 @@ function HomePage() {
 
   const { loading, courses, userInfo, isSurveyOpen, isAssessmentPromptOpen, isQuizOpen, quizAssessment } = state
 
-  console.log('Loading state:', loading)
+  //console.log('Loading state:', loading)
 
   return (
     <>

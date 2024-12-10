@@ -41,9 +41,6 @@ public class GetDiscussionsByCategoryIdSortAndFilterHandler : IQueryHandler<GetD
     // Hàm xử lý lọc theo tags và sắp xếp dữ liệu
     private IQueryable<Discussion> ProcessTagsAndSort(GetDiscussionsByCategoryIdSortAndFilterQuery query, IQueryable<Discussion> allData)
     {
-
-        Console.WriteLine("111111111111111111111111");
-
         if (!string.IsNullOrEmpty(query.keySearch))
         {
             var keySearchLower = query.keySearch.ToLower(); // Chuyển thành chữ thường để tìm kiếm không phân biệt chữ hoa chữ thường

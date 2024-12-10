@@ -79,17 +79,16 @@ namespace Learning.Application.UnitTests.Models.Lectures.Helpers
         }
 
         // Tạo UserCourse hợp lệ
-        public static UserCourse GetValidUserCourse()
+        public static UserEnrollment GetValidUserCourse()
         {
-            return new UserCourse
-            {
+            return new UserEnrollment {
                 UserId = UserId.Of(Guid.NewGuid()),
                 CourseId = CourseId.Of(Guid.NewGuid())
             };
         }
 
         // Tạo UserCourse không hợp lệ (người dùng không tham gia khóa học)
-        public static UserCourse GetInvalidUserCourse()
+        public static UserEnrollment GetInvalidUserCourse()
         {
             return null;
         }

@@ -20,10 +20,6 @@ public class UpdateUserNotificationSettingCommandValidator : AbstractValidator<U
 
         When(x => x.UpdateUserNotificationSettingDto != null, () =>
         {
-            RuleFor(x => x.UpdateUserNotificationSettingDto.NotificationTypeId)
-                .NotEmpty()
-                .WithMessage("NotificationTypeId must not be empty.");
-
             RuleFor(x => x.UpdateUserNotificationSettingDto.NotificationFrequency)
                 .Must(value => Enum.TryParse<NotificationFrequency>(value, true, out _) && Enum.IsDefined(typeof(NotificationFrequency), value))
                 .WithMessage("Invalid NotificationFrequency value. Valid values are: Daily, Weekly, Monthly.");

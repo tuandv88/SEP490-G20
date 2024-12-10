@@ -22,12 +22,6 @@ namespace Community.Infrastructure.Data.Configurations
                     guid => new UserId(guid))
                 .IsRequired();
 
-            builder.Property(uns => uns.NotificationTypeId)
-                .HasConversion(
-                    id => id.Value,
-                    guid => new NotificationTypeId(guid))
-                .IsRequired();
-
             builder.Property(uns => uns.IsNotificationEnabled)
                 .IsRequired();
 
@@ -39,9 +33,6 @@ namespace Community.Infrastructure.Data.Configurations
 
             builder.Property(uns => uns.NotificationFrequency)
                 .IsRequired();
-
-            // Thiết lập chỉ mục
-            builder.HasIndex(uns => new { uns.UserId, uns.NotificationTypeId });
 
             // Mối quan hệ với NotificationHistory
             builder.HasMany(uns => uns.NotificationHistorys)

@@ -15,7 +15,6 @@ public class MessageSentHandler(
     public async Task<MessageSentResult> Handle(MessageSentCommand request, CancellationToken cancellationToken) {
         var userId = userContext.User.Id;
         Conversation? conversation = null;
-
         //Tạo context
         var context = new MessageContext(new Dictionary<string, object?>() {
             {ContextConstant.Learning.LectureId, request.MessageSend.LectureId.ToString()},

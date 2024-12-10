@@ -1,18 +1,21 @@
 ﻿using Community.Application.Models.Comments.Dtos;
 using Community.Domain.Models;
 using Community.Domain.ValueObjects;
+using Community.Application.Interfaces;
 
 namespace Community.Application.Models.Comments.Commands.UpdateComment;
 
 public class UpdateCommentHandler : ICommandHandler<UpdateCommentCommand, UpdateCommentResult>
 {
     private readonly ICommentRepository _commentRepository;
-    private readonly IDiscussionRepository _discussionRepository; 
+    private readonly IDiscussionRepository _discussionRepository;
+    private readonly IUserContextService _userContextService;
 
-    public UpdateCommentHandler(ICommentRepository commentRepository, IDiscussionRepository discussionRepository)
+    public UpdateCommentHandler(ICommentRepository commentRepository, IDiscussionRepository discussionRepository, IUserContextService userContextService)
     {
-        _commentRepository = commentRepository; 
+        _commentRepository = commentRepository;
         _discussionRepository = discussionRepository;
+        _userContextService = userContextService;
     }
 
     public async Task<UpdateCommentResult> Handle(UpdateCommentCommand request, CancellationToken cancellationToken)
@@ -42,25 +45,16 @@ public class UpdateCommentHandler : ICommandHandler<UpdateCommentCommand, Update
     private void UpdateCommentWithNewValues(Comment comment, UpdateCommentDto updateCommentDto)
     {
         // Dữ liệu test UserId
-        var userContextTest = "c3d4e5f6-a7b8-9012-3456-789abcdef010";
+        var currentUserId = _userContextService.User.Id;
 
-        if (!Guid.TryParse(userContextTest, out var currentUserIdTest))
+        if (currentUserId == null)
         {
-            throw new UnauthorizedAccessException("Invalid user ID.");
+            throw new UnauthorizedAccessException("User is not authenticated.");
         }
 
-        var userId = UserId.Of(currentUserIdTest);
+        var userId = UserId.Of(currentUserId);
 
-        // Lấy UserId từ UserContextService
-        //var currentUserId = _userContextService.User.Id;
-
-        //if (currentUserId == null)
-        //{
-        //    throw new UnauthorizedAccessException("User is not authenticated.");
-        //}
-
-        //var userId = UserId.Of(currentUserId.Value);
-
+        comment.UserId = userId;
         comment.DiscussionId = DiscussionId.Of(updateCommentDto.DiscussionId);
         comment.Content = updateCommentDto.Content;
         comment.ParentCommentId = updateCommentDto.ParentCommentId.HasValue ? CommentId.Of(updateCommentDto.ParentCommentId.Value) : null;

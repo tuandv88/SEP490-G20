@@ -7,7 +7,7 @@ namespace Community.API.Endpoints.Notifications
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/notificationhistory", async (CreateNotificationHistoryDto createNotificationHistoryDto, ISender sender) =>
+            app.MapPost("/notificationhistory/create", async (CreateNotificationHistoryDto createNotificationHistoryDto, ISender sender) =>
             {
                 var command = new CreateNotificationHistoryCommand(createNotificationHistoryDto);
                 var result = await sender.Send(command);

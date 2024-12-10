@@ -156,7 +156,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Commands
                     CreateChapterDto = new CreateChapterDto(
                         Title: "Chapter 4",
                         Description: "Description 4",
-                        TimeEstimation: 10,
                         IsActive: true
                     )
                 },
@@ -166,7 +165,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Commands
                     CreateChapterDto = new CreateChapterDto(
                         Title: "Chapter 5",
                         Description: "Description 5",
-                        TimeEstimation: 15,
                         IsActive: true
                     )
                 }

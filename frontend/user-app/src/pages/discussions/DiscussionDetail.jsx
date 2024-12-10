@@ -93,7 +93,7 @@ function DiscussionDetail() {
           });
         }
       } catch (err) {
-        setError(err.message || "Failed to fetch discussion details.");
+        //setError(err.message || "Failed to fetch discussion details.");
       } finally {
         setLoading(false);
       }
@@ -146,11 +146,14 @@ function DiscussionDetail() {
   const handleToggleNotification = async () => {
     try {
       setLoadingNotification(true);
-      await DiscussApi.updateStatusNotificationDiscussionById({ discussionId: id });
-      setDiscussion(prevDiscussion => ({
-        ...prevDiscussion,
-        enableNotification: !prevDiscussion.enableNotification,
-      }));
+      const response = await DiscussApi.updateStatusNotificationDiscussionById({ discussionId: id });
+
+      if (response) {
+        setDiscussion(prevDiscussion => ({
+          ...prevDiscussion,
+          enableNotification: !prevDiscussion.enableNotification,
+        }));
+      }
     } catch (error) {
       console.error("Error updating status notification discussion:", error.message);
     } finally {
@@ -169,6 +172,30 @@ function DiscussionDetail() {
     });
   };
 
+  // Phương thức nhận vào tên loại thông báo và trả về id của loại đó
+  const getNotificationTypeIdByName = async (notificationName) => {
+    try {
+      // Gọi API để lấy danh sách các loại thông báo
+      const { pagination, updatedNotificationTypes } = await NotificationApi.getNotificationTypes({ pageIndex: 1, pageSize: 15 });
+
+      //console.log(updatedNotificationTypes);
+
+      // Tìm loại thông báo có tên trùng với notificationName
+      const notificationType = updatedNotificationTypes.find(type => type.name.toLowerCase() === notificationName.toLowerCase());
+
+      // Nếu tìm thấy loại thông báo, trả về id của nó
+      if (notificationType) {
+        return notificationType.id;
+      } else {
+        throw new Error(`Notification type with name '${notificationName}' not found.`);
+      }
+    } catch (error) {
+      console.error('Error fetching notification type by name:', error);
+      throw error;
+    }
+  };
+
+
   const handleVote = async (voteType) => {
     if (loadingVoteComment) return;
     setLoadingVoteComment(true);
@@ -179,21 +206,34 @@ function DiscussionDetail() {
         voteType: voteType,
         isActive: true,
       });
+
+
       if (response) {
         setVoteCount(prevCount => voteType === 'Like' ? prevCount + 1 : prevCount - 1);
-        const notificationTypeId = await NotificationApi.getNotificationTypeIdByName('New Vote');
-        const notificationData = {
-          userId: discussion.userId,
-          notificationTypeId: notificationTypeId,
-          userNotificationSettingId: userNotificationSettings,
-          message: `<strong>${fullNameCurrentUser}</strong> voted on your post.`,
-          sentVia: 'Web',
-          status: 'Sent',
-        };
-        await NotificationApi.createNotificationHistory(notificationData);
+
+        // Notification.
+        const dataApiDiscussion = await DiscussApi.getDiscussionDetails(discussion.id);
+        if (dataApiDiscussion && dataApiDiscussion.enableNotification) {
+          const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Discussion');
+          // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+          const notificationData = {
+            userId: discussion.userId, // Lấy từ context hoặc props nếu cần
+            notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+            userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+            message: `
+                  <div class="text-sm text-muted-foreground mb-2 break-words">
+                  <p> <strong>${fullNameCurrentUser}</strong> Voted your post.</p>
+                  <p><a href="/discussion/${discussion.id}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
+                  </div> `,
+            sentVia: 'Web', // Hoặc 'Email' nếu cần
+            status: 'Sent', // Trạng thái gửi
+          };
+          // Gọi API để tạo lịch sử thông báo
+          const response = await NotificationApi.createNotificationHistory(notificationData);
+        }
       }
     } catch (error) {
-      console.error(error);
+      //console.error(error);
     } finally {
       setLoadingVoteComment(false);
     }
@@ -324,22 +364,24 @@ function DiscussionDetail() {
   }
 
 
-  if ((!isOwnerDiscussion || !currentUser) && !currentStatusDiscussion) {
+  if (error || ((!isOwnerDiscussion || !currentUser) && !currentStatusDiscussion)) {
     return (
-
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center text-red-600 text-xl">
-          <p>{"The discussion has been deleted or you do not have permission to view this discussion."}</p>
+      <Layout>
+        <div className="flex justify-center items-center h-screen">
+          <div className="text-center text-red-600 text-xl">
+            {/* <p>{"The discussion has been deleted or you do not have permission to view this discussion."}</p> */}
+            <p>{"This discussion does not exist."}</p>
+          </div>
         </div>
-      </div>
+      </Layout>
     )
   }
 
   return (
     <Layout>
-      <div className="bg-gray-50 min-h-screen pt-20 pb-12 ">
+      <div className="bg-gray-100 min-h-screen pt-20 pb-12 ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden"
+          <div className="bg-white rounded-sm shadow-lg overflow-hidden"
             style={{ boxShadow: '0 2px 3px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.1)' }}>
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
@@ -393,14 +435,14 @@ function DiscussionDetail() {
                       </Tooltip>
                     </>
                   )}
-                  <Tooltip title="Bookmark" arrow>
+                  {/* <Tooltip title="Bookmark" arrow>
                     <IconButton
                       className="text-yellow-500 p-1"
                       size="small"
                     >
                       <FontAwesomeIcon icon={faBookmark} className="h-4 w-4" />
                     </IconButton>
-                  </Tooltip>
+                  </Tooltip> */}
                   <Tooltip title="Go to comments" arrow>
                     <IconButton
                       onClick={() => commentSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}

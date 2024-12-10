@@ -412,11 +412,11 @@ export const DiscussApi = {
         //console.log('Vote created successfully:', response.data);
         return response.data;
       } else {
-        throw new Error('Failed to create vote');
+        //throw new Error('Failed to create vote');
       }
     } catch (error) {
       //console.error('Error creating vote:', error);
-      throw error;
+      //throw error;
     }
   },
 

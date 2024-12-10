@@ -29,6 +29,12 @@ class AuthService {
       })
     })
 
+    // Xử lý khi token đã hết hạn
+    this.userManager.events.addAccessTokenExpired(() => {
+      console.log('Token has expired');
+      this.userManager.signoutRedirect();
+    });
+
     this.userManager.events.addSilentRenewError((err) => {
       console.error("Gia hạn token ngầm thất bại:", err)
     })

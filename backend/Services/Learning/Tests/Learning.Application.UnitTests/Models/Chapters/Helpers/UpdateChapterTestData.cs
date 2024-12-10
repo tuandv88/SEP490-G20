@@ -14,7 +14,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Helpers
                 UpdateChapterDto: new UpdateChapterDto(
                     Title: "Valid Title",
                     Description: "Valid Description",
-                    TimeEstimation: 20,
                     IsActive: true
                 )
             );
@@ -28,7 +27,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Helpers
                 UpdateChapterDto: new UpdateChapterDto(
                     Title: null, // Null title
                     Description: "Valid Description",
-                    TimeEstimation: 10,
                     IsActive: true
                 )
             );
@@ -42,7 +40,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Helpers
                 UpdateChapterDto: new UpdateChapterDto(
                     Title: "", // Empty title
                     Description: "Valid Description",
-                    TimeEstimation: 10,
                     IsActive: true
                 )
             );
@@ -56,7 +53,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Helpers
                 UpdateChapterDto: new UpdateChapterDto(
                     Title: "Valid Title",
                     Description: "Valid Description",
-                    TimeEstimation: -5, // Negative time estimation
                     IsActive: true
                 )
             );
@@ -70,7 +66,6 @@ namespace Learning.Application.UnitTests.Models.Chapters.Helpers
                 UpdateChapterDto: new UpdateChapterDto(
                     Title: "Valid Title",
                     Description: null, // Null description
-                    TimeEstimation: 15,
                     IsActive: true
                 )
             );

@@ -95,7 +95,6 @@ namespace Community.Infrastructure.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    NotificationTypeId = table.Column<Guid>(type: "uuid", nullable: false),
                     IsNotificationEnabled = table.Column<bool>(type: "boolean", nullable: false),
                     IsEmailEnabled = table.Column<bool>(type: "boolean", nullable: false),
                     IsWebsiteEnabled = table.Column<bool>(type: "boolean", nullable: false),
@@ -506,11 +505,6 @@ namespace Community.Infrastructure.Data.Migrations
                 name: "IX_UserDiscussions_UserId",
                 table: "UserDiscussions",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserNotificationSettings_UserId_NotificationTypeId",
-                table: "UserNotificationSettings",
-                columns: new[] { "UserId", "NotificationTypeId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Votes_CommentId",

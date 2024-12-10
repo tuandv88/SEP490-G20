@@ -55,15 +55,6 @@ public class UpdateCourseTests
               .WithErrorMessage("Price must be greater than or equal zero.");
     }
 
-    [Test]
-    public void Validator_ShouldFail_WhenTimeEstimationIsZero()
-    {
-        var command = UpdateCourseTestData.GetInvalidUpdateCourseCommand_ZeroTimeEstimation();
-        var result = _validator.TestValidate(command);
-        result.ShouldHaveValidationErrorFor(x => x.UpdateCourseDto.TimeEstimation)
-              .WithErrorMessage("TimeEstimation must be greater than zero.");
-    }
-
     // Handler Tests
     [Test]
     public async Task Handler_ShouldUpdateCourse_WhenValidRequest()

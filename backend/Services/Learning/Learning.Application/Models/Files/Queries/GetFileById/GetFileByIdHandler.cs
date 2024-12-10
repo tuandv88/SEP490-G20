@@ -1,4 +1,6 @@
-﻿namespace Learning.Application.Models.Files.Queries.GetFileById;
+﻿using BuidingBlocks.Storage.Models;
+
+namespace Learning.Application.Models.Files.Queries.GetFileById;
 
 public class GetFileByIdHandler(IFileRepository fileRepository, ILectureRepository lectureRepository, IFilesService filesService) 
     : IQueryHandler<GetFileByIdQuery, GetFileByIdResult> {
@@ -15,7 +17,13 @@ public class GetFileByIdHandler(IFileRepository fileRepository, ILectureReposito
             throw new ConflictException($"The file with ID {request.FileId} is associated with a different lecture.");
         }
 
-        var s3Object = await filesService.GetFileAsync(StorageConstants.BUCKET, file.Url);
+        S3ObjectDto? s3Object = null;
+        if(file.FileType == FileType.VIDEO) {
+            s3Object = await filesService.GetFileAsync(StorageConstants.BUCKET, file.Url);
+        } else {
+            s3Object = await filesService.GetFileAsync(StorageConstants.BUCKET, file.Url, 6*24*7);
+        }
+        
         return new GetFileByIdResult(s3Object.PresignedUrl!);
     }
 }

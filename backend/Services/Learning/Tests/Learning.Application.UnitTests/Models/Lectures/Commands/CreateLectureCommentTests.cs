@@ -8,7 +8,7 @@ namespace Learning.Application.UnitTests.Models.Lectures.Commands
     {
         private Mock<ICourseRepository> _courseRepositoryMock;
         private Mock<IUserContextService> _userContextMock;
-        private Mock<IUserCourseRepository> _userCourseRepositoryMock;
+        private Mock<IUserEnrollmentRepository> _userCourseRepositoryMock;
         private Mock<ILectureCommentRepository> _lectureCommentRepositoryMock;
         private CreateLectureCommentHandler _handler;
 
@@ -17,7 +17,7 @@ namespace Learning.Application.UnitTests.Models.Lectures.Commands
         {
             _courseRepositoryMock = new Mock<ICourseRepository>();
             _userContextMock = new Mock<IUserContextService>();
-            _userCourseRepositoryMock = new Mock<IUserCourseRepository>();
+            _userCourseRepositoryMock = new Mock<IUserEnrollmentRepository>();
             _lectureCommentRepositoryMock = new Mock<ILectureCommentRepository>();
 
             _handler = new CreateLectureCommentHandler(
@@ -89,7 +89,7 @@ namespace Learning.Application.UnitTests.Models.Lectures.Commands
 
             _userCourseRepositoryMock
                 .Setup(repo => repo.GetByUserIdAndCourseIdWithProgressAsync(It.IsAny<Guid>(), command.CourseId))
-                .ReturnsAsync((UserCourse)null);
+                .ReturnsAsync((UserEnrollment)null);
 
             // Act & Assert
             var ex = Assert.ThrowsAsync<ForbiddenAccessException>(() => _handler.Handle(command, CancellationToken.None));

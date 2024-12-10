@@ -138,14 +138,14 @@ public class ConversationalAIService(
             Role = AuthorRole.User,
             Items = [new TextContent { Text = question }]
         };
-        if (!string.IsNullOrEmpty(imageUrl)) {
-            string base64Image = await ImageHelper.ConvertImageUrlToBase64Async(imageUrl);
-            byte[] imageData = Convert.FromBase64String(base64Image);
-            string mimeType = ImageHelper.GetMimeTypeFromUrl(rootImageUrl);
-            var imageContent = new ImageContent(imageData, mimeType);
-            messageContent.Items.Add(imageContent);
+        //if (!string.IsNullOrEmpty(imageUrl)) {
+        //    string base64Image = await ImageHelper.ConvertImageUrlToBase64Async(imageUrl);
+        //    byte[] imageData = Convert.FromBase64String(base64Image);
+        //    string mimeType = ImageHelper.GetMimeTypeFromUrl(rootImageUrl);
+        //    var imageContent = new ImageContent(imageData, mimeType);
+        //    messageContent.Items.Add(imageContent);
 
-        }
+        //}
         ChatHistory chatHistory = [messageContent];
         return chatHistory;
     }

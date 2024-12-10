@@ -12,7 +12,6 @@ public static class UpdateCourseTestData
                 Title: "Updated Title",
                 Description: "Updated Description",
                 Headline: "Updated Headline",
-                TimeEstimation: 15,
                 Prerequisites: "Updated Prerequisites",
                 Objectives: "Updated Objectives",
                 TargetAudiences: "Updated Target Audiences",
@@ -29,7 +28,6 @@ public static class UpdateCourseTestData
                 Title: null, // Invalid Title
                 Description: "Valid Description",
                 Headline: "Valid Headline",
-                TimeEstimation: 10,
                 Prerequisites: "Valid Prerequisites",
                 Objectives: "Valid Objectives",
                 TargetAudiences: "Valid Target Audiences",
@@ -46,7 +44,6 @@ public static class UpdateCourseTestData
                 Title: "Valid Title",
                 Description: "", // Invalid Description
                 Headline: "Valid Headline",
-                TimeEstimation: 10,
                 Prerequisites: "Valid Prerequisites",
                 Objectives: "Valid Objectives",
                 TargetAudiences: "Valid Target Audiences",
@@ -63,7 +60,6 @@ public static class UpdateCourseTestData
                 Title: "Valid Title",
                 Description: "Valid Description",
                 Headline: "Valid Headline",
-                TimeEstimation: 10,
                 Prerequisites: "Valid Prerequisites",
                 Objectives: "Valid Objectives",
                 TargetAudiences: "Valid Target Audiences",
@@ -80,7 +76,6 @@ public static class UpdateCourseTestData
                 Title: "Valid Title",
                 Description: "Valid Description",
                 Headline: "Valid Headline",
-                TimeEstimation: 0, // Invalid TimeEstimation
                 Prerequisites: "Valid Prerequisites",
                 Objectives: "Valid Objectives",
                 TargetAudiences: "Valid Target Audiences",

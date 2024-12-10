@@ -7,7 +7,7 @@ namespace Learning.Tests.Application.UnitTest.Models.Courses.Commands;
 [TestFixture]
 public class UpdateLectureProgressTests
 {
-    private Mock<IUserCourseRepository> _userCourseRepositoryMock;
+    private Mock<IUserEnrollmentRepository> _userCourseRepositoryMock;
     private Mock<IUserContextService> _userContextMock;
     private Mock<ICourseRepository> _courseRepositoryMock;
     private UpdateLectureProgressHandler _handler;
@@ -15,7 +15,7 @@ public class UpdateLectureProgressTests
     [SetUp]
     public void SetUp()
     {
-        _userCourseRepositoryMock = new Mock<IUserCourseRepository>();
+        _userCourseRepositoryMock = new Mock<IUserEnrollmentRepository>();
         _userContextMock = new Mock<IUserContextService>();
         _courseRepositoryMock = new Mock<ICourseRepository>();
 
@@ -50,9 +50,9 @@ public class UpdateLectureProgressTests
             }
         };
 
-        var userCourse = new UserCourse
+        var userCourse = new UserEnrollment
         {
-            Id = UserCourseId.Of(Guid.NewGuid()),
+            Id = UserEnrollmentId.Of(Guid.NewGuid()),
             LectureProgress = new List<LectureProgress>()
         };
 
@@ -65,7 +65,7 @@ public class UpdateLectureProgressTests
             .ReturnsAsync(userCourse);
 
         _userCourseRepositoryMock
-            .Setup(repo => repo.UpdateAsync(It.IsAny<UserCourse>()))
+            .Setup(repo => repo.UpdateAsync(It.IsAny<UserEnrollment>()))
             .Returns(Task.CompletedTask);
 
         _userCourseRepositoryMock

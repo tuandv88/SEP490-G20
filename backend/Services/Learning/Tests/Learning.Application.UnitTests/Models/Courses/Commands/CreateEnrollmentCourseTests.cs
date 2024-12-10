@@ -6,7 +6,7 @@ namespace Learning.Tests.Application.UnitTest.Models.Courses.Commands;
 [TestFixture]
 public class CreateEnrollmentCourseTests
 {
-    private Mock<IUserCourseRepository> _userCourseRepositoryMock;
+    private Mock<IUserEnrollmentRepository> _userCourseRepositoryMock;
     private Mock<ICourseRepository> _courseRepositoryMock;
     private Mock<IUserContextService> _userContextMock;
     private EnrollmentCourseHandler _handler;
@@ -14,7 +14,7 @@ public class CreateEnrollmentCourseTests
     [SetUp]
     public void SetUp()
     {
-        _userCourseRepositoryMock = new Mock<IUserCourseRepository>();
+        _userCourseRepositoryMock = new Mock<IUserEnrollmentRepository>();
         _courseRepositoryMock = new Mock<ICourseRepository>();
         _userContextMock = new Mock<IUserContextService>();
 
@@ -44,10 +44,10 @@ public class CreateEnrollmentCourseTests
 
         _userCourseRepositoryMock
             .Setup(repo => repo.GetByUserIdAndCourseIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
-            .ReturnsAsync((Learning.Domain.Models.UserCourse)null);
+            .ReturnsAsync((Learning.Domain.Models.UserEnrollment)null);
 
         _userCourseRepositoryMock
-             .Setup(repo => repo.AddAsync(It.IsAny<Learning.Domain.Models.UserCourse>()))
+             .Setup(repo => repo.AddAsync(It.IsAny<Learning.Domain.Models.UserEnrollment>()))
              .Returns(Task.CompletedTask);
 
         _userCourseRepositoryMock
@@ -92,7 +92,7 @@ public class CreateEnrollmentCourseTests
 
         _userCourseRepositoryMock
             .Setup(repo => repo.GetByUserIdAndCourseIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
-            .ReturnsAsync(new Learning.Domain.Models.UserCourse()); // Simulating already enrolled
+            .ReturnsAsync(new Learning.Domain.Models.UserEnrollment()); // Simulating already enrolled
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -117,7 +117,7 @@ public class CreateEnrollmentCourseTests
 
         _userCourseRepositoryMock
             .Setup(repo => repo.GetByUserIdAndCourseIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
-            .ReturnsAsync((Learning.Domain.Models.UserCourse)null);
+            .ReturnsAsync((Learning.Domain.Models.UserEnrollment)null);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -142,7 +142,7 @@ public class CreateEnrollmentCourseTests
 
         _userCourseRepositoryMock
             .Setup(repo => repo.GetByUserIdAndCourseIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>()))
-            .ReturnsAsync((Learning.Domain.Models.UserCourse)null);
+            .ReturnsAsync((Learning.Domain.Models.UserEnrollment)null);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);

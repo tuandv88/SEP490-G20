@@ -42,7 +42,7 @@ function DiscussionTabs({ onCategoryChange, categoryId }) {
           }
         }
       } catch (err) {
-        setError("Failed to fetch discussion topics");
+        //setError("Failed to fetch discussion topics");
       } finally {
         setLoading(false);
       }
@@ -54,7 +54,7 @@ function DiscussionTabs({ onCategoryChange, categoryId }) {
   if (loading) {
     return (
       <div className="flex justify-center items-center p-6 bg-white rounded-lg shadow-md">
-        <FontAwesomeIcon icon={faSpinner} spin className="text-[#0a192f] text-4xl" />
+        <FontAwesomeIcon icon={faSpinner} spin className="text-[#32679b] text-4xl" />
       </div>
     );
   }
@@ -85,8 +85,8 @@ function DiscussionTabs({ onCategoryChange, categoryId }) {
               flex items-center justify-center px-6 py-2 rounded-md transition-all duration-200 
               text-sm font-medium shadow-md hover:shadow-lg
               ${categoryId === tab.id
-                ? "bg-[#0a192f] text-white hover:bg-[#112240]"
-                : "bg-white text-[#0a192f] hover:bg-gray-200"
+                ? "bg-[#32679b] text-white hover:bg-[#285580]"
+                : "bg-white text-[#32679b] hover:bg-gray-200"
               }
               w-40 h-20
             `}
@@ -94,7 +94,7 @@ function DiscussionTabs({ onCategoryChange, categoryId }) {
           >
             <FontAwesomeIcon
               icon={getIconForCategory(tab.name)}
-              className={`mr-2 text-lg ${categoryId === tab.id ? 'text-white' : 'text-[#0a192f]'}`}
+              className={`mr-2 text-lg ${categoryId === tab.id ? 'text-white' : 'text-[#32679b]'}`}
             />
             <span>{tab.name}</span>
           </button>

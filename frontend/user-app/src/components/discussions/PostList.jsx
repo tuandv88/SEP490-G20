@@ -403,7 +403,7 @@ function PostList({ categoryId }) {
                 key={filter}
                 className={`px-4 py-2 rounded-md transition-colors duration-200 flex items-center justify-center ${orderBy === filter
                   ? "bg-[#32679b] text-white"
-                  : "bg-gray-200 text-[#32679b] hover:bg-gray-300"
+                  : "bg-gray-200 text-[#6b7280] hover:bg-gray-300"
                   }`}
                 onClick={() => handleFilterClick(filter)}
               >
@@ -534,9 +534,9 @@ function PostList({ categoryId }) {
                             {post.title}
                           </h3>
                           <div className="flex items-center text-sm text-gray-600 mt-1">
-                            <FontAwesomeIcon icon={faUser} className="mr-1 text-[#0a192f]" />
+                            <FontAwesomeIcon icon={faUser} className="mr-1 text-[#6b7280]" />
                             <span className="font-medium text-[#0a192f] mr-2">{post.firstName} {post.lastName}</span>
-                            <FontAwesomeIcon icon={faCalendarAlt} className="mr-1 ml-2 text-[#0a192f]" />
+                            <FontAwesomeIcon icon={faCalendarAlt} className="mr-1 ml-2 text-[#6b7280]" />
                             <span>Created: {formatRelativeDate(post.dateCreated)}</span>
                           </div>
                         </div>
@@ -546,8 +546,8 @@ function PostList({ categoryId }) {
                           <span
                             key={idx}
                             className={`px-3 py-1 rounded-full text-sm transition-colors duration-200 flex items-center cursor-pointer ${selectedTags.includes(tag)
-                              ? "bg-[#32679b] text-white"
-                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                              ? "bg-[#555b66] text-white"
+                              : "bg-gray-200 text-[#646a75] hover:bg-gray-300"
                               }`}
                             onClick={(e) => handleTagClick(tag, e)}
                           >
@@ -559,7 +559,7 @@ function PostList({ categoryId }) {
                       {renderDescription(post.description, post.id)}
                       <div className="flex justify-between items-center text-sm text-gray-600 border-t pt-4 mt-4">
                         <div className="flex items-center">
-                          <FontAwesomeIcon icon={faClock} className="mr-1 text-[#32679b]" />
+                          <FontAwesomeIcon icon={faClock} className="mr-1 text-[#6b7280]" />
                           <span>Updated: {formatRelativeDate(post.dateUpdated)}</span>
                         </div>
                         <div className="flex items-center space-x-4">

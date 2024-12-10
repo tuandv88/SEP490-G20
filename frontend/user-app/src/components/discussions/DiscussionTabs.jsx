@@ -86,7 +86,7 @@ function DiscussionTabs({ onCategoryChange, categoryId }) {
               text-sm font-medium shadow-md hover:shadow-lg
               ${categoryId === tab.id
                 ? "bg-[#32679b] text-white hover:bg-[#285580]"
-                : "bg-white text-[#32679b] hover:bg-gray-200"
+                : "bg-white text-[#6b7280] hover:bg-gray-200"
               }
               w-40 h-20
             `}
@@ -94,7 +94,7 @@ function DiscussionTabs({ onCategoryChange, categoryId }) {
           >
             <FontAwesomeIcon
               icon={getIconForCategory(tab.name)}
-              className={`mr-2 text-lg ${categoryId === tab.id ? 'text-white' : 'text-[#32679b]'}`}
+              className={`mr-2 text-lg ${categoryId === tab.id ? 'text-white' : 'text-[#6b7280]'}`}
             />
             <span>{tab.name}</span>
           </button>

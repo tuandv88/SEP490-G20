@@ -500,7 +500,7 @@ function DiscussionDetail() {
                       {discussion?.tags?.map((tag, idx) => (
                         <span
                           key={idx}
-                          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-black"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-[#555b66]"
                         >
                           <FontAwesomeIcon icon={faTag} className="mr-2 h-3 w-3 text-black" />
                           {tag}

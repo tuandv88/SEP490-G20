@@ -2,7 +2,7 @@
 namespace Payment.Domain.Models;
 public class Transaction : Aggregate<TransactionId> {
     public UserId UserId { get; set; } = default!;
-    public double Amount { get; set; }
+    public double Amount { get; set; } // giá tiền goc chua qua trừ
     public string Currency { get; set; } = default!; // loại tiền tệ
     public TransactionStatus Status { get; set; } = TransactionStatus.Created;
     public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.Paypal;

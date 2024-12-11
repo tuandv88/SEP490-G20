@@ -26,7 +26,7 @@ public class DeductPointsCommandHandler(IPointHistoryRepository pointHistoryRepo
         await pointHistoryRepository.SaveChangesAsync();
     }
 
-    public PointHistory CreateNewPointHistory(long point, Guid userId, string source) {
+    private PointHistory CreateNewPointHistory(long point, Guid userId, string source) {
         return PointHistory.Create(
             PointHistoryId.Of(Guid.NewGuid()),
             UserId.Of(userId),

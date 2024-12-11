@@ -1,7 +1,9 @@
 using Learning.Application.Models.Courses.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Learning.Application.Models.Courses.Queries.GetCoursesWithParticipation;
 
+[Authorize]
 public record GetCoursesWithParticipationQuery(PaginationRequest PaginationRequest, string[]? CourseIds, GetCoursesWithParticipationFilter Filter) : IQuery<GetCoursesWithParticipationResult>;
 public record GetCoursesWithParticipationResult(PaginatedResult<CourseWithParticipationDto> Courses);
 public record GetCoursesWithParticipationFilter(string? SearchString);

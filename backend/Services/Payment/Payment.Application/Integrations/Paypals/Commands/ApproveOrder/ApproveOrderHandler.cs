@@ -47,7 +47,7 @@ public class ApproveOrderHandler(IPaypalClientApi paypalClientApi, ITransactionR
             PointsUsed = transaction.PointsUsed,
             PayerEmail = transaction.PayerEmail!,
             Fullname = transaction.Fullname,
-            Amount = transaction.Amount
+            Amount = transaction.Amount - transaction.DiscountAmount
         });
         await transactionRepository.SaveChangesAsync();
     }

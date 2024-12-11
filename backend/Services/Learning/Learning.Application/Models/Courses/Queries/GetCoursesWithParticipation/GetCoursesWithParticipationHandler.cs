@@ -1,4 +1,4 @@
-﻿namespace Learning.Application.Models.Courses.Queries.GetUserEnrollmentCourses;
+namespace Learning.Application.Models.Courses.Queries.GetCoursesWithParticipation;
 
 using Learning.Application.Models.Courses.Dtos;
 using Microsoft.EntityFrameworkCore;
@@ -6,48 +6,51 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-public class GetUserEnrollmentCoursesHandler(
+public class GetCoursesWithParticipationHandler(
     ICourseRepository repository,
     IFilesService filesService,
     IUserContextService userContext)
-    : IQueryHandler<GetUserEnrollmentCoursesQuery, GetUserEnrollmentCoursesResult>
+    : IQueryHandler<GetCoursesWithParticipationQuery, GetCoursesWithParticipationResult>
 {
-    public async Task<GetUserEnrollmentCoursesResult> Handle(GetUserEnrollmentCoursesQuery request,
+    public async Task<GetCoursesWithParticipationResult> Handle(GetCoursesWithParticipationQuery request,
         CancellationToken cancellationToken)
     {
         var userId = userContext.User.Id;
         var userRole = userContext.User.Role;
         var isAdmin = userRole == PoliciesType.Administrator;
 
-        // Lọc các khóa học mà user đã tham gia
-        var filteredData = repository.GetAllAsQueryable()
-            .AsNoTracking();
+        var filter = request.Filter;
+        var coursesQuery = repository.GetAllAsQueryable().AsSplitQuery().AsNoTracking();
 
-        // Nếu CourseIds không rỗng, thêm điều kiện lọc theo danh sách CourseIds
+        // Search by title
+        if (!string.IsNullOrEmpty(filter.SearchString))
+        {
+            coursesQuery = coursesQuery.Where(c => c.Title.Contains(filter.SearchString));
+        }
+
+        // Filter by CourseIds
         if (request.CourseIds != null && request.CourseIds.Any())
         {
             var courseIdList = request.CourseIds.Select(Guid.Parse).ToList();
             var courseIdArray = courseIdList.Select(c => CourseId.Of(c)).ToList();
-            filteredData = filteredData.Where(c => courseIdArray.Contains(c.Id));
+            coursesQuery = coursesQuery.Where(c => courseIdArray.Contains(c.Id));
         }
 
-        // Chỉ lấy các khóa học mà người dùng đã tham gia
-        filteredData = filteredData.Where(c => c.UserEnrollments.Any(ue => ue.UserId.Equals(UserId.Of(userId))));
-
-        // Nếu người dùng không phải admin, chỉ lấy các khóa học published
+        // Filter by status for non-admin users
         if (!isAdmin)
         {
-            filteredData = filteredData.Where(c => c.CourseStatus == CourseStatus.Published);
+            coursesQuery = coursesQuery.Where(c => c.CourseStatus == CourseStatus.Published);
         }
 
-        // Phân trang
+        // Apply pagination and ordering
         var pageIndex = request.PaginationRequest.PageIndex;
         var pageSize = request.PaginationRequest.PageSize;
 
-        var totalCount = await filteredData.CountAsync(cancellationToken);
+        // Tính tổng số bản ghi trước khi phân trang
+        var totalCount = await coursesQuery.CountAsync(cancellationToken);
 
         // Truy vấn dữ liệu với phân trang và sắp xếp
-        var courses = await filteredData
+        var courses = await coursesQuery
             .OrderByDescending(c => c.UserEnrollments
                 .Where(ue => ue.UserId.Equals(UserId.Of(userId)))
                 .Select(ue => ue.EnrollmentDate)
@@ -73,13 +76,7 @@ public class GetUserEnrollmentCoursesHandler(
                 TotalLectures = c.Chapters.Sum(ch => ch.Lectures.Count),
                 c.Price,
                 c.TimeEstimation,
-                c.CourseLevel,
-                FirstLectureId = c.Chapters
-                    .Where(ch => ch.OrderIndex == 1)
-                    .SelectMany(ch => ch.Lectures)
-                    .Where(l => l.OrderIndex == 1)
-                    .Select(l => l.Id)
-                    .FirstOrDefault()
+                c.CourseLevel
             })
             .ToListAsync(cancellationToken);
 
@@ -92,21 +89,22 @@ public class GetUserEnrollmentCoursesHandler(
 
             var s3Object = await filesService.GetFileAsync(StorageConstants.BUCKET, course.ImageUrl, 60 * 24);
 
-            return new UserEnrollmentDetailsDto(
+            return new CourseWithParticipationDto(
                 course.Id.Value,
                 course.Title,
                 course.Headline,
                 s3Object.PresignedUrl!,
-                course.UserEnrollment!.EnrollmentDate,
+                course.UserEnrollment?.EnrollmentDate,
                 course.UserEnrollment?.CompletionDate,
-                course.UserEnrollment!.UserEnrollmentStatus.ToString(),
+                course.UserEnrollment?.UserEnrollmentStatus.ToString() ?? "NotEnrolled",
                 completionPercentage,
-                course.FirstLectureId!.Value
+                course.Price,
+                course.TimeEstimation,
+                course.CourseLevel.ToString()
             );
         }));
 
-        return new GetUserEnrollmentCoursesResult(
-            new PaginatedResult<UserEnrollmentDetailsDto>(pageIndex, pageSize, totalCount, courseDtos.ToList())
-        );
+        return new GetCoursesWithParticipationResult(
+            new PaginatedResult<CourseWithParticipationDto>(pageIndex, pageSize, totalCount, courseDtos.ToList()));
     }
 }

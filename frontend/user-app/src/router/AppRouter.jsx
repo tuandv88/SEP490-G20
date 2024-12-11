@@ -18,6 +18,7 @@ import ProblemSpace from '@/components/problem/SolveChallenge/ProblemSpace';
 import { UserProfile } from '@/pages/UserProfile';
 import ProtectedRoute from './ProtectedRoute';
 import Payment from '@/pages/Payment'
+import SlientRenew from '@/oidc/silent-renew'
 const Code = lazy(() => import('@/pages/Code'))
 
 export const AppRouter = () => {
@@ -99,6 +100,10 @@ export const AppRouter = () => {
     {
       path: AUTHENTICATION_ROUTERS.PAYMENT,
       element: <Payment />
+    },
+    {
+      path: AUTHENTICATION_ROUTERS.SILENTRENEW,
+      element: <SlientRenew />
     }
   ])
   return <RouterProvider router={router} />

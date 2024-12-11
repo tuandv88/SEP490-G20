@@ -10,6 +10,7 @@ public record SubmissionResponseDto(
     SubmissionStatus Status,
     string LanguageCode,
     int TotalTestCase,
-    int TestCasePass
+    int TestCasePass,
+    DateTime SubmissionDate
 );
 

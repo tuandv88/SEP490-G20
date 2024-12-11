@@ -123,13 +123,6 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
                     ProductName = context.Saga.ProductName,
                     ProductDescription = context.Saga.ProductDescription
                 }) // thu tiền user
-            ,
-            When(PointsNotSufficientEvent)
-                .TransitionTo(Failed)
-                .Publish(context => new PaymentFailedEvent {
-                    TransactionId = context.Message.TransactionId,
-                    Reason = "Not enough points"
-                })
         );
 
         // Capture Payment -> Send email
@@ -172,12 +165,16 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
                 .TransitionTo(Failed)
                 .Then(context => {
                     // Handle product validation failure
+                }).Publish(context => new SetTransactionFailedCommand() {
+                    TransactionId = context.Saga.TransactionId
                 }),
 
             When(PointsNotSufficientEvent)
                 .TransitionTo(Failed)
                 .Then(context => {
                     // Handle insufficient points
+                }).Publish(context => new SetTransactionFailedCommand() {
+                    TransactionId = context.Saga.TransactionId
                 }),
 
             When(PaymentFailedEvent)
@@ -185,6 +182,8 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
                 .Then(context => {
                     // Handle payment failure
                     //Send mail
+                }).Publish(context => new SetTransactionFailedCommand() {
+                    TransactionId = context.Saga.TransactionId
                 }),
 
             When(EmailFailedEvent)

@@ -8,6 +8,10 @@ namespace User.Application.Models.PointHistories.EnventHandlers.Integrations;
 public class RewardPointsGrantedEventHandler(IPointHistoryRepository pointHistoryRepository) : IConsumer<RewardPointsGrantedEvent> {
     public async Task Consume(ConsumeContext<RewardPointsGrantedEvent> context) {
         var message = context.Message;
+        if (message.Point <= 0)
+        {
+            return;
+        }
         var pointHistory = CreateNewPointHistory(message.Point, message.UserId, message.Source);
 
         await pointHistoryRepository.AddAsync(pointHistory);

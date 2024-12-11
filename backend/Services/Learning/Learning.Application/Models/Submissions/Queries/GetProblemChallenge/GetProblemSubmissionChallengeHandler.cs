@@ -18,7 +18,7 @@ public class GetProblemSubmissionChallengeHandler(IProblemSubmissionRepository p
             var totalTestCase = s.TestResults.Count;
             var testCasePass = s.TestResults.Count(tr => tr.IsPass);
             return new SubmissionResponseDto(s.TokenReference,s.SourceCode, s.RunTimeErrors, s.CompileErrors, s.ExecutionTime,
-                s.MemoryUsage, firstFailedTestCase, s.Status, s.LanguageCode.ToString(), totalTestCase, testCasePass
+                s.MemoryUsage, firstFailedTestCase, s.Status, s.LanguageCode.ToString(), totalTestCase, testCasePass, s.CreatedAt!.Value
             );
         }).ToList();
 

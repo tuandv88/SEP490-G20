@@ -15,7 +15,16 @@ public class GetLeaderboardHandler(IProblemRepository problemRepository, IProble
             .AsEnumerable() 
             .Where(ps => ps.Status.Description == SubmissionConstant.Accepted) 
             .ToList(); 
-
+        
+        //Filter theo start date đến end date
+        var startDate = request.Filter.StartDate;
+        var endDate = request.Filter.EndDate;
+        
+        if (startDate.HasValue && endDate.HasValue) {
+            problemSubmissionsData = problemSubmissionsData
+                .Where(ps => ps.SubmissionDate >= startDate && ps.SubmissionDate <= endDate).ToList();
+        }
+        
         var leaderboardQuery = problemSubmissionsData
             .Join(problems.AsEnumerable(), 
                 ps => ps.ProblemId,
@@ -28,7 +37,7 @@ public class GetLeaderboardHandler(IProblemRepository problemRepository, IProble
                 SolvedCount = g.Count(),
                 FirstSubmissionDate = g.Min(x => x.ps.SubmissionDate)
             });
-
+        
         var totalCount = leaderboardQuery.Count();
         var paginatedData = leaderboardQuery
             .OrderByDescending(x => x.SolvedCount)

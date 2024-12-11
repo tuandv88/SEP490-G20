@@ -5,8 +5,8 @@ namespace Learning.API.Endpoints.Problems;
 public record GetLeaderboardResponse(PaginatedResult<UserRankDto> Ranks);
 public class GetLeaderboardEndpont : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
-        app.MapGet("/problems/leadboards", async ([AsParameters] PaginationRequest request, ISender sender) => {
-            var result = await sender.Send(new GetLeaderboardQuery(request));
+        app.MapGet("/problems/leadboards", async ([AsParameters] PaginationRequest request,[AsParameters] GetLeaderboardFilter filter, ISender sender) => {
+            var result = await sender.Send(new GetLeaderboardQuery(request, filter));
 
             var response = result.Adapt<GetLeaderboardResponse>();
 

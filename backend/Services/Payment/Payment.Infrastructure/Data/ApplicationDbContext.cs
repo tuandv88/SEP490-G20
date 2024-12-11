@@ -9,9 +9,7 @@ namespace Payment.Infrastructure.Data;
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
     public DbSet<Transaction> Transactions => Set<Transaction>();
-
     public DbSet<TransactionItem> TransactionItems => Set<TransactionItem>();
-
     public DbSet<TransactionLog> TransactionLogs => Set<TransactionLog>();
     public DbSet<PaymentSagaInstance> PaymentSagaInstances => Set<PaymentSagaInstance>();
 

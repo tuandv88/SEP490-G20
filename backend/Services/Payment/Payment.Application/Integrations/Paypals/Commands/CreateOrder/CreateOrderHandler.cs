@@ -22,6 +22,7 @@ public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextS
         var email = user.Email;
         var fullname = $"{user.FirstName} {user.LastName}";
         var itemAmount = order.Item.Quantity * order.Item.UnitPrice;
+        var rootItemAmount = itemAmount;
         var point = order.Point;
         if (!Enum.TryParse(order.Item.ProductType, true, out Domain.Enums.ProductType productType) && productType != Domain.Enums.ProductType.Course) {
             throw new InvalidOperationException("Unsupported ProductType");
@@ -42,8 +43,7 @@ public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextS
             CustomId = $"{userId}_{order.Item.ProductId}",
             Description = productType.ToString(),
         });
-
-
+        
         var orderRequest = new OrderRequest {
             CheckoutPaymentIntent = "CAPTURE",
             PurchaseUnits = purchaseUnits,
@@ -65,7 +65,7 @@ public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextS
         var transaction = new Transaction {
             Id = transactionId,
             UserId = UserId.Of(userId),
-            Amount = itemAmount,
+            Amount = rootItemAmount,
             Currency = "USD",
             Status = Domain.Enums.TransactionStatus.Created,
             PaymentMethod = paymentMethod,

@@ -22,7 +22,7 @@ import PreferenceNavQuizProblem from '../quiz/PreferenceNavQuizProblem'
 import DescriptionQuizProblem from '../quiz/DescriptionQuizProblem'
 import TestcaseInterfaceQuiz from '../quiz/TestcaseInterfaceQuiz'
 import { useToast } from '@/hooks/use-toast'
-export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete }) {
+export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, setIsQuizSubmitted }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [idCodeSnippetQuestions, setIdCodeSnippetQuestions] = useState()
@@ -312,22 +312,6 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
     setIsConfirmOpen(true) // Hiển thị hộp thoại xác nhận
   }
 
-  const handleSubmitConfirm = async () => {
-    handleNext()
-    try {
-      const response = await QuizAPI.submitQuiz(answer.quizSubmissionId)
-      console.log('Quiz submitted successfully')
-      toast({
-        title: 'Quiz completed successfully!',
-        description:
-          'You will receive a schedule from the system for a moment, check in your profile in the Roadmap section.'
-      })
-      onComplete()
-    } catch (error) {
-      console.error('Error submitting quiz:', error)
-    }
-  }
-
   const handleRunCode = async () => {
     if (isEmpty(codeRunPro)) {
       setIsOpen(true)
@@ -354,6 +338,21 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
       setLoading(false)
     }
   }
+
+  const handleSubmitConfirm = async () => {
+    handleNext();
+    try {
+      const response = await QuizAPI.submitQuiz(answer.quizSubmissionId);
+      console.log('response: ', response)
+      console.log('Quiz submitted successfully');
+      setIsConfirmOpen(false)
+      setIsQuizSubmitted(true)
+      onComplete(true)
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      setIsConfirmOpen(false);
+    }
+  };
 
   const renderQuestion = () => {
     switch (currentQuestion.questionType) {

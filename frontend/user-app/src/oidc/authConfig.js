@@ -13,6 +13,6 @@ export const oidcConfig = {
   post_logout_redirect_uri: VITE_CALLBACK_URL,
   loadUserInfo: true,
   requirePkce: true,
-  //silent_redirect_uri: 'https://localhost:5003/silent-renew.html',
+  silent_redirect_uri: `${API_BASE_URL_CALLBACK}/silent-renew`,
   automaticSilentRenew: true
 }

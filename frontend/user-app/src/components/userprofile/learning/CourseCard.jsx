@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom'
 import { FeedbackModal } from '../feedback/FeedbackModal'
 
 export function CourseCard({ course }) {
-  console.log(course)
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isFeedbackSuccess, setIsFeedbackSuccess] = useState(false)

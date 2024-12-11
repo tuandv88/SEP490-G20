@@ -7,13 +7,13 @@ import ChapterLoading from '@/components/loading/ChapterLoading'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import HeaderCode from '@/layouts/learningheader'
 import ToggleProblem from '@/components/problem/SolveChallenge/ToggleProblem'
-import SubmissionHistory from '@/components/learning/submission/SubmissionHistory'
 import { ProblemAPI } from '@/services/api/problemApi'
 import SubmissionResult from '@/components/learning/submission/SubmissionResult'
 import ErrorPage from '@/pages/ErrorPage'
 import { NotFound } from '@/pages'
 import HeaderTabCode from './HeaderTabCode'
 import DescriptionProblem from './DescriptionProblem'
+import SubmissionHistoryProblem from '@/components/learning/submission/SubmissionHistoryProblem'
 
 const ProblemSpace = () => {
   const navigate = useNavigate()
@@ -72,7 +72,7 @@ const ProblemSpace = () => {
 
       const fetchSubmissionHistory = async (problemId) => {
         try {
-          const response = await ProblemAPI.getSubmissionHistory(problemId)
+          const response = await ProblemAPI.getSubmissionHistoryProblem(problemId)
           setProblemSubmission(response.submissions)
         } catch (error) {
           console.error('Error fetching submission history:', error)
@@ -86,7 +86,7 @@ const ProblemSpace = () => {
   useEffect(() => {
     const fetchSubmissionHistory = async () => {
         try {
-          const response = await ProblemAPI.getSubmissionHistory(problemId)
+          const response = await ProblemAPI.getSubmissionHistoryProblem(problemId)
           setProblemSubmission(response.submissions)
         } catch (error) {
           console.error('Error fetching submission history:', error)
@@ -103,6 +103,13 @@ const ProblemSpace = () => {
       }
     }
   }, [problemId, problemList]);
+
+  useEffect(() => {
+    setResultCodeSubmit(null);
+    setCurrentCode(null);
+    setIsSuccessCode(false);
+    setActiveTab('descriptions');
+  }, [problemId]);
 
   if (isInitialLoading || loading) {
     return <ChapterLoading />
@@ -141,7 +148,7 @@ const ProblemSpace = () => {
               {activeTab === 'submissionResult' && !loading && (
                 <SubmissionResult currentCode={currentCode} resultCodeSubmit={resultCodeSubmit} />
               )}
-              {activeTab === 'submission' && !loading && <SubmissionHistory submissions={problemSubmission} />}
+              {activeTab === 'submission' && !loading && <SubmissionHistoryProblem submissions={problemSubmission} />}
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle className='resize-sha w-[3px]' />

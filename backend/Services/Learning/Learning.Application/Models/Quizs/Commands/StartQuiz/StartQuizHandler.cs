@@ -17,19 +17,23 @@ public class StartQuizHandler(IQuizSubmissionRepository quizSubmissionRepository
             throw new InvalidOperationException("Quiz is not active.");
         }
 
-        // Nếu quiz không có giới hạn số lần làm bài, bỏ qua kiểm tra số lần làm
-        if (quiz.HasAttemptLimit) {
-            var attemptCount = await quizSubmissionRepository.CountByQuizAndUser(request.QuizId, userId);
-            if (attemptCount >= quiz.AttemptLimit) {
-                throw new InvalidOperationException("You have reached the attempt limit for this quiz.");
-            }
-        }
+        
         //Kiểm tra xem đã có bài nào chưa nộp hay không chưa ?
         var previousSubmission = await quizSubmissionRepository.GetSubmissionInProgressAsync(request.QuizId, userId);
         if (previousSubmission != null && previousSubmission.Status == QuizSubmissionStatus.InProgress) {
             return new StartQuizResult(previousSubmission.Id.Value);
         }
-        
+
+        // Nếu quiz không có giới hạn số lần làm bài, bỏ qua kiểm tra số lần làm
+        if (quiz.HasAttemptLimit)
+        {
+            var attemptCount = await quizSubmissionRepository.CountByQuizAndUser(request.QuizId, userId);
+            if (attemptCount >= quiz.AttemptLimit)
+            {
+                throw new InvalidOperationException("You have reached the attempt limit for this quiz.");
+            }
+        }
+
 
         // Tạo submission bắt đầu làm quiz
         var quizSubmission = new QuizSubmission {

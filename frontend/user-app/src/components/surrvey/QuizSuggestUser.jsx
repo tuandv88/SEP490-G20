@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback, useMemo, memo } from 'react'
 import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -22,6 +22,24 @@ import PreferenceNavQuizProblem from '../quiz/PreferenceNavQuizProblem'
 import DescriptionQuizProblem from '../quiz/DescriptionQuizProblem'
 import TestcaseInterfaceQuiz from '../quiz/TestcaseInterfaceQuiz'
 import { useToast } from '@/hooks/use-toast'
+import { useCountdown } from '@/hooks/useCountdown'
+
+// Thêm hàm tính toán thời gian còn lại
+const calculateRemainingTime = (startTime, timeLimit) => {
+  const startDateTime = new Date(startTime)
+  const now = new Date()
+  const elapsedSeconds = Math.floor((now - startDateTime) / 1000)
+  const remainingSeconds = (timeLimit * 60) - elapsedSeconds
+  return Math.max(0, remainingSeconds)
+}
+
+// Tách TimeDisplay thành component riêng để tránh re-render không cần thiết
+const TimeDisplay = memo(({ minutes, seconds }) => (
+  <p className='text-lg font-semibold'>
+    Time left: {minutes}:{seconds} minutes
+  </p>
+))
+
 export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, setIsQuizSubmitted }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
@@ -44,30 +62,44 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, s
 
   const { toast } = useToast()
 
+  console.log(answer)
+
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
-
-  // Chuyển đổi thời gian từ phút sang giây
-  const [timeLeft, setTimeLeft] = useState(timeLimit * 60)
-
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      handleSubmitLater()
-      return
-    }
-
-    const timerId = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1)
-    }, 1000)
-
-    return () => clearInterval(timerId)
-  }, [timeLeft])
-
-  const handleSubmitLater = () => {
-    // Gọi hàm onComplete khi hết thời gian
-    if (onComplete) {
-      onComplete()
+  // Tách logic submit quiz thành một hàm riêng
+  const handleSubmitQuiz = async () => {
+    handleNext();
+    try {
+      const response = await QuizAPI.submitQuiz(answer.quizSubmissionId);
+      console.log('response: ', response)
+      console.log('Quiz submitted successfully');
+      setIsConfirmOpen(false)
+      setIsQuizSubmitted(true)
+      onComplete(true)
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      setIsConfirmOpen(false);
     }
   }
+
+  // Định nghĩa handleSubmitLater trước khi sử dụng
+  const handleSubmitLater = useCallback(async () => {
+    // Khi hết giờ, tự động submit quiz
+    await handleSubmitQuiz();
+  }, []) // Xóa dependencies vì handleSubmitQuiz đã được định nghĩa trong cùng component
+
+  // Tính toán thời gian ban đầu dựa trên startTime
+  const initialTime = useMemo(() => {
+    if (!answer?.startTime) return timeLimit * 60
+    return calculateRemainingTime(answer.startTime, timeLimit)
+  }, [answer?.startTime, timeLimit])
+
+  const timeLeft = useCountdown(initialTime, handleSubmitLater)
+
+  const formattedTime = useMemo(() => {
+    const minutes = Math.floor(timeLeft / 60)
+    const seconds = String(timeLeft % 60).padStart(2, '0')
+    return { minutes, seconds }
+  }, [timeLeft])
 
   useEffect(() => {
     if (answer && answer.questionAnswers) {
@@ -309,7 +341,11 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, s
   }
 
   const handleSubmit = async () => {
-    setIsConfirmOpen(true) // Hiển thị hộp thoại xác nhận
+    setIsConfirmOpen(true)
+  }
+
+  const handleSubmitConfirm = async () => {
+    await handleSubmitQuiz();
   }
 
   const handleRunCode = async () => {
@@ -338,21 +374,6 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, s
       setLoading(false)
     }
   }
-
-  const handleSubmitConfirm = async () => {
-    handleNext();
-    try {
-      const response = await QuizAPI.submitQuiz(answer.quizSubmissionId);
-      console.log('response: ', response)
-      console.log('Quiz submitted successfully');
-      setIsConfirmOpen(false)
-      setIsQuizSubmitted(true)
-      onComplete(true)
-    } catch (error) {
-      console.error('Error submitting quiz:', error);
-      setIsConfirmOpen(false);
-    }
-  };
 
   const renderQuestion = () => {
     switch (currentQuestion.questionType) {
@@ -471,9 +492,7 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, s
               <X className='h-4 w-4' />
             </Button>
             <div className='flex justify-center items-center mt-2'>
-              <p className='text-lg font-semibold'>
-                Time left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')} minutes
-              </p>
+              <TimeDisplay {...formattedTime} />
             </div>
             <CardTitle className='text-2xl font-bold text-indigo-700'>
               Question {currentQuestionIndex + 1} of {quiz.questions.length}

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowRight } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-import Quiz1 from './Quiz1'
 import { QuizAPI } from '@/services/api/quizApi'
 import QuizPopup from '../quiz/QuizPopup'
 import { QuizSubmissionHistory } from '../quiz/QuizSubmissionHistory'
@@ -24,6 +23,8 @@ export default function QuizComponent({ quiz }) {
     }
   }
 
+  console.log(quiz)
+
   useEffect(() => {
     fetchQuizSubmission()
   }, [quiz.id])
@@ -39,9 +40,10 @@ export default function QuizComponent({ quiz }) {
     try {
       // Bắt đầu quiz
       await handleStartQuiz()
-
+      
       // Sau khi quiz được bắt đầu (isQuizStarted được cập nhật), lấy chi tiết quiz
       const quizDetails = await QuizAPI.getQuizDetails(quiz.id)
+      console.log(quizDetails)
       setQuizData(quizDetails)
     } catch (error) {
       console.error('Error starting or fetching quiz details:', error)

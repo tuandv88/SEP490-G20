@@ -12,7 +12,7 @@ const QuizModal = ({ isOpen, onClose, quiz, setIsQuizSubmitted }) => {
 
   const [isQuizStarted, setIsQuizStarted] = useState(false)
   const [quizData, setQuizData] = useState(null)
-
+  console.log(quiz)
   const startQuiz = async () => {
     try {
       // Bắt đầu quiz

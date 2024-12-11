@@ -8,7 +8,7 @@ public record GetTotalRevenueByMonthResponse(List<RevenueByMonthDto> Revenues);
 public class GetTotalRevenueByMonthEndpoint: ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
-    { 
+    {  
         app.MapGet("/revenue/monthly", async ([AsParameters] GetTotalRevenueByMonthRequest request,ISender sender) =>
             {
                 var result = await sender.Send(new GetTotalRevenueByMonthQuery(request.StartDate, request.EndDate));

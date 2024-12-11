@@ -524,7 +524,7 @@ function PostList({ categoryId }) {
                         <img
                           src={post.urlProfilePicture || "/placeholder.svg"}
                           alt="User Avatar"
-                          className="w-12 h-12 rounded-full mr-4 border-2 border-[#32679b] object-cover"
+                          className="w-12 h-12 rounded-full mr-4 border-2 border-[#6b7280] object-cover"
                         />
                         <div className="flex-grow">
                           <h3 className="text-xl font-semibold text-[#0a192f] flex items-center">

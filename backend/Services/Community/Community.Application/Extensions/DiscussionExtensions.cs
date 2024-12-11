@@ -184,7 +184,35 @@ IFilesService filesService) // Thêm CategoryRepository để truy vấn Categor
     }
 
 
+    public static async Task<DiscussionDetailsDto> ToDiscussionDetailsDtoAsync(this Discussion discussion, IFilesService filesService)
+    {
+        string? imageUrl = null;
 
+        if (!string.IsNullOrEmpty(discussion.ImageUrl))
+        {
+            var fileInfo = await filesService.GetFileAsync(StorageConstants.BUCKET, discussion.ImageUrl, 60);
+            imageUrl = fileInfo.PresignedUrl;  
+        }
+
+        return new DiscussionDetailsDto(
+            UserId: discussion.UserId.Value,
+            CategoryId: discussion.CategoryId.Value,
+            Id: discussion.Id.Value,
+            Title: discussion.Title,
+            Description: discussion.Description,
+            ImageUrl: imageUrl,
+            DateCreated: discussion.DateCreated,
+            DateUpdated: discussion.DateUpdated,
+            Tags: discussion.Tags,
+            ViewCount: (long)discussion.ViewCount,
+            VoteCount: (long)VoteExtensions.CalculateTotalVotes(discussion),
+            CommentCount: (long)discussion.Comments.Count,
+            Pinned: discussion.Pinned,
+            Closed: discussion.Closed,
+            EnableNotification: discussion.NotificationsEnabled,
+            IsActive: discussion.IsActive
+        );
+    }
 
 
 }

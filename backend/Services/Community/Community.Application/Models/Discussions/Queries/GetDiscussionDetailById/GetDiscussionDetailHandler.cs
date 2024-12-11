@@ -12,7 +12,7 @@ public class GetDiscussionDetailHandler : IQueryHandler<GetDiscussionDetailByIdQ
     private readonly IDiscussionRepository _repository;
     private readonly IFilesService _filesService;
 
-    public GetDiscussionDetailHandler(IDiscussionRepository repository, IFilesService filesService)
+    public GetDiscussionDetailHandler(IDiscussionRepository repository,  IFilesService filesService)
     {
         _repository = repository;
         _filesService = filesService;
@@ -27,7 +27,9 @@ public class GetDiscussionDetailHandler : IQueryHandler<GetDiscussionDetailByIdQ
             throw new NotFoundException("Discussion not found.", query.Id);
         }
 
-        var discussionDto = await discussion.ToDiscussionDetailDtoAsync(_filesService)!;
+
+
+        var discussionDto = await discussion.ToDiscussionDetailsDtoAsync(_filesService)!;
 
         return new GetDiscussionDetailByIdResult(discussionDto);
     }

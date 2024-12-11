@@ -3,13 +3,13 @@ using Community.Application.Models.Discussions.Queries.GetDiscussionDetailById;
 
 namespace Community.API.Endpoints.Discussions;
 
-public record GetDiscussionDetailByIdResponse(DiscussionDetailDto DiscussionDetailDto);
+public record GetDiscussionDetailByIdResponse(DiscussionDetailsDto DiscussionDetailsDto);
 
 public class GetDiscussionDetailByIdEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/discussion/{id:guid}/details", async (Guid id, ISender sender) =>
+        app.MapGet("/discussions/{id:guid}/details", async (Guid id, ISender sender) =>
         {
             var result = await sender.Send(new GetDiscussionDetailByIdQuery(id));
 

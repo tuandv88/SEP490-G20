@@ -19,7 +19,7 @@ public class GetTotalRevenueByMonthHandler(ITransactionRepository repository) : 
             .Select(g => new RevenueByMonthDto(
                 g.Key.Year,
                 g.Key.Month,
-                g.Sum(t => t.GrossAmount)
+                g.Sum(t => t.NetAmount)
             ))
             .ToListAsync(cancellationToken);
         return new GetTotalRevenueByMonthResult(totalRevenueByMonth);

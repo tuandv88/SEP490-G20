@@ -418,7 +418,7 @@ public static class EmailHtmlTemplates
     }
 
 
-    public static string DiscussionFlaggedTemplate(string discussionId, string title, string flaggedDate, string violationLevel, string violationLevelClass, string reason, string callbackUrl)
+    public static string DiscussionFlaggedTemplate(string fullName, string title, string description, string flaggedDate, string violationLevel, string violationLevelClass, string reason, string callbackUrl)
     {
         string htmlStr = $@"
 <!DOCTYPE html>
@@ -497,8 +497,8 @@ public static class EmailHtmlTemplates
         }}
 
         .btn:hover {{
-            background: linear-gradient(45deg, #d35400, #e67e22);
             transform: translateY(-4px);
+            color: #ffffff !important;
         }}
 
         .footer {{
@@ -584,10 +584,10 @@ public static class EmailHtmlTemplates
             </div>
 
             <div class='message'>
-                <p>Hi, Have a good day. </p>
+                <p>Hi,<strong> {fullName} </strong>  -  Have a good day. </p>
                 <p>We would like to inform you that a discussion has been flagged on ICoder.</p>
-                <p><strong>Discussion ID:</strong> {discussionId}</p>
                 <p><strong>Title:</strong> {title}</p>
+                <p><strong>Description: </strong> {description}</p>
                 <p><strong>Date Flagged:</strong> {flaggedDate}</p>
                 <p><strong>Violation Level:</strong> <span class='{violationLevelClass}'>{violationLevel}</span></p>
                 <p><strong>Reason for Flagging:</strong> {reason}</p>

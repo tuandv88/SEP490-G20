@@ -44,16 +44,20 @@ function CommentList({ discussionId, userIdDiscussion }) {
   const [fullNameCurrentUser, setFullNameCurrentUser] = useState(null);
   const [isAuth, setIsAuthor] = useState(false);
 
-  const [userNotificationSettings, setUserNotificationSettings] = useState('d725fa00-46ef-48e3-815e-d89e08ed7bbd');
+  const [userNotificationSettings, setUserNotificationSettings] = useState('631cca78-80ba-4448-9e54-38eb7bbeec91');
   const [openRemoveDialog, setOpenRemoveDialog] = useState(false);  // Trạng thái mở/đóng dialog
   const [commentIdToDelete, setCommentIdToDelete] = useState(null); // Lưu ID comment cần xóa
 
 
   const [showAlertCheckIsCreateComment, setShowAlertCheckIsCreateComment] = useState(false);
 
+
+  const [loadingPagination, setLoadingPagination] = useState(false);
+
   useEffect(() => {
     const fetchComments = async () => {
       setLoading(true);
+      setLoadingPagination(true);
       setError(null);
       try {
 
@@ -89,6 +93,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
         console.error("Discussion No Any Comment.", err);
       } finally {
         setLoading(false);
+        setLoadingPagination(false);
       }
     };
 
@@ -745,7 +750,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
       {/* Comment Navbar Counts*/}
       <div className="comment-list_navbar-extension">
         <div className="counts-comment">
-          <FontAwesomeIcon icon={faComments} />
+          <FontAwesomeIcon icon={faComments} style={{ color: '#6b7280' }} />
           <p>Comments:</p>
           <p>{totalCommnents}</p>
         </div>
@@ -1064,11 +1069,12 @@ function CommentList({ discussionId, userIdDiscussion }) {
             onChange={handlePageChange}
             shape="rounded"
             variant="outlined"
-            className="pagination-buttons" />
+            className="pagination-buttons"
+            disabled={loadingPagination} />
         </Stack>
       </div>
 
-      <style jsx>{`
+      <style>{`
         /* Bình luận */
         .comment-list_navbar-extension {
           display: flex;
@@ -1077,7 +1083,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
           gap: 8px;
           padding: 8px 16px;
           background-color: #ffffff;
-          border-radius: 8px;
+          border-radius: 4px;
           box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
           flex-wrap: nowrap; /* Đảm bảo tất cả phần tử con ở trên một dòng */
         }
@@ -1100,7 +1106,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
   margin: 0 auto;
   padding: 20px;
   background-color: #ffffff;
-  border-radius: 8px;
+  border-radius: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   position: relative;
   margin-top: 5px;
@@ -1115,11 +1121,12 @@ function CommentList({ discussionId, userIdDiscussion }) {
   font-family: "Helvetica Neue", Arial, sans-serif;
   background-color: #fffff; /* Gray color for input area */
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 4px;
   width: 100%;
   min-height: 100px;
   box-sizing: border-box;
   resize: none;
+  outline: none; /* Loại bỏ viền đen */
 }
 
 /* Style for Comment Preview */
@@ -1162,9 +1169,9 @@ function CommentList({ discussionId, userIdDiscussion }) {
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-weight: 500;
   color: #f9f9f9;
-  background: #0a192f;
+  background: #32679b;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 5px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s ease-in-out;
@@ -1190,6 +1197,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
   border-color: #374151; /* Viền đậm khi active */
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng mạnh hơn */
   transform: scale(1.03); /* Phóng to nhẹ khi active */
+  background: #1e3a5f; /* Nền xanh nhạt khi hover */
 }
 
 /* Light moving effect on hover */
@@ -1222,7 +1230,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 /* Hover effect for disabled buttons */
 .comment-button:hover:not(:disabled),
 .toggle-preview-button:hover:not(:disabled) {
-  background-color: #333333; /* Dark gray on hover */
+  background-color: #32679b; /* Dark gray on hover */
 }
 
         /* pagination */
@@ -1245,9 +1253,9 @@ function CommentList({ discussionId, userIdDiscussion }) {
           font-size: 10px;
           font-family: "Helvetica Neue", Arial, sans-serif;
           font-weight: bold;
-          color: #0a192f;
+          color: #32679b;
           background: #ffffff;
-          border-radius: 8px;
+          border-radius: 6px;
           box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
           cursor: pointer;
           transition: all 0.3s ease-in-out;
@@ -1256,14 +1264,14 @@ function CommentList({ discussionId, userIdDiscussion }) {
         }
 
         .comment-list__pagination .MuiPaginationItem-root:hover {
-          background: #0a192f;
+          background: #32679b;
           color: #ffffff;
           box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
           transform: translateY(-2px);
         }
 
         .comment-list__pagination .MuiPaginationItem-root.Mui-selected {
-          background: #0a192f;
+          background: #32679b;
           color: #ffffff;
           box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
           transform: translateY(0);
@@ -1300,7 +1308,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 12px;
   position: relative;
-  border-radius: 8px;
+  border-radius: 4px;
   transition: all 0.3s ease;
   margin-top: 5px;
 }
@@ -1386,7 +1394,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 }
 
 .vote-icon:hover {
-  color: #0a192f;
+  color: #32679b;
 }
 
 .comment-item__vote-count {
@@ -1410,7 +1418,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .comment-item__show-reply {
   background: transparent;
   border: none;
-  color: #0a192f;
+  color: #32679b;
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s ease;
@@ -1425,7 +1433,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .comment-item__share-edit {
   background: transparent;
   border: none;
-  color: #0a192f;
+  color: #32679b;
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s ease;
@@ -1441,7 +1449,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 }
 
 .comment-item__share {
-  background: #0a192f;
+  background: #32679b;
   color: white;
 }
 
@@ -1464,7 +1472,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
   width: 95%;
   margin-left: 4%;
   background-color: #f6f7f7;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border: 1px solid #e0e0e0;
@@ -1491,7 +1499,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .reply-form button {
   align-self: flex-end;
   padding: 7px 13px;
-  background: #0a192f;
+  background: #32679b;
   color: white;
   border-radius: 4px;
   border: none;
@@ -1512,7 +1520,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
   width: 95%;
   margin-left: 4%;
   background-color: #f6f7f7;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border: 1px solid #e0e0e0;
@@ -1539,7 +1547,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 .reply-form-edit button {
   align-self: flex-end;
   padding: 7px 13px;
-  background: #0a192f;
+  background: #32679b;
   color: white;
   border-radius: 4px;
   border: none;
@@ -1664,7 +1672,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
 
 /* Cấu hình cho nút "Yes" */
 .delete-dialog__btn--yes {
-  background-color: #1e334a; /* Màu đỏ */
+  background-color: #32679b; /* Màu đỏ */
   color: #fff;
   font-weight: 600;
   padding: 6px 14px;

@@ -25,6 +25,7 @@ public class DiscussionRepository : Repository<Discussion>, IDiscussionRepositor
                         .Include(d => d.Bookmarks)
                         .Include(d => d.Comments)
                         .Include(d => d.Votes)
+                        .Include(d => d.UserDiscussions)
                         .AsEnumerable()
                         .FirstOrDefault(c => c.Id.Value == id);
         return discussion;

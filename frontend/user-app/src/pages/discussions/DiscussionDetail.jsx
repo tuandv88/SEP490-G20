@@ -32,7 +32,7 @@ function DiscussionDetail() {
   const [voteCount, setVoteCount] = useState(0);
   const [loadingVoteComment, setLoadingVoteComment] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [userNotificationSettings, setUserNotificationSettings] = useState('d725fa00-46ef-48e3-815e-d89e08ed7bbd');
+  const [userNotificationSettings, setUserNotificationSettings] = useState('631cca78-80ba-4448-9e54-38eb7bbeec91');
   const [newPost, setNewPost] = useState({
     id: "",
     categoryId: "",
@@ -72,6 +72,7 @@ function DiscussionDetail() {
         setCurrentStatusDiscussion(data.isActive);
 
         if (userTmp) {
+          console.log(userTmp);
           const currentUserId = userTmp.profile.sub;
           setFullNameCurrentUser(userTmp.profile.firstName + ' ' + userTmp.profile.lastName);
           setOwnerDiscussion(currentUserId === data.userId);
@@ -119,7 +120,7 @@ function DiscussionDetail() {
       text: "Do you really want to remove this topic?",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#0a192f',
+      confirmButtonColor: '#32679b',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
@@ -334,7 +335,7 @@ function DiscussionDetail() {
           {[0, 1, 2].map((index) => (
             <motion.div
               key={index}
-              className="w-2 h-2 bg-[#0a192f] rounded-full"
+              className="w-2 h-2 bg-[#32679b] rounded-full"
               animate={{
                 scale: [1, 1.5, 1],
                 opacity: [0.3, 1, 0.3],
@@ -402,18 +403,22 @@ function DiscussionDetail() {
                       <FontAwesomeIcon icon={faShareFromSquare} className="h-4 w-4" />
                     </IconButton>
                   </Tooltip>
+
+                  {currentUser &&
+                    (<Tooltip title={discussion.enableNotification ? "Disable notifications" : "Enable notifications"} arrow>
+                      <IconButton
+                        onClick={handleToggleNotification}
+                        disabled={loadingNotification}
+                        className={`${discussion.enableNotification ? 'text-green-500' : 'text-gray-500'} p-1`}
+                        size="small"
+                      >
+                        <FontAwesomeIcon icon={discussion.enableNotification ? faBell : faBellSlash} className="h-4 w-4" />
+                      </IconButton>
+                    </Tooltip>)}
+
                   {isOwnerDiscussion && (
                     <>
-                      <Tooltip title={discussion.enableNotification ? "Disable notifications" : "Enable notifications"} arrow>
-                        <IconButton
-                          onClick={handleToggleNotification}
-                          disabled={loadingNotification}
-                          className={`${discussion.enableNotification ? 'text-green-500' : 'text-gray-500'} p-1`}
-                          size="small"
-                        >
-                          <FontAwesomeIcon icon={discussion.enableNotification ? faBell : faBellSlash} className="h-4 w-4" />
-                        </IconButton>
-                      </Tooltip>
+
                       <Tooltip title="Edit discussion" arrow>
                         <IconButton
                           onClick={() => setOpenDialog(true)}
@@ -499,7 +504,7 @@ function DiscussionDetail() {
                       {discussion?.tags?.map((tag, idx) => (
                         <span
                           key={idx}
-                          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-black"
+                          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-[#555b66]"
                         >
                           <FontAwesomeIcon icon={faTag} className="mr-2 h-3 w-3 text-black" />
                           {tag}
@@ -556,7 +561,7 @@ function DiscussionDetail() {
           },
         }}
       >
-        <DialogTitle className="bg-[#0a192f] text-white text-2xl font-bold py-6 px-8 border-b border-[#1e3a5f]">
+        <DialogTitle className="bg-[#32679b] text-white text-2xl font-bold py-6 px-8 border-b border-[#1e3a5f]">
           Update Post
         </DialogTitle>
         <DialogContent className="p-8 bg-[#f8f8f8]">
@@ -567,7 +572,7 @@ function DiscussionDetail() {
                 value={newPost.categoryId}
                 onChange={(e) => setNewPost({ ...newPost, categoryId: e.target.value })}
                 displayEmpty
-                className="bg-white rounded-md shadow-sm border border-gray-300 focus:border-[#0a192f] focus:ring focus:ring-[#0a192f] focus:ring-opacity-50 "
+                className="bg-white rounded-md shadow-sm border border-gray-300 focus:border-[#32679b] focus:ring focus:ring-[#32679b] focus:ring-opacity-50 "
               >
                 <MenuItem value="" disabled>Select Category</MenuItem>
                 {categories.filter(category => category.isActive).map((category) => (
@@ -583,7 +588,7 @@ function DiscussionDetail() {
                 className="bg-white rounded-md shadow-sm"
                 variant="outlined"
                 InputProps={{
-                  style: { borderColor: '#0a192f' }
+                  style: { borderColor: '#32679b' }
                 }}
               />
             </div>
@@ -598,7 +603,7 @@ function DiscussionDetail() {
                 className="bg-white rounded-md shadow-sm mb-2"
                 variant="outlined"
                 InputProps={{
-                  style: { borderColor: '#0a192f' }
+                  style: { borderColor: '#32679b' }
                 }}
                 helperText="Press Enter to add a tag"
               />
@@ -606,18 +611,18 @@ function DiscussionDetail() {
                 {newPost.tags.map((tag, index) => (
                   <Chip
                     key={index}
-                    icon={<FontAwesomeIcon icon={faTag} style={{ color: '#0a192f' }} />}
+                    icon={<FontAwesomeIcon icon={faTag} style={{ color: '#32679b' }} />}
                     label={tag}
                     onDelete={handleTagDelete(tag)}
                     style={{
                       backgroundColor: '#e5e7eb',
-                      color: '#0a192f',
+                      color: '#32679b',
                       margin: '0 4px 8px 0'
                     }}
                     deleteIcon={
                       <FontAwesomeIcon
                         icon={faTimes}
-                        style={{ color: '#0a192f' }}
+                        style={{ color: '#32679b' }}
                         className="hover:text-red-500 transition-colors duration-200"
                       />
                     }
@@ -626,7 +631,7 @@ function DiscussionDetail() {
               </div>
             </div>
 
-            <div className="border border-[#0a192f] rounded-md overflow-hidden">
+            <div className="border border-[#32679b] rounded-md overflow-hidden">
               <MarkdownEditor
                 value={newPost.content}
                 onChange={handleEditorChange}
@@ -637,7 +642,7 @@ function DiscussionDetail() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <FontAwesomeIcon icon={faImage} className="text-[#0a192f] text-xl" />
+              <FontAwesomeIcon icon={faImage} className="text-[#32679b] text-xl" />
               <input
                 type="file"
                 accept="image/*"
@@ -658,7 +663,7 @@ function DiscussionDetail() {
                     reader.readAsDataURL(file);
                   }
                 }}
-                className="flex-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#0a192f] file:text-white hover:file:bg-[#1e3a5f] transition-colors duration-200"
+                className="flex-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#32679b] file:text-white hover:file:bg-[#1e3a5f] transition-colors duration-200"
               />
             </div>
           </div>
@@ -675,15 +680,15 @@ function DiscussionDetail() {
           <Button
             onClick={handleDialogCancel}
             className="px-6 py-2 rounded-md text-[#1e3a5f] hover:bg-gray-200 transition-colors duration-200"
-            style={{ color: '#0a192f' }}
+            style={{ color: '#32679b' }}
           >
             Cancel
           </Button>
           <Button
             onClick={handlePostSubmit}
             variant="contained"
-            className="px-6 py-2 rounded-md bg-[#0a192f] text-white hover:bg-[#1e3a5f] transition-colors duration-200"
-            style={{ backgroundColor: '#0a192f' }}
+            className="px-6 py-2 rounded-md bg-[#32679b] text-white hover:bg-[#1e3a5f] transition-colors duration-200"
+            style={{ backgroundColor: '#32679b' }}
           >
             Submit
           </Button>

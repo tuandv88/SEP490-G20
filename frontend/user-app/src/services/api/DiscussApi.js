@@ -26,7 +26,7 @@ export const DiscussApi = {
         new URLSearchParams(params).toString();
 
       // In ra URL để kiểm tra
-      console.log(url);
+      //console.log(url);
 
       // Gửi yêu cầu GET tới API với header Authorization
       const response = await axios.get(url);
@@ -61,7 +61,7 @@ export const DiscussApi = {
         return { pagination, updatedDiscussions, users };
       } else {
         // Trả về mảng dataDiscussionDtos rỗng nếu không có thảo luận
-        console.log("No discussions found, returning empty data.");
+        // console.log("No discussions found, returning empty data.");
         return { dataDiscussionDtos: [], updatedDiscussions: [], users: [] };
       }
     } catch (error) {
@@ -487,7 +487,7 @@ export const DiscussApi = {
       if (response && response.data) {
         // Kiểm tra xem response có chứa dữ liệu cần thiết không
         if (response.data.discussionDetailUserDtos && response.data.discussionDetailUserDtos.data) {
-          console.log('Data Response: ', response.data);
+          //console.log('Data Response: ', response.data);
           return response.data;
         } else {
           throw new Error('Invalid data structure in response');

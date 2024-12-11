@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import DiscussionTabs from "../../components/discussions/DiscussionTabs";
 import PostList from "../../components/discussions/PostList";
 import Layout from "@/layouts/layout";
 import { DiscussApi } from "@/services/api/DiscussApi";
-import { useLocation } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2 } from 'lucide-react';
 import Stack from '@mui/material/Stack';
+import AlertRemovePost from '@mui/material/Alert';
 
 const Discuss = () => {
   const [categoryId, setCategoryId] = useState(null);
@@ -14,6 +15,7 @@ const Discuss = () => {
   const [errorCategories, setErrorCategories] = useState(null);
 
   const location = useLocation();
+  const navigate = useNavigate();
   const { removeDiscussionStateMessage } = location.state || {};
 
   const [showRemoveSuccessAlert, setShowRemoveSuccessAlert] = useState(!!removeDiscussionStateMessage);
@@ -32,7 +34,7 @@ const Discuss = () => {
           setCategoryId(data.categoryDtos[0].id);
         }
       } catch (error) {
-        setErrorCategories("Failed to fetch categories");
+        //setErrorCategories("Failed to fetch categories");
       } finally {
         setLoadingCategories(false);
       }
@@ -45,30 +47,30 @@ const Discuss = () => {
     if (showRemoveSuccessAlert) {
       const timer = setTimeout(() => {
         setShowRemoveSuccessAlert(false);
+        // Xóa trạng thái location.state sau khi sử dụng
+        navigate(location.pathname, { replace: true });
       }, 3000);
 
       return () => clearTimeout(timer);
     }
-  }, [showRemoveSuccessAlert]);
+  }, [showRemoveSuccessAlert, navigate, location.pathname]);
 
   return (
     <Layout>
       {showRemoveSuccessAlert && (
-        <div className="fixed top-2 right-2 w-auto max-w-sm z-50 bg-red-100 p-2 rounded-lg shadow-lg">
-          <Alert variant="destructive">
-            <AlertTitle>Success</AlertTitle>
-            <AlertDescription>
-              Discussion removed successfully!
-            </AlertDescription>
-          </Alert>
-        </div>
+        <AlertRemovePost
+          severity="error"
+          className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-red-100 text-red-800 border border-red-300 max-w-sm w-auto p-4 rounded-lg shadow-lg"
+        >
+          Remove Post Success!
+        </AlertRemovePost>
       )}
 
       <div className="bg-gray-100 min-h-screen pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> {/* Increased max-width and added padding */}
           {loadingCategories ? (
             <div className="flex justify-center items-center h-15">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <Loader2 className="h-8 w-8 animate-spin text-[#32679b]" />
             </div>
           ) : errorCategories ? (
             <div className="p-4">

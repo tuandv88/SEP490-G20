@@ -53,7 +53,7 @@ function PostList({ categoryId }) {
   const [keySearch, setKeySearch] = useState("");
   const [pagination, setPagination] = useState({
     pageIndex: 1,
-    pageSize: 5,
+    pageSize: 3,
     totalCount: 0,
     totalPages: 0,
   });
@@ -96,7 +96,7 @@ function PostList({ categoryId }) {
         tags: selectedTags.join(','),
       });
 
-      console.log("API response:", data);
+      //console.log("API response:", data);
 
       if (data && data.updatedDiscussions) {
         setPosts(data.updatedDiscussions);
@@ -125,8 +125,8 @@ function PostList({ categoryId }) {
       setIsAuthor(!!userTmp?.profile.sub);
 
     } catch (err) {
-      console.error("Error fetching posts:", err);
-      setError("Failed to fetch posts. Please try again later.");
+      //console.error("Error fetching posts:", err);
+      //setError("Failed to fetch posts. Please try again later.");
       setPosts([]);
       setPagination(prev => ({ ...prev, totalCount: 0, totalPages: 0, pageIndex: 1 }));
     } finally {
@@ -390,7 +390,7 @@ function PostList({ categoryId }) {
   };
 
   useEffect(() => {
-    console.log('Selected tags:', selectedTags);
+    //console.log('Selected tags:', selectedTags);
   }, [selectedTags]);
 
   return (
@@ -402,8 +402,8 @@ function PostList({ categoryId }) {
               <button
                 key={filter}
                 className={`px-4 py-2 rounded-md transition-colors duration-200 flex items-center justify-center ${orderBy === filter
-                  ? "bg-[#0a192f] text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  ? "bg-[#32679b] text-white"
+                  : "bg-gray-200 text-[#6b7280] hover:bg-gray-300"
                   }`}
                 onClick={() => handleFilterClick(filter)}
               >
@@ -417,7 +417,7 @@ function PostList({ categoryId }) {
             ))}
           </div>
           <button
-            className="bg-[#0a192f] text-white px-6 py-2 rounded-md hover:bg-[#112240] transition-colors duration-200 flex items-center whitespace-nowrap shadow-md"
+            className="bg-[#32679b] text-white px-6 py-2 rounded-md hover:bg-[#285580] transition-colors duration-200 flex items-center whitespace-nowrap shadow-md"
             onClick={handleNewPostButtonClick}
           >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
@@ -449,7 +449,7 @@ function PostList({ categoryId }) {
                     key={tag}
                     label={tag}
                     onDelete={() => handleTagRemove(tag)}
-                    className="bg-[#0a192f] text-white text-xs flex-shrink-0"
+                    className="bg-[#32679b] text-white text-xs flex-shrink-0"
                     deleteIcon={<FontAwesomeIcon icon={faTimes} className="text-white text-xs" />}
                   />
                 ))}
@@ -473,7 +473,7 @@ function PostList({ categoryId }) {
               {[0, 1, 2].map((index) => (
                 <motion.div
                   key={index}
-                  className="w-2 h-2 bg-[#0a192f] rounded-full"
+                  className="w-2 h-2 bg-[#32679b] rounded-full"
                   animate={{
                     scale: [1, 1.5, 1],
                     opacity: [0.3, 1, 0.3],
@@ -504,7 +504,7 @@ function PostList({ categoryId }) {
                 </Typography>
                 <Button
                   variant="contained"
-                  style={{ backgroundColor: '#0a192f', color: 'white', marginTop: '1rem' }}
+                  style={{ backgroundColor: '#32679b', color: 'white', marginTop: '1rem' }}
                   startIcon={<EditIcon />}
                   onClick={handleNewPostButtonClick}
                 >
@@ -524,19 +524,19 @@ function PostList({ categoryId }) {
                         <img
                           src={post.urlProfilePicture || "/placeholder.svg"}
                           alt="User Avatar"
-                          className="w-12 h-12 rounded-full mr-4 border-2 border-[#0a192f] object-cover"
+                          className="w-12 h-12 rounded-full mr-4 border-2 border-[#32679b] object-cover"
                         />
                         <div className="flex-grow">
                           <h3 className="text-xl font-semibold text-[#0a192f] flex items-center">
                             {post.pinned && (
-                              <FontAwesomeIcon icon={faThumbtack} className="text-[#0a192f] mr-2" />
+                              <FontAwesomeIcon icon={faThumbtack} className="text-[#32679b] mr-2" />
                             )}
                             {post.title}
                           </h3>
                           <div className="flex items-center text-sm text-gray-600 mt-1">
-                            <FontAwesomeIcon icon={faUser} className="mr-1 text-[#0a192f]" />
+                            <FontAwesomeIcon icon={faUser} className="mr-1 text-[#6b7280]" />
                             <span className="font-medium text-[#0a192f] mr-2">{post.firstName} {post.lastName}</span>
-                            <FontAwesomeIcon icon={faCalendarAlt} className="mr-1 ml-2 text-[#0a192f]" />
+                            <FontAwesomeIcon icon={faCalendarAlt} className="mr-1 ml-2 text-[#6b7280]" />
                             <span>Created: {formatRelativeDate(post.dateCreated)}</span>
                           </div>
                         </div>
@@ -546,8 +546,8 @@ function PostList({ categoryId }) {
                           <span
                             key={idx}
                             className={`px-3 py-1 rounded-full text-sm transition-colors duration-200 flex items-center cursor-pointer ${selectedTags.includes(tag)
-                              ? "bg-[#0a192f] text-white"
-                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                              ? "bg-[#555b66] text-white"
+                              : "bg-gray-200 text-[#646a75] hover:bg-gray-300"
                               }`}
                             onClick={(e) => handleTagClick(tag, e)}
                           >
@@ -559,7 +559,7 @@ function PostList({ categoryId }) {
                       {renderDescription(post.description, post.id)}
                       <div className="flex justify-between items-center text-sm text-gray-600 border-t pt-4 mt-4">
                         <div className="flex items-center">
-                          <FontAwesomeIcon icon={faClock} className="mr-1 text-[#0a192f]" />
+                          <FontAwesomeIcon icon={faClock} className="mr-1 text-[#6b7280]" />
                           <span>Updated: {formatRelativeDate(post.dateUpdated)}</span>
                         </div>
                         <div className="flex items-center space-x-4">
@@ -572,7 +572,7 @@ function PostList({ categoryId }) {
                             {post.viewCount}
                           </span>
                           <span className="flex items-center">
-                            <FontAwesomeIcon icon={faComments} className="mr-1 text-[#0a192f]" />
+                            <FontAwesomeIcon icon={faComments} className="mr-1 text-[#3e79b2]" />
                             {post.commentCount || 0}
                           </span>
                         </div>
@@ -613,8 +613,8 @@ function PostList({ categoryId }) {
                   onClick={button.onClick}
                   disabled={button.disabled || loading}
                   className={`min-w-0 px-3 py-2 text-sm font-medium rounded-md ${button.current
-                    ? 'bg-[#0a192f] text-white'
-                    : 'text-[#0a192f] border border-[#0a192f] hover:bg-[#0a192f] hover:text-white'
+                    ? 'bg-[#32679b] text-white'
+                    : 'text-[#32679b] border border-[#32679b] hover:bg-[#32679b] hover:text-white'
                     } ${button.disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {button.label}
@@ -625,7 +625,7 @@ function PostList({ categoryId }) {
         )}
 
         <Dialog open={openDialog} onClose={handleDialogClose} fullWidth maxWidth="lg" className="dialog-submit-container">
-          <DialogTitle className="dialog-submit-title bg-[#0a192f] text-white">
+          <DialogTitle className="dialog-submit-title bg-[#32679b] text-white">
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
             Create New Post
           </DialogTitle>
@@ -672,7 +672,7 @@ function PostList({ categoryId }) {
                 className="bg-white rounded-md shadow-sm mb-2 top-2"
                 variant="outlined"
                 InputProps={{
-                  style: { borderColor: '#0a192f' },
+                  style: { borderColor: '#32679b' },
                   startAdornment: (
                     <FontAwesomeIcon icon={faTag} className="mr-2 text-gray-400" />
                   ),
@@ -683,18 +683,18 @@ function PostList({ categoryId }) {
                 {newPost.tags.map((tag, index) => (
                   <Chip
                     key={index}
-                    icon={<FontAwesomeIcon icon={faTag} style={{ color: '#0a192f' }} />}
+                    icon={<FontAwesomeIcon icon={faTag} style={{ color: '#32679b' }} />}
                     label={tag}
                     onDelete={handleTagDelete(tag)}
                     style={{
                       backgroundColor: '#e5e7eb',
-                      color: '#0a192f',
+                      color: '#32679b',
                       margin: '0 4px 8px 0'
                     }}
                     deleteIcon={
                       <FontAwesomeIcon
                         icon={faTimes}
-                        style={{ color: '#0a192f' }}
+                        style={{ color: '#32679b' }}
                         className="hover:text-red-500 transition-colors duration-200"
                       />
                     }
@@ -741,12 +741,12 @@ function PostList({ categoryId }) {
             </div>
           </DialogContent>
           <DialogActions className="dialog-submit-actions bg-gray-100">
-            <Button onClick={handleDialogCancel} className="dialog-submit-btn-cancel text-[#0a192f]"
-              style={{ color: '#0a192f' }}
+            <Button onClick={handleDialogCancel} className="dialog-submit-btn-cancel text-[#32679b]"
+              style={{ color: '#32679b' }}
             >
               Cancel
             </Button>
-            <Button onClick={handlePostSubmit} variant="contained" className="dialog-submit-btn-submit" style={{ backgroundColor: '#0a192f' }}>
+            <Button onClick={handlePostSubmit} variant="contained" className="dialog-submit-btn-submit" style={{ backgroundColor: '#32679b' }}>
               Submit
             </Button>
           </DialogActions>
@@ -769,7 +769,7 @@ function PostList({ categoryId }) {
           <DialogActions className="bg-gray-100 px-6 py-3">
             <Button
               onClick={handleErrorDialogClose}
-              className="bg-[#0a192f] text-white hover:bg-[#cccccc] px-6 py-2 rounded-md text-base font-medium transition-colors duration-200">
+              className="bg-[#32679b] text-white hover:bg-[#cccccc] px-6 py-2 rounded-md text-base font-medium transition-colors duration-200">
               OK
             </Button>
           </DialogActions>
@@ -781,7 +781,7 @@ function PostList({ categoryId }) {
           </Alert>
         )}
       </div>
-      <style jsx>{`
+      <style>{`
         .overflow-x-auto::-webkit-scrollbar {
           display: none;
         }

@@ -279,7 +279,7 @@ function PostList({ categoryId }) {
 
     try {
       const response = await DiscussApi.createDiscuss(discussionData);
-      console.log("Post created successfully:", response);
+      //console.log("Post created successfully:", response);
       if (response) {
         setNewPost({
           categoryId: "",

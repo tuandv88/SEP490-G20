@@ -18,7 +18,7 @@ public class GetUserDiscussionByUserIdAndDiscussionIdHandler : IQueryHandler<Get
 
         if (userDiscussion == null)
         {
-            var userDiscussionNew = UserDiscussion.Create(UserId.Of(query.UserId), DiscussionId.Of(query.DiscussionId));
+            var userDiscussionNew = UserDiscussion.Create(UserId.Of(query.UserId), DiscussionId.Of(query.DiscussionId), notificationsEnabled: false, isFollowing: false);
 
             await _repository.AddAsync(userDiscussionNew);
             await _repository.SaveChangesAsync(cancellationToken);

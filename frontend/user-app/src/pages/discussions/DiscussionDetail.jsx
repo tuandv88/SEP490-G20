@@ -170,7 +170,7 @@ function DiscussionDetail() {
             ...prevUserDiscussion,
             notificationsEnabled: !prevUserDiscussion.notificationsEnabled,
           }));
-          console.log(userDiscussion.notificationsEnabled)
+          //console.log(userDiscussion.notificationsEnabled)
         }
       }
     } catch (error) {
@@ -233,13 +233,14 @@ function DiscussionDetail() {
         if (isOwnerDiscussion === false) {
           // Notification.
           const dataApiUserDiscussion = await DiscussApi.getUserDiscussionByUserIdAndDiscussionId(discussion.userId, id);
-          console.log(dataApiUserDiscussion.data.userDiscussionDto.notificationsEnabled);
+          //console.log(dataApiUserDiscussion.data.userDiscussionDto.notificationsEnabled);
           if (dataApiUserDiscussion && dataApiUserDiscussion.data.userDiscussionDto.notificationsEnabled) {
             const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Discussion');
             // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
             const notificationData = {
-              userId: discussion.userId, // Lấy từ context hoặc props nếu cần
-              notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+              userIdReceive: discussion.userId,
+              userIdSend: null,
+              notificationTypeId: notificationTypeIdTmp,
               userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
               message: `
           <div class="text-sm text-muted-foreground mb-2 break-words">
@@ -248,6 +249,7 @@ function DiscussionDetail() {
           </div> `,
               sentVia: 'Web', // Hoặc 'Email' nếu cần
               status: 'Sent', // Trạng thái gửi
+              subject: null
             };
             // Gọi API để tạo lịch sử thông báo
             const response = await NotificationApi.createNotificationHistory(notificationData);

@@ -8,6 +8,7 @@ public class NotificationHistoryRepository : Repository<NotificationHistory>, IN
         _dbContext = dbContext ?? throw new ArgumentNullException();
     }
 
+
     public override async Task DeleteByIdAsync(Guid id)
     {
         var notificationHistory = await GetByIdAsync(id);

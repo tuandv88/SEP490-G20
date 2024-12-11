@@ -616,7 +616,7 @@ public static class EmailHtmlTemplates
     }
 
 
-    public static string PaymentSuccessfullyTemplate(string fullName, string recipientEmail, string courseName, decimal amountPaid, string paymentType, DateTime paymentDate, string transactionId, string callbackUrl)
+    public static string PaymentSuccessfullyTemplate(string fullName, string recipientEmail, string courseName, double amountPaid, string paymentType, DateTime paymentDate, string transactionId, string callbackUrl)
     {
         string htmlStr = $@"
 <!DOCTYPE html>
@@ -829,7 +829,7 @@ public static class EmailHtmlTemplates
         return htmlStr;
     }
 
-    public static string PaymentFailureTemplate(string fullName, string recipientEmail, string courseName, decimal amountPaid, string paymentType, DateTime paymentDate, string transactionId, string retryUrl)
+    public static string PaymentFailureTemplate(string fullName, string recipientEmail, string courseName, double amountPaid, string paymentType, DateTime paymentDate, string transactionId, string retryUrl)
     {
         string htmlStr = $@"
 <!DOCTYPE html>

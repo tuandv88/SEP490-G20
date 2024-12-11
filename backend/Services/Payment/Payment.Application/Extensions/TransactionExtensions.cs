@@ -5,6 +5,7 @@ namespace Payment.Application.Extensions;
 public static class TransactionExtensions {
     public static TransactionDto ToTransactionDto(this Transaction transaction, List<TransactionItem> transactionItems) {
         return new TransactionDto(
+            transaction.Id.Value,
             transaction.PointsUsed,
             transaction.GrossAmount,
             transaction.DiscountAmount,

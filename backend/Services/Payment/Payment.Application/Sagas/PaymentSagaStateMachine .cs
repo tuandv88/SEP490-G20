@@ -5,11 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Payment.Application.Data.Repositories;
 
 namespace Payment.Application.Sagas;
-public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstance> {
+
+public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstance>
+{
     // States
     public State OrderApproved { get; private set; } = default!;
     public State ProductValidated { get; private set; } = default!;
-    public State PointsChecked { get; private set; } = default!;
     public State PaymentCaptured { get; private set; } = default!;
     public State NotificationSent { get; private set; } = default!;
     public State Failed { get; private set; } = default!;
@@ -30,7 +31,9 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
     public Event<EmailFailedEvent> EmailFailedEvent { get; private set; } = default!;
 
     private readonly IServiceProvider _serviceProvider;
-    public PaymentSagaStateMachine(IServiceProvider serviceProvider) {
+
+    public PaymentSagaStateMachine(IServiceProvider serviceProvider)
+    {
         _serviceProvider = serviceProvider;
 
         InstanceState(x => x.CurrentState);
@@ -52,7 +55,8 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
         // Order Approved -> Validate Product
         Initially(
             When(OrderApprovedEvent)
-                .ThenAsync(async context => {
+                .ThenAsync(async context =>
+                {
                     context.Saga.TransactionId = context.Message.TransactionId;
                     context.Saga.UserId = context.Message.UserId;
                     context.Saga.Currency = context.Message.Currency;
@@ -62,15 +66,17 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
                     context.Saga.ProductType = context.Message.ProductType;
                     context.Saga.UnitPrice = context.Message.UnitPrice;
                     context.Saga.PointsUsed = context.Message.PointsUsed;
-                    context.Saga.Email = context.Message.PayerEmail??"";
+                    context.Saga.Email = context.Message.PayerEmail ?? "";
                     context.Saga.Fullname = context.Message.Fullname;
                     context.Saga.PaymentStatus = "Start";
                     using var scope = _serviceProvider.CreateScope();
                     var logRepository = scope.ServiceProvider.GetRequiredService<ITransactionLogRepository>();
-                    await logRepository.AddLog(context.Message.TransactionId, "OrderApprovedEvent", "Created", "Start Saga");
+                    await logRepository.AddLog(context.Message.TransactionId, "OrderApprovedEvent", "Created",
+                        "Start Saga");
                 })
                 .TransitionTo(OrderApproved)
-                .Publish(context => new ValidateProductCommand {
+                .Publish(context => new ValidateProductCommand
+                {
                     TransactionId = context.Message.TransactionId,
                     ProductId = context.Message.ProductId,
                     UserId = context.Message.UserId,
@@ -84,33 +90,39 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
             When(ProductValidationEvent)
                 .If(context => context.Message.IsValid, x =>
                     x.TransitionTo(ProductValidated)
-                      .ThenAsync(async context => {
-                          context.Saga.ProductName = context.Message.ProductName;
-                          context.Saga.ProductDescription = context.Message.ProductDescription;
-                          using var scope = _serviceProvider.CreateScope();
-                          var logRepository = scope.ServiceProvider.GetRequiredService<ITransactionLogRepository>();
-                          await logRepository.AddLog(context.Message.TransactionId, "ProductValidationEvent", "Created", "ProductValidated Success");
-                      })
-                      .Publish(context => new DeductPointsCommand {
-                          TransactionId = context.Message.TransactionId,
-                          UserId = context.Saga.UserId,
-                          PointsUsed = context.Saga.PointsUsed,
-                          Source = "Convert points to purchase courses."
-                      })
+                        .ThenAsync(async context =>
+                        {
+                            context.Saga.ProductName = context.Message.ProductName;
+                            context.Saga.ProductDescription = context.Message.ProductDescription;
+                            using var scope = _serviceProvider.CreateScope();
+                            var logRepository = scope.ServiceProvider.GetRequiredService<ITransactionLogRepository>();
+                            await logRepository.AddLog(context.Message.TransactionId, "ProductValidationEvent",
+                                "Created", "ProductValidated Success");
+                        })
+                        .Publish(context => new DeductPointsCommand
+                        {
+                            TransactionId = context.Message.TransactionId,
+                            UserId = context.Saga.UserId,
+                            PointsUsed = context.Saga.PointsUsed,
+                            Source = "Convert points to purchase courses."
+                        })
                 )
                 .If(context => !context.Message.IsValid, x =>
                     x.TransitionTo(Failed)
-                      .ThenAsync(async context => {
-                          using var scope = _serviceProvider.CreateScope();
-                          var logRepository = scope.ServiceProvider.GetRequiredService<ITransactionLogRepository>();
-                          await logRepository.AddLog(context.Message.TransactionId, "ProductValidationEvent", "Created", "ProductValidated Fail");
-                      })
-                      .Publish(context => new ProductValidationFailedEvent {
-                          TransactionId = context.Saga.TransactionId,
-                          // Thất bại thì chuyển transaction và fail luôn vì sản phẩm không đúng
-                          //TODO
-                          Reason = "Invalid product"
-                      })
+                        .ThenAsync(async context =>
+                        {
+                            using var scope = _serviceProvider.CreateScope();
+                            var logRepository = scope.ServiceProvider.GetRequiredService<ITransactionLogRepository>();
+                            await logRepository.AddLog(context.Message.TransactionId, "ProductValidationEvent",
+                                "Created", "ProductValidated Fail");
+                        })
+                        .Publish(context => new ProductValidationFailedEvent
+                        {
+                            TransactionId = context.Saga.TransactionId,
+                            // Thất bại thì chuyển transaction và fail luôn vì sản phẩm không đúng
+                            //TODO
+                            Reason = "Invalid product"
+                        })
                 )
         );
 
@@ -118,7 +130,8 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
         During(ProductValidated,
             When(PointsDeductedEvent)
                 .TransitionTo(PaymentCaptured)
-                .Publish(context => new CapturePaymentCommand() {
+                .Publish(context => new CapturePaymentCommand()
+                {
                     TransactionId = context.Message.TransactionId,
                     ProductName = context.Saga.ProductName,
                     ProductDescription = context.Saga.ProductDescription
@@ -129,22 +142,28 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
         During(PaymentCaptured,
             When(PaymentCapturedEvent)
                 .TransitionTo(NotificationSent)
-                .ThenAsync(async context => {
+                .ThenAsync(async context =>
+                {
                     // Phát sự kiện thanh toán thành công
-                    await context.Publish(new PaymentSuccessEvent {
+                    await context.Publish(new PaymentSuccessEvent
+                    {
                         TransactionId = context.Saga.TransactionId,
                         UserId = context.Saga.UserId,
                         ProductId = context.Saga.ProductId,
                         ProductType = context.Saga.ProductType,
                     });
                 })
-                .Publish(context => new SendEmailNotificationCommand {
+                .Publish(context => new SendEmailNotificationCommand
+                {
                     TransactionId = context.Message.TransactionId,
                     Fullname = context.Saga.Fullname,
                     Email = context.Saga.Email,
                     ProductName = context.Saga.ProductName,
                     ProductDescription = context.Saga.ProductDescription,
-                    Amount = context.Saga.Amount
+                    Amount = context.Saga.Amount,
+                    EmailType = EmailType.PaymentSuccess,
+                    PaymentType = context.Saga.PaymentMethod,
+                    ProductId = context.Saga.ProductId
                 })
         );
 
@@ -153,8 +172,9 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
             When(EmailSentEvent)
                 .TransitionTo(Completed)
                 .Finalize(),
-             When(PaymentSuccessEvent) 
-                .Then(context => {
+            When(PaymentSuccessEvent)
+                .Then(context =>
+                {
                     // không làm gì
                 })
         );
@@ -163,32 +183,54 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
         DuringAny(
             When(ProductValidationFailedEvent)
                 .TransitionTo(Failed)
-                .Then(context => {
+                .Then(context =>
+                {
                     // Handle product validation failure
-                }).Publish(context => new SetTransactionFailedCommand() {
+                }).Publish(context => new SetTransactionFailedCommand()
+                {
                     TransactionId = context.Saga.TransactionId
                 }),
-
             When(PointsNotSufficientEvent)
                 .TransitionTo(Failed)
-                .Then(context => {
+                .Then(context =>
+                {
                     // Handle insufficient points
-                }).Publish(context => new SetTransactionFailedCommand() {
+                }).Publish(context => new SetTransactionFailedCommand()
+                {
                     TransactionId = context.Saga.TransactionId
                 }),
-
             When(PaymentFailedEvent)
                 .TransitionTo(Failed)
-                .Then(context => {
+                .Then(context =>
+                {
                     // Handle payment failure
                     //Send mail
-                }).Publish(context => new SetTransactionFailedCommand() {
+                }).Publish(context => new SetTransactionFailedCommand()
+                {
                     TransactionId = context.Saga.TransactionId
+                }).Publish(context => new RefundPointsCommand()
+                {
+                    TransactionId = context.Saga.TransactionId,
+                    UserId = context.Saga.UserId,
+                    PointsUsed = context.Saga.PointsUsed,
+                    Source = "Refund points due to payment failure."
+                })
+                .Publish(context => new SendEmailNotificationCommand()
+                {
+                    TransactionId = context.Message.TransactionId,
+                    Fullname = context.Saga.Fullname,
+                    Email = context.Saga.Email,
+                    ProductName = context.Saga.ProductName,
+                    ProductDescription = context.Saga.ProductDescription,
+                    Amount = context.Saga.Amount,
+                    EmailType = EmailType.PaymentFailed,
+                    PaymentType = context.Saga.PaymentMethod,
+                    ProductId = context.Saga.ProductId
                 }),
-
             When(EmailFailedEvent)
                 .TransitionTo(Failed)
-                .Then(context => {
+                .Then(context =>
+                {
                     // Handle email sending failure
                 })
         );
@@ -196,6 +238,4 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
         // Set completed when the saga finalizes
         SetCompletedWhenFinalized();
     }
-
 }
-

@@ -20,14 +20,14 @@ class AuthService {
     })
 
     // Xử lý gia hạn token tự động
-    this.userManager.events.addAccessTokenExpiring(() => {
-      console.log("Access token sắp hết hạn. Bắt đầu gia hạn token...")
-      this.userManager.signinSilent().then((user) => {
-        console.log("Access token mới:", user.access_token)
-      }).catch((err) => {
-        console.error("Lỗi gia hạn token:", err)
-      })
-    })
+    // this.userManager.events.addAccessTokenExpiring(() => {
+    //   console.log("Access token sắp hết hạn. Bắt đầu gia hạn token...")
+    //   this.userManager.signinSilent().then((user) => {
+    //     console.log("Access token mới:", user.access_token)
+    //   }).catch((err) => {
+    //     console.error("Lỗi gia hạn token:", err)
+    //   })
+    // })
 
     this.userManager.events.addSilentRenewError((err) => {
       console.error("Gia hạn token ngầm thất bại:", err)

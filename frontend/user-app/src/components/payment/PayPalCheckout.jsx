@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { PayPalButtons } from '@paypal/react-paypal-js'
 import { createPayPalOrder, capturePayPalOrder } from '@/services/api/paypalService'
 import OrderItem from './OrderItem'
@@ -15,6 +15,7 @@ import Cookies from 'js-cookie'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 import { useNavigate } from 'react-router-dom'
 import { CourseAPI } from '@/services/api/courseApi'
+import { PaymentStatusPoll } from './process/PaymentStatusPoll'
 
 const PayPalCheckout = () => {
   const { id } = useParams()
@@ -27,8 +28,13 @@ const PayPalCheckout = () => {
   const [userPoint, setUserPoint] = useState(0)
   const [orderSummaryState, setOrderSummaryState] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+  const usePointsRef = useRef(false)
+  const [paymentPollStatus, setPaymentPollStatus] = useState(null)
+  const [paymentMessage, setPaymentMessage] = useState('')
 
   const API_BASE_URL = import.meta.env.VITE_API_URL
+  console.log(usePoints)
 
   useEffect(() => {
     const fetchUserPoint = async () => {
@@ -69,6 +75,21 @@ const PayPalCheckout = () => {
     }
   }, [courseDetail])
 
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      try {
+        const enrolledCourses = await CourseAPI.getEnrolledCourses(id);
+        if (enrolledCourses && enrolledCourses.enrollmentInfo !== null) {
+          navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', id))
+        }
+      } catch (error) {
+        console.error('Error checking enrollment:', error);
+      }
+    };
+
+    checkEnrollment();
+  }, [id, navigate]);
+
   const orderItem = courseDetail
     ? {
         id: courseDetail.id,
@@ -90,7 +111,7 @@ const PayPalCheckout = () => {
       body: JSON.stringify({
         Order: {
           PaymentMethod: 'Paypal',
-          Point: userPoint ? userPoint : 0,
+          Point: usePointsRef.current ? userPoint : 0,
           Item: {
             ProductId: courseDetail.id,
             ProductType: 'Course',
@@ -108,35 +129,44 @@ const PayPalCheckout = () => {
 
   const handleApprove = async (data) => {
     try {
+      setPaymentPollStatus('processing')
+      setPaymentMessage('Processing your payment ...')
+      setIsProcessingPayment(true)
+      let intervalId, timeoutId
+
       const pollForEnrolledCourses = async () => {
         try {
           const enrolledCourses = await CourseAPI.getEnrolledCourses(id)
           if (enrolledCourses && enrolledCourses.enrollmentInfo !== null) {
-            clearInterval(intervalId)
-            clearTimeout(timeoutId)
-            setPaymentStatus('Payment successful! Thank you for your purchase.')
-            navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', id))
+            cleanup()
+            setPaymentPollStatus('success')
+            setPaymentMessage('Thank you for your purchase!')
           }
         } catch (error) {
           console.error('Error fetching enrolled courses:', error)
         }
       }
 
-      // Gọi API mỗi 1 giây
-      const intervalId = setInterval(pollForEnrolledCourses, 1000)
+      const cleanup = () => {
+        if (intervalId) clearInterval(intervalId)
+        if (timeoutId) clearTimeout(timeoutId)
+        setIsProcessingPayment(false)
+      }
 
-      // Đặt giới hạn tối đa (ví dụ: 30 giây)
-      const timeoutId = setTimeout(() => {
-        clearInterval(intervalId)
-        setPaymentStatus('Timeout. Please try again.')
-        navigate(AUTHENTICATION_ROUTERS.COURSELIST)
-      }, 10000)
+      intervalId = setInterval(pollForEnrolledCourses, 1000)
 
-      // const result = await capturePayPalOrder(data.orderID)
-      // console.log('Capture result', result)
+      timeoutId = setTimeout(() => {
+        cleanup()
+        setPaymentPollStatus('pending')
+        setPaymentMessage('Waiting for payment. Please check again later.')
+      }, 15000)
+
+      return () => cleanup()
     } catch (error) {
-      console.error('Error capturing order:', error)
-      setPaymentStatus('Error processing payment. Please try again.')
+      console.error('Error processing payment:', error)
+      setPaymentPollStatus('error')
+      setPaymentMessage('An error occurred during payment. Please try again.')
+      setIsProcessingPayment(false)
     }
   }
 
@@ -148,8 +178,12 @@ const PayPalCheckout = () => {
     if (!courseDetail) return
 
     setUsePoints(!usePoints)
-    if (!usePoints) {
-      const pointValue = userPoint / 1000
+    usePointsRef.current = !usePoints
+
+    const pointValue = userPoint / 1000
+    const willUsePoints = !usePoints
+
+    if (willUsePoints) {
       const newTotal = Math.max(0, courseDetail.price - pointValue).toFixed(2)
       setOrderSummaryState({
         originalPrice: courseDetail.price,
@@ -167,8 +201,33 @@ const PayPalCheckout = () => {
     }
   }
 
+  const handleClosePaymentStatus = () => {
+    setPaymentPollStatus(null)
+    setPaymentMessage('')
+    
+    switch (paymentPollStatus) {
+      case 'success':
+        navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', id))
+        break
+      case 'pending':
+        navigate(AUTHENTICATION_ROUTERS.HOME)
+        break
+      case 'error':
+        navigate(AUTHENTICATION_ROUTERS.COURSELIST)
+        break
+    }
+  }
+
   return (
     <div className='max-w-5xl mx-auto px-4'>
+      {paymentPollStatus && (
+        <PaymentStatusPoll
+          status={paymentPollStatus}
+          message={paymentMessage}
+          onClose={handleClosePaymentStatus}
+        />
+      )}
+      {/* {isProcessingPayment && <Loading />} */}
       <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
         <div className='md:col-span-2 space-y-8'>
           <div className='bg-white p-6 rounded-lg shadow-md'>
@@ -201,6 +260,7 @@ const PayPalCheckout = () => {
             {paymentMethod === 'paypal' && (
               <div className='mt-6'>
                 <PayPalButtons
+                  disabled={paymentPollStatus}
                   createOrder={handleCreateOrder}
                   onApprove={handleApprove}
                   onCancel={handleCancel}

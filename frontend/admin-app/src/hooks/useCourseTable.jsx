@@ -139,10 +139,10 @@ export default function useCourseTable() {
       const courseDetails = await getCourseDetails(courseId)
       const { chapterDetailsDtos } = courseDetails.courseDetailsDto
 
-      if (chapterDetailsDtos.length < 3 || chapterDetailsDtos.some((chapter) => chapter.lectureDtos.length < 2)) {
+      if (chapterDetailsDtos.length < 1 || chapterDetailsDtos.some((chapter) => chapter.lectureDtos.length < 1)) {
         toast({
           title: 'Cannot change status',
-          description: 'The course must have at least 3 chapters, and each chapter must have at least 3 lectures.',
+          description: 'The course must have at least 1 chapters, and each chapter must have at least 1 lectures.',
           variant: 'destructive',
           duration: 1500
         })
@@ -173,7 +173,7 @@ export default function useCourseTable() {
     } catch (error) {
       console.error('Error deleting course:', error)
       toast({
-        title: 'Error', 
+        title: 'Error',
         description: 'An error occurred while deleting the course.',
         variant: 'destructive',
         duration: 1500

@@ -54,7 +54,7 @@ const RoadmapDashboard = ({ user }) => {
   // Poll for learning paths
   const pollLearningPaths = useCallback(() => {
     let attempts = 0
-    const maxAttempts = 10
+    const maxAttempts = 15
     let pollInterval
 
     setPollingStatus('polling')
@@ -93,7 +93,7 @@ const RoadmapDashboard = ({ user }) => {
     }
 
     pollInterval = setInterval(async () => {
-      console.log('Polling for learning paths...', attempts)
+      // console.log('Polling for learning paths...', attempts)
       const found = await poll()
       
       if (found || attempts >= maxAttempts) {

@@ -51,6 +51,7 @@ const LearningSpace = () => {
   const [activeLectureId, setActiveLectureId] = useState(lectureId) 
   const [courseProgress, setCourseProgress] = useState([])
   const [userPoint, setUserPoint] = useState(0)
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
   //courseId
   
   const toggleProblemList = () => {
@@ -118,6 +119,7 @@ const LearningSpace = () => {
         }
       } finally {
         setLoading(false)
+        setIsInitialLoading(false)
       }
     }
 
@@ -207,7 +209,7 @@ const LearningSpace = () => {
     fetchUserPoint()
   }, [lectureId])
 
-  if (loading) {
+  if (isInitialLoading || loading) {
     return <CourseLoadingDetail />
   }
 
@@ -215,7 +217,7 @@ const LearningSpace = () => {
     return <ErrorPage />
   }
 
-  if (!chapters || (chapters.length === 0 && !loading)) {
+  if (!isInitialLoading && (!chapters || chapters.length === 0)) {
     return (
       <NotFound mess='We cannot find documents in this course. Please check the link or search for other courses.' />
     )
@@ -239,7 +241,7 @@ const LearningSpace = () => {
           direction='horizontal'
           className='min-h-[200px] rounded-lg border md:min-w-[450px] !h-[94vh]'
         >
-          <ResizablePanel id='panel-1' order={1} defaultSize={40}>
+          <ResizablePanel id='panel-1' order={1} defaultSize={35}>
             <div className='scroll-container h-full bg-bGprimary'>
               <HeaderTab activeTab={activeTab} setActiveTab={setActiveTab} isNormalLecture={false} />
               {loading && <ChapterLoading />}
@@ -282,7 +284,7 @@ const LearningSpace = () => {
           {isThreePanels && (
             <>
               <ResizableHandle withHandle className='resize-sha w-[3px]' />
-              <ResizablePanel id='panel-3' order={3} defaultSize={30}>
+              <ResizablePanel id='panel-3' order={3} defaultSize={35}>
                 <div className='scroll-container h-full'>
                   <ChatAI lectureId={lectureId} problemId={lectureDetail?.lectureDetailsDto?.problem?.id} />
                 </div>

@@ -21,7 +21,7 @@ public class GetTransactionHandler(ITransactionRepository repository, ITransacti
         var pageSize = query.PaginationRequest.PageSize;
 
         var filteredData = allData
-            //.Include(t => t.Items)
+            // .Include(t => t.Items)
             //.Include(t => t.Logs)
             .Where(t => t.UserId.Equals(UserId.Of(userId)));
 

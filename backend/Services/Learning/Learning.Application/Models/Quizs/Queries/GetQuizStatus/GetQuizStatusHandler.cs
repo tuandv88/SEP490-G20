@@ -5,7 +5,7 @@ public class GetQuizStatusHandler(IQuizSubmissionRepository quizSubmissionReposi
 {
     public async Task<GetQuizStatusResult> Handle(GetQuizStatusQuery request, CancellationToken cancellationToken)
     {
-        var quiz = await quizSubmissionRepository.GetByIdAsync(request.QuizId);
+        var quiz = await quizRepository.GetByIdAsync(request.QuizId);
         if (quiz == null)
         {
             throw new NotFoundException(nameof(Quiz), request.QuizId);

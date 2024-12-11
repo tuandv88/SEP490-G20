@@ -67,7 +67,6 @@ export const LearningAPI = {
         'Authorization': `Bearer ${Cookies.get('authToken')}`
       }
     })
-    console.log(response.data)
     return response.data
   }
 }

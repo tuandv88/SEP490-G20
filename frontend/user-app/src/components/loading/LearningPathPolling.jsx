@@ -10,7 +10,7 @@ export function LearningPathPolling({ status, message, onClose }) {
           bgColor: 'bg-green-100',
           title: 'Learning Path Created Successfully',
           buttonColor: 'bg-green-600 hover:bg-green-700',
-          buttonText: 'View Learning Path'
+          buttonText: 'OK'
         };
       case 'polling':
         return {

@@ -10,6 +10,7 @@ export const QuizAPI = {
         Authorization: `Bearer ${Cookies.get('authToken')}`
       }
     })
+    console.log(response)
     return response.data
   },
   startQuiz: async (quizId) => {
@@ -75,6 +76,14 @@ export const QuizAPI = {
   getQuizAssessment: async () => {
     const response = await axios.get(`${API_BASE_URL}/learning-service/quizs/assessment`, {
       headers: { Authorization: `Bearer ${Cookies.get('authToken')}` }
+    })
+    return response.data
+  },
+  getQuizStatus: async (quizId) => {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/quizs/${quizId}/status`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
     })
     return response.data
   }

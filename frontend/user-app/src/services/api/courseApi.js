@@ -85,5 +85,22 @@ export const CourseAPI = {
   getCourseReviews: async (courseId, pageIndex = 1, pageSize = 5) => {
     const response = await axios.get(`${API_BASE_URL}/learning-service/courses/${courseId}/reviews?PageIndex=${pageIndex}&PageSize=${pageSize}`)
     return response.data
+  },
+  getCourseWithParticipation: async (courseIds) => {
+    const params = new URLSearchParams({
+      PageIndex: 1,
+      PageSize: courseIds.length,
+      courseIds: courseIds.join(',')
+    });
+
+    const response = await axios.get(
+      `${API_BASE_URL}/learning-service/courses/with-participation?${params}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+      }
+    );
+    return response.data;
   }
 }

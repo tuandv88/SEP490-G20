@@ -1,9 +1,12 @@
 import { UserAPI } from '@/services/api/userApi';
-import { Dot, Trophy } from 'lucide-react'
+import { Dot, Trophy, ArrowRight } from 'lucide-react'
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 
 const ProblemPanelTop = ({ leaderboardData }) => {
+  const navigate = useNavigate()
   const [userDetails, setUserDetails] = useState([]);
 
   useEffect(() => {
@@ -79,7 +82,18 @@ const ProblemPanelTop = ({ leaderboardData }) => {
         ))}
       </div>
 
-      <hr className='w-full h-[1px] mt-5' />
+      <hr className='w-full h-[1px] my-5' />
+      
+      <div className='flex justify-center'>
+        <Button
+          onClick={() => navigate(AUTHENTICATION_ROUTERS.LEADERBOARD)}
+          variant="outline"
+          className="flex items-center gap-2 hover:bg-gray-100"
+        >
+          View Leaderboard
+          <ArrowRight className="w-4 h-4" />
+        </Button>
+      </div>
     </div>
   )
 }

@@ -500,7 +500,50 @@ export const DiscussApi = {
       console.error('Error fetching discussions:', error.message);
       throw error;  // Ném lỗi ra ngoài để xử lý ở nơi gọi hàm
     }
-  }
+  },
+
+  // API: Get User Discussion
+  getUserDiscussionByUserIdAndDiscussionId: async (userId, discussionId) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/community-service/userdiscussion/${userId}/${discussionId}`, getAuthHeaders());
+      return response;
+    } catch (error) {
+      console.error("Error Get User Discussion:", error.message);
+      throw error;
+    }
+  },
+
+  // API: Cập nhật trạng thái thông báo
+  updateStatusNotificationUserDiscussion: async ({ userId, discussionId }) => {
+    try {
+      //console.log("Updating notification status for userDiscussion:", userId);
+
+      // Đảm bảo URL được sử dụng đúng và hợp lệ
+      const url = `${API_BASE_URL}/community-service/userdiscussions/${userId}/${discussionId}/update-status-notification`;
+
+      // Gọi API cập nhật trạng thái thông báo
+      const response = await fetch(url, {
+        method: 'PUT', // Phương thức PUT
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('authToken')}`, // Lấy token từ cookies
+          'Content-Type': 'application/json' // Header yêu cầu Content-Type
+        },
+        body: JSON.stringify({}) // Chuyển body là một object nếu cần thiết
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Chuyển đổi phản hồi thành JSON và trả về dữ liệu
+      const data = await response.json();
+      return data;
+
+    } catch (error) {
+      console.error("Error Update Status Notification Discussion:", error.message);
+      throw error;
+    }
+  },
 };
 
 // API thứ hai: Lấy thông tin chi tiết của UserIds

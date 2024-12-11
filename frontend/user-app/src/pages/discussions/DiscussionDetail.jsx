@@ -24,7 +24,9 @@ function DiscussionDetail() {
   const [loading, setLoading] = useState(true);
   const [loadingNotification, setLoadingNotification] = useState(false);
   const [error, setError] = useState(null);
+  const [userDiscussion, setUserDiscussion] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [idCurrentUser, setIdCurrentUser] = useState(null);
   const [fullNameCurrentUser, setFullNameCurrentUser] = useState(null);
   const [isOwnerDiscussion, setOwnerDiscussion] = useState(null);
   const [tooltipContent, setTooltipContent] = useState('Share');
@@ -74,8 +76,21 @@ function DiscussionDetail() {
         if (userTmp) {
           console.log(userTmp);
           const currentUserId = userTmp.profile.sub;
+          setIdCurrentUser(currentUserId);
           setFullNameCurrentUser(userTmp.profile.firstName + ' ' + userTmp.profile.lastName);
           setOwnerDiscussion(currentUserId === data.userId);
+        }
+
+        if (userTmp && data) {
+          const userDiscussionApi = await DiscussApi.getUserDiscussionByUserIdAndDiscussionId(userTmp.profile.sub, data.id);
+          if (userDiscussionApi) {
+            const userDiscussionTmp = userDiscussionApi.data.userDiscussionDto;
+            setUserDiscussion(userDiscussionTmp);
+            setDiscussion(prev => ({
+              ...prev,
+              enableNotification: userDiscussionTmp.notificationsEnabled
+            }));
+          }
         }
 
         if (categories && categories.categoryDtos) {
@@ -147,13 +162,16 @@ function DiscussionDetail() {
   const handleToggleNotification = async () => {
     try {
       setLoadingNotification(true);
-      const response = await DiscussApi.updateStatusNotificationDiscussionById({ discussionId: id });
 
-      if (response) {
-        setDiscussion(prevDiscussion => ({
-          ...prevDiscussion,
-          enableNotification: !prevDiscussion.enableNotification,
-        }));
+      if (idCurrentUser && id) {
+        const response = await DiscussApi.updateStatusNotificationUserDiscussion({ userId: idCurrentUser, discussionId: id });
+        if (response) {
+          setUserDiscussion(prevUserDiscussion => ({
+            ...prevUserDiscussion,
+            notificationsEnabled: !prevUserDiscussion.notificationsEnabled,
+          }));
+          console.log(userDiscussion.notificationsEnabled)
+        }
       }
     } catch (error) {
       console.error("Error updating status notification discussion:", error.message);
@@ -212,26 +230,30 @@ function DiscussionDetail() {
       if (response) {
         setVoteCount(prevCount => voteType === 'Like' ? prevCount + 1 : prevCount - 1);
 
-        // Notification.
-        const dataApiDiscussion = await DiscussApi.getDiscussionDetails(discussion.id);
-        if (dataApiDiscussion && dataApiDiscussion.enableNotification) {
-          const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Discussion');
-          // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
-          const notificationData = {
-            userId: discussion.userId, // Lấy từ context hoặc props nếu cần
-            notificationTypeId: notificationTypeIdTmp, // Loại thông báo
-            userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
-            message: `
-                  <div class="text-sm text-muted-foreground mb-2 break-words">
-                  <p> <strong>${fullNameCurrentUser}</strong> Voted your post.</p>
-                  <p><a href="/discussion/${discussion.id}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
-                  </div> `,
-            sentVia: 'Web', // Hoặc 'Email' nếu cần
-            status: 'Sent', // Trạng thái gửi
-          };
-          // Gọi API để tạo lịch sử thông báo
-          const response = await NotificationApi.createNotificationHistory(notificationData);
+        if (isOwnerDiscussion === false) {
+          // Notification.
+          const dataApiUserDiscussion = await DiscussApi.getUserDiscussionByUserIdAndDiscussionId(discussion.userId, id);
+          console.log(dataApiUserDiscussion.data.userDiscussionDto.notificationsEnabled);
+          if (dataApiUserDiscussion && dataApiUserDiscussion.data.userDiscussionDto.notificationsEnabled) {
+            const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Discussion');
+            // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+            const notificationData = {
+              userId: discussion.userId, // Lấy từ context hoặc props nếu cần
+              notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+              userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+              message: `
+          <div class="text-sm text-muted-foreground mb-2 break-words">
+          <p> <strong>${fullNameCurrentUser}</strong> Voted your post.</p>
+          <p><a href="/discussion/${discussion.id}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
+          </div> `,
+              sentVia: 'Web', // Hoặc 'Email' nếu cần
+              status: 'Sent', // Trạng thái gửi
+            };
+            // Gọi API để tạo lịch sử thông báo
+            const response = await NotificationApi.createNotificationHistory(notificationData);
+          }
         }
+
       }
     } catch (error) {
       //console.error(error);
@@ -405,14 +427,15 @@ function DiscussionDetail() {
                   </Tooltip>
 
                   {currentUser &&
-                    (<Tooltip title={discussion.enableNotification ? "Disable notifications" : "Enable notifications"} arrow>
+                    (<Tooltip title={userDiscussion.notificationsEnabled ? "Disable notifications" : "Enable notifications"} arrow>
                       <IconButton
                         onClick={handleToggleNotification}
                         disabled={loadingNotification}
-                        className={`${discussion.enableNotification ? 'text-green-500' : 'text-gray-500'} p-1`}
+                        className={`${userDiscussion.notificationsEnabled ? 'text-green-500' : 'text-gray-500'} p-1`}
                         size="small"
                       >
-                        <FontAwesomeIcon icon={discussion.enableNotification ? faBell : faBellSlash} className="h-4 w-4" />
+                        <h1>{userDiscussion.notificationsEnabled}</h1>
+                        <FontAwesomeIcon icon={userDiscussion.notificationsEnabled ? faBell : faBellSlash} className="h-4 w-4" />
                       </IconButton>
                     </Tooltip>)}
 

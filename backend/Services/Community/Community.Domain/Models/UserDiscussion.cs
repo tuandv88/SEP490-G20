@@ -18,10 +18,10 @@ namespace Community.Domain.Models
                 Id = UserDiscussionId.Of(Guid.NewGuid()),
                 UserId = userId,
                 DiscussionId = discussionId,
-                IsFollowing = true,
+                IsFollowing = false,
                 DateFollowed = DateTime.UtcNow,
                 LastViewed = DateTime.UtcNow,
-                NotificationsEnabled = true
+                NotificationsEnabled = false
             };
 
             return userDiscussionNew;

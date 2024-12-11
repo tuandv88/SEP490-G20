@@ -1,0 +1,6 @@
+﻿using Community.Application.Models.UserDiscussions.Dtos;
+
+namespace Community.Application.Models.UserDiscussions.Queries.GetUserDiscussionByUserIdAndDiscussionId;
+public record GetUserDiscussionByUserIdAndDiscussionIdResult(UserDiscussionDto UserDiscussionDto);
+[Authorize]
+public record GetUserDiscussionByUserIdAndDiscussionIdQuery(Guid UserId, Guid DiscussionId) : IQuery<GetUserDiscussionByUserIdAndDiscussionIdResult>;

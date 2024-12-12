@@ -113,7 +113,7 @@ export const DiscussApi = {
   // API: Tạo mới một discussion
   createDiscuss: async (discussionData) => {
     try {
-      console.log(discussionData, getAuthHeaders());
+      //console.log(discussionData, getAuthHeaders());
       const response = await axios.post(`${API_BASE_URL}/community-service/discussions/create`, discussionData, getAuthHeaders());
       return response.data;
     } catch (error) {
@@ -193,7 +193,7 @@ export const DiscussApi = {
 
       const commentData = { discussionId, content, dateCreated, parentCommentId, depth, isActive };
       // Gửi yêu cầu POST để tạo comment mới
-      const response = await axios.post(`${API_BASE_URL}/community-service/comments`, commentData, getAuthHeaders());
+      const response = await axios.post(`${API_BASE_URL}/community-service/comments/create`, commentData, getAuthHeaders());
       // Trả về dữ liệu comment mới
 
       return response.data;
@@ -500,7 +500,69 @@ export const DiscussApi = {
       console.error('Error fetching discussions:', error.message);
       throw error;  // Ném lỗi ra ngoài để xử lý ở nơi gọi hàm
     }
+  },
+
+  // API: Get User Discussion
+  getUserDiscussionByUserIdAndDiscussionId: async (userId, discussionId) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/community-service/userdiscussion/${userId}/${discussionId}`, getAuthHeaders());
+      return response;
+    } catch (error) {
+      console.error("Error Get User Discussion:", error.message);
+      throw error;
+    }
+  },
+
+  // API: Cập nhật trạng thái thông báo
+  updateStatusNotificationUserDiscussion: async ({ userId, discussionId }) => {
+    try {
+      //console.log("Updating notification status for userDiscussion:", userId);
+
+      // Đảm bảo URL được sử dụng đúng và hợp lệ
+      const url = `${API_BASE_URL}/community-service/userdiscussions/${userId}/${discussionId}/update-status-notification`;
+
+      // Gọi API cập nhật trạng thái thông báo
+      const response = await fetch(url, {
+        method: 'PUT', // Phương thức PUT
+        headers: {
+          'Authorization': `Bearer ${Cookies.get('authToken')}`, // Lấy token từ cookies
+          'Content-Type': 'application/json' // Header yêu cầu Content-Type
+        },
+        body: JSON.stringify({}) // Chuyển body là một object nếu cần thiết
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Chuyển đổi phản hồi thành JSON và trả về dữ liệu
+      const data = await response.json();
+      return data;
+
+    } catch (error) {
+      console.error("Error Update Status Notification Discussion:", error.message);
+      throw error;
+    }
+  },
+
+  getUserIdsWithNotificationsEnabled: async (discussionId) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/community-service/userdiscussions/${discussionId}/notifications-enabled`,
+        getAuthHeaders() // Thêm token nếu cần
+      );
+
+      if (response && response.data) {
+        return response.data.userIds; // Trả về dữ liệu người dùng nhận thông báo
+      } else {
+        throw new Error('No data received');
+      }
+    } catch (error) {
+      console.error('Error fetching user IDs with notifications enabled:', error);
+      throw error;
+    }
   }
+
 };
 
 // API thứ hai: Lấy thông tin chi tiết của UserIds

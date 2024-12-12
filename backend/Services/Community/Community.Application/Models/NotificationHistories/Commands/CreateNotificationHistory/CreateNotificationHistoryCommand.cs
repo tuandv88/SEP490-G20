@@ -4,7 +4,6 @@ namespace Community.Application.Models.NotificationHistories.Commands.CreateNoti
 
 public record CreateNotificationHistoryResult(Guid? Id, bool IsSuccess);
 [Authorize]
-
 public record CreateNotificationHistoryCommand(CreateNotificationHistoryDto CreateNotificationHistoryDto) : ICommand<CreateNotificationHistoryResult>;
 
 public class CreateNotificationHistoryCommandValidator : AbstractValidator<CreateNotificationHistoryCommand>

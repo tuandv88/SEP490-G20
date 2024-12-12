@@ -48,7 +48,7 @@ public class CreateDiscussionHandler : ICommandHandler<CreateDiscussionCommand, 
         var discussion = await CreateNewDiscussion(userId, request.CreateDiscussionDto);
         await _discussionRepository.AddAsync(discussion);
 
-        var userDiscussion = UserDiscussion.Create(userId, DiscussionId.Of(discussion.Id.Value));
+        var userDiscussion = UserDiscussion.Create(userId, DiscussionId.Of(discussion.Id.Value), notificationsEnabled: true, isFollowing: true);
         await _userDiscussionRepository.AddAsync(userDiscussion);
 
         await _discussionRepository.SaveChangesAsync(cancellationToken);

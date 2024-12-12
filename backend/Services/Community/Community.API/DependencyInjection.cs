@@ -1,4 +1,8 @@
-﻿using Community.API.Endpoints;
+﻿using BuildingBlocks.Email.Helpers;
+using BuildingBlocks.Email.Interfaces;
+using BuildingBlocks.Email.Models;
+using BuildingBlocks.Email.Services;
+using Community.API.Endpoints;
 using Community.API.Services;
 using Community.Application.Interfaces;
 
@@ -21,6 +25,10 @@ public static class DependencyInjection
 
         //IdentityService
         services.AddScoped<IIdentityService, IdentityService>();
+
+        //IEmailService
+        //services.AddSingleton<EmailConfigurationHelper>();
+        services.AddScoped<IEmailService, EmailService>();
 
         return services;
     }

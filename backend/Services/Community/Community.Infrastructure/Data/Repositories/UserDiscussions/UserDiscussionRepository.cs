@@ -1,4 +1,5 @@
-﻿namespace Community.Infrastructure.Data.Repositories.UserDiscussions;
+﻿
+namespace Community.Infrastructure.Data.Repositories.UserDiscussions;
 
 public class UserDiscussionRepository : Repository<UserDiscussion>, IUserDiscussionRepository
 {
@@ -37,4 +38,22 @@ public class UserDiscussionRepository : Repository<UserDiscussion>, IUserDiscuss
                         .FirstOrDefault(uc => uc.UserId.Value == userId && uc.DiscussionId.Value == discussionId);
         return userDiscussion;
     }
+
+    public async Task<List<Guid>> GetUserIdsWithNotificationsEnabledAsync(Guid discussionId)
+    {
+        // Tải toàn bộ dữ liệu từ cơ sở dữ liệu
+        var userDiscussions = await _dbContext.UserDiscussions
+                                              .ToListAsync();
+
+        // Chuyển sang IEnumerable và áp dụng tất cả bộ lọc trong bộ nhớ
+        var userIds = userDiscussions
+                      .AsEnumerable()
+                      .Where(ud => ud.DiscussionId.Value == discussionId && ud.NotificationsEnabled)
+                      .Select(ud => ud.UserId.Value)
+                      .ToList();
+
+        return userIds;
+    }
+
+
 }

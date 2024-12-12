@@ -125,13 +125,45 @@ export const NotificationApi = {
         }
     },
 
-    createNotificationHistory: async ({ userId, notificationTypeId, userNotificationSettingId, message, sentVia, status, subject = null }) => {
+    createNotificationHistory: async ({ userIdReceive, userIdSend, notificationTypeId, userNotificationSettingId, message, sentVia, status, subject = null }) => {
         try {
             // Gửi yêu cầu POST tới API để tạo lịch sử thông báo
             const response = await axios.post(
                 `${API_BASE_URL}/community-service/notificationhistory/create`,
                 {
-                    UserId: userId,
+                    UserIdReceive: userIdReceive,
+                    UserIdSend: userIdSend,
+                    NotificationTypeId: notificationTypeId,
+                    UserNotificationSettingId: userNotificationSettingId,
+                    Message: message,
+                    SentVia: sentVia,
+                    Status: status,
+                    Subject: subject,  // Nếu có subject thì gửi, nếu không thì truyền null
+                },
+                getAuthHeaders()  // Thêm headers với token
+            );
+
+            // Kiểm tra nếu yêu cầu thành công
+            if (response && response.data) {
+                //console.log('Notification history created successfully:', response.data);
+                return response.data;
+            } else {
+                throw new Error('Failed to create notification history');
+            }
+        } catch (error) {
+            //console.error('Error creating notification history:', error);
+            throw error;
+        }
+    },
+
+    createsNotificationHistoryBath: async ({ userIdsReceive, userIdSend, notificationTypeId, userNotificationSettingId, message, sentVia, status, subject = null }) => {
+        try {
+            // Gửi yêu cầu POST tới API để tạo lịch sử thông báo
+            const response = await axios.post(
+                `${API_BASE_URL}/community-service/notificationhistories/creates`,
+                {
+                    UserIdsReceive: userIdsReceive,
+                    UserIdSend: userIdSend,
                     NotificationTypeId: notificationTypeId,
                     UserNotificationSettingId: userNotificationSettingId,
                     Message: message,

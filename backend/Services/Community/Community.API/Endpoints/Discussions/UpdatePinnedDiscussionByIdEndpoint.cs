@@ -1,5 +1,4 @@
 ﻿using Community.Application.Models.Discussions.Commands.UpdatePinnedDiscussionById;
-using Community.Application.Models.Discussions.Commands.UpdateStatusDiscussionById;
 
 namespace Community.API.Endpoints.Discussions;
 
@@ -7,7 +6,7 @@ public class UpdatePinnedDiscussionByIdEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/discussion/{Id:guid}/update-pinned", async (Guid Id, ISender sender) =>
+        app.MapPut("/discussions/{Id:guid}/update-pinned", async (Guid Id, ISender sender) =>
         {
             var command = new UpdatePinnedDiscussionByIdCommand(Id);
 

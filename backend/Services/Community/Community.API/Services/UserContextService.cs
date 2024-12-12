@@ -55,12 +55,6 @@ public class UserContextService : IUserContextService
             email = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value;
         }
 
-        // Nếu không tìm thấy, tìm theo key đầy đủ
-        if (string.IsNullOrEmpty(email))
-        {
-            email = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value;
-        }
-
         // Nếu không tìm thấy, tìm theo key đầy đủ tiêu chuẩn OpenID Connect
         if (String.IsNullOrEmpty(email))
         {

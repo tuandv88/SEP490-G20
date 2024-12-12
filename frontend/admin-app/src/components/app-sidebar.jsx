@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react'
 import {
   BookOpen,
   Codesandbox,
-  Bot,
   Frame,
   LayoutDashboard,
   BookOpenText,
@@ -13,7 +12,8 @@ import {
   Map,
   Code,
   CircleHelp,
-  MessageSquareMore
+  MessageSquareMore,
+  BadgeDollarSign
 } from 'lucide-react'
 import { NavMain } from '@/components/nav-main'
 import { NavProjects } from '@/components/nav-projects'
@@ -46,7 +46,8 @@ import {
   QUIZ_ASSESSMENT_PATH,
   USER_TABLE_PATH,
   USER_DETAIL_PATH,
-  DISCUSSION_TABLE_PATH
+  DISCUSSION_TABLE_PATH,
+  TRANSACTION_TABLE_PATH
 } from '@/routers/router'
 
 // This is sample data.
@@ -152,6 +153,17 @@ export function AppSidebar({ ...props }) {
           {
             title: 'Discussion',
             url: DISCUSSION_TABLE_PATH
+          }
+        ]
+      },
+      {
+        title: 'Payment',
+        url: '#',
+        icon: BadgeDollarSign,
+        items: [
+          {
+            title: 'Transaction',
+            url: TRANSACTION_TABLE_PATH
           }
         ]
       }

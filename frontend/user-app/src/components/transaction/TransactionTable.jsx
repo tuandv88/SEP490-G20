@@ -22,8 +22,7 @@ const TransactionTable = ({ transactions, onTransactionCancelled }) => {
 
     try {
       setIsCancelling(true);
-      //await PaymentAPI.cancelTransaction(selectedTransaction.id);
-      console.log(selectedTransaction)
+      await PaymentAPI.cancelTransaction(selectedTransaction.transactionId);
       toast({
         title: "Transaction Cancelled",
         description: "The transaction has been cancelled successfully.",

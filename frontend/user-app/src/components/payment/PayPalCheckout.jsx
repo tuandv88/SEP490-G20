@@ -16,10 +16,12 @@ import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 import { useNavigate } from 'react-router-dom'
 import { CourseAPI } from '@/services/api/courseApi'
 import { PaymentStatusPoll } from './process/PaymentStatusPoll'
+import { useToast } from '@/hooks/use-toast'
 
 const PayPalCheckout = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [orderId, setOrderId] = useState(null)
   const [paymentStatus, setPaymentStatus] = useState(null)
   const [paymentMethod, setPaymentMethod] = useState('paypal')
@@ -34,35 +36,60 @@ const PayPalCheckout = () => {
   const [paymentMessage, setPaymentMessage] = useState('')
 
   const API_BASE_URL = import.meta.env.VITE_API_URL
-  console.log(usePoints)
 
   useEffect(() => {
-    const fetchUserPoint = async () => {
+    const checkEligibility = async () => {
       try {
-        const response = await UserAPI.getUserPoint()
-        setUserPoint(response.totalPoints)
-      } catch (error) {
-        console.error('Error fetching user points:', error)
-        setUserPoint(0)
-      }
-    }
-    fetchUserPoint()
-  }, [])
+        setLoading(true)
+        const response = await PaymentAPI.checkPaymentEligibility(id)
+        
+        if (!response.isAccepted) {
+          toast({
+            title: "Payment Not Allowed",
+            description: "You have the order that has been created and not paid.",
+            variant: "destructive",
+          })
+          navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', id))
+          return
+        }
 
-  useEffect(() => {
-    const fetchCourseDetail = async () => {
-      setLoading(true)
-      try {
-        const response = await LearningAPI.getCoursePreview(id)
-        setCourseDetail(response.course)
+        await fetchCourseDetail()
+        await fetchUserPoint()
       } catch (error) {
-        console.error('Error fetching course detail:', error)
+        console.error('Error checking payment eligibility:', error)
+        toast({
+          title: "Error",
+          description: "Something went wrong. Please try again later.",
+          variant: "destructive",
+        })
+        navigate(AUTHENTICATION_ROUTERS.HOME)
       } finally {
         setLoading(false)
       }
     }
-    fetchCourseDetail()
-  }, [id])
+
+    checkEligibility()
+  }, [id, navigate, toast])
+
+  const fetchCourseDetail = async () => {
+    try {
+      const response = await LearningAPI.getCoursePreview(id)
+      setCourseDetail(response.course)
+    } catch (error) {
+      console.error('Error fetching course detail:', error)
+      throw error
+    }
+  }
+
+  const fetchUserPoint = async () => {
+    try {
+      const response = await UserAPI.getUserPoint()
+      setUserPoint(response.totalPoints)
+    } catch (error) {
+      console.error('Error fetching user points:', error)
+      setUserPoint(0)
+    }
+  }
 
   useEffect(() => {
     if (courseDetail) {
@@ -105,6 +132,22 @@ const PayPalCheckout = () => {
   }
 
   const handleCreateOrder = async () => {
+
+    try{
+      const response = await PaymentAPI.checkPaymentEligibility(id)
+      if (!response.isAccepted) {
+        toast({
+          title: "Payment Not Allowed",
+          description: "You have the order that has been created and not paid.",
+          variant: "destructive",
+        })
+        navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', id))
+        return        
+      }
+    } catch (error) {
+      console.error('Error creating order:', error)
+    }
+
     const response = await fetch(`${API_BASE_URL}/payment-service/checkout/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${Cookies.get('authToken')}` },
@@ -114,6 +157,7 @@ const PayPalCheckout = () => {
           Point: usePointsRef.current ? userPoint : 0,
           Item: {
             ProductId: courseDetail.id,
+            ProductName: courseDetail.title,
             ProductType: 'Course',
             Quantity: 1,
             UnitPrice: courseDetail.price

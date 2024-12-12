@@ -81,6 +81,7 @@ public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextS
             TransactionId = transactionId,
             ProductId = order.Item.ProductId,
             ProductType = productType,
+            ProductName = order.Item.ProductName,
             Quantity = order.Item.Quantity,
             UnitPrice = order.Item.UnitPrice
         };

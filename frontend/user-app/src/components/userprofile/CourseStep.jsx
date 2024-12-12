@@ -4,6 +4,20 @@ import { format } from 'date-fns'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 import { useNavigate } from 'react-router-dom'
 
+const formatTimeEstimation = (minutes) => {
+  if (!minutes) return '';
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  
+  if (hours === 0) {
+    return `${remainingMinutes} min`;
+  } else if (remainingMinutes === 0) {
+    return `${hours} hours`;
+  } else {
+    return `${hours} hours ${remainingMinutes} min`;
+  }
+};
+
 export default function CourseStep({ step, index, course }) {
   const navigate = useNavigate()
   return (
@@ -19,7 +33,7 @@ export default function CourseStep({ step, index, course }) {
             <div className="flex items-center gap-4 text-sm text-gray-500">
               <span className="flex items-center gap-1">
                 <Clock size={14} />
-                {course?.timeEstimation || ''} hours
+                {formatTimeEstimation(course?.timeEstimation)}
               </span>
               <span>•</span>
               <span>

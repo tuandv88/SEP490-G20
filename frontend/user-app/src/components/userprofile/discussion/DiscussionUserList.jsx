@@ -91,8 +91,6 @@ const ViolationDetails = ({ violation }) => {
         </div>
     );
 
-
-
     return (
         <div className="space-y-6">
             <div className={`p-6 rounded-lg border ${color}`}>
@@ -156,6 +154,7 @@ const DiscussionUserList = () => {
     const [toast, setToast] = useState({ show: false, message: '' });
     const [isLoading, setIsLoading] = useState(false)
     const [totalItems, setTotalItems] = useState(0);
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
 
     const fetchDiscussions = async () => {
@@ -182,11 +181,15 @@ const DiscussionUserList = () => {
     }, [pageIndex, pageSize]);
 
     useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            setPageIndex(1); // Reset page index when search or tags change
-            fetchDiscussions();
-        }, 300);
-        return () => clearTimeout(delayDebounceFn);
+        if (!isFirstLoad) {
+            const delayDebounceFn = setTimeout(() => {
+                setPageIndex(1); // Reset page index when search or tags change
+                fetchDiscussions();
+            }, 300);
+            return () => clearTimeout(delayDebounceFn);
+        } else {
+            setIsFirstLoad(false);
+        }
     }, [searchKeyword, tags, activeTab]);
 
     const handlePageChange = (newPage) => setPageIndex(newPage)
@@ -367,7 +370,7 @@ const DiscussionUserList = () => {
                                                                 key={index}
                                                                 variant={selectedTags.includes(tag) ? "secondary" : "outline"}
                                                                 className={`px-2 py-1 text-xs cursor-pointer transition-colors duration-200 w-20 text-center ${selectedTags.includes(tag)
-                                                                    ? 'bg-primary text-primary-foreground hover:bg-primary/80'
+                                                                    ? 'bg-[#3e79b2] text-white hover:bg-[#3e79b2]/80'
                                                                     : 'hover:bg-gray-100'
                                                                     }`}
                                                                 onClick={() => handleTagClick(tag)}
@@ -505,6 +508,7 @@ const DiscussionUserList = () => {
                             size="sm"
                             onClick={() => handlePageChange(1)}
                             disabled={pageIndex === 1 || isLoading}
+                            className="text-[#3e79b2] border-[#3e79b2] hover:bg-[#3e79b2] hover:text-white"
                         >
                             First
                         </Button>
@@ -513,6 +517,7 @@ const DiscussionUserList = () => {
                             size="sm"
                             onClick={() => handlePageChange(pageIndex - 1)}
                             disabled={pageIndex === 1 || isLoading}
+                            className="text-[#3e79b2] border-[#3e79b2] hover:bg-[#3e79b2] hover:text-white"
                         >
                             Previous
                         </Button>
@@ -526,7 +531,9 @@ const DiscussionUserList = () => {
                                         size="sm"
                                         onClick={() => handlePageChange(pageNumber)}
                                         disabled={isLoading}
-                                    //className={`w-8 h-8 ${pageNumber === pageIndex ? 'animate-pulse' : ''}`}
+                                        className={`${pageNumber === pageIndex
+                                            ? 'bg-[#3e79b2] text-white'
+                                            : 'text-[#3e79b2] border-[#3e79b2] hover:bg-[#3e79b2] hover:text-white'}`}
                                     >
                                         {pageNumber}
                                     </Button>
@@ -535,7 +542,7 @@ const DiscussionUserList = () => {
                             return null;
                         })}
                         {totalPages > 5 && pageIndex < totalPages - 2 && (
-                            <span className="px-2">...</span>
+                            <span className="px-2 text-[#3e79b2]">...</span>
                         )}
                         {totalPages > 5 && pageIndex < totalPages - 1 && (
                             <Button
@@ -543,7 +550,7 @@ const DiscussionUserList = () => {
                                 size="sm"
                                 onClick={() => handlePageChange(totalPages)}
                                 disabled={isLoading}
-                                className="w-8 h-8"
+                                className="text-[#3e79b2] border-[#3e79b2] hover:bg-[#3e79b2] hover:text-white"
                             >
                                 {totalPages}
                             </Button>
@@ -553,6 +560,7 @@ const DiscussionUserList = () => {
                             size="sm"
                             onClick={() => handlePageChange(pageIndex + 1)}
                             disabled={pageIndex === totalPages || isLoading}
+                            className="text-[#3e79b2] border-[#3e79b2] hover:bg-[#3e79b2] hover:text-white"
                         >
                             Next
                         </Button>
@@ -561,6 +569,7 @@ const DiscussionUserList = () => {
                             size="sm"
                             onClick={() => handlePageChange(totalPages)}
                             disabled={pageIndex === totalPages || isLoading}
+                            className="text-[#3e79b2] border-[#3e79b2] hover:bg-[#3e79b2] hover:text-white"
                         >
                             Last
                         </Button>

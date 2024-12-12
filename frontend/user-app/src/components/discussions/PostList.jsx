@@ -250,7 +250,7 @@ function PostList({ categoryId }) {
   };
 
   const handlePostSubmit = async () => {
-    if (!newPost.categoryId || !newPost.title || !newPost.content || !newPost.tags) {
+    if (!newPost.categoryId || !newPost.title || !newPost.content || !newPost.tags.length) {
       setErrorMessage("Please fill in all data: Category, Tag, Topic, Description post before submitting.");
       setOpenErrorDialog(true);
       setTimeout(() => {

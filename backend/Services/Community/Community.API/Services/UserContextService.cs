@@ -31,6 +31,7 @@ public class UserContextService : IUserContextService
     }
 
     private Guid GetUserId()
+    
     {
         var userIdString = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                            ?? _httpContextAccessor.HttpContext?.User.FindFirst("sub")?.Value!;
@@ -39,7 +40,34 @@ public class UserContextService : IUserContextService
 
     private string GetEmail()
     {
-        return _httpContextAccessor.HttpContext?.User.FindFirst("email")?.Value!;
+        // Duyệt qua các claims và in thông tin & debug
+        //foreach (var claim in _httpContextAccessor.HttpContext?.User.Claims ?? Enumerable.Empty<Claim>())
+        //{
+        //    Console.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
+        //}
+
+        // Thử lấy email với key đơn giản trước
+        var email = _httpContextAccessor.HttpContext?.User.FindFirst("email")?.Value;
+
+        // Thêm tìm kiếm với key ClaimTypes.Email
+        if (String.IsNullOrEmpty(email))
+        {
+            email = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value;
+        }
+
+        // Nếu không tìm thấy, tìm theo key đầy đủ
+        if (string.IsNullOrEmpty(email))
+        {
+            email = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value;
+        }
+
+        // Nếu không tìm thấy, tìm theo key đầy đủ tiêu chuẩn OpenID Connect
+        if (String.IsNullOrEmpty(email))
+        {
+            email = _httpContextAccessor.HttpContext?.User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+        }
+
+        return email ?? string.Empty;
     }
 
     private string GetFirstName()

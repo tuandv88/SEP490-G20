@@ -3,25 +3,38 @@ import {
   getMonthlyProblemSubmissionsComparison,
   getMostPopularCoursesWithEnrollments,
   getMonthlyEnrollmentsPerCourse,
-  getTopSolvedProblems
+  getTopSolvedProblems,
+  GetMonthlyRevenueWithGrowth,
+  GetMonthlyCourseSalesWithGrowth
 } from '@/services/api/statisticApi'
 
 export async function fetchDashboardData(dates) {
-  const [newLearners, problemSubmissions, courseEnrollmentDataApi, popularCoursesData, topSolvedProblems] =
-    await Promise.all([
-      getMonthlyNewLearnersComparison(),
-      getMonthlyProblemSubmissionsComparison(),
-      getMonthlyEnrollmentsPerCourse(dates.pastDate, dates.currentDate, 4),
-      getMostPopularCoursesWithEnrollments(1, 4),
-      getTopSolvedProblems(1, 4)
-    ])
+  const [
+    newLearners,
+    problemSubmissions,
+    courseEnrollmentDataApi,
+    popularCoursesData,
+    topSolvedProblems,
+    monthlyRevenueWithGrowth,
+    monthlyCourseSalesWithGrowth
+  ] = await Promise.all([
+    getMonthlyNewLearnersComparison(),
+    getMonthlyProblemSubmissionsComparison(),
+    getMonthlyEnrollmentsPerCourse(dates.pastDate, dates.currentDate, 4),
+    getMostPopularCoursesWithEnrollments(1, 4),
+    getTopSolvedProblems(1, 4),
+    GetMonthlyRevenueWithGrowth(),
+    GetMonthlyCourseSalesWithGrowth()
+  ])
 
   return {
     newLearners,
     problemSubmissions,
     courseEnrollmentData: convertEnrollmentData(courseEnrollmentDataApi),
     popularCourses: popularCoursesData,
-    topSolvedProblems
+    topSolvedProblems,
+    monthlyRevenueWithGrowth,
+    monthlyCourseSalesWithGrowth
   }
 }
 

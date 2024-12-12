@@ -57,6 +57,41 @@ const ViolationDetails = ({ violation }) => {
     };
 
     const { text, color, icon: Icon } = violationLevels[violation.violationLevel];
+    const [showExplanation, setShowExplanation] = useState(false);
+
+    const ViolationLevelsExplanation = () => (
+        <div className="space-y-6">
+            {Object.entries(violationLevels).map(([level, { text, icon: Icon, color }]) => (
+                <div key={level} className={`flex items-start space-x-4 p-4 rounded-lg ${level === '1' ? 'bg-yellow-50' :
+                    level === '2' ? 'bg-orange-50' :
+                        'bg-red-50'
+                    }`}>
+                    <div className={`${level === '1' ? 'text-yellow-600 bg-yellow-200' :
+                        level === '2' ? 'text-orange-600 bg-orange-200' :
+                            'text-red-600 bg-red-200'
+                        } p-2 rounded-full flex-shrink-0`}>
+                        <Icon className="h-6 w-6" />
+                    </div>
+                    <div>
+                        <h3 className={`font-semibold ${level === '1' ? 'text-yellow-800' :
+                            level === '2' ? 'text-orange-800' :
+                                'text-red-800'
+                            }`}>{text}</h3>
+                        <p className={`text-sm ${level === '1' ? 'text-yellow-700' :
+                            level === '2' ? 'text-orange-700' :
+                                'text-red-700'
+                            }`}>
+                            {level === '1' && "Minor infractions that don't severely impact the community. Examples include occasional use of inappropriate language or minor rule violations."}
+                            {level === '2' && "More serious violations that negatively affect the community. Examples include repeated minor infractions, spreading misinformation, or engaging in heated arguments."}
+                            {level === '3' && "Severe violations that significantly harm the community or individual members. Examples include hate speech, harassment, sharing explicit content, or any illegal activities."}
+                        </p>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+
+
 
     return (
         <div className="space-y-6">
@@ -72,6 +107,21 @@ const ViolationDetails = ({ violation }) => {
             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
                 <h3 className="text-lg font-semibold mb-3">Reason:</h3>
                 <p className="text-sm whitespace-pre-wrap leading-relaxed">{violation.reason || 'No reason provided'}</p>
+            </div>
+            <div className="mt-4">
+                <Dialog open={showExplanation} onOpenChange={setShowExplanation}>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                            View Violation Levels Explanation
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px]">
+                        <DialogHeader>
+                            <DialogTitle>Violation Levels Explanation</DialogTitle>
+                        </DialogHeader>
+                        <ViolationLevelsExplanation />
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     )

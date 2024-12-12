@@ -32,7 +32,7 @@ public class UpdatePinnedDiscussionByIdHandler : ICommandHandler<UpdatePinnedDis
         await _repository.UpdateAsync(discussion);
         await _repository.SaveChangesAsync(cancellationToken);
 
-        return new UpdatePinnedDiscussionByIdResult(true, discussion.IsActive);
+        return new UpdatePinnedDiscussionByIdResult(true, discussion.Pinned);
     }
 }
 

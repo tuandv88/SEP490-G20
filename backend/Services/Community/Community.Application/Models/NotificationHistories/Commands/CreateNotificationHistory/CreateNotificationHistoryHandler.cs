@@ -8,13 +8,11 @@ namespace Community.Application.Models.NotificationHistories.Commands.CreateNoti
     {
         private readonly INotificationHistoryRepository _notificationHistoryRepository;
         private readonly INotificationTypeRepository _notificationTypeRepository;
-        private readonly IUserContextService _userContextService;
 
-        public CreateNotificationHistoryHandler(INotificationHistoryRepository notificationHistoryRepository, INotificationTypeRepository notificationTypeRepository, IUserContextService userContextService)
+        public CreateNotificationHistoryHandler(INotificationHistoryRepository notificationHistoryRepository, INotificationTypeRepository notificationTypeRepository)
         {
             _notificationHistoryRepository = notificationHistoryRepository;
             _notificationTypeRepository = notificationTypeRepository;
-            _userContextService = userContextService;
         }
 
         public async Task<CreateNotificationHistoryResult> Handle(CreateNotificationHistoryCommand request, CancellationToken cancellationToken)
@@ -37,24 +35,7 @@ namespace Community.Application.Models.NotificationHistories.Commands.CreateNoti
                 throw new ConflictException("Invalid Status value.");
             }
 
-
-            // Lấy UserId từ UserContextService
-            var currentUserId = _userContextService.User.Id;
-
-            if (currentUserId == null)
-            {
-                throw new UnauthorizedAccessException("User is not authenticated.");
-            }
-
-            // Chuyển đổi UserId
-            var userId = UserId.Of(currentUserId);
-
-            if(currentUserId == request.CreateNotificationHistoryDto.UserId)
-            {
-                return new CreateNotificationHistoryResult(null, false);
-            }
-
-            var notificationHistory = await CreateNewNotificationHistory(request.CreateNotificationHistoryDto, sentVia, status, userId);
+            var notificationHistory = await CreateNewNotificationHistory(request.CreateNotificationHistoryDto, sentVia, status);
 
             await _notificationHistoryRepository.AddAsync(notificationHistory);
             await _notificationHistoryRepository.SaveChangesAsync(cancellationToken);
@@ -62,23 +43,21 @@ namespace Community.Application.Models.NotificationHistories.Commands.CreateNoti
             return new CreateNotificationHistoryResult(notificationHistory.Id.Value, true);
         }
 
-        private async Task<NotificationHistory> CreateNewNotificationHistory(CreateNotificationHistoryDto createNotificationHistoryDto, SentVia sentVia, Status status, UserId userId)
+        private async Task<NotificationHistory> CreateNewNotificationHistory(CreateNotificationHistoryDto createNotificationHistoryDto, SentVia sentVia, Status status)
         {
-            // Lấy NotificationTypeId từ DTO
-            var userIdd = UserId.Of(createNotificationHistoryDto.UserId);
             var notificationTypeId = NotificationTypeId.Of(createNotificationHistoryDto.NotificationTypeId);
             var userNotificationId = UserNotificationSettingId.Of(createNotificationHistoryDto.UserNotificationSettingId);
 
             // Tạo NotificationHistory mới
             var notificationHistory = NotificationHistory.Create(
                 notificationHistoryId: NotificationHistoryId.Of(Guid.NewGuid()),
-                userId: userIdd,
+                userId: UserId.Of(createNotificationHistoryDto.UserIdReceive),
                 notificationTypeId: notificationTypeId,
                 userNotificationSettingId: userNotificationId,
                 createNotificationHistoryDto.Message,
                 sentVia,
                 status,
-                senderId: userId.Value
+                senderId: createNotificationHistoryDto.UserIdSend
             );
 
             // Cập nhật các trường bổ sung

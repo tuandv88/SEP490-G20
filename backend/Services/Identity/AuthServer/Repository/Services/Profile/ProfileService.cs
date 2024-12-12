@@ -42,7 +42,7 @@ namespace AuthServer.Repository.Services.Profile
             // Thêm email vào claims nếu có
             if (!string.IsNullOrEmpty(email))
             {
-                context.IssuedClaims.Add(new Claim("email", email));  // Sử dụng "email" thay vì JwtClaimTypes.Email
+                context.IssuedClaims.Add(new Claim(JwtClaimTypes.Email, email));  // Sử dụng new Claim("email", email) thay vì JwtClaimTypes.Email
             }
 
             // Thêm userId vào claims

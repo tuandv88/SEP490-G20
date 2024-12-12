@@ -27,7 +27,10 @@ public class ContentModerationRequestEventHandler(IChatService chatService, IMes
         });
         var prompt = messageService.BuildPrompt(PromptType.ContentModeration, "", discusstionJson, messageContext);
         string? images = null;
-        if(@event.ImageUrl!=null) {
+
+        //if(@event.ImageUrl!=null) 
+        if (!String.IsNullOrEmpty(@event.ImageUrl)) 
+        { 
             var s3Object = await filesService.GetFileAsync(StorageConstants.BUCKET, @event.ImageUrl, 60*24*7);
             images = s3Object?.PresignedUrl;
         }

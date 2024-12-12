@@ -7,7 +7,7 @@ public class CreateCommentEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/comments", async (CreateCommentDto createCommentDto, ISender sender) =>
+        app.MapPost("/comments/create", async (CreateCommentDto createCommentDto, ISender sender) =>
         {
             var command = new CreateCommentCommand(createCommentDto);
 

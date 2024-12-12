@@ -17,11 +17,14 @@ export const getMonthlyNewLearnersComparison = async () => {
 
 export const getMonthlyProblemSubmissionsComparison = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/learning-service/statistics/problems/submissions/monthly-comparison`, {
-      headers: {
-        Authorization: `Bearer ${Cookies.get('authToken')}`
+    const response = await axios.get(
+      `${API_BASE_URL}/learning-service/statistics/problems/submissions/monthly-comparison`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
       }
-    })
+    )
     return response.data
   } catch (error) {
     throw error
@@ -70,6 +73,32 @@ export const getMonthlyEnrollmentsPerCourse = async (startTime, endTime, courseP
         }
       }
     )
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const GetMonthlyRevenueWithGrowth = async () => {
+  try {
+    const response = await axiosInstance.get('/payment-service/revenue/monthly-growth', {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const GetMonthlyCourseSalesWithGrowth = async () => {
+  try {
+    const response = await axiosInstance.get('/payment-service/courses/monthly-sales-growth', {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
     return response.data
   } catch (error) {
     throw error

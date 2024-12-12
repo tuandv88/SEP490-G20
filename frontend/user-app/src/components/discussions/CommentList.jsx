@@ -18,6 +18,7 @@ import AuthService from '../../oidc/AuthService'; // Import để lấy dữ li�
 function CommentList({ discussionId, userIdDiscussion }) {
   const [isPreview, setIsPreview] = useState(false);
   const textAreaRef = useRef(null);
+  const [isOwnerDiscussion, setOwnerDiscussion] = useState(null);
   const [newComment, setNewComment] = useState("");
   const [refreshComments, setRefreshComments] = useState(false);
   const [comments, setComments] = useState([]);
@@ -82,6 +83,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
           setIdCurrentUser(userTmp.profile.sub);
           setFullNameCurrentUser(userTmp.profile.firstName + ' ' + userTmp.profile.lastName);
           setIsAuthor(true);
+          setOwnerDiscussion(idCurrentUser === userIdDiscussion);
         }
 
         // Dùng hàm loadReplies để tải replies
@@ -142,24 +144,53 @@ function CommentList({ discussionId, userIdDiscussion }) {
       }
 
       if (response) {
-        const dataApiDiscussion = await DiscussApi.getDiscussionDetails(discussionId);
-        if (dataApiDiscussion && dataApiDiscussion.enableNotification) {
-          const notificationTypeIdTmp = await getNotificationTypeIdByName('New Comment');
-          // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+
+        // All userIdReceive exclude
+        const userIds = await DiscussApi.getUserIdsWithNotificationsEnabled(discussionId);
+
+        // Lọc danh sách để loại bỏ chính người gửi && chủ bài viết.
+        const filteredUserIds = userIds.filter(userId => userId !== idCurrentUser && userId !== userIdDiscussion);
+        const notificationTypeIdTmp = await getNotificationTypeIdByName('New Comment');
+        // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+        if (userIds.length > 0 && notificationTypeIdTmp) {
           const notificationData = {
-            userId: userIdDiscussion, // Lấy từ context hoặc props nếu cần
+            userIdsReceive: filteredUserIds,
+            userIdSend: null,
             notificationTypeId: notificationTypeIdTmp, // Loại thông báo
             userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
             message: `
-                      <div class="text-sm text-muted-foreground mb-2 break-words">
-                      <p> <strong>${fullNameCurrentUser}</strong> commented on your discussion post: <strong>${newComment}</strong></p>
-                      <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion</a></p>
-                      </div> `,
+                        <div class="text-sm text-muted-foreground mb-2 break-words">
+                        <p> <strong>${fullNameCurrentUser}</strong> commented on discussion post: <strong>${newComment}</strong></p>
+                        <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion</a></p>
+                        </div> `,
             sentVia: 'Web', // Hoặc 'Email' nếu cần
             status: 'Sent', // Trạng thái gửi
+            subject: null
           };
+          //console.log(notificationData);
+          const response = await NotificationApi.createsNotificationHistoryBath(notificationData);        // Gửi nhiều người
+        }
 
-          const response = await NotificationApi.createNotificationHistory(notificationData);
+        // Lọc ra người dùng có userId === userIdDiscussion. Là chủ bài viết nhưng không phải người gửi.
+        const matchedUserId = userIds.find(userId => userId === userIdDiscussion);
+        if (matchedUserId && !isOwnerDiscussion) {
+          const notificationData = {
+            userIdReceive: matchedUserId,
+            userIdSend: null,
+            notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+            userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+            message: `
+                        <div class="text-sm text-muted-foreground mb-2 break-words">
+                        <p> <strong>${fullNameCurrentUser}</strong> commented on Your Discussion post: <strong>${newComment}</strong></p>
+                        <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion</a></p>
+                        </div> `,
+            sentVia: 'Web', // Hoặc 'Email' nếu cần
+            status: 'Sent', // Trạng thái gửi
+            subject: null
+          };
+          //console.log(notificationData);
+          const response = await NotificationApi.createNotificationHistory(notificationData);             // Gửi 1 người
+          console.log(response)
         }
       }
     } catch (err) {
@@ -245,49 +276,57 @@ function CommentList({ discussionId, userIdDiscussion }) {
             )
           );
 
-          // Notification.
-
-          const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Comment');
-          // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
-          const notificationData = {
-            userId: idReceiveNotification, // Lấy từ context hoặc props nếu cần
-            notificationTypeId: notificationTypeIdTmp, // Loại thông báo
-            userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
-            message: `
-                <div class="text-sm text-muted-foreground mb-2 break-words">
-                <p> <strong>${fullNameCurrentUser}</strong> Voted Comment your post.</p>
-                <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
-                </div> `,
-            sentVia: 'Web', // Hoặc 'Email' nếu cần
-            status: 'Sent', // Trạng thái gửi
-          };
-
-          // Gọi API để tạo lịch sử thông báo
-          const response = await NotificationApi.createNotificationHistory(notificationData);
-
-        } else {
-          // Cập nhật số lượng vote cho Reply của comment 
-          const statusUpdateToTalVoteByReplyIdAndVoteType = updateTotalVote(replyId, voteType);
-          if (statusUpdateToTalVoteByReplyIdAndVoteType) {
-            //console.log("Success Add Vote!");
-
+          const dataApiUserDiscussion = await DiscussApi.getUserDiscussionByUserIdAndDiscussionId(idReceiveNotification, discussionId);
+          if (dataApiUserDiscussion && dataApiUserDiscussion.data.userDiscussionDto.notificationsEnabled && idCurrentUser !== idReceiveNotification) {
             // Notification.
-            const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Reply');
+            const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Comment');
             // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
             const notificationData = {
-              userId: idReceiveNotification, // Lấy từ context hoặc props nếu cần
+              userIdReceive: idReceiveNotification,
+              userIdSend: null,
               notificationTypeId: notificationTypeIdTmp, // Loại thông báo
               userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
               message: `
                 <div class="text-sm text-muted-foreground mb-2 break-words">
-                <p> <strong>${fullNameCurrentUser}</strong> Voted Reply your post.</p>
+                <p> <strong>${fullNameCurrentUser}</strong> Voted Comment your post follow.</p>
                 <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
                 </div> `,
               sentVia: 'Web', // Hoặc 'Email' nếu cần
               status: 'Sent', // Trạng thái gửi
+              subject: null
             };
             // Gọi API để tạo lịch sử thông báo
             const response = await NotificationApi.createNotificationHistory(notificationData);
+          }
+        } else {
+          // Cập nhật số lượng vote cho Reply của comment 
+          const statusUpdateToTalVoteByReplyIdAndVoteType = updateTotalVote(replyId, voteType);
+
+          if (statusUpdateToTalVoteByReplyIdAndVoteType) {
+            //console.log("Success Add Vote!");
+
+            const dataApiUserDiscussion = await DiscussApi.getUserDiscussionByUserIdAndDiscussionId(idReceiveNotification, discussionId);
+            if (dataApiUserDiscussion && dataApiUserDiscussion.data.userDiscussionDto.notificationsEnabled && idCurrentUser !== idReceiveNotification) {
+              // Notification.
+              const notificationTypeIdTmp = await getNotificationTypeIdByName('New Vote Reply');
+              // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+              const notificationData = {
+                userIdReceive: idReceiveNotification,
+                userIdSend: null,
+                notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+                userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+                message: `
+                <div class="text-sm text-muted-foreground mb-2 break-words">
+                <p> <strong>${fullNameCurrentUser}</strong> Voted Reply your post follow.</p>
+                <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
+                </div> `,
+                sentVia: 'Web', // Hoặc 'Email' nếu cần
+                status: 'Sent', // Trạng thái gửi
+                subject: null
+              };
+              // Gọi API để tạo lịch sử thông báo
+              const response = await NotificationApi.createNotificationHistory(notificationData);
+            }
           }
         }
       }
@@ -538,22 +577,25 @@ function CommentList({ discussionId, userIdDiscussion }) {
         //console.log("Success!", newComment);
 
         if (depth == 2) {
-          const dataApiDiscussion = await DiscussApi.getDiscussionDetails(discussionId);
-          if (dataApiDiscussion && dataApiDiscussion.enableNotification) {
+          // Kiểm tra xem có đang bận nhận thông báo không ?
+          const dataApiUserDiscussion = await DiscussApi.getUserDiscussionByUserIdAndDiscussionId(idReceiveNotification, discussionId);
+          //console.log(dataApiUserDiscussion);
+          if (dataApiUserDiscussion && dataApiUserDiscussion.data.userDiscussionDto.notificationsEnabled && idCurrentUser !== idReceiveNotification) {
             const notificationTypeIdTmp = await getNotificationTypeIdByName('New Reply Comment');
-
             // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
             const notificationData = {
-              userId: userIdDiscussion, // Lấy từ context hoặc props nếu cần
+              userIdReceive: idReceiveNotification,
+              userIdSend: null,
               notificationTypeId: notificationTypeIdTmp, // Loại thông báo
               userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
               message: `
                       <div class="text-sm text-muted-foreground mb-2 break-words">
-                      <p> <strong>${fullNameCurrentUser}</strong> Replied to comment on your post: <strong>${contentCheck}</strong></p>
+                      <p> <strong>${fullNameCurrentUser}</strong> Replied to comment on post: <strong>${contentCheck}</strong></p>
                       <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the comment</a></p>
                       </div> `,
               sentVia: 'Web', // Hoặc 'Email' nếu cần
               status: 'Sent', // Trạng thái gửi
+              subject: null
             };
 
             // Gọi API để tạo lịch sử thông báo
@@ -561,24 +603,30 @@ function CommentList({ discussionId, userIdDiscussion }) {
           }
 
         } else if (depth == 3) {
-          const notificationTypeIdTmp = await getNotificationTypeIdByName('New Reply To Reply');
 
-          // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
-          const notificationData = {
-            userId: idReceiveNotification, // Lấy từ context hoặc props nếu cần
-            notificationTypeId: notificationTypeIdTmp, // Loại thông báo
-            userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
-            message: `
+          // Kiểm tra xem có đang bận nhận thông báo không ?
+          const dataApiUserDiscussion = await DiscussApi.getUserDiscussionByUserIdAndDiscussionId(idReceiveNotification, discussionId);
+          if (dataApiUserDiscussion && dataApiUserDiscussion.data.userDiscussionDto.notificationsEnabled && idCurrentUser !== idReceiveNotification) {
+            const notificationTypeIdTmp = await getNotificationTypeIdByName('New Reply To Reply');
+            // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+            const notificationData = {
+              userIdReceive: idReceiveNotification,
+              userIdSend: null,
+              notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+              userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+              message: `
                     <div class="text-sm text-muted-foreground mb-2 break-words">
-                    <p> <strong>${fullNameCurrentUser}</strong> Replied to reply on your post: <strong>${contentCheck}</strong></p>
+                    <p> <strong>${fullNameCurrentUser}</strong> Replied to reply on post: <strong>${contentCheck}</strong></p>
                     <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the comment</a></p>
                     </div> `,
-            sentVia: 'Web', // Hoặc 'Email' nếu cần
-            status: 'Sent', // Trạng thái gửi
-          };
+              sentVia: 'Web', // Hoặc 'Email' nếu cần
+              status: 'Sent', // Trạng thái gửi
+              subject: null
+            };
 
-          // Gọi API để tạo lịch sử thông báo
-          const response = await NotificationApi.createNotificationHistory(notificationData);
+            // Gọi API để tạo lịch sử thông báo
+            const response = await NotificationApi.createNotificationHistory(notificationData);
+          }
         }
       }
     } catch (error) {
@@ -588,10 +636,14 @@ function CommentList({ discussionId, userIdDiscussion }) {
 
   // Hàm hiển thị/ẩn các bình luận con
   const handleShowOrHidenReplies = async (commentId) => {
+
     // Kiểm tra nếu chưa load replies, thì load
-    if (!replies[commentId]) {
-      await loadReplies(commentId);  // Gọi API để tải các câu trả lời (replies)
-    }
+    // if (!replies[commentId]) {
+    //   await loadReplies(commentId);  // Gọi API để tải các câu trả lời (replies) - Load lần đầu...
+    // }
+
+    await loadReplies(commentId);  // Gọi API để tải các câu trả lời (replies) - Luôn luôn load...
+
     // Toggle trạng thái hiển thị của bình luận này
     setShowRepliesMap((prevMap) => ({
       ...prevMap,
@@ -617,12 +669,12 @@ function CommentList({ discussionId, userIdDiscussion }) {
     }
   };
 
-  const handleCreateReplyButtonClick = (parentCommentId, depth) => {
+  const handleCreateReplyButtonClick = (parentCommentId, depth, idUserReplyComment) => {
     if (!isAuth) {
       setShowAlertCheckIsCreateComment(true);
       setTimeout(() => setShowAlertCheckIsCreateComment(false), 5000);
     } else {
-      handleReplyCommentSubmit(parentCommentId, depth)
+      handleReplyCommentSubmit(parentCommentId, depth, idUserReplyComment)
     }
   };
 
@@ -906,7 +958,7 @@ function CommentList({ discussionId, userIdDiscussion }) {
                         value={contentReplyFromComment}
                         onChange={(e) => setContentReplyFromComment(e.target.value)}
                       />
-                      <button onClick={() => handleCreateReplyButtonClick(comment.id, 2)}>Reply Now</button>
+                      <button onClick={() => handleCreateReplyButtonClick(comment.id, 2, comment.userId)}>Reply Now</button>
                     </div>
                   )}
 

@@ -36,7 +36,7 @@ public class DiscussionRepository : Repository<Discussion>, IDiscussionRepositor
         var discussion = _dbContext.Discussions
                        .Include(d => d.UserDiscussions)
                        .Include(d => d.Comments)
-                       .ThenInclude(c => c.Votes)
+                       .Include(d => d.UserDiscussions)
                        .Include(d => d.Votes)
                        .Include(d => d.Bookmarks)
                        .AsEnumerable()

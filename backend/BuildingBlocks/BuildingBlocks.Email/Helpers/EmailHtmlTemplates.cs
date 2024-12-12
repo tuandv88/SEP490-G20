@@ -485,7 +485,7 @@ public static class EmailHtmlTemplates
         .btn {{
             display: inline-block;
             background: linear-gradient(45deg, #e67e22, #d35400);
-            color: #ffffff;
+            color: #ffffff !important;
             text-decoration: none;
             padding: 16px 36px;
             font-size: 18px;

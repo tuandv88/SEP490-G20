@@ -305,24 +305,14 @@ function HomePage() {
                 >
                   View All Courses
                   <ChevronRight className='inline-block ml-2' />
-                </Button>
-                <Button
-                  onClick={() => {
-                    toast({
-                      title: 'Scheduled: Catch up',
-                      description: 'Friday, February 10, 2023 at 5:57 PM'
-                    })
-                  }}
-                >
-                  Show Toast
-                </Button>
+                </Button>               
               </div>
             </div>
           </section>
 
           <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Featured Courses</h2>
+              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Algorithm and Discussion</h2>
               <ProblemSection />
             </div>
           </section>

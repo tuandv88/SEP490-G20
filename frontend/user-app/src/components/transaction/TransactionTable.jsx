@@ -6,13 +6,30 @@ import { CustomConfirmModal } from '../ui/button-confirm-modal';
 import { PaymentAPI } from '@/services/api/paymentApi';
 import { useToast } from '@/hooks/use-toast';
 
+const isWithin30Minutes = (dateTime) => {
+  const transactionDate = new Date(dateTime);
+  const currentDate = new Date();
+  const diffInMinutes = Math.floor((currentDate - transactionDate) / (1000 * 60));
+  return diffInMinutes <= 30;
+};
+
 const TransactionTable = ({ transactions, onTransactionCancelled }) => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const { toast } = useToast();
 
+
   const handleCancelClick = (transaction) => {
+    if (isWithin30Minutes(transaction.dateTime)) {
+      toast({
+        title: "Cannot cancel transaction",
+        description: "You need to wait 30 minutes after creating the transaction to cancel it.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSelectedTransaction(transaction);
     setIsConfirmOpen(true);
   };
@@ -26,7 +43,6 @@ const TransactionTable = ({ transactions, onTransactionCancelled }) => {
       toast({
         title: "Transaction Cancelled",
         description: "The transaction has been cancelled successfully.",
-        variant: "success",
       });
 
       // Notify parent component to refresh the transactions

@@ -1,5 +1,6 @@
 ﻿namespace Payment.Application.Transactions.Dtos;
 public record TransactionDto(
+    Guid TransactionId,
     int PointsUsed,
     double GrossAmount,
     double DiscountAmount,

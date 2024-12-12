@@ -1,11 +1,11 @@
 ﻿using Learning.Application.Models.Courses.Queries.GetStatistics.GetMonthlyEnrollmentsPerCourse;
 
 namespace Learning.API.Endpoints.Statistics;
-public record GetMonthlyEnrollmentsPerCourseRquest(DateTime StartTime, DateTime EndTime, int CoursePerMonth);
+public record GetMonthlyEnrollmentsPerCourseRequest(DateTime StartTime, DateTime EndTime, int CoursePerMonth);
 public record GetMonthlyEnrollmentsPerCourseResponse(List<MonthlyCourseEnrollmentDto> MonthlyCourseEnrollments);
 public class GetMonthlyEnrollmentsPerCourseEndpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
-        app.MapGet("/statistics/courses/enrollments/monthly", async ([AsParameters]GetMonthlyEnrollmentsPerCourseRquest request,ISender sender) => {
+        app.MapGet("/statistics/courses/enrollments/monthly", async ([AsParameters]GetMonthlyEnrollmentsPerCourseRequest request,ISender sender) => {
 
             var result = await sender.Send(new GetMonthlyEnrollmentsPerCourseQuery(request.StartTime, request.EndTime, request.CoursePerMonth));
             var response = result.Adapt<GetMonthlyEnrollmentsPerCourseResponse>();

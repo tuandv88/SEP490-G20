@@ -28,7 +28,7 @@ const colorPalette = [
   'hsl(var(--chart-8))'
 ]
 
-function StatisticsChart({ courseEnrollmentData, topEnrolledCourses }) {
+function StatisticsChart({ courseEnrollmentData, topEnrolledCourses, revenueGrowthData }) {
   const [activeTab, setActiveTab] = useState('courseEnrollment')
 
   // Get unique course names and create a config object
@@ -66,14 +66,14 @@ function StatisticsChart({ courseEnrollmentData, topEnrolledCourses }) {
             Course Enrollment
           </Button>
 
-          {/* <Button
+          <Button
             size='sm'
             variant={activeTab === 'revenueGrowth' ? 'default' : 'outline'}
             onClick={() => setActiveTab('revenueGrowth')}
             className='min-w-[140px]'
           >
             Revenue Growth
-          </Button> */}
+          </Button>
           <Button
             size='sm'
             variant={activeTab === 'topCourses' ? 'default' : 'outline'}
@@ -119,7 +119,7 @@ function StatisticsChart({ courseEnrollmentData, topEnrolledCourses }) {
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Legend wrapperStyle={{ fontSize: '13px', marginTop: '15px' }} />
                 </PieChart>
-              )}
+              )} */}
               {activeTab === 'revenueGrowth' && (
                 <LineChart data={revenueGrowthData} margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
                   <CartesianGrid strokeDasharray='3 3' strokeOpacity={0.5} />
@@ -135,7 +135,7 @@ function StatisticsChart({ courseEnrollmentData, topEnrolledCourses }) {
                     dot={{ strokeWidth: 2, r: 4 }}
                   />
                 </LineChart>
-              )} */}
+              )}
               {activeTab === 'topCourses' && (
                 <BarChart
                   layout='vertical'
@@ -158,7 +158,7 @@ function StatisticsChart({ courseEnrollmentData, topEnrolledCourses }) {
   )
 }
 StatisticsChart.propTypes = {
-  courseEnrollmentData: PropTypes.arrayOf(PropTypes.object).isRequired
+  // courseEnrollmentData: PropTypes.arrayOf(PropTypes.object).isRequired
   // userDistributionData: PropTypes.arrayOf(PropTypes.object).isRequired,
   // revenueGrowthData: PropTypes.arrayOf(PropTypes.object).isRequired,
   // topEnrolledCourses: PropTypes.arrayOf(PropTypes.object).isRequired

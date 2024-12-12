@@ -33,6 +33,13 @@ const CodeEditor = ({
   const setCodeResponse = useStore((state) => state.setCodeResponse)
   const setActiveTabTestcase = useStore((state) => state.setActiveTabTestcase)
 
+  useEffect(() => {
+    if (templates) {
+      setCodeRun(templates)
+      setCode(templates)
+    }
+  }, [templates])
+
   const handleEditorChange = lodash.debounce((value) => {
     setCode(value)
     setCodeRun(value)
@@ -91,8 +98,6 @@ const CodeEditor = ({
   useEffect(() => {
     //console.log('Updated testCase:', testCase)
   }, [testCase])
-
-  console.log(testCase)
 
   return (
     <div className='flex flex-col bg-gray-900 h-full'>

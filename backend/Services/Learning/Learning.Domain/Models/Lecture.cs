@@ -1,5 +1,5 @@
 ﻿namespace Learning.Domain.Models;
-public class Lecture : Aggregate<LectureId> {
+public class Lecture: Aggregate<LectureId> {
     public ChapterId ChapterId { get; set; } = default!;
     public ProblemId? ProblemId { get; set; } = default!; // Unique
     public QuizId? QuizId { get; set; } = default!; // Unique

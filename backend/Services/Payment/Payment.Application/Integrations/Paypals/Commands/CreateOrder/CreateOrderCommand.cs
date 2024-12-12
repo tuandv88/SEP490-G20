@@ -26,9 +26,12 @@ public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
 
         RuleFor(x => x.Order.Item.ProductId)
             .NotEmpty().WithMessage("Product ID is required.");
-
+        
         RuleFor(x => x.Order.Item.ProductType)
             .NotEmpty().WithMessage("Product type is required.");
+        
+        RuleFor(x => x.Order.Item.ProductName)
+            .NotEmpty().WithMessage("Product name is required.");
 
         RuleFor(x => x.Order.Item.Quantity)
             .GreaterThan(0).WithMessage("Quantity must be greater than zero.")

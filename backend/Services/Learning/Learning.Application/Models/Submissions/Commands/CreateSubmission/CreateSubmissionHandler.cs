@@ -60,7 +60,8 @@ public class CreateSubmissionHandler(IProblemRepository problemRepository, IProb
             codeExecute.CodeExecuteDto.Status,
             codeExecute.CodeExecuteDto.LanguageCode,
             totalTestCase,
-            testCasePass
+            testCasePass,
+            problemSubmission.CreatedAt!.Value
         );
 
         return new CreateSubmissionResult(submissionId.Value, responseDto);

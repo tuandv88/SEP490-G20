@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback, useMemo, memo } from 'react'
 import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -21,8 +21,47 @@ import Popup from '../ui/popup'
 import PreferenceNavQuizProblem from '../quiz/PreferenceNavQuizProblem'
 import DescriptionQuizProblem from '../quiz/DescriptionQuizProblem'
 import TestcaseInterfaceQuiz from '../quiz/TestcaseInterfaceQuiz'
-import { useToast } from '@/hooks/use-toast'
-export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete }) {
+import { useCountdown } from '@/hooks/useCountdown'
+import ReactMarkdown from 'react-markdown'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
+
+// Thêm hàm tính toán thời gian còn lại
+const calculateRemainingTime = (startTime, timeLimit) => {
+  const startDateTime = new Date(startTime)
+  const now = new Date()
+  const elapsedSeconds = Math.floor((now - startDateTime) / 1000)
+  const remainingSeconds = (timeLimit * 60) - elapsedSeconds
+  return Math.max(0, remainingSeconds)
+}
+
+// Tách TimeDisplay thành component riêng để tránh re-render không cần thiết
+const TimeDisplay = memo(({ minutes, seconds }) => (
+  <p className='text-lg font-semibold'>
+    Time left: {minutes}:{seconds} minutes
+  </p>
+))
+
+// Thêm component CodeBlock để render code blocks
+const CodeBlock = ({ node, inline, className, children, ...props }) => {
+  const match = /language-(\w+)/.exec(className || '')
+  return !inline && match ? (
+    <SyntaxHighlighter
+      style={vscDarkPlus}
+      language={match[1]}
+      PreTag="div"
+      {...props}
+    >
+      {String(children).replace(/\n$/, '')}
+    </SyntaxHighlighter>
+  ) : (
+    <code className={className} {...props}>
+      {children}
+    </code>
+  )
+}
+
+export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, setIsQuizSubmitted }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [idCodeSnippetQuestions, setIdCodeSnippetQuestions] = useState()
@@ -42,32 +81,61 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
   const [codeSnippets, setCodeSnippets] = useState({})
   const [problemIds, setProblemIds] = useState({})
 
-  const { toast } = useToast()
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  // Tách logic submit quiz thành một hàm riêng
+  const handleSubmitQuiz = async () => {
+    try {
+      // Lưu câu trả lời của câu hỏi hiện tại trước khi submit
+      const currentQuestion = quiz.questions[currentQuestionIndex];
+      let userAnswer = answers[currentQuestion.id] || [];
 
-  // Chuyển đổi thời gian từ phút sang giây
-  const [timeLeft, setTimeLeft] = useState(timeLimit * 60)
+      if (currentQuestion.questionType === 'CodeSnippet') {
+        // Lưu câu trả lời cho câu hỏi code
+        if (isEmpty(codeRunPro)) {
+          await saveCodeSnippetAnswer(currentQuestion.id, templates);
+        } else {
+          await saveCodeSnippetAnswer(currentQuestion.id, codeRunPro);
+        }
+      } else {
+        // Lưu câu trả lời cho các loại câu hỏi khác
+        await saveAnswer(currentQuestion.id, userAnswer);
+      }
 
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      handleSubmitLater()
-      return
+      // Submit quiz
+      const response = await QuizAPI.submitQuiz(answer.quizSubmissionId);
+      console.log('response: ', response);
+      console.log('Quiz submitted successfully');
+      
+      // Đóng modal và cập nhật trạng thái
+      setIsConfirmOpen(false);
+      setIsQuizSubmitted(true);
+      onComplete(true);
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      setIsConfirmOpen(false);
     }
+  };
 
-    const timerId = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1)
-    }, 1000)
+  // Định nghĩa handleSubmitLater trước khi sử dụng
+  const handleSubmitLater = useCallback(async () => {
+    // Khi hết giờ, tự động submit quiz
+    await handleSubmitQuiz();
+  }, []) // Xóa dependencies vì handleSubmitQuiz đã được định nghĩa trong cùng component
 
-    return () => clearInterval(timerId)
+  // Tính toán thời gian ban đầu dựa trên startTime
+  const initialTime = useMemo(() => {
+    if (!answer?.startTime) return timeLimit * 60
+    return calculateRemainingTime(answer.startTime, timeLimit)
+  }, [answer?.startTime, timeLimit])
+
+  const timeLeft = useCountdown(initialTime, handleSubmitLater)
+
+  const formattedTime = useMemo(() => {
+    const minutes = Math.floor(timeLeft / 60)
+    const seconds = String(timeLeft % 60).padStart(2, '0')
+    return { minutes, seconds }
   }, [timeLeft])
-
-  const handleSubmitLater = () => {
-    // Gọi hàm onComplete khi hết thời gian
-    if (onComplete) {
-      onComplete()
-    }
-  }
 
   useEffect(() => {
     if (answer && answer.questionAnswers) {
@@ -103,7 +171,6 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
 
     setCodeRunPro(value)
     setCodeRunQuiz(value)
-    console.log('value: ', value)
   }, 500)
 
   useEffect(() => {
@@ -309,23 +376,11 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
   }
 
   const handleSubmit = async () => {
-    setIsConfirmOpen(true) // Hiển thị hộp thoại xác nhận
+    setIsConfirmOpen(true)
   }
 
   const handleSubmitConfirm = async () => {
-    handleNext()
-    try {
-      const response = await QuizAPI.submitQuiz(answer.quizSubmissionId)
-      console.log('Quiz submitted successfully')
-      toast({
-        title: 'Quiz completed successfully!',
-        description:
-          'You will receive a schedule from the system for a moment, check in your profile in the Roadmap section.'
-      })
-      onComplete()
-    } catch (error) {
-      console.error('Error submitting quiz:', error)
-    }
+    await handleSubmitQuiz();
   }
 
   const handleRunCode = async () => {
@@ -416,40 +471,56 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
       case 'TrueFalse':
       case 'MultipleChoice':
         return (
-          <RadioGroup value={selectedAnswer || ''} onValueChange={handleAnswerChange} className='space-y-2'>
-            {currentQuestion.questionOptions.map((option) => (
-              <div
-                key={option.id}
-                className='flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors'
-              >
-                <RadioGroupItem value={option.id} id={option.id} />
-                <Label htmlFor={option.id} className='flex-grow cursor-pointer'>
-                  {option.content}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
+          <div className='space-y-4'>
+            <RadioGroup value={selectedAnswer || ''} onValueChange={handleAnswerChange} className='space-y-2'>
+              {currentQuestion.questionOptions.map((option) => (
+                <div
+                  key={option.id}
+                  className='flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors'
+                >
+                  <RadioGroupItem value={option.id} id={option.id} />
+                  <Label htmlFor={option.id} className='flex-grow cursor-pointer'>
+                    <ReactMarkdown
+                      components={{
+                        code: CodeBlock
+                      }}
+                    >
+                      {option.content}
+                    </ReactMarkdown>
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
         )
       case 'MultipleSelect':
         return (
-          <div className='space-y-2'>
-            {currentQuestion.questionOptions.map((option) => (
-              <div
-                key={option.id}
-                className='flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors'
-              >
-                <Checkbox
-                  id={option.id}
-                  checked={selectedAnswers[option.id] || false}
-                  onCheckedChange={(checked) => {
-                    handleAnswerChange({ [option.id]: checked }, true)
-                  }}
-                />
-                <Label htmlFor={option.id} className='flex-grow cursor-pointer'>
-                  {option.content}
-                </Label>
-              </div>
-            ))}
+          <div className='space-y-4'>
+            <div className='space-y-2'>
+              {currentQuestion.questionOptions.map((option) => (
+                <div
+                  key={option.id}
+                  className='prose flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors'
+                >
+                  <Checkbox
+                    id={option.id}
+                    checked={selectedAnswers[option.id] || false}
+                    onCheckedChange={(checked) => {
+                      handleAnswerChange({ [option.id]: checked }, true)
+                    }}
+                  />
+                  <Label htmlFor={option.id} className='flex-grow cursor-pointer'>
+                    <ReactMarkdown
+                      components={{
+                        code: CodeBlock
+                      }}
+                    >
+                      {option.content}
+                    </ReactMarkdown>
+                  </Label>
+                </div>
+              ))}
+            </div>
           </div>
         )
       default:
@@ -472,9 +543,7 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
               <X className='h-4 w-4' />
             </Button>
             <div className='flex justify-center items-center mt-2'>
-              <p className='text-lg font-semibold'>
-                Time left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')} minutes
-              </p>
+              <TimeDisplay {...formattedTime} />
             </div>
             <CardTitle className='text-2xl font-bold text-indigo-700'>
               Question {currentQuestionIndex + 1} of {quiz.questions.length}
@@ -493,13 +562,17 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete })
                 transition={{ duration: 0.3 }}
                 className='space-y-4 h-full flex flex-col'
               >
-                <div className='prose max-w-none mb-4'>
-                  {currentQuestion.questionType !== 'CodeSnippet' && (
-                    <div className='prose max-w-none mb-4'>
-                      <div dangerouslySetInnerHTML={{ __html: currentQuestion.content }} />
-                    </div>
-                  )}
-                </div>
+                {currentQuestion.questionType !== 'CodeSnippet' && (
+                  <div className='prose dark:prose-invert max-w-none mb-4'>
+                    <ReactMarkdown
+                      components={{
+                        code: CodeBlock
+                      }}
+                    >
+                      {currentQuestion.content}
+                    </ReactMarkdown>
+                  </div>
+                )}
                 <div className='flex-grow h-[100%]'>{renderQuestion()}</div>
               </motion.div>
             </AnimatePresence>

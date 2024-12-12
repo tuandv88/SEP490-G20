@@ -11,7 +11,8 @@ export default function DiscussionsPage() {
     data: discussions,
     isLoading,
     isError,
-    error
+    error,
+    refetch
   } = useQuery({
     queryKey: ['discussions'],
     queryFn: getAllDiscussions
@@ -36,7 +37,7 @@ export default function DiscussionsPage() {
     <PageContainer breadcrumbs={breadcrumbs}>
       <div className='flex flex-col gap-4'>
         <h1 className='text-2xl font-bold'>Discussions</h1>
-        {discussions && <DiscussionTable data={discussions} />}
+        {discussions && <DiscussionTable data={discussions} refetchData={refetch} />}
       </div>
     </PageContainer>
   )

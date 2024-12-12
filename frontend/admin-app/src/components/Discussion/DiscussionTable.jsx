@@ -12,8 +12,10 @@ import {
 } from '@tanstack/react-table'
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-
+import { StatusDropdown } from './status-dropdown'
 import { Button } from '@/components/ui/button'
+import { deleteDiscussion } from '@/services/api/discussionApi'
+import { DeleteConfirmDialog } from './delete-confirm-dialog'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -28,21 +30,54 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ViolationDetailsDialog } from './violation-details-dialog'
+import { useToast } from '@/hooks/use-toast'
 
-export function DiscussionTable({ data = [] }) {
+export function DiscussionTable({ data = [], refetchData }) {
+  const { toast } = useToast()
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
   const [columnVisibility, setColumnVisibility] = React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
   const [violationDetails, setViolationDetails] = React.useState(null)
-
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = React.useState(false)
+  const [discussionToDelete, setDiscussionToDelete] = React.useState(null)
   const handleViolationClick = (rowData) => {
     setViolationDetails(rowData)
   }
 
-  const deleteDiscussion = (id) => {
-    // Implement delete functionality here
-    console.log(`Deleting discussion with id: ${id}`)
+  const handleDeleteClick = (discussion) => {
+    setDiscussionToDelete(discussion)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!discussionToDelete) return
+
+    try {
+      await deleteDiscussion(discussionToDelete.discussionId)
+      toast({
+        title: 'Success',
+        description: 'Discussion deleted successfully',
+        variant: 'success'
+      })
+      // Fetch lại data sau khi xóa thành công
+      refetchData()
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete discussion',
+        variant: 'destructive'
+      })
+    } finally {
+      // Đóng dialog và reset state
+      setDeleteConfirmOpen(false)
+      setDiscussionToDelete(null)
+    }
+  }
+
+  const handleCloseDialog = () => {
+    setDeleteConfirmOpen(false)
+    setDiscussionToDelete(null)
   }
 
   const columns = [
@@ -87,9 +122,11 @@ export function DiscussionTable({ data = [] }) {
       accessorKey: 'isActive',
       header: 'Status',
       cell: ({ row }) => (
-        <Badge variant={row.getValue('isActive') ? 'success' : 'destructive'}>
-          {row.getValue('isActive') ? 'Active' : 'Inactive'}
-        </Badge>
+        <StatusDropdown
+          isActive={row.getValue('isActive')}
+          discussionId={row.original.discussionId}
+          onStatusChange={refetchData}
+        />
       )
     },
     {
@@ -158,8 +195,9 @@ export function DiscussionTable({ data = [] }) {
                 Copy discussion ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Edit discussion</DropdownMenuItem>
-              <DropdownMenuItem>Delete discussion</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleDeleteClick(discussion)} className='text-red-600'>
+                Delete discussion
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -297,6 +335,12 @@ export function DiscussionTable({ data = [] }) {
           details={violationDetails}
         />
       )}
+      <DeleteConfirmDialog
+        isOpen={deleteConfirmOpen}
+        onClose={handleCloseDialog}
+        onConfirm={handleConfirmDelete}
+        discussionTitle={discussionToDelete?.title || ''}
+      />
     </div>
   )
 }

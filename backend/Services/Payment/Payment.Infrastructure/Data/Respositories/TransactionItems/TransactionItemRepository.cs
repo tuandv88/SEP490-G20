@@ -8,7 +8,7 @@ public class TransactionItemRepository : Repository<TransactionItem>, ITransacti
         _dbContext = dbContext;
     }
 
-    public async override Task DeleteByIdAsync(Guid id) {
+    public override async Task DeleteByIdAsync(Guid id) {
         var transactionItem = await GetByIdAsync(id);
         if (transactionItem != null) {
             _dbContext.TransactionItems.Remove(transactionItem);
@@ -19,7 +19,7 @@ public class TransactionItemRepository : Repository<TransactionItem>, ITransacti
         return _dbContext.TransactionItems.AsQueryable();
     }
 
-    public async override Task<TransactionItem?> GetByIdAsync(Guid id) {
+    public override async Task<TransactionItem?> GetByIdAsync(Guid id) {
         var transactionItem = await _dbContext.TransactionItems
                       .FirstOrDefaultAsync(c => c.Id.Equals(TransactionItemId.Of(id)));
         return transactionItem;

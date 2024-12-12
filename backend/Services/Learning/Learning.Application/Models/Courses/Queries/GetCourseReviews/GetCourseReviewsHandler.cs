@@ -9,7 +9,10 @@ public class GetCourseReviewsHandler(IUserEnrollmentRepository repository) : IQu
 
         var allData = repository.GetAllAsQueryable();
 
-        var totalReviews = allData.Count(ue => ue.Rating > 0);
+        var courseReviewsQuery = allData
+            .Where(ue => ue.CourseId.Equals(CourseId.Of(request.CourseId)) && ue.Rating > 0);
+        var totalReviews = await courseReviewsQuery.CountAsync(cancellationToken);
+        
         var userEnrollments = allData.OrderByDescending(ue => ue.LastModified)
                                     .Where(ue => ue.CourseId.Equals(CourseId.Of(request.CourseId)) && ue.Rating > 0)
                                     .Skip(pageSize * (pageIndex - 1))

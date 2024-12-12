@@ -4,7 +4,6 @@
 import React from 'react'
 
 const HeaderTabCode = ({ activeTab, setActiveTab, isNormalLecture }) => {
-  console.log(activeTab)
 
   return (
     <div className='bg-gray-800 text-white p-2 sticky top-0 z-10'>

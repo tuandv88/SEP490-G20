@@ -19,7 +19,7 @@ class AuthService {
       console.log('User logged out')
     })
 
-    // Xử lý gia hạn token tự động
+    //Xử lý gia hạn token tự động
     this.userManager.events.addAccessTokenExpiring(() => {
       console.log("Access token sắp hết hạn. Bắt đầu gia hạn token...")
       this.userManager.signinSilent().then((user) => {

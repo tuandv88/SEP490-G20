@@ -19,7 +19,9 @@ export const AUTHENTICATION_ROUTERS = {
   USERPROFILE: '/user-profile',
   PROBLEMSPACE: '/problem-solve/:problemId',
   NOTIFICATION: '/notifications/history',
-  PAYMENT: '/payment/:id'
+  PAYMENT: '/payment/:id',
+  SILENTRENEW: '/silent-renew',
+  LEADERBOARD: '/leaderboard'
 }
 
 export const UNAUTHENTICATION_ROUTERS = {}

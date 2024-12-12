@@ -3,7 +3,8 @@
 namespace User.Application.Models.PathSteps.Dtos
 {
     public record UpdatePathStepDto(
-        Guid Id,
+        Guid LearningPathId,
+        Guid CourseId,
         int StepOrder
     );
 

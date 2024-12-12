@@ -9,7 +9,7 @@ public static class PaypalConfigurationExtensions {
             var environment = configuration["PayPal:Environment"]!;
             var clientId = configuration["PayPal:ClientId"];
             var clientSecret = configuration["PayPal:ClientSecret"];
-            if (environment.Equals("Sanbox")) {
+            if (environment.Equals("Sandbox")) {
                 return new PayPalCheckoutSdk.Core.PayPalHttpClient(
                new PayPalCheckoutSdk.Core.SandboxEnvironment(clientId, clientSecret));
             } else {

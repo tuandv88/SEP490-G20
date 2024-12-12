@@ -2,6 +2,7 @@ import './styles/index.css'
 import { AppRouter } from './router/AppRouter'
 import { ThemeProvider } from '@/components/theme-provider'
 import { UserProvider } from './contexts/UserContext'
+import { Toaster } from './components/ui/toaster'
 
 function App() {
   return (

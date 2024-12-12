@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react'
-import { BarChart2, BookOpen, Calendar, Layout, ListChecks, PlusCircle } from 'lucide-react'
-import CourseStep from './CourseStep'
+import React, { useEffect, useState, useCallback } from 'react'
+import { PlusCircle } from 'lucide-react'
 import { LearningAPI } from '@/services/api/learningApi'
-import ChapterLoading from '../loading/ChapterLoading'
 import { QuizAPI } from '@/services/api/quizApi'
-import AssessmentPrompt from '../surrvey/AssessmentPromptProps'
-import QuizModal from '../surrvey/QuizModal'
+import { LearningPathAPI } from '@/services/api/learningPathApi'
 import { Button } from '../ui/button'
 import { LearningPathCard } from './LearningPathCard'
 import { EditPathModal } from './EditPathModal'
 import { DeleteConfirmModal } from './DeleteConfirmModalProps'
+import AssessmentPrompt from '../surrvey/AssessmentPromptProps'
+import QuizModal from '../surrvey/QuizModal'
 import UserRoadMapLoading from '../loading/UserRoadMapLoading'
-import { LearningPathAPI } from '@/services/api/learningPathApi'
+import { LearningPathPolling } from '../loading/LearningPathPolling'
+import { CourseAPI } from '@/services/api/courseApi'
 
 const RoadmapDashboard = ({ user }) => {
+  // State declarations
   const [learningPaths, setLearningPaths] = useState([])
   const [courseDetails, setCourseDetails] = useState({})
   const [loading, setLoading] = useState(true)
@@ -25,25 +26,114 @@ const RoadmapDashboard = ({ user }) => {
   const [isQuizOpen, setIsQuizOpen] = useState(false)
   const [quizAssessment, setQuizAssessment] = useState(null)
   const [availableCourses, setAvailableCourses] = useState([])
+  const [isQuizSubmitted, setIsQuizSubmitted] = useState(false)
+  const [pollingStatus, setPollingStatus] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
+  // Fetch course details helper function
+  const fetchCourseDetails = async (courseIds) => {
+    if (courseIds.size === 0) return {};
+    
+    const response = await CourseAPI.getCourseWithParticipation(Array.from(courseIds));
+    return response.courses.data.reduce((acc, course) => {
+      acc[course.courseId] = {
+        id: course.courseId,
+        title: course.title,
+        headline: course.headline,
+        imageUrl: course.imageUrl,
+        status: course.status,
+        completionPercentage: course.completionPercentage,
+        price: course.price,
+        timeEstimation: course.timeEstimation,
+        courseLevel: course.courseLevel
+      };
+      return acc;
+    }, {});
+  }
 
+  // Poll for learning paths
+  const pollLearningPaths = useCallback(() => {
+    let attempts = 0
+    const maxAttempts = 15
+    let pollInterval
+
+    setPollingStatus('polling')
+
+    const poll = async () => {
+      try {
+        const response = await LearningAPI.getLearningPath()
+        const paths = response.learningPathDtos
+
+        if (paths && paths.length > 0) {
+          setLearningPaths(paths)
+          setIsQuizSubmitted(false)
+          clearInterval(pollInterval)
+          setPollingStatus('success')
+
+          const courseIds = new Set()
+          paths.forEach((path) => {
+            path.pathSteps.forEach((step) => {
+              if (!courseDetails[step.courseId]) {
+                courseIds.add(step.courseId)
+              }
+            })
+          })
+
+          const newCourseDetails = await fetchCourseDetails(courseIds)
+          setCourseDetails((prev) => ({ ...prev, ...newCourseDetails }))
+          return true
+        }
+
+        return false
+      } catch (error) {
+        console.error('Lỗi khi poll lộ trình:', error)
+        setPollingStatus('error')
+        return false
+      }
+    }
+
+    pollInterval = setInterval(async () => {
+      // console.log('Polling for learning paths...', attempts)
+      const found = await poll()
+      
+      if (found || attempts >= maxAttempts) {
+        clearInterval(pollInterval)
+        if (!found) {
+          console.log('Không tìm thấy lộ trình sau 15 giây')
+          setPollingStatus('error')
+        }
+      }
+      attempts++
+    }, 2000)
+
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval)
+      }
+    }
+  }, [courseDetails])
+
+  // Initial data fetch
   useEffect(() => {
-    async function fetchData() {
+    let isSubscribed = true
+
+    const fetchData = async () => {
       try {
         setLoading(true)
-
-        // Lấy danh sách Learning Paths
         const response = await LearningAPI.getLearningPath()
+        
+        if (!isSubscribed) return
+
         const fetchedLearningPaths = response.learningPathDtos
         setLearningPaths(fetchedLearningPaths)
 
-        // Nếu có người dùng, lấy Quiz Assessment
         if (user && fetchedLearningPaths.length === 0) {
           const data = await QuizAPI.getQuizAssessment()
+          if (!isSubscribed) return
           setQuizAssessment(data.quiz)
         }
 
-        // Lấy thông tin chi tiết các khóa học
+        // Fetch course details
         const courseIds = new Set()
         fetchedLearningPaths.forEach((path) => {
           path.pathSteps.forEach((step) => {
@@ -53,99 +143,136 @@ const RoadmapDashboard = ({ user }) => {
           })
         })
 
-        const courseDetailsPromises = Array.from(courseIds).map(async (courseId) => {
-          const response = await LearningAPI.getCoursePreview(courseId)
-          return { courseId, course: response.course }
-        })
-
-        const coursesData = await Promise.all(courseDetailsPromises)
-        const newCourseDetails = {}
-        coursesData.forEach(({ courseId, course }) => {
-          newCourseDetails[courseId] = course
-        })
+        if (!isSubscribed) return
+        const newCourseDetails = await fetchCourseDetails(courseIds)
         setCourseDetails(newCourseDetails)
 
-        // Lấy danh sách tất cả các khóa học và lọc các khóa học có sẵn
+        // Fetch available courses
         const allCourses = await LearningAPI.getCourseList(1, 20)
+        if (!isSubscribed) return
+        
         const filteredCourses = allCourses.courseDtos.data.filter(
-          (course) => !fetchedLearningPaths.some((path) => path.pathSteps.some((step) => step.courseId === course.id))
+          (course) => !fetchedLearningPaths.some((path) => 
+            path.pathSteps.some((step) => step.courseId === course.id)
+          )
         )
         setAvailableCourses(filteredCourses)
       } catch (error) {
         console.error('Error fetching data:', error)
       } finally {
-        setLoading(false)
+        if (isSubscribed) {
+          setLoading(false)
+        }
       }
     }
 
     fetchData()
+
+    return () => {
+      isSubscribed = false
+    }
   }, [user])
 
+  // Effect for polling
+  useEffect(() => {
+    let cleanup
+    if (isQuizSubmitted) {
+      cleanup = pollLearningPaths()
+    }
+    return () => {
+      if (cleanup) {
+        cleanup()
+      }
+    }
+  }, [isQuizSubmitted, pollLearningPaths])
+
+  // Event handlers
   const handleEditPath = (path) => {
     setSelectedPath(path)
     setIsEditModalOpen(true)
-    console.log(path)
   }
 
-  const handleDeletePath = async (pathId) => {
+  const handleDeletePath = (pathId) => {
     setIsDeleteModalOpen(true)
     setPathToDelete(pathId)
-    try {
-      await LearningPathAPI.deleteLearningPath(pathId)
-    } catch (error) {
-      console.error('Error deleting path:', error)
-    }
   }
 
   const handleConfirmDelete = async () => {
     if (pathToDelete) {
+      setIsDeleting(true)
       try {
-        await mockApiService.deleteLearningPath(pathToDelete)
+        await LearningPathAPI.deleteLearningPath(pathToDelete)
         setLearningPaths((prev) => prev.filter((path) => path.id !== pathToDelete))
+        setIsQuizSubmitted(false)
       } catch (error) {
         console.error('Error deleting path:', error)
+      } finally {
+        setIsDeleting(false)
+        setIsDeleteModalOpen(false)
+        setPathToDelete(null)
       }
-      setIsDeleteModalOpen(false)
-      setPathToDelete(null)
     }
   }
 
-  const handleSavePath = async (updatedPath) => {
+  const handleSavePath = async (updatedPath, updatedAvailableCourses) => {
     try {
-      //const savedPath = await mockApiService.updateLearningPath(updatedPath.id, updatedPath)
-      //setLearningPaths((prev) => prev.map((path) => (path.id === savedPath.id ? savedPath : path)))
-      setLearningPaths((prevPaths) => prevPaths.map((path) => (path.id === updatedPath.id ? updatedPath : path)))
+      // Cập nhật learning paths
+      setLearningPaths((prevPaths) => 
+        prevPaths.map((path) => (path.id === updatedPath.id ? updatedPath : path))
+      )
+
+      // Cập nhật available courses
+      setAvailableCourses(updatedAvailableCourses)
+
+      // Cập nhật course details cho các course mới
+      const newCourseDetails = updatedPath.pathSteps.reduce((acc, step) => {
+        if (!courseDetails[step.courseId]) {
+          // Nếu là course mới (chưa có trong courseDetails)
+          acc[step.courseId] = {
+            id: step.courseId,
+            title: step.title,
+            headline: step.headline,
+            status: step.status || 'NotEnrolled',
+            completionPercentage: step.completionPercentage || 0,
+            price: step.price,
+            timeEstimation: step.timeEstimation,
+            courseLevel: step.courseLevel
+          }
+        }
+        return acc
+      }, {})
+
+      // Cập nhật courseDetails với các course mới
+      if (Object.keys(newCourseDetails).length > 0) {
+        setCourseDetails(prev => ({
+          ...prev,
+          ...newCourseDetails
+        }))
+      }
+
       setIsEditModalOpen(false)
       setSelectedPath(null)
-      console.log(updatedPath)
     } catch (error) {
       console.error('Error saving path:', error)
     }
   }
 
-  const handleGeneratePath = () => {
-    setIsAssessmentPromptOpen(true)
-  }
-
-  const handleAssessmentAccept = () => {
-    setIsAssessmentPromptOpen(false)
-    setIsQuizOpen(true)
-  }
-
-  const handleAssessmentDecline = () => {
-    setIsAssessmentPromptOpen(false)
-    //updateUserFirstLogin()
-  }
-
   const handleQuizComplete = (score) => {
     console.log('Quiz completed with score:', score)
     setIsQuizOpen(false)
-    //updateUserFirstLogin()
+  }
+
+  const handleClosePolling = () => {
+    setPollingStatus(null)
+    if (pollingStatus === 'error') {
+      setIsQuizSubmitted(false)
+    }
   }
 
   if (loading) {
     return <UserRoadMapLoading />
   }
+
 
   return (
     <div className='space-y-6 mt-6'>
@@ -153,7 +280,7 @@ const RoadmapDashboard = ({ user }) => {
         <h1 className='text-2xl font-bold'>Recommended Path</h1>
         {!learningPaths.length && (
           <Button
-            onClick={handleGeneratePath}
+            onClick={() => setIsAssessmentPromptOpen(true)}
             className='flex items-center px-4 py-2 bg-primaryButton text-white rounded-lg hover:bg-primaryButtonHover transition-colors'
           >
             <PlusCircle className='w-5 h-5 mr-2' />
@@ -196,25 +323,40 @@ const RoadmapDashboard = ({ user }) => {
         }}
         onConfirm={handleConfirmDelete}
         pathName={learningPaths.find((p) => p.id === pathToDelete)?.pathName || ''}
+        isDeleting={isDeleting}
       />
 
       <AssessmentPrompt
         isOpen={isAssessmentPromptOpen}
-        onClose={() => {
+        onClose={() => setIsAssessmentPromptOpen(false)}
+        onAccept={() => {
           setIsAssessmentPromptOpen(false)
+          setIsQuizOpen(true)
         }}
-        onAccept={handleAssessmentAccept}
-        onDecline={handleAssessmentDecline}
+        onDecline={() => setIsAssessmentPromptOpen(false)}
       />
 
       <QuizModal
         isOpen={isQuizOpen}
-        onClose={() => {
-          setIsQuizOpen(false)
-        }}
+        onClose={() => setIsQuizOpen(false)}
         onComplete={handleQuizComplete}
         quiz={quizAssessment}
+        setIsQuizSubmitted={setIsQuizSubmitted}
       />
+
+      {pollingStatus && (
+        <LearningPathPolling
+          status={pollingStatus}
+          message={
+            pollingStatus === 'error'
+              ? 'Error occurs when creating a roadmap. Please try again later.'
+              : pollingStatus === 'success'
+              ? 'Your learning path has been created successfully.'
+              : 'Creating your learning path based on your assessment results...'
+          }
+          onClose={handleClosePolling}
+        />
+      )}
     </div>
   )
 }

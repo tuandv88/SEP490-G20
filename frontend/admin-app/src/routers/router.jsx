@@ -23,6 +23,7 @@ export const CREATE_PROBLEM_LECTURE_PATH = '/app/edit-course/$courseId/create-pr
 export const UPDATE_PROBLEM_LECTURE_PATH =
   '/app/update-problem-lecture/course/$courseId/lecture/$lectureId/problem/$problemId'
 export const DISCUSSION_TABLE_PATH = '/app/discussion-table'
+export const TRANSACTION_TABLE_PATH = '/app/transaction-table'
 // Define the main root route with layout
 const rootRoute = createRootRoute({
   component: lazy(() => import('@/components/public-layout'))
@@ -152,6 +153,12 @@ const discussionRoute = createRoute({
   component: lazy(() => import('@/pages/Discussion/DiscussionPage'))
 })
 
+const transactionTableRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: 'transaction-table',
+  component: lazy(() => import('@/pages/Payment/TransactionTable'))
+})
+
 const routeTree = rootRoute.addChildren([
   loginRoute,
   callbackRoute,
@@ -172,7 +179,8 @@ const routeTree = rootRoute.addChildren([
     quizAssessmentRoute,
     userTableRoute,
     userDetailRoute,
-    discussionRoute
+    discussionRoute,
+    transactionTableRoute
   ])
 ])
 

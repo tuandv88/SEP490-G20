@@ -8,6 +8,8 @@ using Community.Domain.Models;
 using Community.Domain.ValueObjects;
 using MassTransit;
 using Microsoft.Extensions.Logging;
+using System.Text;
+using System.Web;
 
 namespace Community.Application.Models.Discussions.EventHandlers.Integrations;
 public record ContentModerationResultEventHandler(IDiscussionRepository discussionRepository, IFlagRepository flagRepository,
@@ -54,44 +56,13 @@ public record ContentModerationResultEventHandler(IDiscussionRepository discussi
             discusstion.UpdateStatus(true);
         } else {
             //Trạng thái không an toàn (nội dung không phù hợp)
-            //gửi mail ở đây
             discusstion.UpdateStatus(false);
 
-            var fullname = message.FullName;
-            var email = message.Email;
-
-            var urlCallBack = configuration["SendMailExtensions:urlCallBackFlag"] + "discussion/" + discusstion.Id.Value;
-            var discusstionTmp = discusstion.Description;
-
-            if (discusstionTmp.Length > 50)
-            {
-                discusstionTmp = discusstionTmp.Substring(0, 50) + "...";
-            }
-
-            var violationFlagTmp = flag.ViolationLevel.ToString().ToLower() + "-violation";
-
-            var flagReasonTmp = flag.Reason;
-
-            if(flagReasonTmp.Length > 50)
-            {
-                flagReasonTmp = flagReasonTmp.Substring(0, 50) + "...";
-            }
-
-            var emailBody = EmailHtmlTemplates.DiscussionFlaggedTemplate(fullname, discusstion.Title, discusstionTmp, flag.FlaggedDate.ToString("HH:mm:ss"),  flag.ViolationLevel.ToString(), violationFlagTmp, flagReasonTmp, urlCallBack);
-
-            var emailMetadata = new EmailMetadata(
-                toAddress: email,
-                subject: "Notifications have flagged your post.",
-                body: emailBody
-            );
-
-            // Task.Run(() => emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.NOTIFICATION));
-
+            await SendFlaggedEmailAsync(message, discusstion, flag);
         }
 
         await discussionRepository.UpdateAsync(discusstion);
         await discussionRepository.SaveChangesAsync();
-
     }
 
     private bool IsSafe(string violationLevel) {
@@ -103,5 +74,68 @@ public record ContentModerationResultEventHandler(IDiscussionRepository discussi
                 return false;
         }
     }
+
+    private string SafeSubstring(string input, int maxLength)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+
+        // Sử dụng StringBuilder để xử lý chuỗi hiệu quả hơn
+        var sb = new StringBuilder();
+        int length = 0;
+        foreach (char c in input)
+        {
+            if (length >= maxLength) break;
+            sb.Append(c);
+            length += Char.IsSurrogate(c) ? 0 : 1;
+        }
+
+        string result = sb.ToString();
+        return result.Length == input.Length ? result : result.TrimEnd() + "...";
+    }
+
+    private async Task SendFlaggedEmailAsync(ContentModerationResultEvent message, Discussion discusstion, Flag flag)
+    {
+        try
+        {
+
+            var urlCallBack = configuration["SendMailExtensions:urlCallBackFlag"] + "discussion/" + discusstion.Id.Value;
+
+            var fullname = HttpUtility.HtmlEncode(message.FullName);
+            var email = message.Email;
+
+            var discussionTitle = HttpUtility.HtmlEncode(SafeSubstring(discusstion.Title, 50));
+            var discussionDescription = HttpUtility.HtmlEncode(SafeSubstring(discusstion.Description, 50));
+
+            var violationFlag = flag.ViolationLevel.ToString().ToLower() + "-violation";
+            var flagReason = HttpUtility.HtmlEncode(SafeSubstring(flag.Reason, 50));
+
+            var flagDate = flag.FlaggedDate.ToString("yyyy-MM-dd HH:mm:ss");
+            var flagLevel = flag.ViolationLevel.ToString();
+
+            var emailBody = EmailHtmlTemplates.DiscussionFlaggedTemplate(
+                fullname,
+                discussionTitle,
+                discussionDescription,
+                flagDate,
+                flagLevel,
+                violationFlag,
+                flagReason,
+                urlCallBack
+            );
+
+            var emailMetadata = new EmailMetadata(
+                toAddress: email,
+                subject: "Notifications have flagged your post.",
+                body: emailBody
+            );
+
+            await emailService.SendEmailAndSaveAsync(emailMetadata, EmailtypeConstant.NOTIFICATION);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending email: {ex.Message}");
+        }
+    }
+
 }
 

@@ -21,9 +21,14 @@ public class CancelTransactionHandler(ITransactionRepository repository, IUserCo
         {
             throw new NotFoundException(nameof(Transaction), request.TransactionId);
         }
-
+        
         if (transaction.Status == TransactionStatus.Created)
         {
+            var timeSinceCreated = DateTime.UtcNow - transaction.CreatedAt;
+            if (timeSinceCreated <= TimeSpan.FromMinutes(30))
+            {
+                return new CancelTransactionResult("Transaction cannot be cancelled as it was created less than 30 minutes ago.");
+            }
             transaction.Status = TransactionStatus.Cancelled;
             await repository.UpdateAsync(transaction);
             await repository.SaveChangesAsync(cancellationToken);

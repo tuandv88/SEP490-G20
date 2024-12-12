@@ -11,8 +11,8 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
     // States
     public State OrderApproved { get; private set; } = default!;
     public State ProductValidated { get; private set; } = default!;
+    public State PointsDeducted { get; private set; } = default!;
     public State PaymentCaptured { get; private set; } = default!;
-    public State NotificationSent { get; private set; } = default!;
     public State Failed { get; private set; } = default!;
     public State Completed { get; private set; } = default!;
 
@@ -129,7 +129,7 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
 
         During(ProductValidated,
             When(PointsDeductedEvent)
-                .TransitionTo(PaymentCaptured)
+                .TransitionTo(PointsDeducted)
                 .Publish(context => new CapturePaymentCommand()
                 {
                     TransactionId = context.Message.TransactionId,
@@ -139,9 +139,9 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
         );
 
         // Capture Payment -> Send email
-        During(PaymentCaptured,
+        During(PointsDeducted,
             When(PaymentCapturedEvent)
-                .TransitionTo(NotificationSent)
+                .TransitionTo(PaymentCaptured)
                 .ThenAsync(async context =>
                 {
                     // Phát sự kiện thanh toán thành công
@@ -168,7 +168,7 @@ public class PaymentSagaStateMachine : MassTransitStateMachine<PaymentSagaInstan
         );
 
         // Send Email -> Complete Saga if email sent successfully
-        During(NotificationSent,
+        During(PaymentCaptured,
             When(EmailSentEvent)
                 .TransitionTo(Completed)
                 .Finalize(),

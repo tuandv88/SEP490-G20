@@ -6,6 +6,9 @@ public class LectureProgressConfiguration : IEntityTypeConfiguration<LectureProg
         builder.Property(lp => lp.Id).HasConversion(
                         lectureProgress => lectureProgress.Value,
                         dbId => LectureProgressId.Of(dbId));
+        
+        //postgresql phải dung HasAlternateKey vì no khong tạo UNIQUE CONSTRAINT nhu sqlserver
+        builder.HasAlternateKey(lp => new {lp.LectureId, lp.UserEnrollmentId});
         builder.Property(uc => uc.CompletionDate).HasDefaultValue(null);
         builder.Property(uc => uc.IsCurrent).HasDefaultValue(false);
         builder.Property(uc => uc.Duration);

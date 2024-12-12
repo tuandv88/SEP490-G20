@@ -16,5 +16,10 @@ public class LectureProgress : Aggregate<LectureProgressId>{
             Duration = duration
         };
     }
+
+    public void SetCurrent(bool isCurrent)
+    {
+        IsCurrent = isCurrent;
+    }
 }
 

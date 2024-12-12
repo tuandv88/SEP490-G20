@@ -2,7 +2,7 @@
 
 # Build and Push Docker Images
 
-TAG="v1.63"
+TAG="v1.65"
 
 declare -A images=(
     ["Services/AI/AI.API/Dockerfile"]="hub.icoder.vn/k8s/ai-service:${TAG}"

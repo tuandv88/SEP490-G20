@@ -19,18 +19,10 @@ function convertCoursesToArray(coursesObject) {
   }))
 }
 const revenueGrowthData = [
-  { month: 'Jan', revenue: 50000 },
-  { month: 'Feb', revenue: 60000 },
-  { month: 'Mar', revenue: 75000 },
-  { month: 'Apr', revenue: 90000 },
-  { month: 'May', revenue: 110000 },
-  { month: 'Jun', revenue: 130000 },
-  { month: 'Jul', revenue: 130000 },
-  { month: 'Aug', revenue: 140000 },
-  { month: 'Sep', revenue: 150000 },
-  { month: 'Oct', revenue: 160000 },
-  { month: 'Nov', revenue: 170000 },
-  { month: 'Dec', revenue: 100000 }
+  { month: 'Sep', revenue: 10 },
+  { month: 'Oct', revenue: 30 },
+  { month: 'Nov', revenue: 25 },
+  { month: 'Dec', revenue: 32 }
 ]
 
 export default function AdminDashboard() {
@@ -51,7 +43,15 @@ export default function AdminDashboard() {
     return <div>Error: {error.message}</div>
   }
 
-  const { newLearners, problemSubmissions, courseEnrollmentData, popularCourses, topSolvedProblems } = data
+  const {
+    newLearners,
+    problemSubmissions,
+    courseEnrollmentData,
+    popularCourses,
+    topSolvedProblems,
+    monthlyRevenueWithGrowth,
+    monthlyCourseSalesWithGrowth
+  } = data
   const popularCourData = popularCourses.courses.data
   const topSolvedProblemData = topSolvedProblems.problems.data
   const topEnrolledCourses = convertCoursesToArray(popularCourses)
@@ -62,14 +62,24 @@ export default function AdminDashboard() {
         <DashboardLayout>
           {/* Overview section */}
           <div className='grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4'>
-            <OverviewCard title='Total Revenue' value='25 $' change='+100% from last month' icon={DollarSign} />
+            <OverviewCard
+              title='Total Revenue'
+              value={monthlyRevenueWithGrowth.totalRevenue}
+              change={`${monthlyRevenueWithGrowth.growthRate.toFixed(2)}% from last month`}
+              icon={DollarSign}
+            />
             <OverviewCard
               title='New Users'
               value={newLearners.currentMonthCount}
               change={`${newLearners.percentageChange.toFixed(2)}% from last month`}
               icon={Users}
             />
-            <OverviewCard title='Courses Sold' value='10' change='+100% from last month' icon={BookOpen} />
+            <OverviewCard
+              title='Courses Sold'
+              value={monthlyCourseSalesWithGrowth.currentMonthSales}
+              change={`${monthlyCourseSalesWithGrowth.growthRate.toFixed(2)}% from last month`}
+              icon={BookOpen}
+            />
             <OverviewCard
               title='Algorithm Submissions'
               value={problemSubmissions.currentMonthCount}

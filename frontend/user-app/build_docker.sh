@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAG="v1.62"
+TAG="v1.66"
 
 docker build \
     --build-arg VITE_API_URL="https://api.icoder.vn" \

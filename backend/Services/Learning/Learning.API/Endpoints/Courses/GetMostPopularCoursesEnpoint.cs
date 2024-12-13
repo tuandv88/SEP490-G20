@@ -2,7 +2,7 @@
 
 namespace Learning.API.Endpoints.Courses;
 
-public record GetMostPopularCoursesResponse(PaginatedResult<CourseDto> CourseDtos);
+public record GetMostPopularCoursesResponse(PaginatedResult<CourseBasicDto> CourseDtos);
 public class GetMostPopularCoursesEnpoint : ICarterModule {
     public void AddRoutes(IEndpointRouteBuilder app) {
         app.MapGet("/courses/most-popular", async ([AsParameters] PaginationRequest request, ISender sender) => {

@@ -67,6 +67,8 @@ public class GetUserEnrollmentCoursesHandler(
                         ue.EnrollmentDate,
                         ue.CompletionDate,
                         ue.UserEnrollmentStatus,
+                        ue.Rating,
+                        ue.Feedback,
                         LectureProgressCount = ue.LectureProgress.Count
                     })
                     .FirstOrDefault(),
@@ -101,6 +103,8 @@ public class GetUserEnrollmentCoursesHandler(
                 course.UserEnrollment?.CompletionDate,
                 course.UserEnrollment!.UserEnrollmentStatus.ToString(),
                 completionPercentage,
+                course.UserEnrollment.Rating,
+                course.UserEnrollment.Feedback,
                 course.FirstLectureId!.Value
             );
         }));

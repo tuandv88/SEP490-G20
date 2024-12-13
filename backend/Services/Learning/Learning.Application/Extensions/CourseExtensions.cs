@@ -68,5 +68,32 @@ public static class CourseExtensions {
             LastModified: course.LastModified!.Value
             );
     }
+
+    public static CourseBasicDto ToCourseBasicDto(this Course course, string imageUrl,double averageRating,int totalParticipants)
+    {
+        return new CourseBasicDto(
+            Id: course.Id.Value,
+            Title: course.Title,
+            Headline: course.Headline,
+            CourseStatus: course.CourseStatus.ToString(),
+            ScheduledPublishDate: course.ScheduledPublishDate,
+            ImageUrl: imageUrl,
+            OrderIndex: course.OrderIndex,
+            CourseLevel: course.CourseLevel.ToString(),
+            Price: course.Price,
+            AverageRating: averageRating,
+            TotalParticipants: totalParticipants
+        );
+    }
+    
+    // public static async Task<List<CourseBasicDto>> ToCourseBasicDtoListAsync(this List<Course> courses, IFilesService filesService) {
+    //     var tasks = courses.Select(async c => {
+    //         var imageUrl = await filesService.GetFileAsync(StorageConstants.BUCKET, c.ImageUrl, 60*24);
+    //         return c.ToCourseBasicDto(imageUrl.PresignedUrl!);
+    //     });
+    //
+    //     var courseBasicDto = await Task.WhenAll(tasks);
+    //     return courseBasicDto.ToList();
+    // }
 }
 

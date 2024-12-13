@@ -1,8 +1,10 @@
 ﻿using BuildingBlocks.CQRS;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Payment.Application.Data.Repositories;
 using Payment.Application.Interfaces;
+using Payment.Application.Transactions.Queries.GetItemPaymentEligibility;
 using Payment.Domain.Models;
 using Payment.Domain.ValueObjects;
 using PayPalCheckoutSdk.Core;
@@ -10,9 +12,15 @@ using PayPalCheckoutSdk.Orders;
 
 namespace Payment.Application.Integrations.Paypals.Commands.CreateOrder;
 public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextService userContext, ITransactionRepository transactionRepository,
-    ITransactionItemRepository transactionItemRepository, ILogger<CreateOrderHandler> logger) : ICommandHandler<CreateOrderCommand, CreateOrderResult> {
+    ITransactionItemRepository transactionItemRepository, ILogger<CreateOrderHandler> logger, ISender sender) : ICommandHandler<CreateOrderCommand, CreateOrderResult> {
     public async Task<CreateOrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken) {
         var order = request.Order;
+
+        var eligibilityResult = await sender.Send(new GetItemPaymentEligibilityQuery(order.Item.ProductId), cancellationToken);
+        if (!eligibilityResult.IsAccepted)
+        {
+            return new CreateOrderResult(null!);
+        }
         if (!Enum.TryParse(order.PaymentMethod, true, out Domain.Enums.PaymentMethod paymentMethod) && paymentMethod != Domain.Enums.PaymentMethod.Paypal) {
             throw new InvalidOperationException("Unsupported payment method");
         }

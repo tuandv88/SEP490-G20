@@ -21,8 +21,9 @@ public class SendEmailNotificationCommandHandler(
     public async Task Consume(ConsumeContext<SendEmailNotificationCommand> context)
     {
         var message = context.Message;
-        var webUrl = configuration.GetSection("WebUrl")!;
+        var webUrl = configuration["WebUrl"]!;
         var urlCourse = $"{webUrl}/course-detail/{message.ProductId}";
+        logger.LogInformation($"Send mail start with transactionId: {message.TransactionId} and email: {message.Email}");
         switch (message.EmailType)
         {
             case EmailType.PaymentSuccess:
@@ -42,6 +43,7 @@ public class SendEmailNotificationCommandHandler(
                 {
                     TransactionId = context.Message.TransactionId
                 });
+                logger.LogDebug($"Send mail success \"Payment success\" with transactionId: {message.TransactionId} and email: {message.Email}");
                 break;
             }
             case EmailType.PaymentFailed:
@@ -61,6 +63,7 @@ public class SendEmailNotificationCommandHandler(
                 {
                     TransactionId = context.Message.TransactionId
                 });
+                logger.LogDebug($"Send mail success \"Payment failed\" with transactionId: {message.TransactionId} and email: {message.Email}");
                 break;
             }
         }

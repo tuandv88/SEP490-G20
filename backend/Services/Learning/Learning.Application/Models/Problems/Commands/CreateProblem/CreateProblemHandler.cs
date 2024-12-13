@@ -22,6 +22,7 @@ public class CreateProblemHandler(ILectureRepository lectureRepository, IProblem
         var problem = CreateNewProblem(request.CreateProblemDto);
         if (lecture != null) {
             lecture.ProblemId = problem.Id;
+            await lectureRepository.UpdateAsync(lecture);
         }
         await problemRepository.AddAsync(problem);
         await problemRepository.SaveChangesAsync(cancellationToken);

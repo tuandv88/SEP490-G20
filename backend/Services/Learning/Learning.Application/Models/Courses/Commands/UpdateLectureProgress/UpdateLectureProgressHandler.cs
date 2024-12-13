@@ -15,43 +15,46 @@ public class UpdateLectureProgressHandler(IUserEnrollmentRepository repository, 
         if (!lectureExists) {
             throw new NotFoundException(nameof(Lecture), request.LectureId);
         }
-
-
-        var userCourse = await repository.GetByUserIdAndCourseIdWithProgressAsync(userId, request.CourseId);
+        
+        var userEnrollment = await repository.GetByUserIdAndCourseIdWithProgressAsync(userId, request.CourseId);
                 
-        if (userCourse == null) {
-            throw new NotFoundException("NotFound usercourse of user");
+        if (userEnrollment == null) {
+            throw new NotFoundException("NotFound UserEnrollment of user");
         }
 
         var lectureId = LectureId.Of(request.LectureId);
         
-        var existingProgress = userCourse.LectureProgress.FirstOrDefault(l => l.LectureId.Equals(lectureId));
+        //nếu bài đó đã đánh dấu là hoàn thành thi trả ve true luôn
+        var existingProgress = userEnrollment.LectureProgress.FirstOrDefault(l => l.LectureId.Equals(lectureId));
 
         if (existingProgress != null) {
             return new UpdateLectureProgressResult(true);
         } else {
+            //set lectureProgress cũ ve false
+            var currentProgress = userEnrollment.LectureProgress.FirstOrDefault(l => l.IsCurrent);
+            currentProgress?.SetCurrent(false);
             var newProgress = LectureProgress.Create(
                     LectureProgressId.Of(Guid.NewGuid()),
-                    userCourse.Id,
+                    userEnrollment.Id,
                     lectureId,
                     DateTime.UtcNow,
                     true,
                     duration: request.Duration
                     );
-            userCourse.AddProgress(newProgress);
+            userEnrollment.AddProgress(newProgress);
+            
+            var totalLectures = course.Chapters.SelectMany(ch => ch.Lectures).Count();
+            var completedLectures = userEnrollment.LectureProgress.Count;
+            if(userEnrollment.CompletionDate != null && completedLectures == totalLectures) {
+                userEnrollment.UpdateStatus(UserEnrollmentStatus.Completed);
+                userEnrollment.CompletionDate = DateTime.UtcNow;
+            }
+
+            await repository.UpdateAsync(userEnrollment);
+            await repository.SaveChangesAsync(cancellationToken);
+
+            return new UpdateLectureProgressResult(true);
         }
-
-        var totalLectures = course.Chapters.SelectMany(ch => ch.Lectures).Count();
-        var completedLectures = userCourse.LectureProgress.Count;
-        if(completedLectures == totalLectures) {
-            userCourse.UpdateStatus(UserEnrollmentStatus.Completed);
-            userCourse.CompletionDate = DateTime.UtcNow;
-        }
-
-        await repository.UpdateAsync(userCourse);
-        await repository.SaveChangesAsync(cancellationToken);
-
-        return new UpdateLectureProgressResult(true);
     }
 }
 

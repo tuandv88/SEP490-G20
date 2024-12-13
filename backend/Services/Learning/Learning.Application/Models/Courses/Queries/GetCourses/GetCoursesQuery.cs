@@ -2,7 +2,7 @@
 
 namespace Learning.Application.Models.Courses.Queries.GetCourses;
 public record GetCoursesQuery(PaginationRequest PaginationRequest, GetCourseFilter Filter) : IQuery<GetCoursesResult>;
-public record GetCoursesResult(PaginatedResult<CourseDto> CourseDtos);
+public record GetCoursesResult(PaginatedResult<CourseBasicDto> CourseDtos);
 public record GetCourseFilter(string? SearchString, string? Level, string? Status);
 public class GetCoursesValidator : AbstractValidator<GetCoursesQuery> {
     public GetCoursesValidator() {

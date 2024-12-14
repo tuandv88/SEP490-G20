@@ -5,7 +5,9 @@ public class GetQuizSubmissionHandler(IQuizSubmissionRepository repository, IUse
         var userId = userContext.User.Id;
         var quizSubmission = await repository.GetByQuizAndUserIdAsync(request.QuizId, userId);
         var quizSubmissionSuccess = quizSubmission.Where(q => q.Status == QuizSubmissionStatus.Success);
-        var quizSubmissionDto = quizSubmissionSuccess.Select(q => q.ToQuizSubmissionDto()).ToList();
+        var quizSubmissionDto = quizSubmissionSuccess.Select(q => q.ToQuizSubmissionDto())
+                                                    .OrderByDescending(qs => qs.SubmissionDate)                                        
+                                                    .ToList();
 
         return new GetQuizSubmissionResult(quizSubmissionDto);
     }

@@ -12,13 +12,13 @@ import authServiceInstance from '@/oidc/AuthService'
 import SurveyModal from '@/components/surrvey/SurveyModal'
 import AssessmentPrompt from '@/components/surrvey/AssessmentPromptProps'
 import QuizModal from '@/components/surrvey/QuizModal'
-import { LearningPathPolling } from '@/components/loading/LearningPathPolling'
 import { LearningAPI } from '@/services/api/learningApi'
 
 import { QuizAPI } from '@/services/api/quizApi'
 import { UserAPI } from '@/services/api/userApi'
 import { CourseAPI } from '@/services/api/courseApi'
 import { useToast } from '@/hooks/use-toast'
+import { LearningPathPollingFormHome } from '@/components/loading/LearningPathPollingFormHome'
 
 const Button = ({ children, className, ...props }) => (
   <button className={`px-4 py-2 rounded ${className}`} {...props}>
@@ -296,7 +296,7 @@ function HomePage() {
           {/* Featured Courses Section */}
           <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Featured Courses</h2>
+              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10 text-primaryButton'>Featured Courses</h2>
               {loading ? <CourseLoading /> : <CourseCarousel courses={courses} />}
               <div className='mt-8 text-center md:mt-10'>
                 <Button
@@ -312,7 +312,7 @@ function HomePage() {
 
           <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Algorithm and Discussion</h2>
+              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10 text-primaryButton'>Algorithm and Discussion</h2>
               <ProblemSection />
             </div>
           </section>
@@ -347,7 +347,7 @@ function HomePage() {
         />
 
         {state.pollingStatus && (
-          <LearningPathPolling
+          <LearningPathPollingFormHome
             status={state.pollingStatus}
             message={
               state.pollingStatus === 'error'

@@ -28,14 +28,15 @@ export const ProblemAPI = {
     })
     return response.data
   },
-  getAllProblems: async (pageIndex, pageSize, searchString = '') => {
+  getAllProblems: async (pageIndex, pageSize, searchString = '', difficultyType = '') => {
     const response = await axios.get(
       `${API_BASE_URL}/learning-service/problems`,
       {
         params: {
           PageIndex: pageIndex,
           PageSize: pageSize,
-          SearchString: searchString
+          SearchString: searchString,
+          DifficultyType: difficultyType
         },
         headers: {
           Authorization: `Bearer ${Cookies.get('authToken')}`

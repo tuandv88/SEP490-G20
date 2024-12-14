@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { Star, StarOff, Send, Sparkles, X } from 'lucide-react'
 import { CourseAPI } from '@/services/api/courseApi'
 
-export function FeedbackModal({ isOpen, onClose, setIsFeedbackSuccess, courseId }) {
-  const [rating, setRating] = useState(0)
-  const [feedback, setFeedback] = useState('')
+export function FeedbackModal({ isOpen, onClose, setIsFeedbackSuccess, courseId, existingRating, existingFeedback, readOnly = false }) {
+  const [rating, setRating] = useState(existingRating || 0)
+  const [feedback, setFeedback] = useState(existingFeedback || '')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [hoverRating, setHoverRating] = useState(0)
@@ -63,7 +63,9 @@ export function FeedbackModal({ isOpen, onClose, setIsFeedbackSuccess, courseId 
 
         <div className='text-center mb-8'>
           <h2 className='text-3xl font-bold text-gray-800 mb-2'>Your Feedback</h2>
-          <p className='text-gray-600'>Help us improve your learning experience</p>
+          <p className='text-gray-600'>
+            {readOnly ? 'Your previous feedback' : 'Help us improve your learning experience'}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className='space-y-8'>
@@ -74,10 +76,11 @@ export function FeedbackModal({ isOpen, onClose, setIsFeedbackSuccess, courseId 
                 <button
                   key={star}
                   type='button'
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                  onClick={() => handleStarClick(star)}
-                  className='focus:outline-none transition-all duration-200 hover:scale-110'
+                  onMouseEnter={() => !readOnly && setHoverRating(star)}
+                  onMouseLeave={() => !readOnly && setHoverRating(0)}
+                  onClick={() => !readOnly && handleStarClick(star)}
+                  className={`focus:outline-none transition-all duration-200 ${!readOnly && 'hover:scale-110'}`}
+                  disabled={readOnly}
                 >
                   {star <= (hoverRating || rating) ? (
                     <Star className='w-10 h-10 fill-yellow-400 text-yellow-400 drop-shadow-sm' />
@@ -96,35 +99,38 @@ export function FeedbackModal({ isOpen, onClose, setIsFeedbackSuccess, courseId 
             <textarea
               id='feedback'
               value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
+              onChange={(e) => !readOnly && setFeedback(e.target.value)}
               rows={4}
               className='w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-none'
               placeholder='What did you like? What could be improved?'
+              readOnly={readOnly}
             />
           </div>
 
-          <button
-            type='submit'
-            disabled={isSubmitting || rating === 0 || !feedback.trim()}
-            className={`w-full py-4 px-6 rounded-xl text-white font-medium transition-all duration-200 flex items-center justify-center gap-2
-              ${
-                isSubmitting || rating === 0 || !feedback.trim()
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-200'
-              }`}
-          >
-            {isSubmitting ? (
-              <>
-                <div className='animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent'></div>
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Send className='w-5 h-5' />
-                Submit Feedback
-              </>
-            )}
-          </button>
+          {!readOnly && (
+            <button
+              type='submit'
+              disabled={isSubmitting || rating === 0 || !feedback.trim()}
+              className={`w-full py-4 px-6 rounded-xl text-white font-medium transition-all duration-200 flex items-center justify-center gap-2
+                ${
+                  isSubmitting || rating === 0 || !feedback.trim()
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-200'
+                }`}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className='animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent'></div>
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Send className='w-5 h-5' />
+                  Submit Feedback
+                </>
+              )}
+            </button>
+          )}
 
           {isSuccess && (
             <div className='mt-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl text-center animate-fade-in flex items-center justify-center gap-2'>

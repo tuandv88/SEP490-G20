@@ -36,7 +36,7 @@ const TransactionStatus = ({ status }) => {
   const config = getStatusConfig();
 
   return (
-    <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${config.color}`}>
+    <div className={`flex items-center gap-2 px-3 py-1 rounded-full w-fit ${config.color}`}>
       {config.icon}
       <span className="text-sm font-medium">{config.text}</span>
     </div>

@@ -50,12 +50,12 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
   const [idCodeSnippetQuestions, setIdCodeSnippetQuestions] = useState()
   const [codeSnippetQuestion, setCodeSnippetQuestion] = useState()
   const currentQuestion = quiz.questions[currentQuestionIndex]
-  const [templates, setTemplates] = useState()
+  const [templates, setTemplates] = useState({})
   const [testCase, setTestCase] = useState()
   const setCodeRunQuiz = useStore((state) => state.setCodeRunQuiz)
   const [codeRunPro, setCodeRunPro] = useState()
   const [loading, setLoading] = useState(false)
-  const [response, setResponse] = useState()
+  const [response, setResponse] = useState({})
   const testCasesQuiz = useStore((state) => state.testCasesQuiz)
   const [isOpen, setIsOpen] = useState(false)
 
@@ -188,18 +188,21 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
   }, [currentQuestionIndex, templates, codeSnippets, answers, quiz.questions])
 
   useEffect(() => {
-    for (const question of quiz?.questions) {
-      if (question.questionType === 'CodeSnippet') {
-        setIdCodeSnippetQuestions(question.problemId)
-        fetchProblem(question.problemId)
-      }
-    }
+    const codeSnippetQuestions = quiz?.questions.filter(q => q.questionType === 'CodeSnippet')
+    codeSnippetQuestions.forEach(question => {
+      fetchProblem(question.problemId)
+    })
   }, [quiz])
 
   const fetchProblem = async (problemId) => {
     const data = await ProblemAPI.getProblem(problemId)
     setCodeSnippetQuestion(data)
-    setTemplates(data?.problemDto?.templates?.Java)
+    
+    // Lưu template theo problemId
+    setTemplates(prev => ({
+      ...prev,
+      [problemId]: data?.problemDto?.templates?.Java
+    }))
     
     if (data?.problemDto?.testCases) {
       const testCaseDict = handleArrayToDictionary(data?.problemDto?.testCases)
@@ -390,8 +393,6 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
       return
     }
 
-
-
     const submissionData = {
       createCodeExecuteDto: {
         languageCode: 'Java',
@@ -400,11 +401,14 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
       }
     }
 
-
     setLoading(true)
     try {
       const data = await LearningAPI.excuteCode(idCodeSnippetQuestions, submissionData)
-      setResponse(data)
+      // Lưu response theo questionId
+      setResponse(prev => ({
+        ...prev,
+        [currentQuestion.id]: data
+      }))
     } catch (error) {
       console.error('Error submitting code:', error)
       alert('Error occurred while submitting code')
@@ -419,7 +423,7 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
         return (
           <div className='w-full h-[100%] rounded-md overflow-hidden'>
             <PreferenceNavQuizProblem onSubmit={handleRunCode} loading={loading}></PreferenceNavQuizProblem>
-            {templates && (
+            {templates[idCodeSnippetQuestions] && (
               <ResizablePanelGroup direction='horizontal'>
                 <ResizablePanel defaultSize={40}>
                   <div className='h-full w-full overflow-auto bg-[#1b2a32]'>
@@ -452,7 +456,7 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
                             url: null,
                             workspaceUri: null
                           }}
-                          initValue={codeSnippets[currentQuestion.id] || codeRunPro}
+                          initValue={codeSnippets[currentQuestion.id] || templates[idCodeSnippetQuestions]}
                           //sampleFile='resources/com/example/app/Solution.java'
                           containerId={'editor'}
                           onChange={handleEditorChange}
@@ -463,7 +467,7 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
                     <ResizablePanel defaultSize={40}>
                       <div className='h-full w-full overflow-auto'>
                         <TestcaseInterfaceQuiz 
-                          response={response} 
+                          response={response[currentQuestion.id]} 
                           loading={loading} 
                           testCase={testCaseMap[idCodeSnippetQuestions]} 
                         />

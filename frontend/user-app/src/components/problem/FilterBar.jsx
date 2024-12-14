@@ -21,8 +21,29 @@ function FilterBar({ filters, setFilters, availableTags, handleTagToggle, handle
           onChange={(e) => setSearchString(e.target.value)}
           value={searchString} 
         />
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-full justify-between">
+              {filters.difficulty || 'Difficulty'}
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-full">
+            <DropdownMenuItem onClick={() => setFilters({ ...filters, difficulty: 'Easy' })}>
+              Easy
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFilters({ ...filters, difficulty: 'Medium' })}>
+              Medium
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFilters({ ...filters, difficulty: 'Hard' })}>
+              Hard
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <div className='flex gap-2'>
-          <Button variant='outline' className='text-muted-foreground' onClick={handleReset}> {/* Gọi handleReset */}
+          <Button variant='outline' className='text-muted-foreground' onClick={handleReset}>
             <RotateCcw className='h-3 w-3 mr-1' />
             Reset
           </Button>

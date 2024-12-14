@@ -76,11 +76,24 @@ export const AppRouter = () => {
     },
     {
       path: AUTHENTICATION_ROUTERS.USERPROFILE,
-      element: (
-        <ProtectedRoute>
-          <UserProfile />
-        </ProtectedRoute>
-      )
+      children: [
+        {
+          path: '',
+          element: (
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          )
+        },
+        {
+          path: ':tab',
+          element: (
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          )
+        }
+      ]
     },
     {
       path: AUTHENTICATION_ROUTERS.PROBLEMSPACE,

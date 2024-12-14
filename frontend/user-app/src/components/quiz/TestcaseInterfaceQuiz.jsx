@@ -231,76 +231,78 @@ const TestcaseInterfaceQuiz = ({ response, loading, testCase }) => {
       {activeTabTestcase === 'Test Result' && (
         <div className='bg-gray-800 rounded-md p-4'>
           {loading && <TestResultLoading></TestResultLoading>}
-          {!loading && response?.codeExecuteDto?.testResults && response.codeExecuteDto.testResults.length > 0 && (
+          {!loading && response ? (
             <>
-              <div className='flex mb-4 flex-wrap'>
-                {response.codeExecuteDto.testResults.map((result, index) => (
-                  <div key={index} className='relative mr-2 mb-2'>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      className={`${
-                        activeTestResult === index
-                          ? result.isPass
-                            ? 'border border-green-500'
-                            : 'border border-red-500'
-                          : result.isPass
-                            ? 'bg-green-400'
-                            : 'bg-red-400'
-                      }`}
-                      onClick={() => setActiveTestResult(index)}
-                    >
-                      Case {index + 1}
-                    </Button>
+              {response.codeExecuteDto?.testResults && response.codeExecuteDto.testResults.length > 0 && (
+                <>
+                  <div className='flex mb-4 flex-wrap'>
+                    {response.codeExecuteDto.testResults.map((result, index) => (
+                      <div key={index} className='relative mr-2 mb-2'>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          className={`${
+                            activeTestResult === index
+                              ? result.isPass
+                                ? 'border border-green-500'
+                                : 'border border-red-500'
+                              : result.isPass
+                                ? 'bg-green-400'
+                                : 'bg-red-400'
+                          }`}
+                          onClick={() => setActiveTestResult(index)}
+                        >
+                          Case {index + 1}
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <div className='bg-gray-100 rounded-md p-4'>
-                <div
-                  className={`mb-4 p-4 rounded-md ${response.codeExecuteDto.testResults[activeTestResult].isPass ? 'bg-green-100' : 'bg-red-100'}`}
-                >
-                  {Object.entries(response.codeExecuteDto.testResults[activeTestResult].inputs).map(
-                    ([param, value]) => (
-                      <p key={param} className='text-gray-700 mb-2'>
-                        {param} = {value}
+                  <div className='bg-gray-100 rounded-md p-4'>
+                    <div
+                      className={`mb-4 p-4 rounded-md ${response.codeExecuteDto.testResults[activeTestResult].isPass ? 'bg-green-100' : 'bg-red-100'}`}
+                    >
+                      {Object.entries(response.codeExecuteDto.testResults[activeTestResult].inputs).map(
+                        ([param, value]) => (
+                          <p key={param} className='text-gray-700 mb-2'>
+                            {param} = {value}
+                          </p>
+                        )
+                      )}
+                      <p className='text-gray-700 mb-2'>
+                        Output: {response.codeExecuteDto.testResults[activeTestResult].output}
                       </p>
-                    )
-                  )}
-                  <p className='text-gray-700 mb-2'>
-                    Output: {response.codeExecuteDto.testResults[activeTestResult].output}
-                  </p>
-                  <p className='text-gray-700 mb-2'>
-                    Expected: {response.codeExecuteDto.testResults[activeTestResult].expected}
-                  </p>
-                  <p className='text-gray-700'>
-                    Stdout: {response.codeExecuteDto.testResults[activeTestResult].stdout}
-                  </p>
+                      <p className='text-gray-700 mb-2'>
+                        Expected: {response.codeExecuteDto.testResults[activeTestResult].expected}
+                      </p>
+                      <p className='text-gray-700'>
+                        Stdout: {response.codeExecuteDto.testResults[activeTestResult].stdout}
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {response.codeExecuteDto?.compileErrors && (
+                <div>
+                  <h2 className='text-2xl font-bold text-red-500 mb-4'>Compile Error</h2>
+                  <pre className='bg-red-100 p-4 rounded-md text-red-700 whitespace-pre-wrap'>
+                    {response.codeExecuteDto.compileErrors}
+                  </pre>
                 </div>
-              </div>
+              )}
+
+              {response.codeExecuteDto?.runTimeErrors && (
+                <div>
+                  <h2 className='text-2xl font-bold text-red-500 mb-4'>Runtime Error</h2>
+                  <pre className='bg-red-100 p-4 rounded-md text-red-700 whitespace-pre-wrap'>
+                    {response.codeExecuteDto.runTimeErrors}
+                  </pre>
+                </div>
+              )}
             </>
-          )}
-
-          {!loading && response?.codeExecuteDto?.compileErrors && (
-            <div>
-              <h2 className='text-2xl font-bold text-red-500 mb-4'>Compile Error</h2>
-              <pre className='bg-red-100 p-4 rounded-md text-red-700 whitespace-pre-wrap'>
-                {response.codeExecuteDto.compileErrors}
-              </pre>
-            </div>
-          )}
-
-          {!loading && response?.codeExecuteDto?.runTimeErrors && (
-            <div>
-              <h2 className='text-2xl font-bold text-red-500 mb-4'>Runtime Error</h2>
-              <pre className='bg-red-100 p-4 rounded-md text-red-700 whitespace-pre-wrap'>
-                {response.codeExecuteDto.runTimeErrors}
-              </pre>
-            </div>
-          )}
-
-          {!loading && response === null && (
-            <div className='bg-gray-100 rounded-md p-4'>
-              <p className='text-gray-700 text-center font-medium'>You must run your code first</p>
+          ) : (
+            <div className='flex flex-col items-center justify-center p-8 bg-gray-100 rounded-md'>
+              <p className='text-gray-700 text-center font-medium'>You need to run code to see the result</p>
             </div>
           )}
         </div>

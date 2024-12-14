@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function TransactionSkeleton() {
   return (
-    <Card className="w-full max-w-4xl">
+    <Card className="w-full">
       <CardHeader className="space-y-2">
         <div className="flex items-center gap-2">
           <Skeleton className="h-5 w-5 rounded-full" />

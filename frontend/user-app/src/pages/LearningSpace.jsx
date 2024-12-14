@@ -144,7 +144,6 @@ const LearningSpace = () => {
             const fileDetails = await Promise.all(
               lectureFiles.map(async (file) => {
                 const data = await LearningAPI.getLectureFiles(lectureId, file.fileId)
-
                 if (file.fileType === 'VIDEO') {
                   const videoResponse = await fetch(data.presignedUrl)
                   const videoBlob = await videoResponse.blob()
@@ -156,12 +155,12 @@ const LearningSpace = () => {
 
                 return {
                   ...data,
-                  fileType: file.fileType
+                  fileType: file.fileType,
+                  fileName: file.fileName
                 }
               })
             )
             setFiles(fileDetails)
-            console.log(fileDetails)
           }
 
           // Kiểm tra nếu problem tồn tại
@@ -259,6 +258,7 @@ const LearningSpace = () => {
                   files={files}
                   lectureScore={lectureDetail?.lectureDetailsDto?.point}
                   updateCourseProgress={updateCourseProgressState}
+                  courseProgress={courseProgress}
                 />
               )}
               {activeTab === 'submissionResult' && !loading && (
@@ -332,6 +332,7 @@ const LearningSpace = () => {
                 files={files}
                 lectureScore={lectureDetail?.lectureDetailsDto?.point}
                 updateCourseProgress={updateCourseProgressState}
+                courseProgress={courseProgress}
               />
             </div>
           </ResizablePanel>

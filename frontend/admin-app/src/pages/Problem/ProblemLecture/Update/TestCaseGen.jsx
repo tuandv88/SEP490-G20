@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Upload, X } from 'lucide-react'
+import { Plus, Upload, X, Download } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import * as XLSX from 'xlsx'
 import { useToast } from '@/hooks/use-toast'
@@ -185,7 +185,30 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
     reader.readAsBinaryString(file);
   };
 
+  const downloadTemplate = () => {
+    const wb = XLSX.utils.book_new();
+    
+    const templateData = [
+      {
+        TestCaseId: 1,
+        Input_param1: "value1",
+        Input_param2: "value2", 
+        Expected: "expected output",
+        IsHidden: false
+      },
+      {
+        TestCaseId: 2,
+        Input_param1: "value3",
+        Input_param2: "value4",
+        Expected: "expected output 2", 
+        IsHidden: true
+      }
+    ];
 
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    XLSX.utils.book_append_sheet(wb, ws, "Template");
+    XLSX.writeFile(wb, "testcase_template.xlsx");
+  };
 
   return (
     <Card className='w-full mx-auto'>
@@ -290,6 +313,15 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
                     >
                       <Upload className='w-4 h-4 mr-2' />
                       Import Excel
+                    </Button>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      className='flex-shrink-0 flex-1'
+                      onClick={downloadTemplate}
+                    >
+                      <Download className='w-4 h-4 mr-2' />
+                      Template
                     </Button>
                   </div>
                 </div>

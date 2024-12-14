@@ -26,13 +26,11 @@ function About() {
                     and effective way.
                   </p>
 
-                  <Button size='lg' variant='secondary'>
-                    Learn more
-                  </Button>
+                  
                 </div>
                 <div className='md:w-1/2'>
                   <img
-                    src='https://scontent.fhan3-2.fna.fbcdn.net/v/t39.30808-6/459690003_915372537287677_951671014783210398_n.jpg?stp=dst-jpg_s960x960&_nc_cat=107&ccb=1-7&_nc_sid=cc71e4&_nc_eui2=AeE5h1DOWW8K_CNxUNd2Nbd_noay3zP5C12ehrLfM_kLXUy6qBLDLn7x9TBNOdKQ22sUwn_XjLDHVhqRJWKcSLs-&_nc_ohc=VkqUDBpLhWQQ7kNvgEpltY6&_nc_zt=23&_nc_ht=scontent.fhan3-2.fna&_nc_gid=AgheLUiN3Fo-rbg8Xh-_M0o&oh=00_AYDc4Ejf74AyR8a3oUWT9kPSasqlwDZBrekDndd42ipsww&oe=67565373'
+                    src='https://sin1.contabostorage.com/9414348a03c9471cb842d448f65ca5fb:icoder/frontend/assets/banner-about-us.jpg'
                     alt='About EduPlatform'
                     width={600}
                     height={400}
@@ -45,7 +43,7 @@ function About() {
 
           <section className='py-20 bg-gray-100'>
             <div className='container px-4 mx-auto'>
-              <h2 className='mb-12 text-3xl font-bold text-center'>Our Team</h2>
+              <h2 className='mb-12 text-3xl font-bold text-center text-primaryButton'>Our Team</h2>
               <div className='grid gap-8 md:grid-cols-2 lg:grid-cols-5'>
                 {[
                   {
@@ -110,7 +108,7 @@ function About() {
           <section className='py-20'>
             <div className='container px-4 mx-auto'>
               <div className='mb-12 text-center'>
-                <h2 className='mb-4 text-3xl font-bold'>Mission and Vision</h2>
+                <h2 className='mb-4 text-3xl font-bold text-primaryButton'>Mission and Vision</h2>
                 <p className='text-xl text-gray-600'>
                   We believe that quality education should be accessible to everyone, everywhere.
                 </p>
@@ -145,33 +143,33 @@ function About() {
           {/* Core Values Section */}
           <section className='py-20 bg-gray-100'>
             <div className='container px-4 mx-auto'>
-              <h2 className='mb-12 text-3xl font-bold text-center'>Core Values</h2>
+              <h2 className='mb-12 text-3xl font-bold text-center text-primaryButton'>Core Values</h2>
               <div className='grid gap-8 md:grid-cols-2 lg:grid-cols-4'>
                 {[
                   {
-                    icon: <BookOpen className='w-10 h-10 text-blue-500' />,
+                    icon: <BookOpen className='w-10 h-10 text-primaryButton' />,
                     title: 'Continuous Learning',
                     description: 'We encourage lifelong learning and always update new knowledge.'
                   },
                   {
-                    icon: <Trophy className='w-10 h-10 text-blue-500' />,
+                    icon: <Trophy className='w-10 h-10 text-primaryButton' />,
                     title: 'Excellence',
                     description: 'We always strive for excellence in all aspects of the platform.'
                   },
                   {
-                    icon: <Users className='w-10 h-10 text-blue-500' />,
+                    icon: <Users className='w-10 h-10 text-primaryButton' />,
                     title: 'Community',
                     description: 'We build a strong learning community and support each other.'
                   },
                   {
-                    icon: <Zap className='w-10 h-10 text-blue-500' />,
+                    icon: <Zap className='w-10 h-10 text-primaryButton' />,
                     title: 'Innovation',
                     description: 'We always seek new ways to improve the learning and competitive experience.'
                   }
                 ].map((value, index) => (
                   <Card key={index}>
                     <CardHeader>
-                      <CardTitle className='flex items-center'>
+                      <CardTitle className='flex items-center text-primaryButton'>
                         {value.icon}
                         <span className='ml-2'>{value.title}</span>
                       </CardTitle>
@@ -188,7 +186,7 @@ function About() {
           {/* Our Story Section */}
           <section className='py-20'>
             <div className='container px-4 mx-auto'>
-              <h2 className='mb-12 text-3xl font-bold text-center'>Our Story</h2>
+              <h2 className='mb-12 text-3xl font-bold text-center text-primaryButton'>Our Story</h2>
               <Tabs defaultValue='beginning' className='w-full'>
                 <TabsList className='grid w-full grid-cols-1 md:grid-cols-3'>
                   <TabsTrigger value='beginning'>Beginning</TabsTrigger>

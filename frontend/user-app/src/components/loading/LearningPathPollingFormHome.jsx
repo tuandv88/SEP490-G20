@@ -1,7 +1,11 @@
 import React from 'react';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { AUTHENTICATION_ROUTERS } from '@/data/constants';
 
-export function LearningPathPolling({ status, message, onClose }) {
+export function LearningPathPollingFormHome({ status, message, onClose }) {
+  const navigate = useNavigate();
+
   const getStatusConfig = () => {
     switch (status) {
       case 'success':
@@ -10,7 +14,11 @@ export function LearningPathPolling({ status, message, onClose }) {
           bgColor: 'bg-green-100',
           title: 'Learning Path Created Successfully',
           buttonColor: 'bg-green-600 hover:bg-green-700',
-          buttonText: 'View Learning Path'
+          buttonText: 'View Learning Path',
+          onClick: () => {
+            onClose();
+            navigate(AUTHENTICATION_ROUTERS.USERPROFILE + '/roadmap');
+          }
         };
       case 'polling':
         return {
@@ -28,7 +36,8 @@ export function LearningPathPolling({ status, message, onClose }) {
           bgColor: 'bg-red-100',
           title: 'Cannot create learning path',
           buttonColor: 'bg-red-600 hover:bg-red-700',
-          buttonText: 'Retry'
+          buttonText: 'Retry',
+          onClick: onClose
         };
     }
   };
@@ -52,7 +61,7 @@ export function LearningPathPolling({ status, message, onClose }) {
 
           {status !== 'polling' && (
             <button
-              onClick={onClose}
+              onClick={config.onClick || onClose}
               className={`px-6 py-2 rounded-lg text-white font-medium transition-colors ${config.buttonColor}`}
               disabled={status === 'polling'}
             >

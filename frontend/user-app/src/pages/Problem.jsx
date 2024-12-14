@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import FilterBar from '../components/problem/FilterBar'
-import ActiveFilters from '../components/problem/ActiveFilters'
 import ProblemTable from '../components/problem/ProblemTable'
 import Layout from '@/layouts/layout'
 import ProblemPanelBot from '../components/problem/ProblemPanelBot'
@@ -18,7 +17,6 @@ const ITEMS_PER_PAGE = 5
 function Problem() {
   const [loading, setLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-
   const [problems, setProblems] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [searchString, setSearchString] = useState('')
@@ -26,7 +24,16 @@ function Problem() {
   const [problemSolved, setProblemSolved] = useState([])
   const [leaderboardData, setLeaderboardData] = useState([])
 
+  const [filters, setFilters] = useState({
+    lists: '',
+    difficulty: '',
+    status: '',
+    tags: new Set(),
+    favorite: false
+  })
+
   const pageSize = 6
+  const [difficultyFilter, setDifficultyFilter] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +62,12 @@ function Problem() {
     const fetchProblems = async () => {
       setLoading(true)
       try {
-        const response = await ProblemAPI.getAllProblems(currentPage, pageSize, searchString)
+        const response = await ProblemAPI.getAllProblems(
+          currentPage, 
+          pageSize, 
+          searchString,
+          filters.difficulty
+        )
         const { data, count } = response.problems
         setProblems(data)
         console.log('Problems:', data)
@@ -67,19 +79,11 @@ function Problem() {
       }
     }
     fetchProblems()
-  }, [currentPage, searchQuery])
+  }, [currentPage, searchQuery, filters.difficulty])
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
   }
-
-  const [filters, setFilters] = useState({
-    lists: '',
-    difficulty: '',
-    status: '',
-    tags: new Set(),
-    favorite: false
-  })
 
   const stats = {
     easy: 1,
@@ -159,7 +163,6 @@ function Problem() {
                   handleSearch={handleSearch}
                   searchString={searchString}
                 />
-                <ActiveFilters filters={filters} handleRemoveFilter={handleRemoveFilter} handleReset={handleReset} />
               </div>
               <ProblemPanelBot problemSolved={problemSolved} leaderboardData={leaderboardData} />
               <ProblemPanelTop leaderboardData={leaderboardData} />

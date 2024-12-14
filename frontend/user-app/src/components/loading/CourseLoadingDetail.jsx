@@ -52,6 +52,13 @@ const CourseLoadingDetail = () => {
           <div>
             <Skeleton className='w-full h-[40px]' />
           </div>
+          <div>
+            <Skeleton className='w-full h-[40px]' />
+          </div>
+          <div>
+            <Skeleton className='w-full h-[40px]' />
+          </div>
+          
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Check, Star } from 'lucide-react'
+import { Check, RotateCcw, Star } from 'lucide-react'
 import {
   Pagination,
   PaginationContent,
@@ -105,52 +105,75 @@ function ProblemTable({ problems, currentPage, totalPages, onPageChange }) {
 
   return (
     <div className='space-y-4'>
-      {problems.map((problem) => (
-        <div key={problem.problemsId} className='flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm'>
-          <div className='flex-1 space-y-1'>
-            <div className='flex items-center gap-2'>
-              <h3 className='font-semibold hover:text-blue-500'>
-                <a onClick={() => handleSolveChallenge(problem.problemsId)}>{problem.title}</a>
-              </h3>
-            </div>
-            <div className='flex items-center gap-2 text-sm'>
-              <span
-                className={cn(
-                  'font-medium',
-                  problem.difficulty === 'Easy' && 'text-emerald-500',
-                  problem.difficulty === 'Medium' && 'text-yellow-500',
-                  problem.difficulty === 'Hard' && 'text-red-500'
-                )}
-              >
-                {problem.difficulty}
-              </span>
-              <span className='text-muted-foreground'>Max Score: {problem.maxScore || 10}</span>
-              <span className='text-muted-foreground'>Acceptance: {problem.acceptance === -1 ? '0%' : `${problem.acceptance}%`}</span>
-            </div>
-          </div>
-          <div className='flex items-center gap-4'>
-            {problem.status === 'Solved' && (
-              <div className='text-emerald-500'>
-                <Check className='h-5 w-5' />
-              </div>
-            )}
-            {problem.status === 'Attempted' && (
-              <div className='text-yellow-500'>
-                <Star className='h-5 w-5' />
-              </div>
-            )}
-            <Button className='h-9' variant='outline' onClick={() => handleSolveChallenge(problem.problemsId)}>
-              Solve Challenge
-            </Button>
-          </div>
+      {problems.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg border">
+          <div className="text-6xl mb-4">🤔</div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            No problem found
+          </h3>
+          <p className="text-gray-600 text-center mb-4">
+            No problem found
+            Please try adjusting the filters or searching with a different keyword.
+          </p>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.reload()}
+            className="flex items-center gap-2"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Reload page
+          </Button>
         </div>
-      ))}
+      ) : (
+        <>
+          {problems.map((problem) => (
+            <div key={problem.problemsId} className='flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm'>
+              <div className='flex-1 space-y-1'>
+                <div className='flex items-center gap-2'>
+                  <h3 className='font-semibold hover:text-blue-500 cursor-pointer'>
+                    <a onClick={() => handleSolveChallenge(problem.problemsId)}>{problem.title}</a>
+                  </h3>
+                </div>
+                <div className='flex items-center gap-2 text-sm cursor-default'>
+                  <span
+                    className={cn(
+                      'font-medium',
+                      problem.difficulty === 'Easy' && 'text-emerald-500',
+                      problem.difficulty === 'Medium' && 'text-yellow-500',
+                      problem.difficulty === 'Hard' && 'text-red-500'
+                    )}
+                  >
+                    {problem.difficulty}
+                  </span>
+                  <span className='text-muted-foreground'> - </span>
+                  <span className='text-muted-foreground'>Acceptance: {problem.acceptance === -1 ? '0%' : `${problem.acceptance}%`}</span>
+                </div>
+              </div>
+              <div className='flex items-center gap-4'>
+                {problem.status === 'Solved' && (
+                  <div className='text-emerald-500'>
+                    <Check className='h-5 w-5' />
+                  </div>
+                )}
+                {problem.status === 'Attempted' && (
+                  <div className='text-yellow-500'>
+                    <Star className='h-5 w-5' />
+                  </div>
+                )}
+                <Button className='h-9' variant='outline' onClick={() => handleSolveChallenge(problem.problemsId)}>
+                  Solve Challenge
+                </Button>
+              </div>
+            </div>
+          ))}
 
-      <div className='flex items-center justify-center py-4'>
-        <Pagination>
-          <PaginationContent>{renderPaginationItems()}</PaginationContent>
-        </Pagination>
-      </div>
+          <div className='flex items-center justify-center py-4'>
+            <Pagination>
+              <PaginationContent>{renderPaginationItems()}</PaginationContent>
+            </Pagination>
+          </div>
+        </>
+      )}
     </div>
   )
 }

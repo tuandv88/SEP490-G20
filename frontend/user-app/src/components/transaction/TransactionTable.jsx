@@ -5,6 +5,8 @@ import { Button } from '../ui/button';
 import { CustomConfirmModal } from '../ui/button-confirm-modal';
 import { PaymentAPI } from '@/services/api/paymentApi';
 import { useToast } from '@/hooks/use-toast';
+import { AUTHENTICATION_ROUTERS } from '@/data/constants';
+import { useNavigate } from 'react-router-dom';
 
 const isWithin30Minutes = (dateTime) => {
   const transactionDate = new Date(dateTime);
@@ -18,7 +20,7 @@ const TransactionTable = ({ transactions, onTransactionCancelled }) => {
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const { toast } = useToast();
-
+  const navigate = useNavigate()
 
   const handleCancelClick = (transaction) => {
     if (isWithin30Minutes(transaction.dateTime)) {
@@ -33,6 +35,10 @@ const TransactionTable = ({ transactions, onTransactionCancelled }) => {
     setSelectedTransaction(transaction);
     setIsConfirmOpen(true);
   };
+
+  const handleCourseClick = (courseId) => {
+    navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', courseId))
+  }
 
   const handleConfirmCancel = async () => {
     if (!selectedTransaction) return;
@@ -81,7 +87,7 @@ const TransactionTable = ({ transactions, onTransactionCancelled }) => {
             {transactions.map((transaction) => (
               <tr key={transaction.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 w-[200px]">
-                  <div className="text-sm font-medium text-gray-900 truncate">
+                  <div onClick={() => handleCourseClick(transaction.items[0]?.productId)} className="text-sm font-medium text-gray-900 truncate cursor-pointer" >
                     {transaction.items[0]?.productName || 'Unnamed Course'}
                   </div>
                   <div className="text-sm text-gray-500 truncate">

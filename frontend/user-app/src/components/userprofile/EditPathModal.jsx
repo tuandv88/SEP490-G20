@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { X, GripVertical, Clock, DollarSign, Search } from 'lucide-react'
 import { LearningPathAPI } from '@/services/api/learningPathApi'
+import { formatTimeEstimation } from '@/utils/formatTimeEstimation'
 
 export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onClose, onSave }) => {
   const [editedPath, setEditedPath] = useState({
@@ -19,7 +20,7 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
   })
 
   const [availableCourses, setAvailableCourses] = useState(
-    availableCoursesList.filter((course) => !path.pathSteps.find((step) => step.courseId === course.id))
+    availableCoursesList.filter((course) => !path.pathSteps.find((step) => step.courseId === course.courseId))
   )
 
   const [searchTerm, setSearchTerm] = useState('')
@@ -55,12 +56,12 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
     const newStep = {
       id: `temp-${Date.now()}`,
       learningPathId: path.id,
-      courseId: course.id,
+      courseId: course.courseId,
       stepOrder: editedPath.pathSteps.length + 1,
-      status: 'NotEnrolled',
-      completionPercentage: 0,
-      enrollmentDate: null,
-      completionDate: null,
+      status: course.status || 'NotEnrolled',
+      completionPercentage: course.completionPercentage || 0,
+      enrollmentDate: course.enrollmentDate || null,
+      completionDate: course.completionDate || null,
       expectedCompletionDate: new Date().toISOString(),
       title: course.title,
       headline: course.headline,
@@ -72,17 +73,17 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
       ...editedPath,
       pathSteps: [...editedPath.pathSteps, newStep]
     })
-    setAvailableCourses(availableCourses.filter((c) => c.id !== course.id))
+    setAvailableCourses(availableCourses.filter((c) => c.courseId !== course.courseId))
   }
 
   const removeCourse = (stepId) => {
     const removedStep = editedPath.pathSteps.find((step) => step.id === stepId)
     if (removedStep) {
-      const removedCourse = courses.find((course) => course.id === removedStep.courseId) || 
-                           availableCoursesList.find((course) => course.id === removedStep.courseId)
+      const removedCourse = courses.find((course) => course.courseId === removedStep.courseId) || 
+                           availableCoursesList.find((course) => course.courseId === removedStep.courseId)
       
       if (removedCourse) {
-        const isAlreadyAvailable = availableCourses.some(course => course.id === removedCourse.id)
+        const isAlreadyAvailable = availableCourses.some(course => course.courseId === removedCourse.courseId)
         if (!isAlreadyAvailable) {
           setAvailableCourses([...availableCourses, removedCourse])
         }
@@ -161,7 +162,7 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
                               <div className='flex gap-4 text-sm text-gray-500'>
                                 <span className='flex items-center gap-1'>
                                   <Clock size={16} />
-                                  {step.timeEstimation || 'N/A'} hours
+                                  {formatTimeEstimation(step.timeEstimation) || 'N/A'}
                                 </span>
                                 <span className='flex items-center gap-1'>
                                   <DollarSign size={16} />

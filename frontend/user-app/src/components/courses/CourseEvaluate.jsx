@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
 import { UserAPI } from '@/services/api/userApi';
+import { CourseAPI } from '@/services/api/courseApi';
 import { formatDistanceToNow } from 'date-fns';
 import { CourseEvaluateLoading } from '../loading/CourseEvaluateLoading';
 
@@ -19,19 +20,53 @@ function RatingStars({ rating }) {
   );
 }
 
-export function CourseEvaluate({ reviewData }) {
+export function CourseEvaluate({ courseId }) {
   const [userDetails, setUserDetails] = useState({});
+  const [reviewData, setReviewData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 5;
 
-  // Tạo mảng thống kê rating từ 1-5 sao
+  const fetchReviews = async (pageIndex) => {
+    try {
+      const data = await CourseAPI.getCourseReviews(courseId, pageIndex, PAGE_SIZE);
+      setReviewData(prevData => {
+        if (prevData && pageIndex > 1) {
+          return {
+            ...data,
+            courseReviews: {
+              ...data.courseReviews,
+              reviews: {
+                ...data.courseReviews.reviews,
+                data: [...prevData.courseReviews.reviews.data, ...data.courseReviews.reviews.data]
+              }
+            }
+          };
+        }
+        return data;
+      });
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews(1);
+  }, [courseId]);
+
+  // Thay đổi hàm generateRatingStats để sử dụng starRatings
   const generateRatingStats = (reviews) => {
-    const stats = Array(5).fill(0);
-    reviews.data.forEach(review => {
-      stats[review.rating - 1]++;
-    });
-    return stats.map((count, index) => ({
-      stars: 5 - index,
-      count
-    }));
+    const stats = [];
+    for (let i = 5; i >= 1; i--) {
+      stats.push({
+        stars: i,
+        count: reviews.starRatings[i] || 0
+      });
+    }
+    return stats;
   };
 
   // Fetch user details cho mỗi review
@@ -59,16 +94,22 @@ export function CourseEvaluate({ reviewData }) {
     }
   }, [reviewData]);
 
-  if (reviewData.loading) {
+  const handleLoadMore = () => {
+    setPage(prev => prev + 1);
+    fetchReviews(page + 1);
+  };
+
+  if (loading && !reviewData) {
     return <CourseEvaluateLoading />;
   }
 
-  if (reviewData.error) {
-    return <div className="text-red-500">{reviewData.error}</div>;
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
   }
 
   const { courseReviews } = reviewData;
-  const ratingStats = generateRatingStats(courseReviews.reviews);
+  const ratingStats = generateRatingStats(courseReviews);
+  const hasMoreReviews = courseReviews.reviews.count > courseReviews.reviews.data.length;
 
   return (
     <div className="space-y-8">
@@ -147,6 +188,18 @@ export function CourseEvaluate({ reviewData }) {
             </div>
           );
         })}
+
+        {/* Load More Button */}
+        {hasMoreReviews && (
+          <div className="text-center">
+            <button
+              onClick={handleLoadMore}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Load More Reviews
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

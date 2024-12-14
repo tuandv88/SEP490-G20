@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import PreCoppy from '../ui/PreCoppy'
-import { BookOpenCheck, CheckCircle, Frown, GraduationCap, Smile, Trophy } from 'lucide-react'
+import { BookOpenCheck, CheckCircle, Frown, GraduationCap, Smile, Trophy, FileText, Download } from 'lucide-react'
 import DescriptionLoading from '../loading/DescriptionLoading'
 import { Button } from '../ui/button'
 import { LearningAPI } from '@/services/api/learningApi'
@@ -22,17 +22,50 @@ const NormalLecture = ({
   files,
   lectureScore,
   updateCourseProgress,
+  courseProgress,
 }) => {
-  console.log(lectureScore)
+  const [videoBlobUrl, setVideoBlobUrl] = useState(null)
+  const [documentUrls, setDocumentUrls] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const updateTimeoutRef = useRef(null)
+
+  const isLectureCompleted = courseProgress?.some(
+    progress => progress.lectureId === lectureId
+  )
+
   const handleComplete = async () => {
+    if (isUpdating) return;
+    
     try {
+      setIsUpdating(true)
+      
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current)
+      }
+
       await CourseAPI.updateCourseProgress(courseId, lectureId)
       await updateCourseProgress()
-      handleNextLecture()
+
+      updateTimeoutRef.current = setTimeout(() => {
+        setIsUpdating(false)
+        handleNextLecture()
+      }, 1000)
+
     } catch (error) {
       console.error('Error updating progress:', error)
+      setIsUpdating(false)
     }
   }
+
+  useEffect(() => {
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const documentFiles = files.filter((file) => file && file.fileType === 'DOCUMENT')
 
@@ -69,21 +102,39 @@ const NormalLecture = ({
           )}
 
           <div className='flex items-center justify-between rounded-xl py-4 shadow-lg mt-5'>
-            <Button
-              onClick={handleComplete}
-              className='flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg'
-            >
-              <CheckCircle className='w-5 h-5' />
-              <span>Mark as complete</span>
-            </Button>
+            {isLectureCompleted ? (
+              <div className='flex items-center space-x-2 bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg opacity-75'>
+                <CheckCircle className='w-5 h-5' />
+                <span>Completed</span>
+              </div>
+            ) : (
+              <Button
+                onClick={handleComplete}
+                disabled={isUpdating}
+                className={`flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 
+                  hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 
+                  rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg
+                  ${isUpdating ? 'opacity-75 cursor-not-allowed' : ''}`}
+              >
+                {isUpdating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Updating...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className='w-5 h-5' />
+                    <span>Mark as complete</span>
+                  </>
+                )}
+              </Button>
+            )}
 
             <div className='flex items-center space-x-4 mr-10'>
-
               <div className='p-3 bg-green-100 rounded-lg'>
                 <GraduationCap className='w-5 h-5 text-green-600' />
               </div>
               <div className='flex flex-col'>
-                {/* <span className='text-gray-400 text-sm font-medium'>Lecture Score</span> */}
                 <span className='text-white text-3xl font-bold'>{lectureScore}</span>
               </div>
             </div>
@@ -125,29 +176,44 @@ const NormalLecture = ({
             </ReactMarkdown>
           </div>
           {documentFiles.length > 0 && (
-            <div className='document-list mt-5'>
-              <h3 className='text-xl font-bold mb-3'>Documents</h3>
-              <ul>
+            <div className='document-list mt-8'>
+              <div className='flex items-center space-x-2 mb-4'>
+                <FileText className='w-6 h-6 text-blue-500' />
+                <h3 className='text-xl font-bold'>Documents</h3>
+              </div>
+              <div className='space-y-3'>
                 {documentFiles.map((file, index) => {
                   if (file && file.presignedUrl) {
                     return (
-                      <li key={index} className='mb-2'>
-                        <a
-                          href={file.presignedUrl}
-                          onClick={(e) => handleDownload(e, file.presignedUrl, `Document ${index + 1}`)}
-                          className='text-blue-500 hover:underline cursor-pointer'
-                          target='_blank'
-                        >
-                          Download document {index + 1}
-                        </a>
-                      </li>
+                      <div 
+                        key={index} 
+                        className='flex items-center justify-between bg-gray-800 hover:bg-gray-700 p-4 rounded-lg transition-all duration-200'
+                      >
+                        <div className='flex items-center space-x-3 flex-grow'>
+                          <FileText className='w-5 h-5 text-blue-500 flex-shrink-0' />
+                          <div className='flex flex-col'>
+                            <span className='text-gray-200 font-medium truncate max-w-md' title={file.fileName}>
+                              {file.fileName}
+                            </span>
+                          </div>
+                        </div>
+                        <div className='flex items-center space-x-4'>
+                          <a
+                            href={file.presignedUrl}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-blue-500 hover:text-blue-400 transition-colors p-2 rounded-full hover:bg-gray-600'
+                            title='Open in new tab'
+                          >
+                            <Download className='w-5 h-5' />
+                          </a>                         
+                        </div>
+                      </div>
                     )
-                  } else {
-                    console.warn('File bị thiếu hoặc thiếu presignedUrl:', file)
-                    return null
                   }
+                  return null
                 })}
-              </ul>
+              </div>
             </div>
           )}
         </div>

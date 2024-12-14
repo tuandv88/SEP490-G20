@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { AccountInfo } from '../components/userprofile/AccountInfo'
 import { AlgorithmDashboard } from '../components/userprofile/algorithm/AlgorithmDashboard'
 import { LearningDashboard } from '../components/userprofile/learning/LearningDashboard'
-import { MyPosts } from '../components/userprofile/MyPosts'
-import { ProfileTabs } from '../components/userprofile/ProfileTabs'
 import { ProfileLayout } from '../components/userprofile/ProfileLayout'
 import Layout from '@/layouts/layout'
-import { useNavigate } from 'react-router-dom'
 import { UserContext } from '@/contexts/UserContext'
 import authServiceInstance from '@/oidc/AuthService'
 import { Loading } from '@/components/ui/overlay'
@@ -14,14 +12,23 @@ import RoadmapDashboard from '@/components/userprofile/RoadmapDashboard'
 import { ProblemAPI } from '@/services/api/problemApi'
 import DiscussionUserList from '@/components/userprofile/discussion/DiscussionUserList'
 import TransactionHistory from '@/components/transaction/TransactionHistory'
+import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 
 export function UserProfile() {
-  const [activeTab, setActiveTab] = useState('account')
-  const { user } = useContext(UserContext)
-  const [loading, setLoading] = useState(true)
-  const [problemSolved, setProblemSolved] = useState([])
+  const { tab } = useParams()
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+  const { user } = useContext(UserContext)
+  const [problemSolved, setProblemSolved] = useState([])
   const [problems, setProblems] = useState([])
+
+  const validTabs = ['account', 'roadmap', 'learning', 'algorithm', 'discussionuserlist', 'transaction']
+  
+  const activeTab = tab && validTabs.includes(tab) ? tab : 'account'
+
+  const handleTabChange = (newTab) => {
+    navigate(AUTHENTICATION_ROUTERS.USERPROFILE + '/' + newTab)
+  }
 
   useEffect(() => {
     const initializeUserProfile = async () => {
@@ -44,15 +51,14 @@ export function UserProfile() {
   useEffect(() => {
     const fetchSolvedProblems = async () => {
       try {
-        const solvedProblems = await ProblemAPI.getSolvedProblems();
-        setProblems(solvedProblems);
+        const solvedProblems = await ProblemAPI.getSolvedProblems()
+        setProblems(solvedProblems)
       } catch (error) {
-        console.error('Error fetching solved problems:', error);
+        console.error('Error fetching solved problems:', error)
       }
-    };
-    fetchSolvedProblems();
-  }, []);
-
+    }
+    fetchSolvedProblems()
+  }, [])
 
   if (loading) {
     return <Loading />
@@ -79,7 +85,7 @@ export function UserProfile() {
 
   return (
     <Layout>
-       <ProfileLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+      <ProfileLayout activeTab={activeTab} setActiveTab={handleTabChange}>
         {renderTabContent()}
       </ProfileLayout>
     </Layout>

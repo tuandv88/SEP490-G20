@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { ChevronLeft, ChevronRight, Clock, ExternalLink, Star } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Clock, ExternalLink, Star, UserRoundPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '../ui/card'
 import { CourseBadge } from './CourseBadge'
@@ -75,12 +75,12 @@ export function CourseCarousel({ courses }) {
 
                   <div className='flex items-center justify-between'>
                     <div className='flex items-center text-gray-600'>
-                      <Clock size={16} className='mr-1' />
-                      <span>11 practices</span>
+                      <UserRoundPlus size={16} className='mr-1' />
+                      <span>{course.totalParticipants} participants</span>
                     </div>
                     <div className='flex items-center text-gray-600'>
                       <Star size={16} className='mr-1 fill-yellow-400 text-yellow-400' />
-                      <span>12</span>
+                      <span>{course.averageRating}</span>
                     </div>
                   </div>
                 </div>

@@ -9,7 +9,7 @@ export function ProfileLayout({ children, activeTab, setActiveTab }) {
 
   return (
     <div className='min-h-screen bg-white mt-[75px]'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+      <div className='mx-auto px-4 sm:px-6 lg:px-8 py-8 mr-10 ml-20'>
         {/* Thông tin người dùng */}
 
         {/* Bố cục flex với sidebar và nội dung */}

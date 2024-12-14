@@ -81,9 +81,6 @@ const PreferenceNavQuizProblem = ({ onSubmit, loading }) => {
         </div>
     
         <div className='flex items-center space-x-2 mr-5'>
-        <button className='p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md'>
-            <AlarmClock className='w-5 h-5' color='white'/>
-          </button>
           <button
             onClick={onSubmit}
             className='flex items-center px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600'

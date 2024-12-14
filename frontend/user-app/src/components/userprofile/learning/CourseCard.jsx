@@ -74,6 +74,9 @@ export function CourseCard({ course }) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         setIsFeedbackSuccess={setIsFeedbackSuccess}
+        existingRating={course.rating !== -1 ? course.rating : undefined}
+        existingFeedback={course.rating !== -1 ? course.feedback : undefined}
+        readOnly={course.rating !== -1}
       />
     </div>
   )

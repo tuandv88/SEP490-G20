@@ -3,21 +3,7 @@ import { Clock, DollarSign, Eye } from 'lucide-react'
 import { format } from 'date-fns'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 import { useNavigate } from 'react-router-dom'
-
-const formatTimeEstimation = (minutes) => {
-  if (!minutes) return '';
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  
-  if (hours === 0) {
-    return `${remainingMinutes} min`;
-  } else if (remainingMinutes === 0) {
-    return `${hours} hours`;
-  } else {
-    return `${hours} hours ${remainingMinutes} min`;
-  }
-};
-
+import { formatTimeEstimation } from '@/utils/formatTimeEstimation'
 export default function CourseStep({ step, index, course }) {
   const navigate = useNavigate()
   return (

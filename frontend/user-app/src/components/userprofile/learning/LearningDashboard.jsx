@@ -1,26 +1,32 @@
 import React, { useEffect, useState } from 'react'
-import { BookOpen, Clock, GraduationCap, Trophy } from 'lucide-react'
+import { BookOpen, Clock, GraduationCap, Trophy, Star } from 'lucide-react'
 import { CourseCard } from './CourseCard'
 import { StatsCard } from './StatsCard'
 import { CourseAPI } from '@/services/api/courseApi'
+import { UserAPI } from '@/services/api/userApi'
 import LearningDashBoardLoading from '@/components/loading/LearningDashBoardLoading'
 
 export function LearningDashboard() {
   const [courses, setCourses] = useState([])
   const [stats, setStats] = useState([])
   const [loading, setLoading] = useState(true)
+  const [userPoint, setUserPoint] = useState(0)
 
   useEffect(() => {
-    const fetchEnrolledCourses = async () => {
+    const fetchData = async () => {
       try {
-        // Gọi API và nhận mảng các khóa học
-        const enrolledCourses = await CourseAPI.getUserEnrollments(1, 10)
+        // Fetch enrolled courses và user point song song
+        const [enrolledCourses, pointData] = await Promise.all([
+          CourseAPI.getUserEnrollments(1, 10),
+          UserAPI.getUserPoint()
+        ])
 
+        console.log(enrolledCourses)
+        console.log(pointData)
         const coursesWithProgress = await Promise.all(
           enrolledCourses.courseDtos.data.map(async (course) => {
             try {
               const courseProgress = await CourseAPI.getCourseProgress(course.courseId)
-
               const currentLecture = courseProgress.progress.find((lecture) => lecture.isCurrent)
               return {
                 ...course,
@@ -34,6 +40,7 @@ export function LearningDashboard() {
         )
    
         setCourses(coursesWithProgress)
+        setUserPoint(pointData.totalPoints)
 
         // Tính toán thống kê
         const totalCourses = coursesWithProgress.length
@@ -56,32 +63,37 @@ export function LearningDashboard() {
             iconColor: 'text-yellow-600'
           },
           {
-            icon: Trophy,
+            icon: Star,
             label: 'Completed',
             value: completed,
             bgColor: 'bg-green-100',
             iconColor: 'text-green-600'
+          },
+          {
+            icon: Trophy,
+            label: 'Total Points',
+            value: pointData.totalPoints,
+            bgColor: 'bg-purple-100',
+            iconColor: 'text-purple-600'
           }
         ])
       } catch (error) {
-        console.error('Lỗi khi lấy danh sách khóa học:', error)
+        console.error('Lỗi khi lấy dữ liệu:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchEnrolledCourses()
+    fetchData()
   }, [])
 
   if (loading) {
     return <LearningDashBoardLoading />
   }
 
-  console.log(courses)
-
   return (
     <div className='space-y-6 mt-6'>
-      <div className='grid grid-cols-3 gap-6'>
+      <div className='grid grid-cols-4 gap-6'>
         {stats.map((stat, index) => (
           <StatsCard key={index} {...stat} />
         ))}

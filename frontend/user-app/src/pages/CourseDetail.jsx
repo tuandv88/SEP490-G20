@@ -44,11 +44,9 @@ function CourseDetail() {
           CourseAPI.getCourseReviews(id, 1, 20)
         ])
 
-        console.log(reviewData)
         setCourseDetail(courseData)     
         setEnrolledCourses(enrolledData.enrollmentInfo)   
         setReviewData(reviewData)
-        console.log(enrolledData)
       } catch (error) {
         console.error('Error fetching data:', error)
         setError(true)
@@ -160,7 +158,7 @@ function CourseDetail() {
                         <CourseContent chapters={courseDetail?.course?.chapters} />
                       </>
                     ) : (
-                      <CourseEvaluate reviewData={reviewData} />
+                      <CourseEvaluate courseId={id} />
                     )}
                   </div>
                 </div>

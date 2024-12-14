@@ -68,5 +68,13 @@ export const LearningAPI = {
       }
     })
     return response.data
+  },
+  getCourseAvailableForUser: async (pageIndex, pageSize) => {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/courses/with-participation?PageIndex=${pageIndex}&PageSize=${pageSize}`, {
+      headers: {
+        'Authorization': `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
   }
 }

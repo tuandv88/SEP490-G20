@@ -1,7 +1,7 @@
 import React from 'react';
 import { User, UserCircle, Compass, FileText, BookOpen, Code, MessageCircle } from 'lucide-react';
 
-export function ProfileTabs({ activeTab, setActiveTab }) {
+export const ProfileTabs = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'account', label: 'Account Information', icon: User },
     { id: 'roadmap', label: 'Roadmap', icon: Compass },
@@ -13,27 +13,21 @@ export function ProfileTabs({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <div className="space-y-2">
-      {tabs.map((tab) => {
-        const Icon = tab.icon;
-        return (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`
-              group flex items-center w-full px-4 py-2 text-sm font-medium rounded-md
-              ${
-                activeTab === tab.id
-                  ? 'bg-primaryButton text-white'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-              }
-            `}
-          >
-            <Icon className="mr-3 h-5 w-5" />
-            {tab.label}
-          </button>
-        );
-      })}
+    <div className="space-y-1">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => setActiveTab(tab.id)}
+          className={`${
+            activeTab === tab.id
+              ? 'bg-muted text-primary'
+              : 'text-muted-foreground hover:bg-muted hover:text-primary'
+          } w-full flex items-center px-3 py-2 text-sm font-medium rounded-md`}
+        >
+          <tab.icon className="h-5 w-5 mr-3" />
+          {tab.label}
+        </button>
+      ))}
     </div>
-  );
+  )
 }

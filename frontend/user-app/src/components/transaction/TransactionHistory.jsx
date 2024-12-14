@@ -86,9 +86,7 @@ const TransactionHistory = () => {
 
           <div className='px-6 py-4 bg-gray-50 border-t border-gray-200'>
             <div className='flex justify-between items-center'>
-              <p className='text-sm text-gray-600'>
-                Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, transactionData.transactions.count)} of {transactionData.transactions.count} transactions
-              </p>
+              
               
               <Pagination>
                 <PaginationContent>

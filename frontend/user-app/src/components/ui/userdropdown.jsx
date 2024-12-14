@@ -3,6 +3,7 @@ import { AUTHENTICATION_ROUTERS } from '@/data/constants'
 import authServiceInstance from '@/oidc/AuthService'
 import { useContext, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { LogOut, User, Edit } from 'lucide-react'
 
 export default function DropdownMenuUser({ isOpen, userName, onClose }) {
   const { user } = useContext(UserContext)
@@ -38,15 +39,25 @@ export default function DropdownMenuUser({ isOpen, userName, onClose }) {
       aria-labelledby='options-menu'
     >
       <div className='px-4 py-3'>
-        <div className='flex items-center'>
-          <img
-            className='w-10 h-10 mr-3 rounded-full'
-            src={user.profile.urlImagePresigned}
-            alt=''
-          />
-          <div>
-            <p className='text-sm font-medium text-gray-900'>{userName}</p>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center'>
+            <img
+              className='w-10 h-10 mr-3 rounded-full'
+              src={user.profile.urlImagePresigned}
+              alt=''
+            />
+            <div>
+              <p className='text-sm font-medium text-gray-900'>{userName}</p>
+            </div>
           </div>
+          <a 
+            href={`${import.meta.env.VITE_AUTH_URL}/Profile/Index`}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            title="Edit Profile"
+            target="_blank"
+          >
+            <Edit className="h-4 w-4 text-gray-500" />
+          </a>
         </div>
       </div>
 
@@ -59,14 +70,10 @@ export default function DropdownMenuUser({ isOpen, userName, onClose }) {
           className='block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
           role='menuitem'
         >
-          My Profile
-        </button>
-
-        <button
-          className='block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
-          role='menuitem'
-        >
-          Settings
+          <div className="flex items-center">
+            <User className="h-4 w-4 mr-2" />
+            <span>My Profile</span>
+          </div>
         </button>
 
         <button
@@ -77,7 +84,10 @@ export default function DropdownMenuUser({ isOpen, userName, onClose }) {
           className='block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900'
           role='menuitem'
         >
-          Sign out
+          <div className="flex items-center">
+            <LogOut className="h-4 w-4 mr-2" />
+            <span>Sign out</span>
+          </div>
         </button>
       </div>
     </div>

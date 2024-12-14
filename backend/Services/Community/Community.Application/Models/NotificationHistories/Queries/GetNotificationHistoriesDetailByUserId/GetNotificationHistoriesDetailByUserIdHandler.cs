@@ -39,9 +39,16 @@ public class GetNotificationHistoriesDetailByUserIdHandler : IQueryHandler<GetNo
 
         var allData = await _repository.GetAllNotificationDetailByUserId(userId.Value);
 
-        if (allData == null)
+        // Nếu không có thông báo nào, trả về rỗng
+        if (allData == null || !allData.Any())
         {
-            throw new NotFoundException("Not Found NotifiactionHistories.");
+            var emptyPaginatedData = new PaginatedResult<NotificationHistoryDetailDto>(
+                query.PaginationRequest.PageIndex,
+                query.PaginationRequest.PageSize,
+                0,
+                new List<NotificationHistoryDetailDto>());
+
+            return new GetNotificationHistoriesDetailByUserIdResult(emptyPaginatedData);
         }
 
         // Lấy thông tin NotificationType cho tất cả các NotificationHistory (tạo dictionary để tối ưu)
@@ -51,7 +58,13 @@ public class GetNotificationHistoriesDetailByUserIdHandler : IQueryHandler<GetNo
 
         if (notificationTypes == null || !notificationTypes.Any())
         {
-            throw new NotFoundException("Notification Types not found.");
+            var emptyPaginatedData = new PaginatedResult<NotificationHistoryDetailDto>(
+                query.PaginationRequest.PageIndex,
+                query.PaginationRequest.PageSize,
+                0,
+                new List<NotificationHistoryDetailDto>());
+
+            return new GetNotificationHistoriesDetailByUserIdResult(emptyPaginatedData);
         }
 
 

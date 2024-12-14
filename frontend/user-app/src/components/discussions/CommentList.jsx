@@ -159,38 +159,49 @@ function CommentList({ discussionId, userIdDiscussion }) {
             notificationTypeId: notificationTypeIdTmp, // Loại thông báo
             userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
             message: `
-                        <div class="text-sm text-muted-foreground mb-2 break-words">
-                        <p> <strong>${fullNameCurrentUser}</strong> commented on discussion post: <strong>${newComment}</strong></p>
-                        <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion</a></p>
-                        </div> `,
+            <div class="text-sm text-muted-foreground mb-2 break-words">
+              <a href="/discussion/${discussionId}" style="color: inherit; text-decoration: none;">
+                <p>
+                  <strong>${fullNameCurrentUser}</strong> commented on discussion post: 
+                  <strong>${newComment}</strong>
+                </p>
+              </a>
+            </div>
+          `,
             sentVia: 'Web', // Hoặc 'Email' nếu cần
             status: 'Sent', // Trạng thái gửi
             subject: null
           };
           //console.log(notificationData);
-          const response = await NotificationApi.createsNotificationHistoryBath(notificationData);        // Gửi nhiều người
+          const responseBatch = await NotificationApi.createsNotificationHistoryBath(notificationData);        // Gửi nhiều người
         }
 
         // Lọc ra người dùng có userId === userIdDiscussion. Là chủ bài viết nhưng không phải người gửi.
-        const matchedUserId = userIds.find(userId => userId === userIdDiscussion);
-        if (matchedUserId && !isOwnerDiscussion) {
+        const matchedUserId = userIds.find(userId => userId === userIdDiscussion && userId !== idCurrentUser);
+        if (matchedUserId) {
           const notificationData = {
             userIdReceive: matchedUserId,
             userIdSend: null,
             notificationTypeId: notificationTypeIdTmp, // Loại thông báo
             userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
             message: `
-                        <div class="text-sm text-muted-foreground mb-2 break-words">
-                        <p> <strong>${fullNameCurrentUser}</strong> commented on Your Discussion post: <strong>${newComment}</strong></p>
-                        <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion</a></p>
-                        </div> `,
+            <div class="text-sm text-muted-foreground mb-2 break-words">
+              <a href="/discussion/${discussionId}" style="color: inherit; text-decoration: none;">
+                <p>
+                  <strong>${fullNameCurrentUser}</strong> commented on your discussion post: 
+                  <strong>${newComment}</strong>
+                </p>
+              </a>
+            </div>
+          `,
             sentVia: 'Web', // Hoặc 'Email' nếu cần
             status: 'Sent', // Trạng thái gửi
             subject: null
           };
+
           //console.log(notificationData);
-          const response = await NotificationApi.createNotificationHistory(notificationData);             // Gửi 1 người
-          console.log(response)
+          const responseSingle = await NotificationApi.createNotificationHistory(notificationData);             // Gửi 1 người
+          //console.log(response)
         }
       }
     } catch (err) {
@@ -287,10 +298,14 @@ function CommentList({ discussionId, userIdDiscussion }) {
               notificationTypeId: notificationTypeIdTmp, // Loại thông báo
               userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
               message: `
-                <div class="text-sm text-muted-foreground mb-2 break-words">
-                <p> <strong>${fullNameCurrentUser}</strong> Voted Comment your post follow.</p>
-                <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
-                </div> `,
+            <div class="text-sm text-muted-foreground mb-2 break-words">
+              <a href="/discussion/${discussionId}" style="color: inherit; text-decoration: none;">
+                <p>
+                  <strong>${fullNameCurrentUser}</strong> Voted comment your post follow.
+                </p>
+              </a>
+            </div>
+          `,
               sentVia: 'Web', // Hoặc 'Email' nếu cần
               status: 'Sent', // Trạng thái gửi
               subject: null
@@ -316,10 +331,14 @@ function CommentList({ discussionId, userIdDiscussion }) {
                 notificationTypeId: notificationTypeIdTmp, // Loại thông báo
                 userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
                 message: `
-                <div class="text-sm text-muted-foreground mb-2 break-words">
-                <p> <strong>${fullNameCurrentUser}</strong> Voted Reply your post follow.</p>
-                <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
-                </div> `,
+            <div class="text-sm text-muted-foreground mb-2 break-words">
+              <a href="/discussion/${discussionId}" style="color: inherit; text-decoration: none;">
+                <p>
+                  <strong>${fullNameCurrentUser}</strong> Voted Reply your post follow.
+                </p>
+              </a>
+            </div>
+          `,
                 sentVia: 'Web', // Hoặc 'Email' nếu cần
                 status: 'Sent', // Trạng thái gửi
                 subject: null
@@ -589,10 +608,14 @@ function CommentList({ discussionId, userIdDiscussion }) {
               notificationTypeId: notificationTypeIdTmp, // Loại thông báo
               userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
               message: `
-                      <div class="text-sm text-muted-foreground mb-2 break-words">
-                      <p> <strong>${fullNameCurrentUser}</strong> Replied to comment on post: <strong>${contentCheck}</strong></p>
-                      <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the comment</a></p>
-                      </div> `,
+            <div class="text-sm text-muted-foreground mb-2 break-words">
+              <a href="/discussion/${discussionId}" style="color: inherit; text-decoration: none;">
+                <p>
+                  <strong>${fullNameCurrentUser}</strong> Replied to comment on post: <strong>${contentCheck}</strong></p>
+                </p>
+              </a>
+            </div>
+          `,
               sentVia: 'Web', // Hoặc 'Email' nếu cần
               status: 'Sent', // Trạng thái gửi
               subject: null
@@ -615,10 +638,14 @@ function CommentList({ discussionId, userIdDiscussion }) {
               notificationTypeId: notificationTypeIdTmp, // Loại thông báo
               userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
               message: `
-                    <div class="text-sm text-muted-foreground mb-2 break-words">
-                    <p> <strong>${fullNameCurrentUser}</strong> Replied to reply on post: <strong>${contentCheck}</strong></p>
-                    <p><a href="/discussion/${discussionId}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the comment</a></p>
-                    </div> `,
+            <div class="text-sm text-muted-foreground mb-2 break-words">
+              <a href="/discussion/${discussionId}" style="color: inherit; text-decoration: none;">
+                <p>
+                  <strong>${fullNameCurrentUser}</strong> Replied to reply on post: <strong>${contentCheck}</strong></p>
+                </p>
+              </a>
+            </div>
+          `,
               sentVia: 'Web', // Hoặc 'Email' nếu cần
               status: 'Sent', // Trạng thái gửi
               subject: null
@@ -913,7 +940,10 @@ function CommentList({ discussionId, userIdDiscussion }) {
                     onClick={copyToClipboard}
                   >
                     <Tooltip title={tooltipContent} arrow>
-                      <FontAwesomeIcon icon={faShareFromSquare} /> Share
+                      <div className="tooltip-content">
+                        <FontAwesomeIcon icon={faShareFromSquare} />
+                        Share
+                      </div>
                     </Tooltip>
                   </button>
 

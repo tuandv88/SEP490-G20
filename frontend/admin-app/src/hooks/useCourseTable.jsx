@@ -201,21 +201,14 @@ export default function useCourseTable() {
       return
     }
 
-    const scheduledDate = currentStatus === 'Scheduled' ? null : undefined
-    console.log(`Setting scheduledDate to: ${scheduledDate}`)
-
-    await updateCourseStatus(courseId, newStatus, scheduledDate)
+    await updateCourseStatus(courseId, newStatus, null)
   }
 
   const updateCourseStatus = async (courseId, status, scheduledPublishDate) => {
-    console.log(
-      `Updating course ${courseId} status to ${status} with scheduledPublishDate: ${convertISOtoUTC(scheduledPublishDate)}`
-    )
-
     try {
       const payload = {
         courseStatus: status,
-        scheduledPublishDate: convertISOtoUTC(scheduledPublishDate)
+        scheduledPublishDate: scheduledPublishDate === null ? null : convertISOtoUTC(scheduledPublishDate)
       }
 
       console.log('Payload for API call:', payload)

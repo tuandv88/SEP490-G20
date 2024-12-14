@@ -1,4 +1,6 @@
-﻿namespace Learning.Domain.Models;
+﻿using Learning.Domain.Events;
+
+namespace Learning.Domain.Models;
 public class QuizSubmission : Aggregate<QuizSubmissionId> {
     public UserId UserId { get; set; } = default!;
     public QuizId QuizId { get; set; } = default!;
@@ -15,6 +17,7 @@ public class QuizSubmission : Aggregate<QuizSubmissionId> {
 
     public void UpdateStatus(QuizSubmissionStatus status) {
         Status = status;
+        AddDomainEvent(new QuizSubmissionSuccessEvent(QuizId, Status, UserId));
     }
     public void UpdateSubmitResult(long score,long totalScore, int totalQuestions, int correctAnswers,int passingMark, List<QuestionAnswer>? answers) {
         Score = score;

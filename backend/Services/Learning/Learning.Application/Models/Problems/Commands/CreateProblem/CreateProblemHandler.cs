@@ -16,6 +16,11 @@ public class CreateProblemHandler(ILectureRepository lectureRepository, IProblem
             if (lecture.ProblemId != null) {
                 throw new ConflictException("Lecture has problem.");
             }
+
+            if (lecture.LectureType != LectureType.Practice)
+            {
+                throw new ConflictException("LectureType must be practice");
+            }
         }
         //TODO test code solution trước khi lưu vào database
         await ExecuteTestScripts(request.CreateProblemDto);

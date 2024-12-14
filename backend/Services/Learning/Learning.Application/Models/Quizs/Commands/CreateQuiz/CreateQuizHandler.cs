@@ -12,6 +12,10 @@ public class CreateQuizHandler(IQuizRepository quizRepository, ILectureRepositor
             if (lecture.QuizId != null) {
                 throw new ConflictException("Lecture has quiz.");
             }
+            if (lecture.LectureType != LectureType.Quiz)
+            {
+                throw new ConflictException("LectureType must be quiz");
+            }
         }
 
         var quiz = CreateNewQuiz(request.CreateQuizDto);

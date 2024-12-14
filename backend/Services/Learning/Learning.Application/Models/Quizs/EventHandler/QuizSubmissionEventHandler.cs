@@ -47,7 +47,6 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
             }
             await quizSubmissionRepository.SaveChangesAsync();
         }
-        return;
     }
     private void UpdateSubmissionWithoutAnswers(QuizSubmission quizSubmission, Quiz quiz) {
         quizSubmission.UpdateSubmitResult(0, quiz.Questions.Sum(q => q.Mark), quiz.Questions.Count, 0, quiz.PassingMark,

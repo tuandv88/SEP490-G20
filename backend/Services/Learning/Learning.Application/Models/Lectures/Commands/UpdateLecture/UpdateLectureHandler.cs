@@ -16,17 +16,11 @@ public class UpdateLectureHandler(IChapterRepository chapterRepository, ILecture
     }
 
     private Lecture UpdateLecture(Chapter chapter, Guid lectureId, UpdateLectureDto lectureDto) {
-
-        var lectureType = Enum.TryParse<LectureType>(lectureDto.LectureType, out var status)
-            ? status
-            : throw new ArgumentOutOfRangeException(nameof(lectureDto.LectureType), $"Value '{lectureDto.LectureType}' is not valid for LectureType.");
-
         var lecture = chapter.UpdateLecture(
             lectureId: LectureId.Of(lectureId),
             title: lectureDto.Title,
             summary: lectureDto.Summary,
             timeEstimation: lectureDto.TimeEstimation,
-            lectureType: lectureType,
             point: lectureDto.Point,
             isFree: lectureDto.IsFree
         );

@@ -39,19 +39,25 @@ public class GetTransactionAuditHandler(
         // Apply Status Filter
         if (filter.Status != null)
         {
-            transactions = transactions.Where(t => t.Status.ToString().Equals(filter.Status));
+            if (Enum.TryParse<TransactionStatus>(filter.Status, true, out var status))
+            {
+                transactions = transactions.Where(t => t.Status == status);
+            }
         }
 
         // Apply Payment Method Filter
         if (filter.PaymentMethod != null)
         {
-            transactions = transactions.Where(t => t.PaymentMethod.ToString().Equals(filter.PaymentMethod));
+            if (Enum.TryParse<PaymentMethod>(filter.PaymentMethod, true, out var paymentMethod))
+            {
+                transactions = transactions.Where(t => t.PaymentMethod == paymentMethod);
+            }
         }
 
         // Apply UserId Filter
         if (filter.UserId.HasValue && filter.UserId.Value != Guid.Empty)
         {
-            transactions = transactions.Where(t => t.UserId.Equals(filter.UserId.Value));
+            transactions = transactions.Where(t => t.UserId.Equals(UserId.Of(filter.UserId.Value)));
         }
 
         // Apply Currency Filter

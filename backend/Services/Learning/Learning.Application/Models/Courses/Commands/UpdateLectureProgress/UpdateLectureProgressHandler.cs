@@ -45,7 +45,7 @@ public class UpdateLectureProgressHandler(IUserEnrollmentRepository repository, 
             
             var totalLectures = course.Chapters.SelectMany(ch => ch.Lectures).Count();
             var completedLectures = userEnrollment.LectureProgress.Count;
-            if(userEnrollment.CompletionDate != null && completedLectures == totalLectures) {
+            if(userEnrollment.CompletionDate == null && completedLectures == totalLectures) {
                 userEnrollment.UpdateStatus(UserEnrollmentStatus.Completed);
                 userEnrollment.CompletionDate = DateTime.UtcNow;
             }

@@ -1,5 +1,5 @@
 ﻿namespace Learning.Domain.Models;
-public class ProblemSubmission : Entity<ProblemSubmissionId> {
+public class ProblemSubmission : Aggregate<ProblemSubmissionId> {
     public UserId UserId { get; set; } = default!;
     public ProblemId ProblemId { get; set; } = default!;
     public DateTime SubmissionDate { get; set; } = DateTime.UtcNow;

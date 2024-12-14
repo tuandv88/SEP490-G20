@@ -12,22 +12,32 @@ export function formatDateTime(dateString) {
   return `${hours}:${minutes}-${day}/${month}/${year}`
 }
 
-export function convertLocalToUTC(localDate) {
-  // Tạo một đối tượng Date từ ngày giờ địa phương
-  const date = new Date(localDate)
+export const localToUTC = (localTime) => {
+  const date = new Date(localTime)
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+}
 
-  // Lấy các thành phần của ngày giờ UTC
+export function convertISOtoUTC(isoString) {
+  // Tạo đối tượng Date từ chuỗi ISO
+  const date = new Date(isoString)
+
+  // Lấy các thành phần UTC
   const year = date.getUTCFullYear()
-  const month = date.getUTCMonth() // Lưu ý: Tháng trong JavaScript bắt đầu từ 0
+  const month = date.getUTCMonth()
   const day = date.getUTCDate()
   const hours = date.getUTCHours()
   const minutes = date.getUTCMinutes()
   const seconds = date.getUTCSeconds()
 
-  // Tạo một đối tượng Date mới với các thành phần UTC
-  const utcDate = new Date(Date.UTC(year, month, day, hours, minutes, seconds))
+  // Format các thành phần với padding số 0
+  const monthStr = (month + 1).toString().padStart(2, '0')
+  const dayStr = day.toString().padStart(2, '0')
+  const hoursStr = hours.toString().padStart(2, '0')
+  const minutesStr = minutes.toString().padStart(2, '0')
+  const secondsStr = seconds.toString().padStart(2, '0')
 
-  return utcDate
+  // Trả về chuỗi định dạng UTC
+  return `${year}-${monthStr}-${dayStr}T${hoursStr}:${minutesStr}:${secondsStr}Z`
 }
 
 export function getPastAndCurrentDates() {

@@ -65,7 +65,8 @@ public static class CourseExtensions {
             CourseLevel: course.CourseLevel.ToString(),
             Price: course.Price,
             Chapters: chapters,
-            LastModified: course.LastModified!.Value
+            LastModified: course.LastModified!.Value,
+            course.ScheduledPublishDate
             );
     }
 

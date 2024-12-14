@@ -22,7 +22,7 @@ public class GetCoursesHandler(
         filteredData = filteredData.Where(c => c.Title.ToLower().Contains(titleSearch.ToLower()));
         if (!isAdmin)
         {
-            filteredData = filteredData.Where(c => c.CourseStatus == CourseStatus.Published);
+            filteredData = filteredData.Where(c => c.CourseStatus == CourseStatus.Published || c.CourseStatus == CourseStatus.Scheduled);
         }
 
         if (!query.Filter.Level.IsNullOrEmpty() && 

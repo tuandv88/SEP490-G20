@@ -21,6 +21,7 @@ public class CreateQuizHandler(IQuizRepository quizRepository, ILectureRepositor
         var quiz = CreateNewQuiz(request.CreateQuizDto);
         if (lecture != null) {
             lecture.QuizId = quiz.Id;
+            await lectureRepository.UpdateAsync(lecture);
         }
         await quizRepository.AddAsync(quiz);
         await quizRepository.SaveChangesAsync(cancellationToken);

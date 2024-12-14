@@ -343,7 +343,7 @@ namespace Learning.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LectureId");
+                    b.HasAlternateKey("LectureId", "UserEnrollmentId");
 
                     b.HasIndex("UserEnrollmentId");
 
@@ -537,7 +537,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 26, 20, 31, 23, 892, DateTimeKind.Utc).AddTicks(4308));
+                        .HasDefaultValue(new DateTime(2024, 12, 12, 19, 10, 29, 312, DateTimeKind.Utc).AddTicks(1675));
 
                     b.Property<string>("TestResults")
                         .IsRequired()
@@ -757,7 +757,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("StartTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 26, 20, 31, 23, 910, DateTimeKind.Utc).AddTicks(346));
+                        .HasDefaultValue(new DateTime(2024, 12, 12, 19, 10, 29, 331, DateTimeKind.Utc).AddTicks(7081));
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -768,7 +768,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 26, 20, 31, 23, 910, DateTimeKind.Utc).AddTicks(1084));
+                        .HasDefaultValue(new DateTime(2024, 12, 12, 19, 10, 29, 331, DateTimeKind.Utc).AddTicks(7976));
 
                     b.Property<int>("TotalQuestions")
                         .HasColumnType("integer");
@@ -903,7 +903,7 @@ namespace Learning.Infrastructure.Data.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2024, 11, 26, 20, 31, 23, 917, DateTimeKind.Utc).AddTicks(6752));
+                        .HasDefaultValue(new DateTime(2024, 12, 12, 19, 10, 29, 342, DateTimeKind.Utc).AddTicks(1441));
 
                     b.Property<string>("Feedback")
                         .IsRequired()

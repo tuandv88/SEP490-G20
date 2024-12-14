@@ -316,6 +316,33 @@ function DiscussionDetail() {
         setReloadComponentCurrent(!reloadComponentCurrent);
         setShowAlert(true);
         setTimeout(() => setShowAlert(false), 3000);
+
+        if (discussion.isActive) {
+          // All userIdReceive Notification.
+          const userIds = await DiscussApi.getUserIdsWithNotificationsEnabled(discussion.id);
+          // Lọc danh sách để loại bỏ chính người gửi && chủ bài viết.
+          const filteredUserIds = userIds.filter(userIdTmp => userIdTmp !== discussion.userId);
+          const notificationTypeIdTmp = await getNotificationTypeIdByName('Update Discussion');
+          // Sau khi tạo bình luận thành công, tạo lịch sử thông báo
+          if (userIds.length > 0 && notificationTypeIdTmp) {
+            const notificationData = {
+              userIdsReceive: filteredUserIds,
+              userIdSend: null,
+              notificationTypeId: notificationTypeIdTmp, // Loại thông báo
+              userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
+              message: `
+                <div class="text-sm text-muted-foreground mb-2 break-words">
+                <p> <strong>${discussion.firstName + " " + discussion.lastName}</strong> update post: <strong>${discussion.title}</strong></p>
+                <p><a href="/discussion/${discussion.id}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion</a></p>
+                </div> `,
+              sentVia: 'Web', // Hoặc 'Email' nếu cần
+              status: 'Sent', // Trạng thái gửi
+              subject: null
+            };
+            //console.log(notificationData);
+            const response = await NotificationApi.createsNotificationHistoryBath(notificationData);        // Gửi nhiều người
+          }
+        }
       }
     } catch (error) {
       console.error("Error updating post:", error);

@@ -43,6 +43,8 @@ function CourseDetail() {
           CourseAPI.getEnrolledCourses(id),
           CourseAPI.getCourseReviews(id, 1, 20)
         ])
+
+        console.log(reviewData)
         setCourseDetail(courseData)     
         setEnrolledCourses(enrolledData.enrollmentInfo)   
         setReviewData(reviewData)
@@ -130,7 +132,7 @@ function CourseDetail() {
                       <button
                         className={`px-4 py-2 ${
                           activeTab === 'introduce'
-                            ? 'text-red-500 border-b-2 border-red-500 font-medium'
+                            ? 'text-primaryButton border-b-2 border-primaryButton font-medium'
                             : 'text-gray-500 hover:text-gray-700'
                         }`}
                         onClick={() => setActiveTab('introduce')}
@@ -140,7 +142,7 @@ function CourseDetail() {
                       <button
                         className={`px-4 py-2 ${
                           activeTab === 'evaluate'
-                            ? 'text-red-500 border-b-2 border-red-500 font-medium'
+                            ? 'text-primaryButton border-b-2 border-primaryButton font-medium'
                             : 'text-gray-500 hover:text-gray-700'
                         }`}
                         onClick={() => setActiveTab('evaluate')}

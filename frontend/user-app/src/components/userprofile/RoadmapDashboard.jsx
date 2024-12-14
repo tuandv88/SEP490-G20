@@ -11,6 +11,7 @@ import AssessmentPrompt from '../surrvey/AssessmentPromptProps'
 import QuizModal from '../surrvey/QuizModal'
 import UserRoadMapLoading from '../loading/UserRoadMapLoading'
 import { LearningPathPolling } from '../loading/LearningPathPolling'
+import { CourseAPI } from '@/services/api/courseApi'
 
 const RoadmapDashboard = ({ user }) => {
   // State declarations
@@ -31,22 +32,29 @@ const RoadmapDashboard = ({ user }) => {
 
   // Fetch course details helper function
   const fetchCourseDetails = async (courseIds) => {
-    const courseDetailsPromises = Array.from(courseIds).map(async (courseId) => {
-      const response = await LearningAPI.getCoursePreview(courseId)
-      return { courseId, course: response.course }
-    })
-
-    const coursesData = await Promise.all(courseDetailsPromises)
-    return coursesData.reduce((acc, { courseId, course }) => {
-      acc[courseId] = course
-      return acc
-    }, {})
+    if (courseIds.size === 0) return {};
+    
+    const response = await CourseAPI.getCourseWithParticipation(Array.from(courseIds));
+    return response.courses.data.reduce((acc, course) => {
+      acc[course.courseId] = {
+        id: course.courseId,
+        title: course.title,
+        headline: course.headline,
+        imageUrl: course.imageUrl,
+        status: course.status,
+        completionPercentage: course.completionPercentage,
+        price: course.price,
+        timeEstimation: course.timeEstimation,
+        courseLevel: course.courseLevel
+      };
+      return acc;
+    }, {});
   }
 
   // Poll for learning paths
   const pollLearningPaths = useCallback(() => {
     let attempts = 0
-    const maxAttempts = 7
+    const maxAttempts = 15
     let pollInterval
 
     setPollingStatus('polling')
@@ -85,7 +93,7 @@ const RoadmapDashboard = ({ user }) => {
     }
 
     pollInterval = setInterval(async () => {
-      console.log('Polling for learning paths...', attempts)
+      // console.log('Polling for learning paths...', attempts)
       const found = await poll()
       
       if (found || attempts >= maxAttempts) {
@@ -206,11 +214,42 @@ const RoadmapDashboard = ({ user }) => {
     }
   }
 
-  const handleSavePath = async (updatedPath) => {
+  const handleSavePath = async (updatedPath, updatedAvailableCourses) => {
     try {
+      // Cập nhật learning paths
       setLearningPaths((prevPaths) => 
         prevPaths.map((path) => (path.id === updatedPath.id ? updatedPath : path))
       )
+
+      // Cập nhật available courses
+      setAvailableCourses(updatedAvailableCourses)
+
+      // Cập nhật course details cho các course mới
+      const newCourseDetails = updatedPath.pathSteps.reduce((acc, step) => {
+        if (!courseDetails[step.courseId]) {
+          // Nếu là course mới (chưa có trong courseDetails)
+          acc[step.courseId] = {
+            id: step.courseId,
+            title: step.title,
+            headline: step.headline,
+            status: step.status || 'NotEnrolled',
+            completionPercentage: step.completionPercentage || 0,
+            price: step.price,
+            timeEstimation: step.timeEstimation,
+            courseLevel: step.courseLevel
+          }
+        }
+        return acc
+      }, {})
+
+      // Cập nhật courseDetails với các course mới
+      if (Object.keys(newCourseDetails).length > 0) {
+        setCourseDetails(prev => ({
+          ...prev,
+          ...newCourseDetails
+        }))
+      }
+
       setIsEditModalOpen(false)
       setSelectedPath(null)
     } catch (error) {
@@ -233,6 +272,7 @@ const RoadmapDashboard = ({ user }) => {
   if (loading) {
     return <UserRoadMapLoading />
   }
+
 
   return (
     <div className='space-y-6 mt-6'>

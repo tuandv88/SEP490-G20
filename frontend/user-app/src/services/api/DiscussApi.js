@@ -130,7 +130,7 @@ export const DiscussApi = {
       const requestBody = {
         updateDiscussionDto: discussionData
       };
-      console.log(requestBody);
+      //console.log(requestBody);
       const response = await fetch(`${API_BASE_URL}/community-service/discussions/update`, {
         method: 'PUT', // Phương thức PUT để cập nhật dữ liệu
         headers: {

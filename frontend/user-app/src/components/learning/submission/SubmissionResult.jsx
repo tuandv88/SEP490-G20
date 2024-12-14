@@ -2,7 +2,6 @@ import React from 'react'
 import { Check, X } from 'lucide-react'
 
 export default function SubmissionResult({ currentCode, resultCodeSubmit }) {
-  console.log(resultCodeSubmit)
   return (
     <div className='bg-[#1b2a32] h-full'>
       {resultCodeSubmit ? (

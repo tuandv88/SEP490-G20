@@ -61,7 +61,7 @@ export const LearningPathCard = ({
         </div>
 
         <div className="space-y-4">
-          <h4 className="font-semibold">Các bước trong lộ trình</h4>
+          <h4 className="font-semibold">Steps in the roadmap</h4>
           {path.pathSteps
             .sort((a, b) => a.stepOrder - b.stepOrder)
             .map((step, index) => (

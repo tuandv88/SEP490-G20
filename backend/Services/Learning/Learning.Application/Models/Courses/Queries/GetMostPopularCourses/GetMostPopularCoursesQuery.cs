@@ -2,5 +2,5 @@
 
 namespace Learning.Application.Models.Courses.Queries.GetMostPopularCourses;
 public record GetMostPopularCoursesQuery(PaginationRequest PaginationRequest) : IQuery<GetMostPopularCourseResult>;
-public record GetMostPopularCourseResult(PaginatedResult<CourseDto> CourseDtos);
+public record GetMostPopularCourseResult(PaginatedResult<CourseBasicDto> CourseDtos);
 

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Clock, Calendar, Award } from 'lucide-react'
+import { Clock, Calendar, Award, ShoppingCart } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CourseAPI } from '@/services/api/courseApi'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
@@ -14,9 +14,7 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
   const { user } = useContext(UserContext)
   const [firstLectureId, setFirstLectureId] = useState(null)
 
-
   console.log(courseDetail.course.price)
-
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -67,7 +65,7 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
       }
     } else {
       navigate(AUTHENTICATION_ROUTERS.PAYMENT.replace(':id', id), {
-        state: { 
+        state: {
           courseId: id,
           price: courseDetail.course.price
         }
@@ -76,7 +74,7 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
   }
 
   const convertToHoursAndMinutes = (minutes) => {
-    const hours = Math.floor(minutes / 60) 
+    const hours = Math.floor(minutes / 60)
     const remainingMinutes = minutes % 60
     return `${hours} hours ${remainingMinutes} minutes`
   }
@@ -120,13 +118,22 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
               <>
                 <button
                   onClick={() => handlePayment()}
-                  className='w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors mb-4'
+                  className='group relative w-full bg-gradient-to-r from-violet-500 to-purple-600 text-white py-4 rounded-xl 
+                 font-semibold hover:from-violet-600 hover:to-purple-700 transition-all duration-300 
+                 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl
+                 transform hover:-translate-y-0.5 overflow-hidden'
                 >
-                  Pay Now
+                  <div className='absolute inset-0 bg-gradient-to-r from-pink-500 to-rose-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
+                  <ShoppingCart className='w-5 h-5 relative z-10 transition-transform group-hover:scale-110' />
+                  <span className='text-lg relative z-10'>Purchase Course</span>
                 </button>
-                <p className='text-center text-gray-600 text-sm'>
-                  Join the course for ${courseDetail.course.price}
-                </p>
+                <div className='mt-2 text-center'>
+                  <div className='flex flex-col items-center justify-center'>
+                    <span className='text-gray-600 text-sm uppercase tracking-wide mb-1'>Course Price</span>
+                    <div className='text-4xl font-bold text-primaryButton mb-2'>${courseDetail.course.price.toFixed(2)}</div>
+                    <div className='flex items-center gap-3 text-sm text-gray-600'></div>
+                  </div>
+                </div>
               </>
             )}
           </>
@@ -140,7 +147,9 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
         </div>
         <div className='flex items-center gap-2'>
           <Clock className='w-5 h-5 text-gray-500' />
-          <span className='text-gray-600'>Time Estimate: {convertToHoursAndMinutes(courseDetail?.course?.timeEstimation)}</span>
+          <span className='text-gray-600'>
+            Time Estimate: {convertToHoursAndMinutes(courseDetail?.course?.timeEstimation)}
+          </span>
         </div>
         <div className='flex items-center gap-2'>
           <Calendar className='w-5 h-5 text-gray-500' />

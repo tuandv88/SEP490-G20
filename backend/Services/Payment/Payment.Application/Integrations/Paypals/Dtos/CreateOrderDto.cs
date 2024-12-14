@@ -7,6 +7,7 @@ public record CreateOrderDto(
 
 public record CreateOrderItem(
     string ProductId,
+    string ProductName,
     string ProductType,
     int Quantity,
     double UnitPrice

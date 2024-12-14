@@ -3,7 +3,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { AUTHENTICATION_ROUTERS } from '../data/constants'
 import Layout from '@/layouts/layout'
-import { useEffect, useReducer, useState } from 'react'
+import { useEffect, useReducer, useState, useCallback } from 'react'
 import { ChevronRight } from 'lucide-react'
 import CourseLoading from '@/components/loading/CourseLoading'
 import { ProblemSection } from '@/components/problem/ProblemSection'
@@ -12,6 +12,8 @@ import authServiceInstance from '@/oidc/AuthService'
 import SurveyModal from '@/components/surrvey/SurveyModal'
 import AssessmentPrompt from '@/components/surrvey/AssessmentPromptProps'
 import QuizModal from '@/components/surrvey/QuizModal'
+import { LearningPathPolling } from '@/components/loading/LearningPathPolling'
+import { LearningAPI } from '@/services/api/learningApi'
 
 import { QuizAPI } from '@/services/api/quizApi'
 import { UserAPI } from '@/services/api/userApi'
@@ -35,8 +37,6 @@ const Avatar = ({ src, alt, className, ...props }) => (
 )
 
 function HomePage() {
-  const { toast } = useToast()
-
   const initialState = {
     courses: [],
     loading: false,
@@ -45,7 +45,9 @@ function HomePage() {
     isSurveyOpen: false,
     isAssessmentPromptOpen: false,
     isQuizOpen: false,
-    quizAssessment: null
+    quizAssessment: null,
+    isQuizSubmitted: false,
+    pollingStatus: null
   }
 
   function reducer(state, action) {
@@ -66,13 +68,17 @@ function HomePage() {
         return { ...state, isQuizOpen: action.payload }
       case 'SET_QUIZ_ASSESSMENT':
         return { ...state, quizAssessment: action.payload }
+      case 'SET_IS_QUIZ_SUBMITTED':
+        return { ...state, isQuizSubmitted: action.payload }
+      case 'SET_POLLING_STATUS':
+        return { ...state, pollingStatus: action.payload }
       default:
         return state
     }
   }
 
   const [state, dispatch] = useReducer(reducer, initialState)
-
+  const { toast } = useToast()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -172,7 +178,74 @@ function HomePage() {
 
   const handleQuizComplete = (score) => {
     dispatch({ type: 'SET_IS_QUIZ_OPEN', payload: false })
+    dispatch({ type: 'SET_IS_QUIZ_SUBMITTED', payload: true })
   }
+
+  const handleClosePolling = () => {
+    dispatch({ type: 'SET_POLLING_STATUS', payload: null })
+    if (state.pollingStatus === 'error') {
+      dispatch({ type: 'SET_IS_QUIZ_SUBMITTED', payload: false })
+    }
+  }
+
+  const pollLearningPaths = useCallback(() => {
+    let attempts = 0
+    const maxAttempts = 15
+    let pollInterval
+
+    dispatch({ type: 'SET_POLLING_STATUS', payload: 'polling' })
+
+    const poll = async () => {
+      try {
+        const response = await LearningAPI.getLearningPath()
+        const paths = response.learningPathDtos
+
+        if (paths && paths.length > 0) {
+          dispatch({ type: 'SET_IS_QUIZ_SUBMITTED', payload: false })
+          clearInterval(pollInterval)
+          dispatch({ type: 'SET_POLLING_STATUS', payload: 'success' })
+          return true
+        }
+        return false
+      } catch (error) {
+        console.error('Lỗi khi poll lộ trình:', error)
+        dispatch({ type: 'SET_POLLING_STATUS', payload: 'error' })
+        return false
+      }
+    }
+
+    pollInterval = setInterval(async () => {
+      // console.log('Polling for learning paths...', attempts)
+      const found = await poll()
+      
+      if (found || attempts >= maxAttempts) {
+        clearInterval(pollInterval)
+        if (!found) {
+          console.log('Không tìm thấy lộ trình sau 15 giây')
+          dispatch({ type: 'SET_POLLING_STATUS', payload: 'error' })
+        }
+      }
+      attempts++
+    }, 2000)
+
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    let cleanup
+    if (state.isQuizSubmitted) {
+      cleanup = pollLearningPaths()
+    }
+    return () => {
+      if (cleanup) {
+        cleanup()
+      }
+    }
+  }, [state.isQuizSubmitted, pollLearningPaths])
 
   const { loading, courses, userInfo, isSurveyOpen, isAssessmentPromptOpen, isQuizOpen, quizAssessment } = state
 
@@ -195,8 +268,18 @@ function HomePage() {
                     algorithms.
                   </p>
                   <div className='flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4'>
-                    <Button onClick={() => navigate(AUTHENTICATION_ROUTERS.COURSELIST)} className='text-black bg-white hover:bg-blue-100'>Explore courses</Button>
-                    <Button onClick={() => navigate(AUTHENTICATION_ROUTERS.PROBLEMS)} className='border border-white hover:bg-red-600'>Participate in the algorithm</Button>
+                    <Button
+                      onClick={() => navigate(AUTHENTICATION_ROUTERS.COURSELIST)}
+                      className='text-black bg-white hover:bg-blue-100'
+                    >
+                      Explore courses
+                    </Button>
+                    <Button
+                      onClick={() => navigate(AUTHENTICATION_ROUTERS.PROBLEMS)}
+                      className='border border-white hover:bg-red-600'
+                    >
+                      Participate in the algorithm
+                    </Button>
                   </div>
                 </div>
                 <div className='md:w-5/11'>
@@ -222,14 +305,14 @@ function HomePage() {
                 >
                   View All Courses
                   <ChevronRight className='inline-block ml-2' />
-                </Button>
+                </Button>               
               </div>
             </div>
           </section>
 
           <section className='py-12 md:py-20'>
             <div className='container px-4 mx-auto'>
-              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Featured Courses</h2>
+              <h2 className='mb-8 text-2xl font-bold text-center md:text-3xl md:mb-10'>Algorithm and Discussion</h2>
               <ProblemSection />
             </div>
           </section>
@@ -260,7 +343,22 @@ function HomePage() {
           }}
           onComplete={handleQuizComplete}
           quiz={quizAssessment}
+          setIsQuizSubmitted={(value) => dispatch({ type: 'SET_IS_QUIZ_SUBMITTED', payload: value })}
         />
+
+        {state.pollingStatus && (
+          <LearningPathPolling
+            status={state.pollingStatus}
+            message={
+              state.pollingStatus === 'error'
+                ? 'Error occurs when creating a roadmap. Please try again later.'
+                : state.pollingStatus === 'success'
+                ? 'Your learning path has been created successfully.'
+                : 'Creating your learning path based on your assessment results...'
+            }
+            onClose={handleClosePolling}
+          />
+        )}
       </Layout>
     </>
   )

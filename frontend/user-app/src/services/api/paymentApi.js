@@ -32,5 +32,38 @@ export const PaymentAPI = {
       console.error('Error fetching transactions:', error)
       throw error
     }
+  },
+  cancelTransaction: async (transactionId) => {
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/payment-service/transactions/${transactionId}/cancel`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+          }
+        }
+      )
+      return response.data
+    } catch (error) {
+      console.error('Error cancelling transaction:', error)
+      throw error
+    }
+  },
+  checkPaymentEligibility: async (itemId) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/payment-service/items/${itemId}/payment-eligibility`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('authToken')}`
+          }
+        }
+      )
+      return response.data
+    } catch (error) {
+      console.error('Error checking payment eligibility:', error)
+      throw error
+    }
   }
 }

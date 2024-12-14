@@ -23,6 +23,8 @@ import { CustomConfirmModal } from '../ui/button-confirm-modal'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { useCountdown } from '@/hooks/useCountdown'
+
 
 const CodeBlock = ({ node, inline, className, children, ...props }) => {
   const match = /language-(\w+)/.exec(className || '')
@@ -63,10 +65,40 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
   const [problemIds, setProblemIds] = useState({})
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [testCaseMap, setTestCaseMap] = useState({})
 
-  const [timeLeft, setTimeLeft] = useState(timeLimit * 60);
+  const calculateRemainingTime = () => {
+    if (!hasTimeLimit) return 0;
+    
+    if (!answer?.startTime) return timeLimit * 60;
+    
+    const startTime = new Date(answer.startTime);
+    const now = new Date();
+    const elapsedSeconds = Math.floor((now - startTime) / 1000);
+    const remainingSeconds = (timeLimit * 60) - elapsedSeconds;
+    
+    return Math.max(0, remainingSeconds);
+  };
 
-  const [testCaseMap, setTestCaseMap] = useState({});
+  const timeLeft = useCountdown(
+    hasTimeLimit ? calculateRemainingTime() : 0,
+    async () => {
+      if (hasTimeLimit) {
+        await handleSubmitConfirm();
+      }
+    }
+  );
+
+  useEffect(() => {
+    if (hasTimeLimit) {
+      const remainingTime = calculateRemainingTime();
+      if (remainingTime <= 0) {
+        handleSubmitConfirm();
+      }
+    }
+  }, []);
+
+
 
   useEffect(() => {
     if (answer && answer.questionAnswers) {
@@ -89,6 +121,7 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
       setAnswers(initialAnswers)
     }
   }, [answer])
+
 
   const handleEditorChange = lodash.debounce((value) => {
     const currentQuestion = quiz.questions[currentQuestionIndex]
@@ -317,14 +350,32 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
   };
 
   const handleSubmitConfirm = async () => {
-    handleNext();
     try {
+      // Lưu câu trả lời của câu hỏi hiện tại trước khi submit
+      const currentQuestion = quiz.questions[currentQuestionIndex];
+      let userAnswer = answers[currentQuestion.id] || [];
+
+      if (currentQuestion.questionType === 'CodeSnippet') {
+        // Lưu câu trả lời cho câu hỏi code
+        if (isEmpty(codeRunPro)) {
+          await saveCodeSnippetAnswer(currentQuestion.id, templates);
+        } else {
+          await saveCodeSnippetAnswer(currentQuestion.id, codeRunPro);
+        }
+      } else {
+        // Lưu câu trả lời cho các loại câu hỏi khác
+        await saveAnswer(currentQuestion.id, userAnswer);
+      }
+
+      // Submit quiz
       const response = await QuizAPI.submitQuiz(answer.quizSubmissionId);
       console.log('Quiz submitted successfully');
-      setIsConfirmOpen(false);
-      onClose(true);
+      
+      // Đóng các modal và cập nhật trạng thái
+      setIsConfirmOpen(false);     
+      onClose(true);    
     } catch (error) {
-      console.error('Error submitting quiz:', error);
+      console.error('Error submitting quiz:', error);      
       setIsConfirmOpen(false);
     }
   };
@@ -335,12 +386,11 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
 
   const handleRunCode = async () => {
     if (isEmpty(codeRunPro)) {
-      console.log('codeRunPro: ', codeRunPro)
       setIsOpen(true)
       return
     }
 
-    console.log('codeRunPro: ', codeRunPro)
+
 
     const submissionData = {
       createCodeExecuteDto: {
@@ -350,7 +400,7 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
       }
     }
 
-    console.log('submissionData: ', submissionData)
+
     setLoading(true)
     try {
       const data = await LearningAPI.excuteCode(idCodeSnippetQuestions, submissionData)
@@ -484,29 +534,6 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
         return <p>Unsupported question type: {currentQuestion.questionType}</p>
     }
   }
-
-  useEffect(() => {
-    let timer;
-    if (hasTimeLimit && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            // Khi hết giờ, tự động nộp bài
-            handleSubmitConfirm();
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (timer) {
-        clearInterval(timer);
-      }
-    };
-  }, [hasTimeLimit, timeLeft]);
 
   const handleClose = () => {
     onClose(false);

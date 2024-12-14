@@ -32,7 +32,8 @@ public class UserContextService : IUserContextService {
     }
 
     private string GetEmail() {
-        return _httpContextAccessor.HttpContext?.User.FindFirst("email")?.Value!;
+        return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Email)?.Value
+               ?? _httpContextAccessor.HttpContext?.User.FindFirst("email")?.Value!;
     }
 
     private string GetFirstName() {

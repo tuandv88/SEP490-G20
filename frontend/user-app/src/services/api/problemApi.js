@@ -20,6 +20,14 @@ export const ProblemAPI = {
     })
     return response.data
   },
+  getSubmissionHistoryProblem: async (problemId) => {
+    const response = await axios.get(`${API_BASE_URL}/learning-service/problems/${problemId}/submissions/challenge`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  },
   getAllProblems: async (pageIndex, pageSize, searchString = '') => {
     const response = await axios.get(
       `${API_BASE_URL}/learning-service/problems`,

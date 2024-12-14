@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import { X, GripVertical, Clock, DollarSign } from 'lucide-react'
+import { X, GripVertical, Clock, DollarSign, Search } from 'lucide-react'
 import { LearningPathAPI } from '@/services/api/learningPathApi'
 
 export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onClose, onSave }) => {
@@ -22,44 +22,26 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
     availableCoursesList.filter((course) => !path.pathSteps.find((step) => step.courseId === course.id))
   )
 
-  const handleDragEnd = async (result) => {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filteredCourses, setFilteredCourses] = useState(availableCourses)
+
+  useEffect(() => {
+    const filtered = availableCourses.filter(course => 
+      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.headline?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    setFilteredCourses(filtered)
+  }, [searchTerm, availableCourses])
+
+  const handleDragEnd = (result) => {
     if (!result.destination) return
 
     const sourceIndex = result.source.index
     const destinationIndex = result.destination.index
 
-    // Lấy ra course id của source và destination
-    const sourceItem = editedPath.pathSteps[sourceIndex]
-    const destinationItem = editedPath.pathSteps[destinationIndex]
-
-    const sourceCourseId = sourceItem.id
-    const sourceStepOrder = sourceItem.stepOrder
-    const destinationCourseId = destinationItem.id
-    const destinationStepOrder = destinationItem.stepOrder
-
-    const data = {
-      PathSteps: [
-        {
-          id: sourceCourseId,
-          stepOrder: destinationStepOrder
-        },
-        {
-          id: destinationCourseId,
-          stepOrder: sourceStepOrder
-        }
-      ]
-    }
-
-    try {
-      const response = await LearningPathAPI.swapCourseInPath(data)
-      console.log('Response:', response)
-    } catch (error) {
-      console.error('Error swapping courses:', error)
-    }
-
     const items = Array.from(editedPath.pathSteps)
-    const [reorderedItem] = items.splice(result.source.index, 1)
-    items.splice(result.destination.index, 0, reorderedItem)
+    const [reorderedItem] = items.splice(sourceIndex, 1)
+    items.splice(destinationIndex, 0, reorderedItem)
 
     const updatedSteps = items.map((item, index) => ({
       ...item,
@@ -69,13 +51,14 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
     setEditedPath({ ...editedPath, pathSteps: updatedSteps })
   }
 
-  const addCourse = async (course) => {
+  const addCourse = (course) => {
     const newStep = {
       id: `temp-${Date.now()}`,
       learningPathId: path.id,
       courseId: course.id,
       stepOrder: editedPath.pathSteps.length + 1,
-      status: 0,
+      status: 'NotEnrolled',
+      completionPercentage: 0,
       enrollmentDate: null,
       completionDate: null,
       expectedCompletionDate: new Date().toISOString(),
@@ -85,21 +68,6 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
       price: course.price
     }
 
-    const data = {
-      createPathStepDto: {
-        learningPathId: path.id,
-        courseId: course.id,
-        stepOrder: editedPath.pathSteps.length + 1
-      }
-    }
-
-    try {
-      const response = await LearningPathAPI.createPathStep(data)
-      console.log('Response:', response)
-    } catch (error) {
-      console.error('Error creating path step:', error)
-    }
-
     setEditedPath({
       ...editedPath,
       pathSteps: [...editedPath.pathSteps, newStep]
@@ -107,13 +75,17 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
     setAvailableCourses(availableCourses.filter((c) => c.id !== course.id))
   }
 
-  const removeCourse = async (stepId) => {
-    console.log(stepId)
+  const removeCourse = (stepId) => {
     const removedStep = editedPath.pathSteps.find((step) => step.id === stepId)
     if (removedStep) {
-      const removedCourse = courses.find((course) => course.id === removedStep.courseId)
+      const removedCourse = courses.find((course) => course.id === removedStep.courseId) || 
+                           availableCoursesList.find((course) => course.id === removedStep.courseId)
+      
       if (removedCourse) {
-        setAvailableCourses([...availableCourses, removedCourse])
+        const isAlreadyAvailable = availableCourses.some(course => course.id === removedCourse.id)
+        if (!isAlreadyAvailable) {
+          setAvailableCourses([...availableCourses, removedCourse])
+        }
       }
     }
 
@@ -126,12 +98,23 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
           stepOrder: index + 1
         }))
     })
+  }
 
+  const handleSaveChanges = async () => {
     try {
-      const response = await LearningPathAPI.deletePathStep(stepId)
-      console.log('Response:', response)
+      const pathStepsData = {
+        PathSteps: editedPath.pathSteps.map(step => ({
+          learningPathId: path.id,
+          courseId: step.courseId,
+          stepOrder: step.stepOrder
+        }))
+      }
+
+      await LearningPathAPI.swapCourseInPath(pathStepsData)
+      
+      onSave(editedPath, availableCourses)
     } catch (error) {
-      console.error('Error deleting path step:', error)
+      console.error('Error saving path changes:', error)
     }
   }
 
@@ -201,18 +184,49 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
           </div>
 
           <div className='w-[30vw] border-l p-4 overflow-y-auto'>
-            <h3 className='font-bold mb-4'>Available Courses</h3>
-            <div className='space-y-2'>
-              {availableCourses.map((course) => (
-                <div
-                  key={course.id}
-                  className='p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100'
-                  onClick={() => addCourse(course)}
-                >
-                  <h4 className='font-semibold'>{course.title}</h4>
-                  <p className='text-sm text-gray-600'>{course.title}</p>
-                </div>
-              ))}
+            <div className='space-y-4'>
+              <h3 className='font-bold'>Available Courses</h3>
+              
+              <div className='relative'>
+                <input
+                  type='text'
+                  placeholder='Search courses...'
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className='w-full px-4 py-2 pl-10 border rounded-lg focus:ring-2 focus:border-primaryButton focus:outline-none'
+                />
+                <Search 
+                  size={18} 
+                  className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'
+                />
+              </div>
+
+              <p className='text-sm text-gray-500'>
+                {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''} available
+              </p>
+
+              <div className='space-y-2'>
+                {filteredCourses.map((course) => (
+                  <div
+                    key={course.id}
+                    className='p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100'
+                    onClick={() => addCourse(course)}
+                  >
+                    <h4 className='font-semibold'>{course.title}</h4>
+                    <p className='text-sm text-gray-600'>{course.headline}</p>
+                    <div className='flex items-center gap-4 text-sm text-gray-500 mt-2'>
+                      <span className='flex items-center gap-1'>
+                        <Clock size={14} />
+                        {course.timeEstimation || 0} hours
+                      </span>
+                      <span className='flex items-center gap-1'>
+                        <DollarSign size={14} />
+                        {course.price === 0 ? 'Free' : course.price}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -222,8 +236,8 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
             Cancel
           </button>
           <button
-            onClick={() => onSave(editedPath)}
-            className='px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600'
+            onClick={handleSaveChanges}
+            className='px-4 py-2 bg-primaryButton text-white rounded-lg hover:bg-[#3e80c1]'
           >
             Save Changes
           </button>

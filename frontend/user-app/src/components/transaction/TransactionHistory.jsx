@@ -3,9 +3,20 @@ import { History } from 'lucide-react'
 import TransactionTable from './TransactionTable'
 import TransactionSkeleton from '../loading/TransactionSkeleton'
 import { PaymentAPI } from '../../services/api/paymentApi'
+import { Button } from '../ui/button'
+import { 
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 const TransactionHistory = () => {
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize] = useState(10)
   const [transactionData, setTransactionData] = useState({
     totalPointUsed: 0,
     transactions: {
@@ -13,35 +24,39 @@ const TransactionHistory = () => {
       count: 0
     }
   })
-  
-  console.log(transactionData)
+
+  const totalPages = Math.ceil(transactionData.transactions.count / pageSize)
+
+  const fetchTransactions = async (page) => {
+    try {
+      setLoading(true)
+      const response = await PaymentAPI.getTransactions(page, pageSize)
+      setTransactionData(response)
+    } catch (error) {
+      console.error('Error fetching transactions:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        setLoading(true)
-        const response = await PaymentAPI.getTransactions(1, 20)
-        setTransactionData(response)
-      } catch (error) {
-        console.error('Error fetching transactions:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchTransactions()
-  }, [])
+    fetchTransactions(currentPage)
+  }, [currentPage])
+
+  const handleTransactionCancelled = () => {
+    fetchTransactions(currentPage)
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
 
   if (loading) {
     return <TransactionSkeleton />
   }
 
-  // const totalPointsValue = transactionData?.transactions?.data?.reduce(
-  //   (sum, t) => sum + (t?.grossAmount || 0),
-  //   0
-  // ) || 0
-
   return (
-    <div className='min-h-screen py-8 px-4 sm:px-6 lg:px-8'>
+    <div className='min-h-screen py-8 px-4 sm:px-6 lg:px-8 !max-w-full'>
       <div className='max-w-7xl mx-auto'>
         <div className='bg-white rounded-lg shadow-lg overflow-hidden'>
           <div className='px-6 py-4 border-b border-gray-200'>
@@ -59,20 +74,51 @@ const TransactionHistory = () => {
               <div className='text-sm text-indigo-800'>
                 <span className='font-medium'>Total Points Used:</span> {transactionData?.totalPointUsed || 0} points
               </div>
-              {/* <div className='text-sm text-indigo-800'>
-                <span className='font-medium'>Total Points Value:</span> ${totalPointsValue.toFixed(2)}
-              </div> */}
             </div>
           </div>
 
           <div className='p-6'>
-            <TransactionTable transactions={transactionData.transactions.data} />
+            <TransactionTable 
+              transactions={transactionData.transactions.data} 
+              onTransactionCancelled={handleTransactionCancelled}
+            />
           </div>
 
           <div className='px-6 py-4 bg-gray-50 border-t border-gray-200'>
-            <p className='text-sm text-gray-600'>
-              Showing {transactionData.transactions.count} transactions
-            </p>
+            <div className='flex justify-between items-center'>
+              <p className='text-sm text-gray-600'>
+                Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, transactionData.transactions.count)} of {transactionData.transactions.count} transactions
+              </p>
+              
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    />
+                  </PaginationItem>
+                  
+                  {[...Array(totalPages)].map((_, index) => (
+                    <PaginationItem key={index + 1}>
+                      <PaginationLink
+                        onClick={() => handlePageChange(index + 1)}
+                        isActive={currentPage === index + 1}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
           </div>
         </div>
       </div>

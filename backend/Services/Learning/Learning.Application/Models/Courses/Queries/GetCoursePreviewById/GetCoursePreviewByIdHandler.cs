@@ -1,7 +1,7 @@
 ﻿using Learning.Application.Models.Courses.Queries.GetCoursePreviewById;
 using Learning.Application.Models.Lectures.Dtos;
 
-namespace Learning.Application.Models.Courses.Queries;
+namespace Learning.Application.Models.Courses.Queries.GetCoursePreviewById;
 public class GetCoursePreviewByIdHandler(ICourseRepository repository, IFilesService filesService, IUserContextService userContext, IFileRepository fileRepository)
     : IQueryHandler<GetCoursePreviewByIdQuery, GetCoursePreviewByIdResult> {
     public async Task<GetCoursePreviewByIdResult> Handle(GetCoursePreviewByIdQuery request, CancellationToken cancellationToken) {

@@ -1,5 +1,4 @@
-﻿using AuthServer.Models.AccountViewModel;
-using AuthServer.Models;
+﻿using AuthServer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using AuthServer.Models.ProfileViewModel;
@@ -14,17 +13,15 @@ namespace AuthServer.Controllers
 {
     public class ProfileController : Controller
     {
-        private readonly SignInManager<Users> _signInManager;
         private readonly UserManager<Users> _userManager;
         private readonly UrlEncoder _urlEncoder;
         private readonly IFilesService _filesService;
         private readonly IConfiguration _configuration;
 
-        public ProfileController(SignInManager<Users> signInManager, UserManager<Users> userManagerr, UrlEncoder urlEncoder, IFilesService filesService, IConfiguration configuration)
+        public ProfileController(UserManager<Users> userManagerr, UrlEncoder urlEncoder, IFilesService filesService, IConfiguration configuration)
         {
 
             _configuration = configuration;
-            _signInManager = signInManager;
             _userManager = userManagerr;
             _urlEncoder = urlEncoder;
             _filesService = filesService;
@@ -232,7 +229,7 @@ namespace AuthServer.Controllers
         [HttpPost]
         public async Task<IActionResult> AddEmail(EmailViewModel model)
         {
-            return View();
+            return View(model);
         }
 
         [HttpGet]

@@ -23,9 +23,6 @@ public class UpdateLectureCommandValidator : AbstractValidator<UpdateLectureComm
         RuleFor(x => x.Lecture.Point)
             .GreaterThanOrEqualTo(0).WithMessage("Point must be greater than or equal to zero.");
 
-        RuleFor(x => x.Lecture.LectureType)
-            .Must(BeValidLectureType).WithMessage("Lecture type must be a valid value (Lesson, Quiz, Practice).");
-
         RuleFor(x => x.Lecture.IsFree)
             .NotNull().WithMessage("IsFree must not be null.");
     }

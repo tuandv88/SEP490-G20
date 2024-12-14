@@ -262,7 +262,7 @@ namespace AuthServer.Controllers
         {
             if (userId == null || code == null || expiration == null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Account");
             }
 
             // Tìm người dùng theo ID
@@ -750,7 +750,7 @@ namespace AuthServer.Controllers
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Account");
                 }
                 else
                 {

@@ -6,10 +6,10 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
     public string BuildPrompt(PromptType promptType, string question, string facts, IMessageContext? context = default) {
         return promptType switch {
             PromptType.AnswerWithFacts => BuidAnswerWithFacts(question, facts, context),
-            PromptType.Suggestion => BuidSuggestion(question, facts),
-            PromptType.Summarize => BuidSummarize(question, facts),
-            PromptType.Pathway => BuidPathway(question, facts, context),
-            PromptType.ContentModeration => BuidContentModeration(question, facts, context),
+            PromptType.Suggestion => BuildSuggestion(question, facts),
+            PromptType.Summarize => BuildSummarize(question, facts),
+            PromptType.Pathway => BuildPathway(question, facts, context),
+            PromptType.ContentModeration => BuildContentModeration(question, facts, context),
             _ => throw new ArgumentOutOfRangeException(nameof(promptType), promptType, null)
         };
     }
@@ -33,26 +33,27 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
         var lectureId = context.GetCustomLearningLectureIdOrDefault("");
         var problemId = context.GetCustomLearningProblemIdOrDefault("");
         var connectionId = context.GetCustomCommunityConnectionIdOrDefault("");
-
+        var fullname = context.GetCustomUserFullnameOrDefault("");
+        
         prompt = prompt.Replace("{{$facts}}", facts.Trim(), StringComparison.OrdinalIgnoreCase);
         prompt = prompt.Replace("{{$lectureId}}", lectureId, StringComparison.OrdinalIgnoreCase);
         prompt = prompt.Replace("{{$problemId}}", problemId, StringComparison.OrdinalIgnoreCase);
         prompt = prompt.Replace("{{$connectionId}}", connectionId, StringComparison.OrdinalIgnoreCase);
-
+        prompt = prompt.Replace("{{$fullname}}", fullname, StringComparison.OrdinalIgnoreCase);
 
         question = question.Trim();
         question = question.EndsWith('?') ? question : $"{question}?";
         prompt = prompt.Replace("{{$input}}", question, StringComparison.OrdinalIgnoreCase);
         return prompt;
     }
-    private string BuidSuggestion(string question, string facts) {
+    private string BuildSuggestion(string question, string facts) {
         throw new NotImplementedException();
     }
-    private string BuidSummarize(string question, string facts) {
+    private string BuildSummarize(string question, string facts) {
         throw new NotImplementedException();
     }
 
-    private string BuidPathway(string question, string facts, IMessageContext? context) {
+    private string BuildPathway(string question, string facts, IMessageContext? context) {
         var prompt = promptProvider.ReadPrompt(PromptType.Pathway.ToStringValue());
         var answers = context.GetCustomPathwayAnswersOrDefault("");
 
@@ -60,7 +61,7 @@ public class MessageService(IPromptProvider promptProvider) : IMessageService {
         prompt = prompt.Replace("{{$assessment}}", answers.Trim(), StringComparison.OrdinalIgnoreCase);
         return prompt;
     }
-    private string BuidContentModeration(string question, string facts, IMessageContext? context) {
+    private string BuildContentModeration(string question, string facts, IMessageContext? context) {
         var prompt = promptProvider.ReadPrompt(PromptType.ContentModeration.ToStringValue());
         var answers = context.GetCustomContentModerationOrDefault("");
 

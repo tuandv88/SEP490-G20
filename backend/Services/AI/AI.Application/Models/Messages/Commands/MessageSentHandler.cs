@@ -1,5 +1,4 @@
-﻿using AI.Application.Common.Constants;
-using AI.Application.Models.Messages.Dtos;
+﻿using AI.Application.Models.Messages.Dtos;
 using AI.Domain.Enums;
 using AI.Domain.ValueObjects;
 using Microsoft.Extensions.Configuration;
@@ -12,14 +11,18 @@ public class MessageSentHandler(
     IDocumentRepository documentRepository,IKernelMemory memory, IDocumentService documentService,
     IConfiguration configuration
     ) : ICommandHandler<MessageSentCommand, MessageSentResult> {
-    public async Task<MessageSentResult> Handle(MessageSentCommand request, CancellationToken cancellationToken) {
-        var userId = userContext.User.Id;
+    public async Task<MessageSentResult> Handle(MessageSentCommand request, CancellationToken cancellationToken)
+    {
+        var user = userContext.User;
+        var userId = user.Id;
+        var fullname = $"{user.FirstName} {user.LastName}";
         Conversation? conversation = null;
         //Tạo context
         var context = new MessageContext(new Dictionary<string, object?>() {
             {ContextConstant.Learning.LectureId, request.MessageSend.LectureId.ToString()},
             {ContextConstant.Learning.ProblemId, request.MessageSend.ProblemId.ToString()},
-            {ContextConstant.Community.ConnectionId, request.connectionId.ToString()}
+            {ContextConstant.Community.ConnectionId, request.connectionId},
+            {ContextConstant.User.FullName, fullname}
         });
         //chỉ định promptType
         var promptType = PromptType.AnswerWithFacts;
@@ -42,7 +45,7 @@ public class MessageSentHandler(
 
         var prompt = messageService.BuildPrompt(promptType, request.MessageSend.Content, facts.Result, context);
 
-        var answer = await chatService.GenerateAnswer(conversation.Id.Value, prompt, context);
+        var answer = await chatService.GenerateAnswer(conversation.Id.Value, prompt, context, cancellationToken);
 
         //Lưu lại câu hỏi trước đó người dùng hỏi
         var messageFromUser = CreateNewMessageFromUser(conversation, request.MessageSend.Content, promptType, context.Arguments!);

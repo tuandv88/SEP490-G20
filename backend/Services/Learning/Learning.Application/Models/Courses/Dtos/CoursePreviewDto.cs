@@ -14,7 +14,8 @@ public record CoursePreviewDto(
     string CourseLevel,
     double Price,
     List<ChapterPreviewDto> Chapters,
-    DateTime LastModified
+    DateTime LastModified,
+    DateTime? ScheduledPublishDate
 );
 
 

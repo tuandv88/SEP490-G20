@@ -187,16 +187,16 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
-// Chuyển toàn bộ cấu hình sang một dictionary
-var configDictionary = builder.Configuration.AsEnumerable().ToDictionary(k => k.Key, v => v.Value);
+//// Chuyển toàn bộ cấu hình sang một dictionary
+//var configDictionary = builder.Configuration.AsEnumerable().ToDictionary(k => k.Key, v => v.Value);
 
-// Chuyển đổi sang JSON
-string configJson = JsonSerializer.Serialize(configDictionary, new JsonSerializerOptions { WriteIndented = true });
+//// Chuyển đổi sang JSON
+//string configJson = JsonSerializer.Serialize(configDictionary, new JsonSerializerOptions { WriteIndented = true });
 
-// In ra console
-Console.WriteLine("========== Application Configuration (JSON) ==========");
-Console.WriteLine(configJson);
-Console.WriteLine("======================================================");
+//// In ra console
+//Console.WriteLine("========== Application Configuration (JSON) ==========");
+//Console.WriteLine(configJson);
+//Console.WriteLine("======================================================");
 
 
 // Kiểm tra tham số đầu vào

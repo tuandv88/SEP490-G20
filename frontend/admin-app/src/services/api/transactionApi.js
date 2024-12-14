@@ -10,11 +10,13 @@ export const getTransactionsAudit = async (
     status: null,
     paymentMethod: null,
     minAmount: null,
-    maxAmount: null
+    maxAmount: null,
+    userId: null,
+    productName: null,
+    isDescending: false
   }
 ) => {
   try {
-    // Tạo object chứa các query params
     const queryParams = {
       PageIndex: pageIndex,
       PageSize: pageSize,
@@ -23,10 +25,12 @@ export const getTransactionsAudit = async (
       ...(filters.status && { Status: filters.status }),
       ...(filters.paymentMethod && { PaymentMethod: filters.paymentMethod }),
       ...(filters.minAmount && { MinAmount: filters.minAmount }),
-      ...(filters.maxAmount && { MaxAmount: filters.maxAmount })
+      ...(filters.maxAmount && { MaxAmount: filters.maxAmount }),
+      ...(filters.userId && { UserId: filters.userId }),
+      ...(filters.productName && { ProductName: filters.productName }),
+      IsDescending: filters.isDescending
     }
 
-    // Chuyển đổi object thành query string, loại bỏ các giá trị null/undefined
     const queryString = Object.entries(queryParams)
       .filter(([_, value]) => value != null)
       .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)

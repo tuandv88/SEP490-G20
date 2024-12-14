@@ -229,7 +229,7 @@ export default function QuizManagement() {
             <Plus className='h-4 w-4 mr-2' />
             Add Question
           </Button>
-          <Button onClick={() => setIsFullScreenPopupOpen(true)}>Create Problem Quiz</Button>
+          <Button onClick={() => setIsFullScreenPopupOpen(true)}>Create Practice Question</Button>
         </div>
 
         <Card className='md:col-span-2'>

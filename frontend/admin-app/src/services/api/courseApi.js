@@ -1,9 +1,10 @@
 import axiosInstance from '@/lib/axios'
 import Cookies from 'js-cookie'
 
-export const getCourses = async (pageIndex, pageSize) => {
+export const getCourses = async (params) => {
   try {
-    const response = await axiosInstance.get(`/learning-service/courses?PageIndex=${pageIndex}&PageSize=${pageSize}`, {
+    const queryString = new URLSearchParams(params).toString()
+    const response = await axiosInstance.get(`/learning-service/courses?${queryString}`, {
       headers: {
         Authorization: `Bearer ${Cookies.get('authToken')}`
       }

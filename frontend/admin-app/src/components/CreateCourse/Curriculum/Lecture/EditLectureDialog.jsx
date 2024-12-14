@@ -14,7 +14,12 @@ export default function EditLectureDialog({ isOpen, onClose, lecture, onSave }) 
         <DialogHeader>
           <DialogTitle>Edit Lecture</DialogTitle>
         </DialogHeader>
-        <LectureForm lecture={lecture} onSave={onSave} onCancel={onClose} />
+        <LectureForm 
+          lecture={lecture} 
+          onSave={onSave} 
+          onCancel={onClose} 
+          isUpdate={true}
+        />
       </DialogContent>
     </Dialog>
   )

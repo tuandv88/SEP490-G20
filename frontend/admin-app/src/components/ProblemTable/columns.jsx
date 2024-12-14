@@ -14,6 +14,8 @@ import { Badge } from '@/components/ui/badge'
 import { useNavigate } from '@tanstack/react-router'
 import { deleteProblemAg } from '@/services/api/problemApi'
 import { UPDATE_PROBLEM_AG_PATH } from '@/routers/router'
+import { changeProblemStatus } from '@/services/api/problemApi'
+import { useToast } from '@/hooks/use-toast'
 const columnHelper = createColumnHelper()
 
 export const columns = [
@@ -72,9 +74,55 @@ export const columns = [
   }),
   columnHelper.accessor('isActive', {
     header: 'Status',
-    cell: ({ row }) => {
-      const value = row.getValue('isActive')
-      return <Badge variant={value ? 'success' : 'secondary'}>{value ? 'Active' : 'Inactive'}</Badge>
+    cell: ({ row, table }) => {
+      const problem = row.original
+      const { toast } = useToast()
+      const { triggerRefetch } = table.options.meta
+
+      const handleStatusChange = async (newStatus) => {
+        try {
+          await changeProblemStatus(problem.problemsId, newStatus)
+          toast({
+            title: 'Success',
+            description: `Problem status changed to ${newStatus ? 'Active' : 'Inactive'}`,
+            duration: 1500
+          })
+          triggerRefetch() // Trigger table refresh
+        } catch (error) {
+          toast({
+            title: 'Error',
+            description: 'Failed to change problem status',
+            variant: 'destructive',
+            duration: 1500
+          })
+        }
+      }
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 flex items-center gap-2">
+              <Badge variant={problem.isActive ? 'success' : 'destructive'}>
+                {problem.isActive ? 'Active' : 'Inactive'}
+              </Badge>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem 
+              onClick={() => handleStatusChange(true)}
+              disabled={problem.isActive}
+            >
+              Set Active
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => handleStatusChange(false)}
+              disabled={!problem.isActive}
+            >
+              Set Inactive
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
     }
   }),
   columnHelper.display({

@@ -37,7 +37,18 @@ export const columns = [
   {
     accessorKey: 'fullname',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Customer' />,
-    cell: ({ row }) => <div>{row.getValue('fullname')}</div>
+    cell: ({ row, table }) => (
+      <Button
+        variant="link"
+        className="p-0 h-auto font-normal"
+        onClick={() => table.options.onUserSelect({
+          id: row.original.userId,
+          fullname: row.getValue('fullname')
+        })}
+      >
+        {row.getValue('fullname')}
+      </Button>
+    )
   },
   {
     accessorKey: 'amount',

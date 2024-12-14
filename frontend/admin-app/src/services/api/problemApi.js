@@ -29,11 +29,10 @@ export const deleteProblemAg = async (problemId) => {
   }
 }
 
-export const getProblemAg = async (pageIndex, pageSize) => {
+export const getProblemAg = async (queryString) => {
   try {
     const response = await axiosInstance.get(
-      `/learning-service/problems?PageIndex=${pageIndex}&PageSize=${pageSize}`,
-      {},
+      `/learning-service/problems?${queryString}`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get('authToken')}`
@@ -42,7 +41,7 @@ export const getProblemAg = async (pageIndex, pageSize) => {
     )
     return response.data
   } catch (error) {
-    console.error('Error create problem:', error)
+    console.error('Error fetching problems:', error)
     throw error
   }
 }
@@ -141,6 +140,24 @@ export const getProblemById = async (problemId) => {
     return response.data
   } catch (error) {
     console.error('Error get problem by id:', error)
+    throw error
+  }
+}
+
+export const changeProblemStatus = async (problemId, isActive) => {
+  try {
+    const response = await axiosInstance.put(
+      `/learning-service/problems/${problemId}/change-active`,
+      { isActive },
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.error('Error changing problem status:', error)
     throw error
   }
 }

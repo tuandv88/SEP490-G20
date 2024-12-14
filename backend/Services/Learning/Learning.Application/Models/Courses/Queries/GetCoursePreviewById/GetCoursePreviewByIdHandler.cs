@@ -13,9 +13,9 @@ public class GetCoursePreviewByIdHandler(ICourseRepository repository, IFilesSer
         }
 
         var isAdmin = userRole == PoliciesType.Administrator;
-        var isPublished = course.CourseStatus == CourseStatus.Published;
+        var isAccepted = course.CourseStatus is CourseStatus.Published or CourseStatus.Scheduled;
 
-        if (!isAdmin && !isPublished) {
+        if (!isAdmin && !isAccepted) {
             throw new NotFoundException("Course", request.Id);
         }
         var s3Object = await filesService.GetFileAsync(StorageConstants.BUCKET, course.ImageUrl, 60);

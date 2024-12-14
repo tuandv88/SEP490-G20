@@ -15,7 +15,7 @@ export default function SchedulePublishDialog({ open, onOpenChange, onConfirm })
   useEffect(() => {
     if (open) {
       const date = new Date()
-      setSelectedDate(addMinutes(date, 15))
+      setSelectedDate(addMinutes(date, 5))
     }
   }, [open])
 
@@ -48,16 +48,14 @@ export default function SchedulePublishDialog({ open, onOpenChange, onConfirm })
   const handleConfirm = () => {
     if (selectedDate instanceof Date && !isNaN(selectedDate)) {
       const currentDateTime = new Date()
-      const minimumDateTime = addMinutes(currentDateTime, 15)
+      const minimumDateTime = addMinutes(currentDateTime, 5)
 
       if (selectedDate < minimumDateTime) {
-        showErrorToast('Please select a date and time at least 15 minutes in the future.')
+        showErrorToast('Please select a date and time at least 5 minutes in the future.')
         return
       }
 
-      const utc7Date = new Date(selectedDate.getTime() + 7 * 60 * 60 * 1000)
-      onConfirm(utc7Date.toISOString())
-      console.log('Confirmed UTC+7 date and time:', utc7Date.toISOString())
+      onConfirm(selectedDate)
       onOpenChange(false)
     } else {
       showErrorToast('Invalid date selected. Please try again.')

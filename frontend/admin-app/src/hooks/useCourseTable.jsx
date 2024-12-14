@@ -35,7 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { format, addMinutes, parseISO } from 'date-fns'
 import { formatDateTime } from '@/utils/format'
-import { convertLocalToUTC } from '@/utils/format'
+import { convertISOtoUTC, localToUTC } from '@/utils/format'
 import {
   getCourses,
   changeCourseLevel,
@@ -209,13 +209,13 @@ export default function useCourseTable() {
 
   const updateCourseStatus = async (courseId, status, scheduledPublishDate) => {
     console.log(
-      `Updating course ${courseId} status to ${status} with scheduledPublishDate: ${convertLocalToUTC(scheduledPublishDate)}`
+      `Updating course ${courseId} status to ${status} with scheduledPublishDate: ${convertISOtoUTC(scheduledPublishDate)}`
     )
 
     try {
       const payload = {
         courseStatus: status,
-        scheduledPublishDate: convertLocalToUTC(scheduledPublishDate)
+        scheduledPublishDate: convertISOtoUTC(scheduledPublishDate)
       }
 
       console.log('Payload for API call:', payload)
@@ -226,7 +226,9 @@ export default function useCourseTable() {
       await fetchCourses()
       toast({
         title: 'Status updated',
-        description: `Course status has been changed to ${status}.`
+        description: `Course status has been changed to ${status}.`,
+        variant: 'default',
+        duration: 1500
       })
     } catch (error) {
       console.error('Error updating course status:', error)
@@ -247,7 +249,9 @@ export default function useCourseTable() {
       setIsStatusChangeDialogOpen(false)
       toast({
         title: 'Course Scheduled',
-        description: `Course has been scheduled for publication on ${format(scheduledDate, 'PPpp')}.`
+        description: `Course has been scheduled for publication on ${format(scheduledDate, 'PPpp')}.`,
+        variant: 'default',
+        duration: 1500
       })
     } catch (error) {
       toast({
@@ -272,7 +276,9 @@ export default function useCourseTable() {
       await fetchCourses()
       toast({
         title: 'Level updated',
-        description: `Course level has been changed to ${newLevel}.`
+        description: `Course level has been changed to ${newLevel}.`,
+        variant: 'default',
+        duration: 1500
       })
     } catch (error) {
       console.error('Error changing course level:', error)

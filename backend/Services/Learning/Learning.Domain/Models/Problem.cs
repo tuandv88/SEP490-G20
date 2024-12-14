@@ -1,4 +1,6 @@
 ﻿
+using Learning.Domain.Events;
+
 namespace Learning.Domain.Models;
 public class Problem : Aggregate<ProblemId> {
     public List<TestScript> TestScripts = new();
@@ -98,8 +100,13 @@ public class Problem : Aggregate<ProblemId> {
         ProblemSolutions.RemoveAll(t => idsToRemove.Contains(t.Id));
     }
 
-    public void AddProblemSubmission(params ProblemSubmission[] problemSubmission) {
+    public void AddProblemSubmission(params ProblemSubmission[] problemSubmission)
+    {
         ProblemSubmissions.AddRange(problemSubmission);
+        foreach (var submission in problemSubmission)
+        {
+            submission.AddDomainEvent(new ProblemSubmissionCreateEvent(submission.ProblemId,submission.UserId, submission.Status));
+        }
     }
 
     public void RemoveProblemSubmission(params ProblemSubmission[] problemSubmission) {

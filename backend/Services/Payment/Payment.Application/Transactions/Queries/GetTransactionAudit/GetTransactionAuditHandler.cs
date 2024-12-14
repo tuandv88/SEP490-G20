@@ -14,7 +14,6 @@ public class GetTransactionAuditHandler(
     ITransactionItemRepository transactionItemRepository)
     : IQueryHandler<GetTransactionAuditQuery, GetTransactionAuditResult>
 {
-    [SuppressMessage("ReSharper.DPA", "DPA0006: Large number of DB commands", MessageId = "count: 50")]
     public async Task<GetTransactionAuditResult> Handle(GetTransactionAuditQuery request,
         CancellationToken cancellationToken)
     {
@@ -93,13 +92,13 @@ public class GetTransactionAuditHandler(
         // Apply PayerEmail Filter
         if (!string.IsNullOrWhiteSpace(filter.PayerEmail))
         {
-            transactions = transactions.Where(t => t.PayerEmail != null && t.PayerEmail.Contains(filter.PayerEmail));
+            transactions = transactions.Where(t => t.PayerEmail != null && t.PayerEmail.ToLower().Contains(filter.PayerEmail.ToLower()));
         }
 
         // Apply Fullname Filter
         if (!string.IsNullOrWhiteSpace(filter.Fullname))
         {
-            transactions = transactions.Where(t => t.Fullname.Contains(filter.Fullname));
+            transactions = transactions.Where(t => t.Fullname.ToLower().Contains(filter.Fullname.ToLower()));
         }
 
         // Apply ProductType Filter

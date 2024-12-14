@@ -214,7 +214,6 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
       ...newCurriculum[chapterIndex].lectures[lectureIndex],
       ...updatedLecture
     }
-    setCurriculum(newCurriculum)
     setEditingLecture(null)
     toast({
       title: 'Lecture updated',

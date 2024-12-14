@@ -243,10 +243,14 @@ function DiscussionDetail() {
               notificationTypeId: notificationTypeIdTmp,
               userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
               message: `
-          <div class="text-sm text-muted-foreground mb-2 break-words">
-          <p> <strong>${fullNameCurrentUser}</strong> Voted your post.</p>
-          <p><a href="/discussion/${discussion.id}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion.</a></p>
-          </div> `,
+            <div class="text-sm text-muted-foreground mb-2 break-words">
+              <a href="/discussion/${discussion.id}" style="color: inherit; text-decoration: none;">
+                <p>
+                  <strong>${fullNameCurrentUser}</strong> Voted your post.
+                </p>
+              </a>
+            </div>
+          `,
               sentVia: 'Web', // Hoặc 'Email' nếu cần
               status: 'Sent', // Trạng thái gửi
               subject: null
@@ -331,10 +335,14 @@ function DiscussionDetail() {
               notificationTypeId: notificationTypeIdTmp, // Loại thông báo
               userNotificationSettingId: userNotificationSettings, // Cài đặt thông báo của người dùng
               message: `
-                <div class="text-sm text-muted-foreground mb-2 break-words">
-                <p> <strong>${discussion.firstName + " " + discussion.lastName}</strong> update post: <strong>${discussion.title}</strong></p>
-                <p><a href="/discussion/${discussion.id}" style="color: hsl(var(--primary)); text-decoration: none; font-weight: normal; font-size: 0.875rem;">Click here to view the discussion</a></p>
-                </div> `,
+            <div class="text-sm text-muted-foreground mb-2 break-words">
+              <a href="/discussion/${discussion.id}" style="color: inherit; text-decoration: none;">
+                <p>
+                  <strong>${fullNameCurrentUser}</strong> update post: <strong>${discussion.title}</strong></p>
+                </p>
+              </a>
+            </div>
+          `,
               sentVia: 'Web', // Hoặc 'Email' nếu cần
               status: 'Sent', // Trạng thái gửi
               subject: null

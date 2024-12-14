@@ -194,7 +194,7 @@ export default function PopupNotification() {
                             {error && <p className="text-center text-destructive p-2 text-xs" role="alert">{error}</p>}
                         </div>
                         <div className="border-t p-2 flex justify-between items-center">
-                            <Button
+                            {/* <Button
                                 variant="ghost"
                                 size="sm"
                                 className="text-xs"
@@ -202,7 +202,7 @@ export default function PopupNotification() {
                             >
                                 <Settings className="h-4 w-4 mr-1" />
                                 Settings
-                            </Button>
+                            </Button> */}
                             <Button
                                 variant="ghost"
                                 size="sm"

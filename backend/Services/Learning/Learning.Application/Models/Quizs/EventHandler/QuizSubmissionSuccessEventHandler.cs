@@ -9,14 +9,19 @@ public class QuizSubmissionSuccessEventHandler(
 {
     public async Task Handle(QuizSubmissionSuccessEvent notification, CancellationToken cancellationToken)
     {
-        var quizId = notification.QuizId;
-        var status = notification.Status;
-        var userId = notification.UserId;
+        var quizSubmission = notification.QuizSubmission;
+        var quizId = quizSubmission.QuizId;
+        var status = quizSubmission.Status;
+        var userId = quizSubmission.UserId;
         if (status != QuizSubmissionStatus.Success)
         {
             return;
         }
 
+        if (quizSubmission.TotalScore < quizSubmission.PassingMark)
+        {
+            return;
+        }
         var lecture = await lectureRepository.GetByQuizIdAsync(quizId.Value);
         if (lecture is not { LectureType: LectureType.Quiz })
         {

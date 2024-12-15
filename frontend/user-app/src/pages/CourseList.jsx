@@ -91,8 +91,15 @@ function CourseList() {
   return (
     <div>
       <Header />
-      <div className='container px-4 pt-40 pb-12 mx-auto bg-gray-50'>
-        <h1 className='mb-8 text-4xl font-bold text-center text-primaryButton'>Explore Courses</h1>
+      <div className='container px-4 pt-40 pb-12 mx-auto'>
+        <div className="mb-8">
+          <h1 className='text-4xl font-bold text-center text-primaryButton'>
+            Explore Courses
+          </h1>
+          <p className="text-center text-gray-600 mt-2">
+            Discover our comprehensive collection of programming courses
+          </p>
+        </div>
 
         {/* Search and Filter Section */}
         <div className='flex flex-col gap-4 p-6 mb-8 bg-white rounded-lg shadow-md md:flex-row'>

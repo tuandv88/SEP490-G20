@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import { ControlledAlertDialog } from '@/components/alert/ControlledAlertDialog'
 import { useFormContext } from 'react-hook-form'
+import { useToast } from '@/hooks/use-toast'
 
 const tabs = [
   { id: 'basic', label: 'Basic Info', icon: FileText },
@@ -12,6 +13,7 @@ const tabs = [
 
 export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, isRunSuccess, isLoadingSubmit }) {
   const { trigger, formState: { errors } } = useFormContext()
+  const { toast } = useToast()
   const currentTabIndex = tabs.findIndex((tab) => tab.id === activeTab)
   const isLastTab = currentTabIndex === tabs.length - 1
   const isFirstTab = currentTabIndex === 0

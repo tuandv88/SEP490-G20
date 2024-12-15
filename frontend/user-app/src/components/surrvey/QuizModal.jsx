@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ArrowRight, X } from 'lucide-react'
 import { Card, CardHeader, CardTitle } from 'react-bootstrap'
 import { CardContent } from '../ui/card'
@@ -13,6 +13,21 @@ const QuizModal = ({ isOpen, onClose, quiz, setIsQuizSubmitted }) => {
   const [isQuizStarted, setIsQuizStarted] = useState(false)
   const [quizData, setQuizData] = useState(null)
   const [error, setError] = useState(null)
+  const [quizStatus, setQuizStatus] = useState(null)
+
+  useEffect(() => {
+    const checkQuizStatus = async () => {
+      try {
+        const status = await QuizAPI.getQuizStatus(quiz.id)
+        setQuizStatus(status.status)
+      } catch (error) {
+        console.error('Error checking quiz status:', error)
+      }
+    }
+    if (isOpen) {
+      checkQuizStatus()
+    }
+  }, [quiz.id, isOpen])
 
   const startQuiz = async () => {
     try {
@@ -55,6 +70,21 @@ const QuizModal = ({ isOpen, onClose, quiz, setIsQuizSubmitted }) => {
     onClose()
   }
 
+  const handleContinue = async () => {
+    try {
+      setError(null)
+      const quizDetails = await QuizAPI.getQuizDetails(quiz.id)
+      if (!quizDetails) {
+        throw new Error('Failed to fetch quiz details')
+      }
+      setQuizData(quizDetails)
+      setIsQuizStarted(true)
+    } catch (error) {
+      console.error('Error getting quiz details:', error)
+      setError('Failed to continue quiz. Please try again.')
+    }
+  }
+
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
       <div className='bg-white rounded-lg w-full max-w-4xl mx-4 relative'>
@@ -88,14 +118,25 @@ const QuizModal = ({ isOpen, onClose, quiz, setIsQuizSubmitted }) => {
             </div>
 
             <div className='flex justify-center mt-6'>
-              <Button 
-                size='lg' 
-                onClick={startQuiz}
-                disabled={isQuizStarted}
-              >
-                {isQuizStarted ? 'Starting Quiz...' : 'Start Quiz'}
-                <ArrowRight className='ml-2 h-5 w-5' />
-              </Button>
+              {quizStatus === 'InProgress' ? (
+                <Button 
+                  size='lg' 
+                  onClick={handleContinue}
+                  disabled={isQuizStarted}
+                >
+                  Continue Quiz
+                  <ArrowRight className='ml-2 h-5 w-5' />
+                </Button>
+              ) : (
+                <Button 
+                  size='lg' 
+                  onClick={startQuiz}
+                  disabled={isQuizStarted}
+                >
+                  {isQuizStarted ? 'Starting Quiz...' : 'Start Quiz'}
+                  <ArrowRight className='ml-2 h-5 w-5' />
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -105,6 +146,7 @@ const QuizModal = ({ isOpen, onClose, quiz, setIsQuizSubmitted }) => {
           quiz={quizData.quiz}
           answer={quizData.answer}
           timeLimit={quiz.timeLimit}
+          hasTimeLimit={quiz.hasTimeLimit}
           onComplete={handleCloseQuiz}
           setIsQuizSubmitted={setIsQuizSubmitted}
         />

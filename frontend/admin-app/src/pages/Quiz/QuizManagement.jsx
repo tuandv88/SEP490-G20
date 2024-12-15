@@ -17,6 +17,7 @@ import { FileQuestion, Award } from 'lucide-react'
 import { EDIT_CURRICULUM_COURSE_PATH } from '@/routers/router'
 import { FullScreenPopup } from './FullScreenPopup'
 import { UpdateProblemQuizModal } from './UpdateProblemQuizModal'
+import { FullScreenPopupProblem } from './FullScreenPopupProblem'
 
 export default function QuizManagement() {
   const { params } = useMatch(quizManagementRoute.id)
@@ -280,7 +281,14 @@ export default function QuizManagement() {
       )}
 
       {isFullScreenPopupOpen && (
-        <FullScreenPopup
+        // <FullScreenPopup
+        //   isOpen={isFullScreenPopupOpen}
+        //   onClose={() => setIsFullScreenPopupOpen(false)}
+        //   quizId={quizId}
+        //   isUpdate={isUpdate}
+        //   setIsUpdate={setIsUpdate}
+        // />
+        <FullScreenPopupProblem
           isOpen={isFullScreenPopupOpen}
           onClose={() => setIsFullScreenPopupOpen(false)}
           quizId={quizId}

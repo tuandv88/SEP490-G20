@@ -148,11 +148,12 @@ const RoadmapDashboard = ({ user }) => {
         setCourseDetails(newCourseDetails)
 
         // Fetch available courses
-        const allCoursesResponse = await LearningAPI.getCourseAvailableForUser(1, 20)
-        if (!isSubscribed) return       
-        const filteredCourses = allCoursesResponse.courses.data.filter(
+        const allCourses = await LearningAPI.getCourseList(1, 20)
+        if (!isSubscribed) return
+        
+        const filteredCourses = allCourses.courseDtos.data.filter(
           (course) => !fetchedLearningPaths.some((path) => 
-            path.pathSteps.some((step) => step.courseId === course.courseId)
+            path.pathSteps.some((step) => step.courseId === course.id)
           )
         )
         setAvailableCourses(filteredCourses)
@@ -203,15 +204,6 @@ const RoadmapDashboard = ({ user }) => {
         await LearningPathAPI.deleteLearningPath(pathToDelete)
         setLearningPaths((prev) => prev.filter((path) => path.id !== pathToDelete))
         setIsQuizSubmitted(false)
-        
-        try {
-          const data = await QuizAPI.getQuizAssessment()
-          setQuizAssessment(data.quiz)
-        } catch (error) {
-          console.error('Error fetching quiz assessment:', error)
-          // Có thể thêm thông báo lỗi cho người dùng ở đây
-        }
-
       } catch (error) {
         console.error('Error deleting path:', error)
       } finally {
@@ -338,13 +330,8 @@ const RoadmapDashboard = ({ user }) => {
         isOpen={isAssessmentPromptOpen}
         onClose={() => setIsAssessmentPromptOpen(false)}
         onAccept={() => {
-          // Kiểm tra nếu có quiz assessment mới mở modal
-          if (quizAssessment) {
-            setIsAssessmentPromptOpen(false)
-            setIsQuizOpen(true)
-          } else {
-            console.error('Quiz assessment not available')
-          }
+          setIsAssessmentPromptOpen(false)
+          setIsQuizOpen(true)
         }}
         onDecline={() => setIsAssessmentPromptOpen(false)}
       />

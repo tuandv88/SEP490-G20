@@ -21,8 +21,6 @@ export function LearningDashboard() {
           UserAPI.getUserPoint()
         ])
 
-        console.log(enrolledCourses)
-        console.log(pointData)
         const coursesWithProgress = await Promise.all(
           enrolledCourses.courseDtos.data.map(async (course) => {
             try {

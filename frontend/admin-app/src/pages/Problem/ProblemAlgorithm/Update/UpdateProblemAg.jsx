@@ -99,7 +99,6 @@ const UpdateProblemAg = ({}) => {
       problem: updatedData
     }
 
-    console.log(problemData)
     setIsLoadingSubmit(true)
     try {
       const response = await updateProblemAg(problemData, problemId)

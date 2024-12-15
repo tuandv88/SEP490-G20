@@ -20,7 +20,6 @@ import { Switch } from '@/components/ui/switch'
 import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
-import { createQuizAssessment } from '@/services/api/quizApi'
 import MarkdownFormField from '@/components/markdown-form-field'
 
 // Define the schema for form validation
@@ -38,7 +37,7 @@ const quizSchema = z
     attemptLimit: z.coerce.number().int('Attempt limit must be an integer').optional(),
     isActive: z.boolean(),
     isRandomized: z.boolean(),
-    quizType: z.enum(['ASSESSMENT'])
+    quizType: z.enum(['PRACTICE', 'FINAL'])
   })
   .superRefine((data, ctx) => {
     if (data.hasTimeLimit) {
@@ -74,20 +73,20 @@ const quizSchema = z
     }
   })
 
-function QuizCreationForm({ isOpen, onOpenChange, onSubmit }) {
+function QuizEditForm({ isOpen, onOpenChange, onSubmit, defaultValues }) {
   const methods = useForm({
     resolver: zodResolver(quizSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      passingMark: 1,
-      hasTimeLimit: false,
-      timeLimit: 1,
-      hasAttemptLimit: false,
-      attemptLimit: 1,
-      isActive: true,
-      isRandomized: false,
-      quizType: 'ASSESSMENT'
+      title: defaultValues.title,
+      description: defaultValues.description,
+      passingMark: defaultValues.passingMark,
+      hasTimeLimit: defaultValues.hasTimeLimit,
+      timeLimit: defaultValues.timeLimit || 1,
+      hasAttemptLimit: defaultValues.hasAttemptLimit,
+      attemptLimit: defaultValues.attemptLimit || 1,
+      isActive: defaultValues.isActive,
+      isRandomized: defaultValues.isRandomized,
+      quizType: defaultValues.quizType
     }
   })
 
@@ -105,33 +104,35 @@ function QuizCreationForm({ isOpen, onOpenChange, onSubmit }) {
   const handleFormSubmit = async (data) => {
     try {
       const quizData = {
-        createQuizDto: {
+        quiz: {
           isActive: data.isActive,
           isRandomized: data.isRandomized,
           title: data.title,
           description: data.description,
           passingMark: data.passingMark,
-          timeLimit: data.hasTimeLimit ? data.timeLimit : undefined,
+          timeLimit: data.hasTimeLimit ? data.timeLimit : 1,
           hasTimeLimit: data.hasTimeLimit,
-          attemptLimit: data.hasAttemptLimit ? data.attemptLimit : undefined,
+          attemptLimit: data.hasAttemptLimit ? data.attemptLimit : 1,
           hasAttemptLimit: data.hasAttemptLimit,
           quizType: data.quizType
         }
       }
 
-      const createdQuiz = await createQuizAssessment(quizData)
-      onSubmit(createdQuiz)
+      await onSubmit(quizData)
       onOpenChange(false)
       toast({
-        title: 'Quiz Created',
-        description: 'Your quiz has been successfully created.'
+        title: 'Quiz Updated',
+        description: 'Your quiz has been successfully updated.',
+        variant: 'default',
+        duration: 1500
       })
     } catch (error) {
-      console.error('Error creating quiz:', error)
+      console.error('Error updating quiz:', error)
       toast({
         title: 'Error',
-        description: 'Failed to create quiz. Please try again.',
-        variant: 'destructive'
+        description: error?.response?.data?.message || 'Failed to update quiz. Please try again.',
+        variant: 'destructive',
+        duration: 1500
       })
     }
   }
@@ -140,8 +141,8 @@ function QuizCreationForm({ isOpen, onOpenChange, onSubmit }) {
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[900px] max-h-[90vh]'>
         <DialogHeader>
-          <DialogTitle className='text-2xl font-bold'>Create Quiz</DialogTitle>
-          <DialogDescription>Fill in the details to create a new quiz.</DialogDescription>
+          <DialogTitle className='text-2xl font-bold'>Edit Quiz</DialogTitle>
+          <DialogDescription>Update the quiz details.</DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -293,7 +294,8 @@ function QuizCreationForm({ isOpen, onOpenChange, onSubmit }) {
                             <SelectValue placeholder='Select quiz type' />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value='ASSESSMENT'>Assessment</SelectItem>
+                            <SelectItem value='PRACTICE'>Practice</SelectItem>
+                            <SelectItem value='FINAL'>Final</SelectItem>
                           </SelectContent>
                         </Select>
                       )}
@@ -309,7 +311,7 @@ function QuizCreationForm({ isOpen, onOpenChange, onSubmit }) {
                 </Button>
               </DialogClose>
               <Button type='submit' disabled={isSubmitting}>
-                {isSubmitting ? 'Creating...' : 'Create Quiz'}
+                {isSubmitting ? 'Updating...' : 'Update Quiz'}
               </Button>
             </DialogFooter>
           </form>
@@ -319,4 +321,4 @@ function QuizCreationForm({ isOpen, onOpenChange, onSubmit }) {
   )
 }
 
-export { QuizCreationForm }
+export { QuizEditForm }

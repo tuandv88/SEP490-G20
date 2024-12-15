@@ -4,47 +4,23 @@ import { DataTableRowActions } from './DataTableRowActions'
 import { Button } from '@/components/ui/button'
 import { AmountPopup } from './AmountPopup'
 import { Checkbox } from '@/components/ui/checkbox'
-
+import { Badge } from '@/components/ui/badge'
 import { statuses, paymentMethods } from './data'
 
 export const columns = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label='Select all'
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label='Select row'
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false
-  },
-  {
-    accessorKey: 'stt',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='STT' />,
-    cell: ({ row }) => <div className='w-[40px] text-center'>{row.index + 1}</div>,
-    enableSorting: false,
-    enableHiding: false
-  },
   {
     accessorKey: 'fullname',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Customer' />,
     cell: ({ row, table }) => (
       <Button
-        variant="link"
-        className="p-0 h-auto font-normal"
-        onClick={() => table.options.onUserSelect({
-          id: row.original.userId,
-          fullname: row.getValue('fullname')
-        })}
+        variant='link'
+        className='p-0 h-auto font-medium'
+        onClick={() =>
+          table.options.onUserSelect({
+            id: row.original.userId,
+            fullname: row.getValue('fullname')
+          })
+        }
       >
         {row.getValue('fullname')}
       </Button>
@@ -55,7 +31,11 @@ export const columns = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount'))
-      return <AmountPopup {...row.original} />
+      const formattedAmount = `${new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount)}`
+      return <AmountPopup {...row.original}>{formattedAmount}</AmountPopup>
     },
     enableColumnFilter: true,
     meta: {
@@ -65,7 +45,22 @@ export const columns = [
   {
     accessorKey: 'status',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('status')}</div>,
+    cell: ({ row }) => {
+      const status = row.getValue('status')
+      return (
+        <Badge
+          variant={
+            status.toLowerCase() === 'completed'
+              ? 'success'
+              : status.toLowerCase() === 'processing'
+                ? 'warning'
+                : 'default'
+          }
+        >
+          {status}
+        </Badge>
+      )
+    },
     enableColumnFilter: true,
     filterFn: 'arrIncludesSome',
     meta: {
@@ -85,26 +80,36 @@ export const columns = [
     }
   },
   {
-    accessorKey: 'productName',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Product Name' />,
-    cell: ({ row }) => <div>{row.original.items[0]?.productName || 'N/A'}</div>
-  },
-  {
-    accessorKey: 'quantity',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Quantity' />,
-    cell: ({ row }) => <div>{row.original.items[0]?.quantity || 'N/A'}</div>
+    accessorKey: 'items',
+    header: ({ column }) => <DataTableColumnHeader column={column} title='Products' />,
+    cell: ({ row }) => {
+      const items = row.original.items
+      return (
+        <div>
+          {items.map((item, index) => (
+            <div key={index} className='text-sm'>
+              <span className='font-medium'>{item.productName}</span>
+              <span className='text-muted-foreground ml-2'>x{item.quantity}</span>
+            </div>
+          ))}
+        </div>
+      )
+    }
   },
   {
     accessorKey: 'createdAt',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
-    cell: ({ row }) => <div>{new Date(row.getValue('createdAt')).toLocaleString()}</div>,
+    cell: ({ row }) => {
+      const date = new Date(row.getValue('createdAt'))
+      return (
+        <div>
+          {date.toLocaleDateString()} {date.toLocaleTimeString()}
+        </div>
+      )
+    },
     enableColumnFilter: true,
     meta: {
       filterType: 'date'
     }
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => <DataTableRowActions row={row} />
   }
 ]

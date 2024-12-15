@@ -67,8 +67,6 @@ const CreateProblemLecture = ({}) => {
       createProblemDto: updatedData
     }
 
-    console.log(problemData)
-
     setIsLoadingSubmit(true)
     try {
       const response = await createProblemLecture(problemData, lectureId)

@@ -58,10 +58,8 @@ export default function CourseCreator() {
         ...data
       }
     }
-    console.log('courseCreate', courseCreate)
     try {
       const response = await createCourse(courseCreate)
-      console.log('Course created successfully:', response)
       toast({
         title: 'Course created successfully',
         description: 'Your new course has been added to the course list.',

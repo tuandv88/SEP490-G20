@@ -11,7 +11,6 @@ function Callback() {
   useEffect(() => {
     AuthService.handleCallback()
       .then(() => {
-        console.log('Verify Auth Code - Get Access_Token & Save Storage..')
         navigate({ to: DASHBOARD_PATH })
       })
       .catch((error) => {

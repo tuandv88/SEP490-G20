@@ -96,7 +96,7 @@ const CreateProblemQuiz = ({ onClose, quizId, isUpdate, setIsUpdate }) => {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 h-full'>
+    <div className='min-h-screen bg-gray-50 h-full z-[9999]'>
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FormTabs

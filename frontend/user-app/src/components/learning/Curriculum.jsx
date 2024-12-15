@@ -23,11 +23,9 @@ const Curriculum = ({ courseId, chapters,
 
 
   const handleLectureClick = (lectureId) => {
-    console.log(lectureId)
     setActiveLectureId(lectureId)
     setSelectedLectureId(lectureId)
     navigate(`/learning-space/${courseId}/lecture/${lectureId}`);
-    console.log("Navigate")
   }
 
   const isLectureCompleted = (lectureId) => {

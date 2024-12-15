@@ -13,6 +13,7 @@ import { getFullQuizDetail } from '@/services/api/questionApi'
 import { useToast } from '@/hooks/use-toast'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { FullScreenPopupProblem } from '../Quiz/FullScreenPopupProblem'
 import { QuizEditForm } from './QuizEditForm'
 export default function QuizAssessment() {
   const [showAddQuestionForm, setShowAddQuestionForm] = useState(false)
@@ -23,6 +24,7 @@ export default function QuizAssessment() {
   const [quizDetail, setQuizDetail] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
+  const [isFullScreenPopupOpen, setIsFullScreenPopupOpen] = useState(false)
   const [showEditQuizForm, setShowEditQuizForm] = useState(false)
 
   useEffect(() => {
@@ -40,6 +42,12 @@ export default function QuizAssessment() {
   useEffect(() => {
     fetchQuizAssessment()
   }, [])
+
+  useEffect(() => {
+    if (quizDetail?.quiz?.id) {
+      fetchQuizDetail(quizDetail.quiz.id)
+    }
+  }, [isUpdate])
 
   const fetchQuizAssessment = async () => {
     setIsLoading(true)
@@ -89,8 +97,9 @@ export default function QuizAssessment() {
   }
 
   const handleQuestionAdded = () => {
-    if (quizDetail && quizDetail.quiz && quizDetail.quiz.id) {
+    if (quizDetail?.quiz?.id) {
       fetchQuizDetail(quizDetail.quiz.id)
+      setIsUpdate(!isUpdate)
     }
   }
 
@@ -275,10 +284,16 @@ export default function QuizAssessment() {
           <Card className='md:col-span-2'>
             <CardHeader className='flex flex-row items-center justify-between'>
               <CardTitle>Questions</CardTitle>
-              <Button onClick={() => setShowAddQuestionForm(true)}>
-                <Plus className='w-4 h-4 mr-2' />
-                Add Question
-              </Button>
+              <div className='flex gap-2'>
+                <Button onClick={() => setIsFullScreenPopupOpen(true)}>
+                  <Plus className='w-4 h-4 mr-2' />
+                  Create Practice Question
+                </Button>
+                <Button onClick={() => setShowAddQuestionForm(true)}>
+                  <Plus className='w-4 h-4 mr-2' />
+                  Add Question
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className='space-y-4'>
@@ -292,6 +307,8 @@ export default function QuizAssessment() {
                       onDelete={handleDeleteQuestion}
                       onToggleActive={handleToggleActive}
                       onQuestionUpdated={handleQuestionAdded}
+                      setIsUpdate={setIsUpdate}
+                      isUpdate={isUpdate}
                     />
                   ))
                 ) : (
@@ -330,6 +347,13 @@ export default function QuizAssessment() {
         />
       )}
 
+      {isFullScreenPopupOpen && (
+        <FullScreenPopupProblem
+          isOpen={isFullScreenPopupOpen}
+          onClose={() => setIsFullScreenPopupOpen(false)}
+          quizId={quizId}
+          isUpdate={isUpdate}
+          setIsUpdate={setIsUpdate}
       {showEditQuizForm && (
         <QuizEditForm
           isOpen={showEditQuizForm}

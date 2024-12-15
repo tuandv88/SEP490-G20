@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EDIT_CURRICULUM_COURSE_PATH } from '@/routers/router'
 import { FullScreenPopup } from './FullScreenPopup'
 import { UpdateProblemQuizModal } from './UpdateProblemQuizModal'
+import { FullScreenPopupProblem } from './FullScreenPopupProblem'
 import { QuizEditForm } from './QuizEditForm'
 import { updateQuiz } from '@/services/api/quizApi'
 
@@ -310,7 +311,14 @@ export default function QuizManagement() {
       )}
 
       {isFullScreenPopupOpen && (
-        <FullScreenPopup
+        // <FullScreenPopup
+        //   isOpen={isFullScreenPopupOpen}
+        //   onClose={() => setIsFullScreenPopupOpen(false)}
+        //   quizId={quizId}
+        //   isUpdate={isUpdate}
+        //   setIsUpdate={setIsUpdate}
+        // />
+        <FullScreenPopupProblem
           isOpen={isFullScreenPopupOpen}
           onClose={() => setIsFullScreenPopupOpen(false)}
           quizId={quizId}

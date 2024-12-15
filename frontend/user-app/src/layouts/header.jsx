@@ -72,7 +72,6 @@ export default function Header() {
   // }
   const navigate = useNavigate();
   const handleClick = () => {
-    console.log('Navigating to /notifications/history');
     navigate(`/notifications/history`);
   }
 

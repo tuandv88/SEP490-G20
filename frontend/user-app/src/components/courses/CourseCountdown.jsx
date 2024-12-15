@@ -4,10 +4,14 @@ export function CourseCountdown({ scheduledDate }) {
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
 
   function calculateTimeLeft() {
-    const difference = new Date(scheduledDate).getTime() - new Date().getTime()
-    
+    const difference = new Date(scheduledDate) - new Date()
     if (difference <= 0) {
-      return null
+      return {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0
+      }
     }
 
     return {
@@ -26,26 +30,30 @@ export function CourseCountdown({ scheduledDate }) {
     return () => clearInterval(timer)
   }, [scheduledDate])
 
-  if (!timeLeft) return null
+  const timeUnits = [
+    { label: 'Day', value: timeLeft.days },
+    { label: 'Hour', value: timeLeft.hours },
+    { label: 'Minute', value: timeLeft.minutes },
+    { label: 'Second', value: timeLeft.seconds }
+  ]
 
   return (
-    <div className="bg-black/70 backdrop-blur-sm rounded-lg p-2 text-white mb-4">
-      <div className="text-sm font-medium mb-1">Incomming in</div>
-      <div className="flex gap-2 text-sm justify-center">
-        <TimeUnit value={timeLeft.days} unit="d" />
-        <TimeUnit value={timeLeft.hours} unit="h" />
-        <TimeUnit value={timeLeft.minutes} unit="m" />
-        <TimeUnit value={timeLeft.seconds} unit="s" />
-      </div>
-    </div>
-  )
-}
-
-function TimeUnit({ value, unit }) {
-  return (
-    <div className="flex items-center">
-      <span className="font-bold">{value.toString().padStart(2, '0')}</span>
-      <span className="text-xs ml-1 text-gray-300">{unit}</span>
+    <div className="flex gap-3 justify-center">
+      {timeUnits.map((unit, index) => (
+        <div key={unit.label} className="flex flex-col items-center">
+          <div className="text-2xl font-bold text-white">
+            {String(unit.value).padStart(2, '0')}
+          </div>
+          <div className="text-xs text-white/80 font-medium">
+            {unit.label}
+          </div>
+          {index < timeUnits.length - 1 && (
+            <div className="text-white text-xl font-bold absolute top-1/2 -translate-y-1/2 -right-2">
+              :
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   )
 } 

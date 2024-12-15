@@ -122,7 +122,6 @@ function HomePage() {
 
   async function updateSurveyStatus(userId) {
     try {
-      console.log('Updating survey status for user:', userId)
       await UserAPI.changeSurveyStatus(userId)
       authServiceInstance.refreshToken()
       localStorage.setItem('isSurveyCompleted', 'true')

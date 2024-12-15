@@ -20,13 +20,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizId, onQuestionUpdated }) {
+import { UpdateProblemQuizModal } from '../Quiz/UpdateProblemQuizModal'
+export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizId, onQuestionUpdated, setIsUpdate, isUpdate }) {
   const [isEditing, setIsEditing] = useState(false)
   const [problem, setProblem] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isUpdateProblemQuiz, setIsUpdateProblemQuiz] = useState(false)
 
   useEffect(() => {
-    if (isEditing) {
+    if (isEditing || isUpdateProblemQuiz) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'auto'
@@ -35,7 +37,7 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
     return () => {
       document.body.style.overflow = 'auto'
     }
-  }, [isEditing])
+  }, [isEditing, isUpdateProblemQuiz])
 
   useEffect(() => {
     if (question.questionType === 'CodeSnippet' && question.problemId) {
@@ -73,6 +75,7 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
   }
 
   const handleProblemEdit = () => {
+    setIsUpdateProblemQuiz(true)
   }
 
   const handleProblemDelete = () => {
@@ -218,6 +221,19 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+
+      {isUpdateProblemQuiz && (
+        <UpdateProblemQuizModal
+          isOpen={isUpdateProblemQuiz}
+          onClose={() => setIsUpdateProblemQuiz(false)}
+          quizId={quizId}
+          question={question}
+          problem={problem}
+          setIsUpdate={setIsUpdate}
+          isUpdate={isUpdate}
+        />
+      )}
     </>
   )
 }

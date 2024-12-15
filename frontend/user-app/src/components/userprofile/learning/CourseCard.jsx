@@ -24,7 +24,7 @@ export function CourseCard({ course }) {
       <div className='flex space-x-4'>
         <img src={course.imageUrl} alt={course.title} className='w-48 h-32 object-cover rounded-lg' />
         <div className='flex-1'>
-          <div className='flex items-center justify-between'>
+          <div onClick={() => navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', course.courseId))} className='flex items-center justify-between cursor-pointer hover:text-primaryButton'>
             <h3 className='text-lg font-semibold'>{course.title}</h3>
           </div>
           <p className='text-sm text-gray-600 mt-2'>{course.headline}</p>

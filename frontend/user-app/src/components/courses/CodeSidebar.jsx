@@ -89,7 +89,6 @@ export function CourseSidebar({ enrolledCourses, courseDetail }) {
     return `${hours} hours ${remainingMinutes} minutes`
   }
 
-  console.log('Zo')
 
   const renderEnrollOrPurchaseButton = () => {
     if (courseDetail.course.price === 0) {

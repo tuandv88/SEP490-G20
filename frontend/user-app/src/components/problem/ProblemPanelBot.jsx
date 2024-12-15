@@ -9,7 +9,6 @@ const StatsPanel = ({ problemSolved, leaderboardData }) => {
   const { user, updateUser } = useContext(UserContext)
   const [userRank, setUserRank] = useState(null)
 
-  console.log(problemSolved)
 
   useEffect(() => {
     if (!user) {

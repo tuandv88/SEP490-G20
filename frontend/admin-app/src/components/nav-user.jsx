@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react'
+import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles, UserCog } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -54,6 +54,17 @@ export function NavUser({ user }) {
                 </div>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <a 
+                href={`${import.meta.env.VITE_BASE_URL_AUTH}/Profile/Index`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center"
+              >
+                <UserCog className="mr-2 h-4 w-4" />
+                <span>Manage Profile</span>
+              </a>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => AuthService.logout()}>
               <LogOut />
               Log out

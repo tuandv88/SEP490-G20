@@ -17,7 +17,6 @@ export const getAllUsersDetail = async () => {
     })
     return response.data
   } catch (error) {
-    console.error('Error changing course status:', error)
     throw error
   }
 }
@@ -31,7 +30,6 @@ export const getAllRoles = async () => {
     })
     return response.data
   } catch (error) {
-    console.error('Error changing course status:', error)
     throw error
   }
 }

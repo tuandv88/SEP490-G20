@@ -5,8 +5,6 @@ import { DASHBOARD_PATH } from '@/routers/router'
 import { Loading } from '@/components/overlay'
 
 function Callback() {
-  console.log('Callback method....')
-
   const navigate = useNavigate()
   useEffect(() => {
     AuthService.handleCallback()
@@ -14,8 +12,6 @@ function Callback() {
         navigate({ to: DASHBOARD_PATH })
       })
       .catch((error) => {
-        console.error('Error handling callback:', error)
-        console.error('Verify Auth Code Failed.')
         navigate({ to: '/' })
       })
   }, [navigate])

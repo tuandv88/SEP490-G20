@@ -67,7 +67,6 @@ export default function CourseCreator() {
       })
       navigate({ to: COURSE_TABLE_PATH })
     } catch (error) {
-      console.error('Error creating course:', error)
       setError('There was a problem creating your course. Please try again.')
       toast({
         title: 'Error creating course',

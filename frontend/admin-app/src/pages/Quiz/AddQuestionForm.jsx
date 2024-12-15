@@ -359,7 +359,6 @@ export function AddQuestionForm({ onClose, quizId, setIsUpdate, isUpdate }) {
                 },
                 (errors) => {
                   setShowErrors(true)
-                  console.log('Validation errors:', errors)
                 }
               )}
             >

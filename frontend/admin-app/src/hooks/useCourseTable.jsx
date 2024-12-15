@@ -399,7 +399,6 @@ export default function useCourseTable() {
       setPageSize(courseDtos.pageSize)
       setError(null)
     } catch (error) {
-      console.error('Error fetching courses:', error)
       setError(error)
       setCourses([])
       setTotalCount(0)
@@ -482,7 +481,6 @@ export default function useCourseTable() {
       setIsDeleteDialogOpen(false)
       await fetchCourses()
     } catch (error) {
-      console.error('Error deleting course:', error)
       toast({
         title: 'Error',
         description: 'An error occurred while deleting the course.',
@@ -531,7 +529,6 @@ export default function useCourseTable() {
         duration: 1500
       })
     } catch (error) {
-      console.error('Error updating course status:', error)
       toast({
         title: 'Error',
         description: 'An error occurred while updating the course status.',
@@ -581,7 +578,6 @@ export default function useCourseTable() {
         duration: 1500
       })
     } catch (error) {
-      console.error('Error changing course level:', error)
       toast({
         title: 'Error',
         description: 'An error occurred while updating the course level.',

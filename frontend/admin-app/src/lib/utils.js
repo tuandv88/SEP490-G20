@@ -6,7 +6,6 @@ export function cn(...inputs) {
 }
 
 export function transformTestCases(originalData) {
-  console.log(originalData)
   return {
     testCases: originalData.map((item) => {
       const { expectedOutput, isHidden, ...inputs } = item
@@ -19,20 +18,19 @@ export function transformTestCases(originalData) {
 }
 
 export function transformTestCasesUpdate(originalData) {
-  console.log(originalData);
   return {
     testCases: originalData.map((item) => {
-      const { id, expectedOutput, isHidden, ...inputs } = item; 
+      const { id, expectedOutput, isHidden, ...inputs } = item
       return {
         inputs,
-        expectedOutput,
-      };
+        expectedOutput
+      }
     })
-  };
+  }
 }
 
 export function transformTestScript(originalData) {
-  return {    
+  return {
     testCases: originalData.map((item) => {
       const { expectedOutput, isHidden, order, ...inputs } = item
       return {
@@ -46,7 +44,7 @@ export function transformTestScript(originalData) {
 }
 
 export function transformTestScriptUpdate(originalData) {
-  return {    
+  return {
     testCases: originalData.map((item) => {
       const { expectedOutput, isHidden, order, id, ...inputs } = item
       return {
@@ -62,13 +60,13 @@ export function transformTestScriptUpdate(originalData) {
 
 export function reverseTransformTestScript(transformedData) {
   return transformedData.map(({ id, inputs, expectedOutput, isHidden }) => {
-    return { 
+    return {
       id,
       ...inputs,
       expectedOutput,
       isHidden
-    };
-  });
+    }
+  })
 }
 
 export function getVideoDuration(file) {

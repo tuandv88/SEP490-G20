@@ -75,7 +75,6 @@ const CreateProblemAg = ({}) => {
           </ToastAction>
         )
       })
-      console.error('Error creating problem:', error)
     } finally {
       setIsLoadingSubmit(false)
     }

@@ -23,7 +23,6 @@ export function StatusDropdown({ isActive, discussionId, onStatusChange }) {
         description: 'Failed to update discussion status. Please try again.',
         variant: 'destructive'
       })
-      console.error('Error updating discussion status:', error)
     }
   }
 

@@ -93,7 +93,6 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, is
           // Nếu không có lỗi, chuyển sang tab tiếp theo
           setActiveTab(tabs[currentTabIndex + 1].id)
         } catch (error) {
-          console.error('Validation error:', error)
           toast({
             variant: 'destructive',
             title: 'Validation Error',

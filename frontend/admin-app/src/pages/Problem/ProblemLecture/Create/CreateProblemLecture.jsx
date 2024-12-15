@@ -87,7 +87,6 @@ const CreateProblemLecture = ({}) => {
           </ToastAction>
         )
       })
-      console.error('Error creating problem:', error)
     } finally {
       setIsLoadingSubmit(false)
     }

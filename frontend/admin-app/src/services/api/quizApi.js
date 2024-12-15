@@ -10,7 +10,6 @@ export const createQuiz = async (quizData, lectureId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error creating course:', error)
     throw error
   }
 }
@@ -24,7 +23,6 @@ export const deleteQuiz = async (quizId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error deleting quiz:', error)
     throw error
   }
 }
@@ -54,7 +52,6 @@ export const createQuizAssessment = async (quizData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error creating course:', error)
     throw error
   }
 }
@@ -68,7 +65,6 @@ export const updateQuiz = async (quizId, quizData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error updating quiz:', error)
     throw error
   }
 }
@@ -82,7 +78,6 @@ export const updateProblemQuestion = async (quizId, questionId, quizData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error updating quiz:', error)
     throw error
   }
 }

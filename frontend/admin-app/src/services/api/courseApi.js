@@ -11,7 +11,6 @@ export const getCourses = async (params) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error fetching courses:', error)
     throw error
   }
 }
@@ -25,7 +24,6 @@ export const updateCourse = async (courseId, courseData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error updating course:', error)
     throw error
   }
 }
@@ -39,7 +37,6 @@ export const updateCourseImage = async (courseId, imageData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error updating course image:', error)
     throw error
   }
 }
@@ -66,7 +63,6 @@ export const changeCourseStatus = async (courseId, status) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error changing course status:', error)
     throw error
   }
 }
@@ -80,13 +76,11 @@ export const changeCourseLevel = async (courseId, level) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error changing course level:', error)
     throw error
   }
 }
 
 export const createCourse = async (courseData) => {
-  console.log(Cookies.get('authToken'))
   try {
     const response = await axiosInstance.post('/learning-service/courses', courseData, {
       headers: {
@@ -95,7 +89,6 @@ export const createCourse = async (courseData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error creating course:', error)
     throw error
   }
 }
@@ -109,7 +102,6 @@ export const getCourseDetails = async (courseId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error fetching course details:', error)
     throw error
   }
 }

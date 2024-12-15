@@ -67,7 +67,6 @@ const UpdateProblemQuiz = ({ onClose, quizId, question, problem, setIsUpdate, is
         const response = await getProblemDetail(problem.problemDto.id)
         setProblemDetail(response.problemDetailsDto)
       } catch (error) {
-        console.error('Error fetching problem detail:', error)
         toast({
           variant: 'destructive',
           title: 'Error',
@@ -149,7 +148,6 @@ const UpdateProblemQuiz = ({ onClose, quizId, question, problem, setIsUpdate, is
       onClose()
       
     } catch (error) {
-      console.error('Error updating question:', error)
       toast({
         variant: 'destructive',
         title: 'Error',

@@ -30,7 +30,6 @@ const EditCourse = () => {
         setCourse(courseData.courseDetailsDto.courseDto)
         setChapter(courseData.courseDetailsDto.chapterDetailsDtos)
       } catch (error) {
-        console.error('Failed to fetch course details:', error)
       }
     }
 

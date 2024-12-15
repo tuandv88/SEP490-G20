@@ -104,3 +104,19 @@ export const GetMonthlyCourseSalesWithGrowth = async () => {
     throw error
   }
 }
+
+export const GetTotalRevenueByMonth = async (startTime, endTime) => {
+  try {
+    const response = await axiosInstance.get(
+      `/payment-service/revenue/monthly?StartDate=${startTime}&EndDate=${endTime}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+      }
+    )
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}

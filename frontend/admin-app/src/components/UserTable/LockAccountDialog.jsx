@@ -10,42 +10,73 @@ export function LockAccountDialog({ isOpen, onClose, userId, onLockAccount }) {
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
-  const minDateTime = new Date(Date.now() + 30 * 60 * 1000).toISOString().slice(0, 16)
+  const minDateTime = new Date(Date.now() + 10 * 60 * 1000).toISOString().slice(0, 16)
 
   const validateLockoutTime = (time) => {
-    if (!time) return false
-    const selectedTime = new Date(time).getTime()
-    const minTime = new Date(minDateTime).getTime()
-    return selectedTime >= minTime
+    try {
+      if (!time) return false
+
+      const selectedTime = new Date(time).getTime()
+      const currentTime = Date.now()
+      const minTime = currentTime + 10 * 60 * 1000 // Thời gian hiện tại + 10 phút
+
+      // Kiểm tra thời gian chọn phải lớn hơn thời gian hiện tại + 10 phút
+      if (selectedTime <= currentTime) {
+        toast({
+          title: 'Error',
+          description: 'Lockout time cannot be in the past.',
+          variant: 'destructive',
+          duration: 3000
+        })
+        return false
+      }
+
+      if (selectedTime < minTime) {
+        toast({
+          title: 'Error',
+          description: 'Lockout time must be at least 10 minutes from now.',
+          variant: 'destructive',
+          duration: 3000
+        })
+        return false
+      }
+
+      return true
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Invalid date format.',
+        variant: 'destructive',
+        duration: 3000
+      })
+      return false
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (lockoutTime && !validateLockoutTime(lockoutTime)) {
-      toast({
-        title: 'Error',
-        description: 'Lockout time must be at least 30 minutes from now.',
-        variant: 'destructive',
-        duration: 3000
-      })
+
+    if (!validateLockoutTime(lockoutTime)) {
       return
     }
+
     setLoading(true)
     try {
       const lockoutTimeUtc = new Date(lockoutTime).toISOString()
       await lockAccountUser(userId, lockoutTimeUtc)
+
       toast({
         title: 'Success',
         description: 'Account locked successfully.',
         variant: 'success',
         duration: 1500
       })
-      onLockAccount(lockoutTimeUtc)
+      onLockAccount()
       onClose()
     } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to lock account. Please try again.',
+        description: error?.response?.data?.message || 'Failed to lock account. Please try again.',
         variant: 'destructive',
         duration: 3000
       })
@@ -73,13 +104,8 @@ export function LockAccountDialog({ isOpen, onClose, userId, onLockAccount }) {
                 value={lockoutTime}
                 onChange={(e) => setLockoutTime(e.target.value)}
                 onBlur={(e) => {
-                  if (e.target.value && !validateLockoutTime(e.target.value)) {
-                    toast({
-                      title: 'Warning',
-                      description: 'Lockout time must be at least 30 minutes from now.',
-                      variant: 'warning',
-                      duration: 3000
-                    })
+                  if (e.target.value) {
+                    validateLockoutTime(e.target.value)
                   }
                 }}
                 className='col-span-3'

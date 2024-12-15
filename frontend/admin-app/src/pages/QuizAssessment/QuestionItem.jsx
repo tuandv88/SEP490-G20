@@ -79,7 +79,6 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
   }
 
   const handleProblemDelete = () => {
-    console.log('Deleting problem:', problem.id)
   }
 
   const getQuestionTypeColor = (type) => {

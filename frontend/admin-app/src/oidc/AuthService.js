@@ -11,21 +11,17 @@ class AuthService {
 
     this.userManager.events.addUserLoaded((user) => {
       Cookies.set('authToken', user.access_token, { expires: 7 })
-      console.log('User loaded: ', user)
     })
 
     this.userManager.events.addUserUnloaded(() => {
       Cookies.remove('authToken')
-      console.log('User logged out')
     })
 
     // Xử lý gia hạn token tự động
     this.userManager.events.addAccessTokenExpiring(() => {
-      console.log('Access token sắp hết hạn. Bắt đầu gia hạn token...')
       this.userManager
         .signinSilent()
         .then((user) => {
-          console.log('Access token mới:', user.access_token)
         })
         .catch((err) => {
           console.error('Lỗi gia hạn token:', err)
@@ -56,7 +52,6 @@ class AuthService {
   callApi() {
     return this.getUser().then((user) => {
       if (user) {
-        console.log("User's access token using for API:", user.access_token)
 
         // Thực hiện gọi API bảo vệ
         const xhr = new XMLHttpRequest()
@@ -64,7 +59,6 @@ class AuthService {
         xhr.setRequestHeader('Authorization', 'Bearer ' + user.access_token) // Gửi access token trong header
 
         xhr.onload = function () {
-          console.log('API response: ', xhr.responseText)
         }
 
         xhr.onerror = function () {

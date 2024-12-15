@@ -26,7 +26,7 @@ public class UpdateQuizHandler(IQuizRepository repository) : ICommandHandler<Upd
             timeLimit: quizDto.TimeLimit,
             hasTimeLimit: quizDto.HasTimeLimit,
             attemptLimit: quizDto.AttemptLimit,
-            hasAttemptLimit: quizDto.HasTimeLimit,
+            hasAttemptLimit: quizDto.HasAttemptLimit,
             quizType: (QuizType)Enum.Parse(typeof(QuizType), quizDto.QuizType)
             );
 

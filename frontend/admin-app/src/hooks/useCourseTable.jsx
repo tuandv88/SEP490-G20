@@ -345,10 +345,10 @@ export default function useCourseTable() {
                   <Copy className='mr-2 h-4 w-4' />
                   <span>Copy course ID</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                {/* <DropdownMenuItem>
                   <Eye className='mr-2 h-4 w-4' />
                   <span>View course details</span>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuSeparator />
                 {isDraft && (
                   <>
@@ -389,9 +389,7 @@ export default function useCourseTable() {
         Status: selectedStatus || undefined
       }
 
-      const filteredParams = Object.fromEntries(
-        Object.entries(params).filter(([_, value]) => value !== undefined)
-      )
+      const filteredParams = Object.fromEntries(Object.entries(params).filter(([_, value]) => value !== undefined))
 
       const response = await getCourses(filteredParams)
       const { courseDtos } = response
@@ -438,7 +436,7 @@ export default function useCourseTable() {
   useEffect(() => {
     const statusFilter = table.getColumn('courseStatus')?.getFilterValue()?.[0]
     const levelFilter = table.getColumn('courseLevel')?.getFilterValue()?.[0]
-    
+
     setSelectedStatus(statusFilter || '')
     setSelectedLevel(levelFilter || '')
   }, [table.getState().columnFilters])
@@ -496,26 +494,26 @@ export default function useCourseTable() {
 
   const handleStatusChange = async (courseId, newStatus, currentStatus) => {
     if (newStatus === currentStatus) {
-      return;
+      return
     }
 
     if (newStatus === 'Scheduled') {
-      setSelectedCourse(courseId);
-      setNewStatus(newStatus);
-      setIsStatusChangeDialogOpen(true);
-      return;
+      setSelectedCourse(courseId)
+      setNewStatus(newStatus)
+      setIsStatusChangeDialogOpen(true)
+      return
     }
 
     if (newStatus === 'Published' || newStatus === 'Scheduled') {
-      const meetsRequirements = await checkCourseRequirements(courseId);
+      const meetsRequirements = await checkCourseRequirements(courseId)
       if (!meetsRequirements) {
-        return;
+        return
       }
     }
 
-    setSelectedCourse(courseId);
-    setNewStatus(newStatus);
-    await updateCourseStatus(courseId, newStatus, null);
+    setSelectedCourse(courseId)
+    setNewStatus(newStatus)
+    await updateCourseStatus(courseId, newStatus, null)
   }
 
   const updateCourseStatus = async (courseId, status, scheduledPublishDate) => {
@@ -524,12 +522,7 @@ export default function useCourseTable() {
         courseStatus: status,
         scheduledPublishDate: scheduledPublishDate === null ? null : convertISOtoUTC(scheduledPublishDate)
       }
-
-      console.log('Payload for API call:', payload)
-
       const response = await changeCourseStatus(courseId, payload)
-      console.log('API response:', response)
-
       await fetchCourses()
       toast({
         title: 'Status updated',

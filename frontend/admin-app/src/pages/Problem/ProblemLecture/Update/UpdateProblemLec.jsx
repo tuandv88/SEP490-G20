@@ -28,7 +28,6 @@ const UpdateProblemAg = ({}) => {
   const { problemId } = params
   const { lectureId } = params
   const { courseId } = params
-  console.log('problemId', problemId)
 
   const form = useForm({
     resolver: zodResolver(updateBasicInfoSchema),

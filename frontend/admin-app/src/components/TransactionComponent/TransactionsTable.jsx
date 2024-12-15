@@ -26,7 +26,6 @@ export function TransactionsTable() {
     setIsLoading(true)
     try {
       const response = await getTransactionsAudit(pageIndex + 1, pageSize, filters)
-      console.log(response)
       if (response?.transactions) {
         setData(response.transactions.data || [])
         setPagination((prev) => ({
@@ -52,7 +51,7 @@ export function TransactionsTable() {
         paymentMethod: null
       })
       setSelectedUser(null)
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
         pageIndex: 0
       }))
@@ -77,9 +76,9 @@ export function TransactionsTable() {
           ...filters,
           ...newFilters,
           status: newFilters.status === 'all' ? undefined : newFilters.status,
-          paymentMethod: newFilters.paymentMethod === 'all' ? undefined : newFilters.paymentMethod,
+          paymentMethod: newFilters.paymentMethod === 'all' ? undefined : newFilters.paymentMethod
         }
-        
+
         setFilters(combinedFilters)
         await fetchData({
           pageIndex: 0,
@@ -95,31 +94,34 @@ export function TransactionsTable() {
     [fetchData, pagination.pageSize, filters]
   )
 
-  const handleColumnFiltersChange = useCallback(async (column, value) => {
-    setIsLoading(true)
-    try {
-      const newFilters = {
-        ...columnFilters,
-        [column]: value
-      }
-      setColumnFilters(newFilters)
-      
-      const combinedFilters = {
-        ...filters,
-        ...newFilters
-      }
+  const handleColumnFiltersChange = useCallback(
+    async (column, value) => {
+      setIsLoading(true)
+      try {
+        const newFilters = {
+          ...columnFilters,
+          [column]: value
+        }
+        setColumnFilters(newFilters)
 
-      await fetchData({
-        pageIndex: 0,
-        pageSize: pagination.pageSize,
-        filters: combinedFilters
-      })
-    } catch (error) {
-      console.error('Error changing column filters:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [filters, pagination.pageSize, fetchData, columnFilters])
+        const combinedFilters = {
+          ...filters,
+          ...newFilters
+        }
+
+        await fetchData({
+          pageIndex: 0,
+          pageSize: pagination.pageSize,
+          filters: combinedFilters
+        })
+      } catch (error) {
+        console.error('Error changing column filters:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [filters, pagination.pageSize, fetchData, columnFilters]
+  )
 
   const handlePaginationChange = useCallback(
     async (newPagination) => {
@@ -145,26 +147,29 @@ export function TransactionsTable() {
     [fetchData, filters]
   )
 
-  const handleUserSelect = useCallback(async (user) => {
-    setIsLoading(true)
-    try {
-      setSelectedUser(user)
-      const newFilters = {
-        ...filters,
-        userId: user.id
+  const handleUserSelect = useCallback(
+    async (user) => {
+      setIsLoading(true)
+      try {
+        setSelectedUser(user)
+        const newFilters = {
+          ...filters,
+          userId: user.id
+        }
+        setFilters(newFilters)
+        await fetchData({
+          pageIndex: 0,
+          pageSize: pagination.pageSize,
+          filters: newFilters
+        })
+      } catch (error) {
+        console.error('Error selecting user:', error)
+      } finally {
+        setIsLoading(false)
       }
-      setFilters(newFilters)
-      await fetchData({
-        pageIndex: 0,
-        pageSize: pagination.pageSize,
-        filters: newFilters
-      })
-    } catch (error) {
-      console.error('Error selecting user:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [filters, pagination.pageSize, fetchData])
+    },
+    [filters, pagination.pageSize, fetchData]
+  )
 
   useEffect(() => {
     fetchData({
@@ -185,7 +190,7 @@ export function TransactionsTable() {
               variant='ghost'
               onClick={() => {
                 setSelectedUser(null)
-                handleFiltersChange({...filters, userId: null})
+                handleFiltersChange({ ...filters, userId: null })
               }}
             >
               Clear filter

@@ -12,7 +12,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { questionSchema, problemSchema } from './basic-info-step'
 
 const CreateProblemQuiz = ({ onClose, quizId, isUpdate, setIsUpdate }) => {
-  console.log(quizId)
   const [activeTab, setActiveTab] = useState('basic')
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
   const { toast } = useToast()
@@ -53,9 +52,7 @@ const CreateProblemQuiz = ({ onClose, quizId, isUpdate, setIsUpdate }) => {
   })
 
   const onSubmit = async (data) => {
-    const form2Values = form2.getValues();
-    console.log('Form2 values:', form2Values); // Debug
-    console.log('Content value:', form2Values.content); // Debug
+    const form2Values = form2.getValues()
 
     const updatedData = { ...data }
 
@@ -71,11 +68,9 @@ const CreateProblemQuiz = ({ onClose, quizId, isUpdate, setIsUpdate }) => {
       }
     }
 
-    console.log(problemData)
-
     try {
       setIsLoadingSubmit(true)
-      const response = await createProblemQuestion(quizId, problemData)   
+      const response = await createProblemQuestion(quizId, problemData)
       setIsUpdate(!isUpdate)
       onClose()
       toast({
@@ -88,7 +83,11 @@ const CreateProblemQuiz = ({ onClose, quizId, isUpdate, setIsUpdate }) => {
         variant: 'destructive',
         title: 'Oops! Something went wrong',
         description: 'Please try again!',
-        action: <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>Try again</ToastAction>
+        action: (
+          <ToastAction altText='Try again' onClick={() => onSubmit(form.getValues())}>
+            Try again
+          </ToastAction>
+        )
       })
       console.error('Error creating question:', error)
     } finally {

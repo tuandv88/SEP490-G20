@@ -195,9 +195,9 @@ export function DiscussionTable({ data = [], refetchData }) {
                 Copy discussion ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleDeleteClick(discussion)} className='text-red-600'>
+              {/* <DropdownMenuItem onClick={() => handleDeleteClick(discussion)} className='text-red-600'>
                 Delete discussion
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -319,7 +319,7 @@ export function DiscussionTable({ data = [], refetchData }) {
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side='top'>
-              {[8, 10, 20, 30, 40, 50].map((pageSize) => (
+              {[5, 10].map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>

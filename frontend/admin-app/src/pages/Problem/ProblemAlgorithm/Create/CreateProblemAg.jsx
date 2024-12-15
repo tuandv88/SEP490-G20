@@ -20,7 +20,6 @@ const CreateProblemAg = ({}) => {
   const [isRunSuccess, setIsRunSuccess] = useState(false)
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
 
-  console.log(isSaveTemplate)
 
   const form = useForm({
     resolver: zodResolver(basicInfoSchema),
@@ -55,7 +54,6 @@ const CreateProblemAg = ({}) => {
       createProblemDto: updatedData
     }
 
-    console.log(problemData)
 
     setIsLoadingSubmit(true)
     try {

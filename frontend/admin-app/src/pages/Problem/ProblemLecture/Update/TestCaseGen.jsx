@@ -20,10 +20,12 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
 
   useEffect(() => {
     if (testCases && testCases.length > 0) {
-      const extractedParams = Object.keys(testCases[0]).filter(key => key !== 'expectedOutput' && key !== 'isHidden' && key !== 'id');
-      setParams(extractedParams);
+      const extractedParams = Object.keys(testCases[0]).filter(
+        (key) => key !== 'expectedOutput' && key !== 'isHidden' && key !== 'id'
+      )
+      setParams(extractedParams)
     }
-  }, [testCases]);
+  }, [testCases])
 
   const addParam = () => {
     if (newParam && !params.includes(newParam)) {
@@ -47,7 +49,7 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
       acc[param] = ''
       return acc
     }, {})
-    setTestCases([...testCases, { ...newTestCase, expectedOutput: 'N/A', isHidden: false  }])
+    setTestCases([...testCases, { ...newTestCase, expectedOutput: 'N/A', isHidden: false }])
   }
 
   const updateTestCaseValue = (testCaseIndex, param, value) => {
@@ -89,29 +91,24 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
     setPreviewOutput(output)
   }, [testCases, params])
 
-
   const createTestCaseNoParam = () => {
     setTestCases([...testCases, { expectedOutput: '', isHidden: false }])
   }
 
-  const fileInputRef = React.useRef(null);
+  const fileInputRef = React.useRef(null)
 
   const handleImportClick = () => {
-    console.log("Import button clicked");
-    fileInputRef.current?.click();
-  };
+    fileInputRef.current?.click()
+  }
 
   const handleImportExcel = (event) => {
-    console.log("File input changed");
-    const file = event.target.files[0];
+    const file = event.target.files[0]
     if (!file) {
-      console.log("No file selected");
-      return;
+      return
     }
-    console.log("Selected file:", file);
 
-    const reader = new FileReader();
-    
+    const reader = new FileReader()
+
     reader.onload = (e) => {
       try {
         const workbook = XLSX.read(e.target.result, { type: 'binary' })
@@ -121,15 +118,15 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
 
         // Lấy tất cả các params từ headers của Excel
         const excelParams = Object.keys(data[0])
-          .filter(key => key.startsWith('Input_'))
-          .map(key => key.substring(6)); // Lấy phần sau "Input_"
+          .filter((key) => key.startsWith('Input_'))
+          .map((key) => key.substring(6)) // Lấy phần sau "Input_"
 
         // Xử lý dữ liệu từ Excel
-        const newTestCases = data.map(row => {
+        const newTestCases = data.map((row) => {
           const testCase = {}
-          
+
           // Lọc và xử lý các cột
-          Object.keys(row).forEach(key => {
+          Object.keys(row).forEach((key) => {
             // Bỏ qua cột TestCaseId
             if (key === 'TestCaseId') return
 
@@ -141,14 +138,9 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
             // Xử lý cột Expected và IsHidden
             else if (key === 'Expected') {
               testCase.expectedOutput = row[key].toString()
-            }
-            else if (key === 'IsHidden') {
-              const value = row[key];
-              testCase.isHidden = value === true || 
-                                 value === 'TRUE' || 
-                                 value === 'true' || 
-                                 value === 1 || 
-                                 value === '1';
+            } else if (key === 'IsHidden') {
+              const value = row[key]
+              testCase.isHidden = value === true || value === 'TRUE' || value === 'true' || value === 1 || value === '1'
             }
           })
 
@@ -156,59 +148,58 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
         })
 
         // Cập nhật params - gộp params hiện tại với params mới từ Excel
-        const updatedParams = [...new Set([...params, ...excelParams])];
-        setParams(updatedParams);
+        const updatedParams = [...new Set([...params, ...excelParams])]
+        setParams(updatedParams)
 
         setTestCases([...testCases, ...newTestCases])
         toast({
-          title: "Import success",
-          description: `Imported ${newTestCases.length} test cases`,
+          title: 'Import success',
+          description: `Imported ${newTestCases.length} test cases`
         })
 
         // Reset input file để có thể import lại file cũ
         event.target.value = ''
-        
       } catch (error) {
         console.error('Import error:', error)
         toast({
-          variant: "destructive", 
-          title: "Import failed",
-          description: "Invalid file format",
+          variant: 'destructive',
+          title: 'Import failed',
+          description: 'Invalid file format'
         })
       }
-    };
+    }
 
     reader.onerror = (error) => {
-      console.error('FileReader error:', error);
-    };
+      console.error('FileReader error:', error)
+    }
 
-    reader.readAsBinaryString(file);
-  };
+    reader.readAsBinaryString(file)
+  }
 
   const downloadTemplate = () => {
-    const wb = XLSX.utils.book_new();
-    
+    const wb = XLSX.utils.book_new()
+
     const templateData = [
       {
         TestCaseId: 1,
-        Input_param1: "value1",
-        Input_param2: "value2", 
-        Expected: "expected output",
+        Input_param1: 'value1',
+        Input_param2: 'value2',
+        Expected: 'expected output',
         IsHidden: false
       },
       {
         TestCaseId: 2,
-        Input_param1: "value3",
-        Input_param2: "value4",
-        Expected: "expected output 2", 
+        Input_param1: 'value3',
+        Input_param2: 'value4',
+        Expected: 'expected output 2',
         IsHidden: true
       }
-    ];
+    ]
 
-    const ws = XLSX.utils.json_to_sheet(templateData);
-    XLSX.utils.book_append_sheet(wb, ws, "Template");
-    XLSX.writeFile(wb, "testcase_template.xlsx");
-  };
+    const ws = XLSX.utils.json_to_sheet(templateData)
+    XLSX.utils.book_append_sheet(wb, ws, 'Template')
+    XLSX.writeFile(wb, 'testcase_template.xlsx')
+  }
 
   return (
     <Card className='w-full mx-auto'>
@@ -219,16 +210,20 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
       </div>
       <CardFooter className='flex flex-col items-stretch gap-4'>
         <div className='grid grid-cols-3 gap-4'>
-          <div className={`col-span-2 grid  ${testCases.length === 0 ? 'rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center' : 'grid-cols-2 gap-4'}`}>
-            {testCases.length === 0 && <p className='text-center text-gray-500 w-full font-semibold'>No test cases created yet.</p>}
+          <div
+            className={`col-span-2 grid  ${testCases.length === 0 ? 'rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center' : 'grid-cols-2 gap-4'}`}
+          >
+            {testCases.length === 0 && (
+              <p className='text-center text-gray-500 w-full font-semibold'>No test cases created yet.</p>
+            )}
             {testCases.map((testCase, testCaseIndex) => {
-              const { id, ...displayTestCase } = testCase; // Loại bỏ 'id' khi hiển thị
+              const { id, ...displayTestCase } = testCase // Loại bỏ 'id' khi hiển thị
               return (
                 <Card key={id || testCaseIndex} className='w-full mb-4'>
                   <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                     <CardTitle className='text-sm font-semibold'>Test Case {testCaseIndex + 1}</CardTitle>
-                    <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-2">
+                    <div className='flex items-center space-x-2'>
+                      <div className='flex items-center space-x-2'>
                         <Label htmlFor={`hidden-toggle-${testCaseIndex}`}>Hidden</Label>
                         <Switch
                           id={`hidden-toggle-${testCaseIndex}`}
@@ -236,45 +231,47 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
                           onCheckedChange={() => toggleTestCaseHidden(testCaseIndex)}
                         />
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeTestCase(testCaseIndex)}
-                      >
-                        <X className="h-4 w-4" />
+                      <Button variant='ghost' size='sm' onClick={() => removeTestCase(testCaseIndex)}>
+                        <X className='h-4 w-4' />
                       </Button>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {Object.entries(displayTestCase).map(([param, value]) => (
-                      param !== 'expectedOutput' && param !== 'isHidden' && (
-                        <div key={param} className="flex items-center gap-2 mb-2">
-                          <Label htmlFor={`${testCaseIndex}-${param}`} className="w-1/3">
-                            <Badge variant="outline" className="mr-2">{param}</Badge>
-                          </Label>
-                          <Input
-                            id={`${testCaseIndex}-${param}`}
-                            value={value}
-                            onChange={(e) => updateTestCaseValue(testCaseIndex, param, e.target.value)}
-                            className="w-2/3"
-                          />
-                        </div>
-                      )
-                    ))}
-                    <div className="flex items-center gap-2 mb-2">
-                      <Label htmlFor={`${testCaseIndex}-expectedOutput`} className="w-1/3">
-                        <Badge variant="outline" className="mr-2">Expected Output</Badge>
+                    {Object.entries(displayTestCase).map(
+                      ([param, value]) =>
+                        param !== 'expectedOutput' &&
+                        param !== 'isHidden' && (
+                          <div key={param} className='flex items-center gap-2 mb-2'>
+                            <Label htmlFor={`${testCaseIndex}-${param}`} className='w-1/3'>
+                              <Badge variant='outline' className='mr-2'>
+                                {param}
+                              </Badge>
+                            </Label>
+                            <Input
+                              id={`${testCaseIndex}-${param}`}
+                              value={value}
+                              onChange={(e) => updateTestCaseValue(testCaseIndex, param, e.target.value)}
+                              className='w-2/3'
+                            />
+                          </div>
+                        )
+                    )}
+                    <div className='flex items-center gap-2 mb-2'>
+                      <Label htmlFor={`${testCaseIndex}-expectedOutput`} className='w-1/3'>
+                        <Badge variant='outline' className='mr-2'>
+                          Expected Output
+                        </Badge>
                       </Label>
                       <Input
                         id={`${testCaseIndex}-expectedOutput`}
                         value={testCase.expectedOutput}
                         onChange={(e) => updateExpectedOutput(testCaseIndex, e.target.value)}
-                        className="w-2/3"
+                        className='w-2/3'
                       />
                     </div>
                   </CardContent>
                 </Card>
-              );
+              )
             })}
           </div>
           <div>
@@ -299,14 +296,14 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
                       Add Param
                     </Button>
                     <input
-                      type="file"
-                      accept=".xlsx,.xls"
-                      className="hidden"
+                      type='file'
+                      accept='.xlsx,.xls'
+                      className='hidden'
                       ref={fileInputRef}
                       onChange={handleImportExcel}
                     />
-                    <Button 
-                      type='button' 
+                    <Button
+                      type='button'
                       variant='outline'
                       className='flex-shrink-0 flex-1'
                       onClick={handleImportClick}
@@ -314,12 +311,7 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
                       <Upload className='w-4 h-4 mr-2' />
                       Import Excel
                     </Button>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      className='flex-shrink-0 flex-1'
-                      onClick={downloadTemplate}
-                    >
+                    <Button type='button' variant='outline' className='flex-shrink-0 flex-1' onClick={downloadTemplate}>
                       <Download className='w-4 h-4 mr-2' />
                       Template
                     </Button>
@@ -337,19 +329,15 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
                 </div>
               </CardContent>
               <CardFooter className='flex flex-col sm:flex-row gap-2'>
-                <Button 
-                  type='button' 
-                  onClick={createTestCase} 
-                  disabled={params.length === 0} 
+                <Button
+                  type='button'
+                  onClick={createTestCase}
+                  disabled={params.length === 0}
                   className='w-full sm:w-auto'
                 >
                   Create Test Case
                 </Button>
-                <Button 
-                  type='button' 
-                  onClick={createTestCaseNoParam} 
-                  className='w-full sm:w-auto'
-                >
+                <Button type='button' onClick={createTestCaseNoParam} className='w-full sm:w-auto'>
                   Create No Parameters
                 </Button>
               </CardFooter>

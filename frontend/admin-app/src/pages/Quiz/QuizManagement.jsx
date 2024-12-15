@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useMatch } from '@tanstack/react-router'
-import { ChevronLeft, Clock, RotateCcw, Plus, Loader2 } from 'lucide-react'
+import { ChevronLeft, Clock, RotateCcw, Plus, Loader2, FileQuestion, Award, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
@@ -13,11 +13,12 @@ import { useToast } from '@/hooks/use-toast'
 import { useStore } from '@/data/store'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { FileQuestion, Award } from 'lucide-react'
 import { EDIT_CURRICULUM_COURSE_PATH } from '@/routers/router'
 import { FullScreenPopup } from './FullScreenPopup'
 import { UpdateProblemQuizModal } from './UpdateProblemQuizModal'
 import { FullScreenPopupProblem } from './FullScreenPopupProblem'
+import { QuizEditForm } from './QuizEditForm'
+import { updateQuiz } from '@/services/api/quizApi'
 
 export default function QuizManagement() {
   const { params } = useMatch(quizManagementRoute.id)
@@ -31,6 +32,7 @@ export default function QuizManagement() {
   const { toast } = useToast()
   const [isFullScreenPopupOpen, setIsFullScreenPopupOpen] = useState(false)
   const [showCreateQuizForm, setShowCreateQuizForm] = useState(false)
+  const [showEditQuizForm, setShowEditQuizForm] = useState(false)
 
   useEffect(() => {
     if (showAddQuestionForm || showCreateQuizForm || isFullScreenPopupOpen) {
@@ -104,6 +106,29 @@ export default function QuizManagement() {
     }))
   }
 
+  const handleUpdateQuiz = async (updatedQuizData) => {
+    try {
+      const response = await updateQuiz(quizId, updatedQuizData)
+      if (response) {
+        const updatedQuiz = await getFullQuizDetail(quizId)
+        setQuizDetail(updatedQuiz)
+        toast({
+          title: 'Success',
+          description: 'Quiz updated successfully',
+          duration: 1500
+        })
+      }
+    } catch (error) {
+      console.error('Error updating quiz:', error)
+      toast({
+        title: 'Error',
+        description: error?.response?.data?.message || 'Failed to update quiz. Please try again.',
+        variant: 'destructive',
+        duration: 1500
+      })
+    }
+  }
+
   const LoadingSkeleton = () => (
     <div className='space-y-6'>
       <Skeleton className='h-10 w-40' />
@@ -161,10 +186,15 @@ export default function QuizManagement() {
         <Card className='w-full'>
           <CardHeader className='pb-4'>
             <div className='flex items-center justify-between'>
-              <CardTitle className='text-2xl font-bold'>{quizDetail?.quiz?.title}</CardTitle>
-              <Badge variant={quizDetail?.quiz?.isActive ? 'success' : 'secondary'}>
-                {quizDetail?.quiz?.isActive ? 'Active' : 'Inactive'}
-              </Badge>
+              <div className='flex items-center gap-4'>
+                <CardTitle className='text-2xl font-bold'>{quizDetail?.quiz?.title}</CardTitle>
+                <Badge variant={quizDetail?.quiz?.isActive ? 'success' : 'secondary'}>
+                  {quizDetail?.quiz?.isActive ? 'Active' : 'Inactive'}
+                </Badge>
+              </div>
+              <Button variant='outline' size='icon' onClick={() => setShowEditQuizForm(true)}>
+                <Pencil className='h-4 w-4' />
+              </Button>
             </div>
           </CardHeader>
           <CardContent className='pt-0'>
@@ -294,6 +324,15 @@ export default function QuizManagement() {
           quizId={quizId}
           isUpdate={isUpdate}
           setIsUpdate={setIsUpdate}
+        />
+      )}
+
+      {showEditQuizForm && (
+        <QuizEditForm
+          isOpen={showEditQuizForm}
+          onOpenChange={setShowEditQuizForm}
+          onSubmit={handleUpdateQuiz}
+          defaultValues={quizDetail.quiz}
         />
       )}
     </div>

@@ -11,7 +11,8 @@ function UsersPage() {
     data: users,
     isLoading: usersLoading,
     isError: usersError,
-    error: usersErrorMessage
+    error: usersErrorMessage,
+    refetch
   } = useQuery({
     queryKey: ['users'],
     queryFn: getAllUsersDetail,
@@ -50,7 +51,7 @@ function UsersPage() {
   return (
     <div className='container mx-auto '>
       <h1 className='text-2xl font-bold mb-5'>User Management</h1>
-      <DataTable columns={columns} data={users} roles={roles} />
+      <DataTable columns={columns} data={users} roles={roles} onDataChange={refetch} />
     </div>
   )
 }

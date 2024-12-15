@@ -136,7 +136,6 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
   const { toast } = useToast()
   const { setValue } = form
 
-  console.log(testCases)
   const handleAddFile = () => {
     const lastFileNumber = Math.max(
       ...files.map((file) => {
@@ -188,12 +187,12 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
       toast({
         variant: 'destructive',
         title: 'Empty Code or Test Content',
-        description: 'Your code or test content is empty, please check again',       
+        description: 'Your code or test content is empty, please check again'
       })
       return
     }
     setIsRunning(true)
-    setTestCaseTab('result')    
+    setTestCaseTab('result')
 
     const values = form.getValues()
 
@@ -208,8 +207,6 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
         maxFileSize: values.maxFileSize * 1024
       }
     }
-
-    console.log(resource)
 
     const testCase = transformTestCases(testCases)
     const createCode = {
@@ -247,50 +244,47 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
     try {
       const response = await runCode(createCode)
       setTestResults(response.codeExecuteDtos)
-      const hasCompileOrRuntimeErrors = response.codeExecuteDtos.some(dto =>
-        dto.compileErrors || dto.runTimeErrors
-      );
-  
+      const hasCompileOrRuntimeErrors = response.codeExecuteDtos.some((dto) => dto.compileErrors || dto.runTimeErrors)
+
       if (hasCompileOrRuntimeErrors) {
         toast({
           variant: 'destructive',
           title: 'Runcode Result',
           description: 'There are compile or runtime errors. Please check your code.'
-        });
+        })
         setIsRunSuccess(false)
-        return;
+        return
       }
 
-      const hasFailedTestCase = response.codeExecuteDtos.some(dto =>
-        dto.testResults.some(testResult => !testResult.isPass)
-      );
-  
-      console.log(response)
+      const hasFailedTestCase = response.codeExecuteDtos.some((dto) =>
+        dto.testResults.some((testResult) => !testResult.isPass)
+      )
+
       if (hasFailedTestCase) {
         toast({
           variant: 'destructive',
           title: 'Runcode Result',
           description: 'Some test cases failed, please check your code again'
         })
-        setIsRunSuccess(false)  
+        setIsRunSuccess(false)
       } else {
         toast({
           variant: 'success',
           title: 'Runcode Result',
           description: 'All test cases passed successfully!'
         })
-        setIsRunSuccess(true)       
-      }     
+        setIsRunSuccess(true)
+      }
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Runcode Result',
         description: 'There was a problem with your request.',
-        action: <ToastAction altText='Try again'>Try again</ToastAction>           
+        action: <ToastAction altText='Try again'>Try again</ToastAction>
       })
-      setIsRunSuccess(false)  
+      setIsRunSuccess(false)
       console.error('Error creating course:', error)
-    } finally {      
+    } finally {
       setIsRunning(false)
     }
   }

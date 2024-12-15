@@ -4,8 +4,6 @@ import CodeEditor from '@/pages/Problem/ProblemQuiz/Update/CodeEditor'
 import Template from '@/pages/Problem/ProblemQuiz/Update/Template';
 
 const FormTabs = ({ activeTab, form, form2, setIsSaveTemplate, setIsRunSuccess, testCaseUpdate, solutionUpdate }) => {
-  console.log(testCaseUpdate)
-  console.log(solutionUpdate)
   return (
     <div className='mx-auto px-4 py-24'>
       <div className='space-y-6'>

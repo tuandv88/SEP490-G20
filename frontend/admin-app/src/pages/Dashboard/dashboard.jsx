@@ -18,12 +18,36 @@ function convertCoursesToArray(coursesObject) {
     enrollments: course.enrollmentCount
   }))
 }
-const revenueGrowthData = [
-  { month: 'Sep', revenue: 10 },
-  { month: 'Oct', revenue: 30 },
-  { month: 'Nov', revenue: 25 },
-  { month: 'Dec', revenue: 32 }
-]
+function convertToRevenueGrowthData(apiData) {
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+  // Kiểm tra nếu apiData và revenues là undefined hoặc null
+  if (!apiData || !apiData.revenues) {
+    return monthNames.map((month) => ({ month, revenue: 0 }))
+  }
+
+  try {
+    // Lấy mảng revenues từ apiData
+    const revenueData = apiData.revenues
+
+    // Tạo object để mapping dữ liệu từ API
+    const revenueByMonth = {}
+    revenueData.forEach((item) => {
+      if (item && typeof item.month === 'number' && item.totalRevenue != null) {
+        revenueByMonth[item.month] = Number(item.totalRevenue.toFixed(2))
+      }
+    })
+
+    // Tạo mảng đầy đủ 12 tháng
+    return monthNames.map((month, index) => ({
+      month: month,
+      revenue: revenueByMonth[index + 1] || 0
+    }))
+  } catch (error) {
+    console.error('Error converting revenue data:', error)
+    return monthNames.map((month) => ({ month, revenue: 0 }))
+  }
+}
 
 export default function AdminDashboard() {
   const breadcrumbs = [{ label: 'Dashboard', href: '/' }]
@@ -50,11 +74,13 @@ export default function AdminDashboard() {
     popularCourses,
     topSolvedProblems,
     monthlyRevenueWithGrowth,
-    monthlyCourseSalesWithGrowth
+    monthlyCourseSalesWithGrowth,
+    totalRevenueByMonth
   } = data
   const popularCourData = popularCourses.courses.data
   const topSolvedProblemData = topSolvedProblems.problems.data
   const topEnrolledCourses = convertCoursesToArray(popularCourses)
+  const revenueGrowthData = convertToRevenueGrowthData(totalRevenueByMonth)
 
   return (
     <ErrorBoundary>

@@ -32,7 +32,6 @@ export default function EditBasicInfoCourse() {
     const fetchCourseData = async () => {
       try {
         const data = await getCourseDetails(courseId)
-        console.log('data', data)
         const courseDto = data.courseDetailsDto.courseDto
         setCourseData({
           ...courseDto
@@ -74,7 +73,6 @@ export default function EditBasicInfoCourse() {
     }
     try {
       const response = await updateCourse(courseId, courseUpdate)
-      console.log('Course updated successfully:', response)
       toast({
         title: 'Course updated successfully',
         description: 'Your course has been updated.',

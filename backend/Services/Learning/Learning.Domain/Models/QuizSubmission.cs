@@ -17,7 +17,7 @@ public class QuizSubmission : Aggregate<QuizSubmissionId> {
 
     public void UpdateStatus(QuizSubmissionStatus status) {
         Status = status;
-        if(status == QuizSubmissionStatus.Success){
+        if(Status == QuizSubmissionStatus.Success){
             AddDomainEvent(new QuizSubmissionSuccessEvent(this));
         }
     }

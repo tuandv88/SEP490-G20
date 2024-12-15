@@ -202,10 +202,11 @@ export const columns = [
   {
     accessorKey: 'isAccountLocked',
     header: () => <div className='font-bold text-primary text-center'>Account Status</div>,
-    cell: ({ row, changeData }) => {
+    cell: ({ row, table }) => {
       const [isLocked, setIsLocked] = useState(row.getValue('isAccountLocked'))
       const [isDialogOpen, setIsDialogOpen] = useState(false)
       const userId = row.original.id
+      const onDataChange = table.options.meta?.onDataChange
 
       const handleStatusChange = (newStatus) => {
         if (newStatus === 'locked') {
@@ -240,10 +241,12 @@ export const columns = [
             isOpen={isDialogOpen}
             onClose={() => setIsDialogOpen(false)}
             userId={userId}
-            onLockAccount={(lockoutTime) => {
+            onLockAccount={() => {
               setIsLocked(true)
               setIsDialogOpen(false)
-              changeData()
+              if (onDataChange) {
+                onDataChange()
+              }
             }}
           />
         </div>

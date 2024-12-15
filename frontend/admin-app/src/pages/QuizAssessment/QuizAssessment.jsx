@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { ChevronLeft, Clock, RotateCcw, Plus, Loader2, FileQuestion, Award } from 'lucide-react'
+import { ChevronLeft, Clock, RotateCcw, Plus, Loader2, FileQuestion, Award, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
@@ -8,11 +8,12 @@ import { AddQuestionForm } from './AddQuestionForm'
 import { QuizCreationForm } from './QuizCreationForm'
 import { QuestionItem } from './QuestionItem'
 import { deleteQuestion } from '@/services/api/questionApi'
-import { getQuizAssessment, createQuizAssessment } from '@/services/api/quizApi'
+import { getQuizAssessment, createQuizAssessment, updateQuiz } from '@/services/api/quizApi'
 import { getFullQuizDetail } from '@/services/api/questionApi'
 import { useToast } from '@/hooks/use-toast'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { QuizEditForm } from './QuizEditForm'
 export default function QuizAssessment() {
   const [showAddQuestionForm, setShowAddQuestionForm] = useState(false)
   const [isUpdate, setIsUpdate] = useState(false)
@@ -22,6 +23,7 @@ export default function QuizAssessment() {
   const [quizDetail, setQuizDetail] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
+  const [showEditQuizForm, setShowEditQuizForm] = useState(false)
 
   useEffect(() => {
     if (showAddQuestionForm || showCreateQuizForm) {
@@ -154,6 +156,28 @@ export default function QuizAssessment() {
     }
   }
 
+  const handleUpdateQuiz = async (updatedQuizData) => {
+    try {
+      const response = await updateQuiz(quizDetail.quiz.id, updatedQuizData)
+      if (response) {
+        await fetchQuizDetail(quizDetail.quiz.id)
+        toast({
+          title: 'Success',
+          description: 'Quiz updated successfully',
+          duration: 1500
+        })
+      }
+    } catch (error) {
+      console.error('Error updating quiz:', error)
+      toast({
+        title: 'Error',
+        description: error?.response?.data?.message || 'Failed to update quiz. Please try again.',
+        variant: 'destructive',
+        duration: 1500
+      })
+    }
+  }
+
   if (isLoading) {
     return (
       <div className='container p-4 mx-auto space-y-6'>
@@ -181,10 +205,15 @@ export default function QuizAssessment() {
           <Card className='w-full'>
             <CardHeader className='pb-4'>
               <div className='flex items-center justify-between'>
-                <CardTitle className='text-2xl font-bold'>{quizDetail.quiz.title}</CardTitle>
-                <Badge variant={quizDetail.quiz.isActive ? 'success' : 'secondary'}>
-                  {quizDetail.quiz.isActive ? 'Active' : 'Inactive'}
-                </Badge>
+                <div className='flex items-center gap-4'>
+                  <CardTitle className='text-2xl font-bold'>{quizDetail.quiz.title}</CardTitle>
+                  <Badge variant={quizDetail.quiz.isActive ? 'success' : 'secondary'}>
+                    {quizDetail.quiz.isActive ? 'Active' : 'Inactive'}
+                  </Badge>
+                </div>
+                <Button variant='outline' size='icon' onClick={() => setShowEditQuizForm(true)}>
+                  <Pencil className='h-4 w-4' />
+                </Button>
               </div>
             </CardHeader>
             <CardContent className='pt-0'>
@@ -205,7 +234,7 @@ export default function QuizAssessment() {
                     </div>
                     <div className='space-y-1'>
                       <p className='text-sm font-medium leading-none'>Passing Mark</p>
-                      <p className='text-sm text-muted-foreground'>{quizDetail.quiz.passingMark}</p>
+                      <p className='text-sm text-muted-foreground'>{quizDetail.quiz.passingMark}%</p>
                     </div>
                   </div>
                 </div>
@@ -298,6 +327,15 @@ export default function QuizAssessment() {
           isOpen={showCreateQuizForm}
           onOpenChange={setShowCreateQuizForm}
           onSubmit={handleCreateQuiz}
+        />
+      )}
+
+      {showEditQuizForm && (
+        <QuizEditForm
+          isOpen={showEditQuizForm}
+          onOpenChange={setShowEditQuizForm}
+          onSubmit={handleUpdateQuiz}
+          defaultValues={quizDetail.quiz}
         />
       )}
     </div>

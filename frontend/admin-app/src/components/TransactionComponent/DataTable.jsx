@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -14,11 +14,25 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { DataTablePagination } from './DataTablePagination'
 import { DataTableToolbar } from './DataTableToolbar'
 
-export function DataTable({ columns, data, pagination, onPaginationChange, isLoading }) {
+export function DataTable({ columns, data, pagination, onPaginationChange, onFiltersChange, onColumnFiltersChange, isLoading, onUserSelect, onClearFilters }) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState({})
   const [columnFilters, setColumnFilters] = useState([])
   const [sorting, setSorting] = useState([])
+
+  const handleColumnFiltersChange = useCallback((filters) => {
+    if (!Array.isArray(filters)) {
+      filters = []
+    }
+    setColumnFilters(filters)
+    
+    if (filters.length > 0) {
+      const [filter] = filters
+      onColumnFiltersChange(filter.id, filter.value)
+    } else {
+      onColumnFiltersChange(null, null)
+    }
+  }, [onColumnFiltersChange])
 
   const table = useReactTable({
     data,
@@ -39,11 +53,12 @@ export function DataTable({ columns, data, pagination, onPaginationChange, isLoa
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: handleColumnFiltersChange,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel()
+    getSortedRowModel: getSortedRowModel(),
+    onUserSelect,
   })
 
   const LoadingRow = () => (
@@ -66,7 +81,11 @@ export function DataTable({ columns, data, pagination, onPaginationChange, isLoa
 
   return (
     <div className='space-y-4'>
-      <DataTableToolbar table={table} />
+      <DataTableToolbar 
+        table={table} 
+        onFiltersChange={onFiltersChange}
+        onClearFilters={onClearFilters}
+      />
       <div className='rounded-md border'>
         <Table>
           <TableHeader>

@@ -179,18 +179,9 @@ export function EditQuestionForm({ quizId, question, onSave, onCancel }) {
                   name='questionType'
                   control={control}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id='questionType'>
-                        <SelectValue placeholder='Select type' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {QUESTION_TYPES.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="p-2 border rounded-md bg-muted">
+                      {field.value}
+                    </div>
                   )}
                 />
               </div>

@@ -2,12 +2,12 @@ import React from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
 
-export function AmountPopup({ amount, grossAmount, netAmount, feeAmount }) {
+export function AmountPopup({ amount, grossAmount, netAmount, feeAmount, pointsUsed }) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button variant='ghost' className='p-0 font-normal'>
-          {amount}
+          {amount}$
         </Button>
       </PopoverTrigger>
       <PopoverContent className='w-80'>
@@ -28,6 +28,12 @@ export function AmountPopup({ amount, grossAmount, netAmount, feeAmount }) {
             <div className='grid grid-cols-3 items-center gap-4'>
               <span className='text-sm font-medium'>Fee Amount:</span>
               <span className='col-span-2'>{feeAmount.toFixed(2)}$</span>
+            </div>
+            <div className='grid grid-cols-3 items-center gap-4'>
+              <span className='text-sm font-medium'>Points Used:</span>
+              <span className='col-span-2'>
+                {pointsUsed} {pointsUsed <= 1 ? 'point' : 'points'}
+              </span>
             </div>
           </div>
         </div>

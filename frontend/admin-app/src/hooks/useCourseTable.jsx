@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
   useReactTable,
@@ -34,7 +34,7 @@ import {
   DropdownMenuRadioItem
 } from '@/components/ui/dropdown-menu'
 import { format, addMinutes, parseISO } from 'date-fns'
-import { formatDateTime } from '@/utils/format'
+import { formatDateTime, formatDateTimeToLocal } from '@/utils/format'
 import { convertISOtoUTC, localToUTC } from '@/utils/format'
 import {
   getCourses,
@@ -109,185 +109,11 @@ export default function useCourseTable() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState(null)
 
-  const fetchCourses = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const response = await getCourses(pageIndex, pageSize)
-      console.log(response)
-      const { courseDtos } = response
-      setCourses(courseDtos.data || [])
-      setTotalCount(courseDtos.count || 0)
-      setPageIndex(courseDtos.pageIndex)
-      setPageSize(courseDtos.pageSize)
-      setError(null)
-    } catch (error) {
-      console.error('Error fetching courses:', error)
-      setError(error)
-      setCourses([])
-      setTotalCount(0)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [pageIndex, pageSize])
+  const [searchString, setSearchString] = useState('')
+  const [selectedLevel, setSelectedLevel] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState('')
 
-  useEffect(() => {
-    fetchCourses()
-  }, [fetchCourses])
-
-  const checkCourseRequirements = async (courseId) => {
-    try {
-      const courseDetails = await getCourseDetails(courseId)
-      const { chapterDetailsDtos } = courseDetails.courseDetailsDto
-
-      if (chapterDetailsDtos.length < 1 || chapterDetailsDtos.some((chapter) => chapter.lectureDtos.length < 1)) {
-        toast({
-          title: 'Cannot change status',
-          description: 'The course must have at least 1 chapters, and each chapter must have at least 1 lectures.',
-          variant: 'destructive',
-          duration: 1500
-        })
-        return false
-      }
-      return true
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An error occurred while checking course details.',
-        variant: 'destructive',
-        duration: 1500
-      })
-      return false
-    }
-  }
-  const handleDeleteCourse = async () => {
-    try {
-      await deleteCourse(courseToDelete)
-      toast({
-        title: 'Course deleted',
-        description: 'The course has been deleted successfully.',
-        variant: 'default',
-        duration: 1500
-      })
-      setIsDeleteDialogOpen(false)
-      await fetchCourses()
-    } catch (error) {
-      console.error('Error deleting course:', error)
-      toast({
-        title: 'Error',
-        description: 'An error occurred while deleting the course.',
-        variant: 'destructive',
-        duration: 1500
-      })
-    }
-  }
-
-  const handleStatusChange = async (courseId, newStatus, currentStatus) => {
-    if (newStatus === currentStatus) {
-      return
-    }
-
-    setSelectedCourse(courseId)
-    setNewStatus(newStatus)
-
-    if (newStatus === 'Published' || newStatus === 'Scheduled') {
-      const meetsRequirements = await checkCourseRequirements(courseId)
-      if (!meetsRequirements) {
-        return
-      }
-    }
-
-    if (newStatus === 'Scheduled') {
-      setIsStatusChangeDialogOpen(true)
-      return
-    }
-
-    await updateCourseStatus(courseId, newStatus, null)
-  }
-
-  const updateCourseStatus = async (courseId, status, scheduledPublishDate) => {
-    try {
-      const payload = {
-        courseStatus: status,
-        scheduledPublishDate: scheduledPublishDate === null ? null : convertISOtoUTC(scheduledPublishDate)
-      }
-
-      console.log('Payload for API call:', payload)
-
-      const response = await changeCourseStatus(courseId, payload)
-      console.log('API response:', response)
-
-      await fetchCourses()
-      toast({
-        title: 'Status updated',
-        description: `Course status has been changed to ${status}.`,
-        variant: 'default',
-        duration: 1500
-      })
-    } catch (error) {
-      console.error('Error updating course status:', error)
-      toast({
-        title: 'Error',
-        description: 'An error occurred while updating the course status.',
-        variant: 'destructive',
-        duration: 1500
-      })
-    }
-  }
-
-  const handleScheduledStatusConfirm = async (scheduledDateTime) => {
-    const scheduledDate = new Date(scheduledDateTime)
-
-    try {
-      await updateCourseStatus(selectedCourse, 'Scheduled', scheduledDateTime)
-      setIsStatusChangeDialogOpen(false)
-      toast({
-        title: 'Course Scheduled',
-        description: `Course has been scheduled for publication on ${format(scheduledDate, 'PPpp')}.`,
-        variant: 'default',
-        duration: 1500
-      })
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An error occurred while scheduling the course.',
-        variant: 'destructive',
-        duration: 1500
-      })
-    }
-  }
-
-  const handleLevelChange = async (courseId, newLevel, currentLevel) => {
-    const payload = {
-      courseLevel: newLevel
-    }
-    if (newLevel === currentLevel) {
-      return
-    }
-
-    try {
-      await changeCourseLevel(courseId, payload)
-      await fetchCourses()
-      toast({
-        title: 'Level updated',
-        description: `Course level has been changed to ${newLevel}.`,
-        variant: 'default',
-        duration: 1500
-      })
-    } catch (error) {
-      console.error('Error changing course level:', error)
-      toast({
-        title: 'Error',
-        description: 'An error occurred while updating the course level.',
-        variant: 'destructive',
-        duration: 1500
-      })
-    }
-  }
-
-  const handleShowDeleteDialog = (courseId) => {
-    setCourseToDelete(courseId)
-    setIsDeleteDialogOpen(true)
-  }
+  const debounceTimeout = useRef(null)
 
   const columns = [
     // {
@@ -359,7 +185,7 @@ export default function useCourseTable() {
       ),
       cell: ({ row }) => {
         const date = row.getValue('scheduledPublishDate')
-        return <div className='text-center'>{formatDateTime(date)}</div>
+        return <div className='text-center'>{date ? formatDateTimeToLocal(date) : 'N/A'}</div>
       }
     },
     {
@@ -519,10 +345,10 @@ export default function useCourseTable() {
                   <Copy className='mr-2 h-4 w-4' />
                   <span>Copy course ID</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                {/* <DropdownMenuItem>
                   <Eye className='mr-2 h-4 w-4' />
                   <span>View course details</span>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuSeparator />
                 {isDraft && (
                   <>
@@ -552,6 +378,36 @@ export default function useCourseTable() {
     }
   ]
 
+  const fetchCourses = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const params = {
+        PageIndex: pageIndex,
+        PageSize: pageSize,
+        SearchString: searchString || undefined,
+        Level: selectedLevel || undefined,
+        Status: selectedStatus || undefined
+      }
+
+      const filteredParams = Object.fromEntries(Object.entries(params).filter(([_, value]) => value !== undefined))
+
+      const response = await getCourses(filteredParams)
+      const { courseDtos } = response
+      setCourses(courseDtos.data || [])
+      setTotalCount(courseDtos.count || 0)
+      setPageIndex(courseDtos.pageIndex)
+      setPageSize(courseDtos.pageSize)
+      setError(null)
+    } catch (error) {
+      console.error('Error fetching courses:', error)
+      setError(error)
+      setCourses([])
+      setTotalCount(0)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [pageIndex, pageSize, searchString, selectedLevel, selectedStatus])
+
   const table = useReactTable({
     data: courses,
     columns,
@@ -577,8 +433,200 @@ export default function useCourseTable() {
     pageCount: Math.ceil(totalCount / pageSize)
   })
 
+  useEffect(() => {
+    const statusFilter = table.getColumn('courseStatus')?.getFilterValue()?.[0]
+    const levelFilter = table.getColumn('courseLevel')?.getFilterValue()?.[0]
+
+    setSelectedStatus(statusFilter || '')
+    setSelectedLevel(levelFilter || '')
+  }, [table.getState().columnFilters])
+
+  useEffect(() => {
+    fetchCourses()
+  }, [fetchCourses])
+
+  const checkCourseRequirements = async (courseId) => {
+    try {
+      const courseDetails = await getCourseDetails(courseId)
+      const { chapterDetailsDtos } = courseDetails.courseDetailsDto
+
+      if (chapterDetailsDtos.length < 1 || chapterDetailsDtos.some((chapter) => chapter.lectureDtos.length < 1)) {
+        toast({
+          title: 'Cannot change status',
+          description: 'The course must have at least 1 chapters, and each chapter must have at least 1 lectures.',
+          variant: 'destructive',
+          duration: 1500
+        })
+        return false
+      }
+      return true
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'An error occurred while checking course details.',
+        variant: 'destructive',
+        duration: 1500
+      })
+      return false
+    }
+  }
+  const handleDeleteCourse = async () => {
+    try {
+      await deleteCourse(courseToDelete)
+      toast({
+        title: 'Course deleted',
+        description: 'The course has been deleted successfully.',
+        variant: 'default',
+        duration: 1500
+      })
+      setIsDeleteDialogOpen(false)
+      await fetchCourses()
+    } catch (error) {
+      console.error('Error deleting course:', error)
+      toast({
+        title: 'Error',
+        description: 'An error occurred while deleting the course.',
+        variant: 'destructive',
+        duration: 1500
+      })
+    }
+  }
+
+  const handleStatusChange = async (courseId, newStatus, currentStatus) => {
+    if (newStatus === currentStatus) {
+      return
+    }
+
+    if (newStatus === 'Scheduled') {
+      setSelectedCourse(courseId)
+      setNewStatus(newStatus)
+      setIsStatusChangeDialogOpen(true)
+      return
+    }
+
+    if (newStatus === 'Published' || newStatus === 'Scheduled') {
+      const meetsRequirements = await checkCourseRequirements(courseId)
+      if (!meetsRequirements) {
+        return
+      }
+    }
+
+    setSelectedCourse(courseId)
+    setNewStatus(newStatus)
+    await updateCourseStatus(courseId, newStatus, null)
+  }
+
+  const updateCourseStatus = async (courseId, status, scheduledPublishDate) => {
+    try {
+      const payload = {
+        courseStatus: status,
+        scheduledPublishDate: scheduledPublishDate === null ? null : convertISOtoUTC(scheduledPublishDate)
+      }
+      const response = await changeCourseStatus(courseId, payload)
+      await fetchCourses()
+      toast({
+        title: 'Status updated',
+        description: `Course status has been changed to ${status}.`,
+        variant: 'default',
+        duration: 1500
+      })
+    } catch (error) {
+      console.error('Error updating course status:', error)
+      toast({
+        title: 'Error',
+        description: 'An error occurred while updating the course status.',
+        variant: 'destructive',
+        duration: 1500
+      })
+    }
+  }
+
+  const handleScheduledStatusConfirm = async (scheduledDateTime) => {
+    const scheduledDate = new Date(scheduledDateTime)
+
+    try {
+      await updateCourseStatus(selectedCourse, 'Scheduled', scheduledDateTime)
+      setIsStatusChangeDialogOpen(false)
+      toast({
+        title: 'Course Scheduled',
+        description: `Course has been scheduled for publication on ${format(scheduledDate, 'PPpp')}.`,
+        variant: 'default',
+        duration: 1500
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'An error occurred while scheduling the course.',
+        variant: 'destructive',
+        duration: 1500
+      })
+    }
+  }
+
+  const handleLevelChange = async (courseId, newLevel, currentLevel) => {
+    const payload = {
+      courseLevel: newLevel
+    }
+    if (newLevel === currentLevel) {
+      return
+    }
+
+    try {
+      await changeCourseLevel(courseId, payload)
+      await fetchCourses()
+      toast({
+        title: 'Level updated',
+        description: `Course level has been changed to ${newLevel}.`,
+        variant: 'default',
+        duration: 1500
+      })
+    } catch (error) {
+      console.error('Error changing course level:', error)
+      toast({
+        title: 'Error',
+        description: 'An error occurred while updating the course level.',
+        variant: 'destructive',
+        duration: 1500
+      })
+    }
+  }
+
+  const handleShowDeleteDialog = (courseId) => {
+    setCourseToDelete(courseId)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleSearch = useCallback((value) => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current)
+    }
+
+    debounceTimeout.current = setTimeout(() => {
+      setSearchString(value)
+      setPageIndex(1)
+    }, 300)
+  }, [])
+
+  const handleLevelFilter = useCallback((value) => {
+    setSelectedLevel(value)
+    setPageIndex(1)
+  }, [])
+
+  const handleStatusFilter = useCallback((value) => {
+    setSelectedStatus(value)
+    setPageIndex(1)
+  }, [])
+
   const goToPage = useCallback((newPageIndex) => {
     setPageIndex(newPageIndex)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current)
+      }
+    }
   }, [])
 
   return {
@@ -602,6 +650,12 @@ export default function useCourseTable() {
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     handleShowDeleteDialog,
-    handleDeleteCourse
+    handleDeleteCourse,
+    searchString,
+    selectedLevel,
+    selectedStatus,
+    handleSearch,
+    handleLevelFilter,
+    handleStatusFilter
   }
 }

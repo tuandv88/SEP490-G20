@@ -16,7 +16,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Separator } from '@/components/ui/separator'
 
-export function DataTableFacetedFilter({ column, title, options }) {
+export function DataTableFacetedFilter({ column, title, options, multiple = true }) {
   const facets = column?.getFacetedUniqueValues()
   const selectedValues = new Set(column?.getFilterValue())
 
@@ -63,13 +63,17 @@ export function DataTableFacetedFilter({ column, title, options }) {
                   <CommandItem
                     key={option.value}
                     onSelect={() => {
-                      if (isSelected) {
-                        selectedValues.delete(option.value)
+                      if (multiple) {
+                        if (isSelected) {
+                          selectedValues.delete(option.value)
+                        } else {
+                          selectedValues.add(option.value)
+                        }
+                        const filterValues = Array.from(selectedValues)
+                        column?.setFilterValue(filterValues.length ? filterValues : undefined)
                       } else {
-                        selectedValues.add(option.value)
+                        column?.setFilterValue(isSelected ? undefined : [option.value])
                       }
-                      const filterValues = Array.from(selectedValues)
-                      column?.setFilterValue(filterValues.length ? filterValues : undefined)
                     }}
                   >
                     <div

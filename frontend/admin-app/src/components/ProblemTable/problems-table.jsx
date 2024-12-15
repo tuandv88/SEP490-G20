@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
   flexRender,
@@ -50,31 +50,64 @@ export default function ProblemsTable() {
   const [rowSelection, setRowSelection] = React.useState({})
   const [pagination, setPagination] = React.useState({
     pageIndex: pageFromUrl - 1,
-    pageSize: 3
+    pageSize: 10
   })
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [problemToDelete, setProblemToDelete] = useState(null)
   const [isUpdate, setIsUpdate] = useState(false)
 
+  const [inputValue, setInputValue] = useState('')
+  const [searchString, setSearchString] = useState('')
+  const [selectedDifficulty, setSelectedDifficulty] = useState('all')
+  const debounceTimeout = useRef(null)
+
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  React.useEffect(() => {
+    return () => {
+      if (debounceTimeout.current) {
+        clearTimeout(debounceTimeout.current)
+      }
+    }
+  }, [])
+
   React.useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const response = await getProblemAg(pagination.pageIndex + 1, pagination.pageSize)
-        console.log(response)
+        const params = {
+          PageIndex: pagination.pageIndex + 1,
+          PageSize: pagination.pageSize,
+          SearchString: inputValue || undefined,
+          DifficultyType: selectedDifficulty === 'all' ? undefined : selectedDifficulty
+        }
+
+        const filteredParams = Object.fromEntries(
+          Object.entries(params).filter(([_, value]) => value !== undefined)
+        )
+
+        const queryString = new URLSearchParams(filteredParams).toString()
+        const response = await getProblemAg(queryString)
         setData(response.problems.data)
         setTotalCount(response.problems.count)
-        setLoading(false)
       } catch (error) {
         console.error('Error fetching data: ', error)
         setError('An error occurred while fetching data. Please try again later.')
+      } finally {
         setLoading(false)
       }
     }
 
-    fetchData()
-  }, [pagination.pageIndex, pagination.pageSize, isUpdate])
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current)
+    }
+
+    debounceTimeout.current = setTimeout(() => {
+      fetchData()
+    }, 300)
+
+  }, [pagination.pageIndex, pagination.pageSize, inputValue, selectedDifficulty, refreshTrigger])
 
   React.useEffect(() => {
     navigate(
@@ -119,6 +152,10 @@ export default function ProblemsTable() {
     }
   }
 
+  const triggerRefetch = () => {
+    setRefreshTrigger(prev => prev + 1)
+  }
+
   const table = useReactTable({
     data,
     columns,
@@ -141,7 +178,8 @@ export default function ProblemsTable() {
     },
     manualPagination: true,
     meta: {
-      handleShowDeleteDialog
+      handleShowDeleteDialog,
+      triggerRefetch
     }
   })
 
@@ -213,26 +251,43 @@ export default function ProblemsTable() {
       <div className='flex flex-col sm:flex-row items-center py-4 gap-2'>
         <Input
           placeholder='Filter titles...'
-          value={table.getColumn('title')?.getFilterValue() ?? ''}
-          onChange={(event) => table.getColumn('title')?.setFilterValue(event.target.value)}
+          value={inputValue}
+          onChange={(event) => {
+            const value = event.target.value
+            setInputValue(value)
+            table.setPageIndex(0)
+          }}
           className='max-w-sm'
         />
 
         <Select
-          value={table.getColumn('difficulty')?.getFilterValue() ?? ''}
-          onValueChange={(value) => table.getColumn('difficulty')?.setFilterValue(value)}
+          value={selectedDifficulty}
+          onValueChange={(value) => {
+            setSelectedDifficulty(value)
+            table.setPageIndex(0)
+          }}
         >
           <SelectTrigger className='w-[180px]'>
             <SelectValue placeholder='Select difficulty' />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All</SelectItem>
             <SelectItem value='Easy'>Easy</SelectItem>
             <SelectItem value='Medium'>Medium</SelectItem>
             <SelectItem value='Hard'>Hard</SelectItem>
           </SelectContent>
         </Select>
-        {isFiltered && (
-          <Button onClick={clearFilters} variant='outline' size='sm'>
+
+        {(inputValue || selectedDifficulty !== 'all') && (
+          <Button 
+            onClick={() => {
+              setInputValue('')
+              setSelectedDifficulty('all')
+              table.setPageIndex(0)
+            }} 
+            variant='outline' 
+            size='sm'
+          >
             Clear Filters
           </Button>
         )}

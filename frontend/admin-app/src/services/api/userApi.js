@@ -69,6 +69,19 @@ export const getUserById = async (userId) => {
   }
 }
 
+export const createUser = async (userData) => {
+  try {
+    const response = await axiosInstanceAuth.post(`/users/account/create`, userData, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    throw new Error(error.response.data.message || 'Server error')
+  }
+}
+
 export const lockAccountUser = async (userId, lockoutTimeUtc) => {
   try {
     const response = await axiosInstanceAuth.put(

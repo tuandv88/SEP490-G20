@@ -8,6 +8,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import MarkdownFormField from '@/components/markdown-form-field'
+import PropTypes from 'prop-types'
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -21,7 +22,7 @@ const formSchema = z.object({
   isFree: z.boolean()
 })
 
-export default function LectureForm({ lecture, onSave, onCancel, isLoading }) {
+export default function LectureForm({ lecture, onSave, onCancel, isLoading, isUpdate }) {
   const methods = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: lecture || {
@@ -34,14 +35,10 @@ export default function LectureForm({ lecture, onSave, onCancel, isLoading }) {
     }
   })
 
-  const handleSubmit = methods.handleSubmit((data) => {
-    onSave(data)
-  })
-
   return (
     <FormProvider {...methods}>
       <Form {...methods}>
-        <form onSubmit={handleSubmit} className='space-y-8'>
+        <form onSubmit={methods.handleSubmit(onSave)} className='space-y-8'>
           <div className='pr-4'>
             <FormField
               control={methods.control}
@@ -81,18 +78,24 @@ export default function LectureForm({ lecture, onSave, onCancel, isLoading }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Lecture Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select a lecture type' />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value='Lesson'>Lesson</SelectItem>
-                      <SelectItem value='Quiz'>Quiz</SelectItem>
-                      <SelectItem value='Practice'>Practice</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {isUpdate ? (
+                    <div className="p-2 border rounded-md bg-muted">
+                      {field.value}
+                    </div>
+                  ) : (
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select a lecture type' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value='Lesson'>Lesson</SelectItem>
+                        <SelectItem value='Quiz'>Quiz</SelectItem>
+                        <SelectItem value='Practice'>Practice</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -137,4 +140,12 @@ export default function LectureForm({ lecture, onSave, onCancel, isLoading }) {
       </Form>
     </FormProvider>
   )
+}
+
+LectureForm.propTypes = {
+  lecture: PropTypes.object,
+  onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool,
+  isUpdate: PropTypes.bool
 }

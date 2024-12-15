@@ -4,57 +4,46 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import MarkdownFormField from '@/components/markdown-form-field'
 import { Switch } from '@/components/ui/switch'
-import * as z from "zod"
+import * as z from 'zod'
 
 export const basicInfoSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  language: z.string().min(1, "Language is required"),
-  problemType: z.string().default("Challenge"),
-  difficultyType: z.string().min(1, "Difficulty type is required"),
-  cpuTimeLimit: z.number()
-    .min(0.1, "CPU time limit must be at least 0.1")
-    .max(20, "CPU time limit must not exceed 20"),
-  cpuExtraTime: z.number()
-    .min(0, "CPU extra time must be at least 0")
-    .max(5, "CPU extra time must not exceed 5"),
-  memoryLimit: z.number()
-    .min(50, "Memory limit must be at least 50MB")
-    .max(500, "Memory limit must not exceed 500MB"),
-  stackLimit: z.number()
-    .min(30, "Stack limit must be at least 30MB")
-    .max(125, "Stack limit must not exceed 125MB"),
-  maxThread: z.number()
-    .min(20, "Max thread must be at least 20")
-    .max(120, "Max thread must not exceed 120"),
-  maxFileSize: z.number()
-    .min(1, "Max file size must be at least 1MB")
-    .max(20, "Max file size must not exceed 20MB"),
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  language: z.string().min(1, 'Language is required'),
+  problemType: z.string().default('Challenge'),
+  difficultyType: z.string().min(1, 'Difficulty type is required'),
+  cpuTimeLimit: z.number().min(0.1, 'CPU time limit must be at least 0.1').max(20, 'CPU time limit must not exceed 20'),
+  cpuExtraTime: z.number().min(0, 'CPU extra time must be at least 0').max(5, 'CPU extra time must not exceed 5'),
+  memoryLimit: z.number().min(50, 'Memory limit must be at least 50MB').max(500, 'Memory limit must not exceed 500MB'),
+  stackLimit: z.number().min(30, 'Stack limit must be at least 30MB').max(125, 'Stack limit must not exceed 125MB'),
+  maxThread: z.number().min(20, 'Max thread must be at least 20').max(120, 'Max thread must not exceed 120'),
+  maxFileSize: z.number().min(1, 'Max file size must be at least 1MB').max(20, 'Max file size must not exceed 20MB'),
   enableNetwork: z.boolean(),
   isActive: z.boolean(),
   testCases: z.any(),
-  createTestScriptDto: z.array(
-    z.object({
-      fileName: z.string(),
-      template: z.string(),
-      testCode: z.string(),
-      description: z.string(),
-      languageCode: z.string(),
-      solutions: z.array(
-        z.object({
-          fileName: z.string(),
-          solutionCode: z.string(),
-          description: z.string(),
-          languageCode: z.string(),
-          priority: z.boolean()
-        })
-      )
-    })
-  ).optional()
+  createTestScriptDto: z
+    .array(
+      z.object({
+        fileName: z.string(),
+        template: z.string(),
+        testCode: z.string(),
+        description: z.string(),
+        languageCode: z.string(),
+        solutions: z.array(
+          z.object({
+            fileName: z.string(),
+            solutionCode: z.string(),
+            description: z.string(),
+            languageCode: z.string(),
+            priority: z.boolean()
+          })
+        )
+      })
+    )
+    .optional()
 })
 
 export default function BasicInfoStep({ form }) {
-  console.log("Run")
   return (
     <div className='max-w-5xl mx-auto'>
       <h1 className='mb-6 text-3xl font-semibold'>Create Code Problem - Basic Info</h1>

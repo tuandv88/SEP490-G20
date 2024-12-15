@@ -59,6 +59,20 @@ export const createQuizAssessment = async (quizData) => {
   }
 }
 
+export const updateQuiz = async (quizId, quizData) => {
+  try {
+    const response = await axiosInstance.put(`/learning-service/quizs/${quizId}`, quizData, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('authToken')}`
+      }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error updating quiz:', error)
+    throw error
+  }
+}
+
 export const updateProblemQuestion = async (quizId, questionId, quizData) => {
   try {
     const response = await axiosInstance.put(`/learning-service/quizs/${quizId}/questions/${questionId}`, quizData, {
@@ -72,4 +86,3 @@ export const updateProblemQuestion = async (quizId, questionId, quizData) => {
     throw error
   }
 }
-

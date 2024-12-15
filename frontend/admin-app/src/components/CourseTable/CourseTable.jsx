@@ -20,12 +20,14 @@ import useCourseTable from '@/hooks/useCourseTable'
 import SchedulePublishDialog from '@/components/SchedulePublishDialog'
 import { CREATE_COURSE_PATH } from '@/routers/router'
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog'
+import { Badge } from '@/components/ui/badge'
 
 function CourseTable() {
   const navigate = useNavigate()
   const [resetKey, setResetKey] = useState(0)
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
   const [levelDropdownOpen, setLevelDropdownOpen] = useState(false)
+  const [inputValue, setInputValue] = useState('')
 
   const {
     table,
@@ -34,21 +36,20 @@ function CourseTable() {
     pageIndex,
     setPageIndex,
     pageSize,
-    setPageSize,
+
     totalCount,
     isStatusChangeDialogOpen,
     setIsStatusChangeDialogOpen,
-    scheduledDateTime,
-    setScheduledDateTime,
+
     handleScheduledStatusConfirm,
-    handleStatusChange,
-    selectedCourse,
-    newStatus,
-    handleLevelChange,
+
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
-    handleShowDeleteDialog,
-    handleDeleteCourse
+
+    handleDeleteCourse,
+    searchString,
+    handleSearch,
+
   } = useCourseTable()
 
   const handleNewCourse = () => {
@@ -56,10 +57,12 @@ function CourseTable() {
   }
 
   const hasActiveFilters = () => {
-    return table.getState().columnFilters.length > 0
+    return table.getState().columnFilters.length > 0 || searchString
   }
 
   const resetFilters = () => {
+    setInputValue('')
+    handleSearch('')
     table.resetColumnFilters()
     setResetKey((prev) => prev + 1)
     setStatusDropdownOpen(false)
@@ -83,29 +86,36 @@ center gap-4 py-4'
       >
         <Input
           placeholder='Filter courses...'
-          value={table.getColumn('title')?.getFilterValue() ?? ''}
-          onChange={(event) => table.getColumn('title')?.setFilterValue(event.target.value)}
+          value={inputValue}
+          onChange={(event) => {
+            const value = event.target.value
+            setInputValue(value)
+            handleSearch(value)
+          }}
           className='max-w-sm'
         />
-        <MultiSelect
-          options={['Draft', 'Published', 'Scheduled', 'Archived']}
-          placeholder='Select Statuses'
-          value={table.getColumn('courseStatus')?.getFilterValue() ?? []}
-          onChange={(values) => table.getColumn('courseStatus')?.setFilterValue(values)}
-          resetKey={resetKey}
-          isOpen={statusDropdownOpen}
-          setIsOpen={setStatusDropdownOpen}
-        />
-        <MultiSelect
-          options={['Basic', 'Intermediate', 'Advanced', 'Expert']}
-          placeholder='Select Levels'
-          value={table.getColumn('courseLevel')?.getFilterValue() ?? []}
-          onChange={(values) => table.getColumn('courseLevel')?.setFilterValue(values)}
-          resetKey={resetKey}
-          isOpen={levelDropdownOpen}
-          setIsOpen={setLevelDropdownOpen}
-          icon={<GraduationCap className='w-4 h-4 mr-2' />}
-        />
+        <div className='flex items-center gap-2'>
+          <MultiSelect
+            options={['Draft', 'Published', 'Scheduled', 'Archived']}
+            placeholder='Select Status'
+            value={table.getColumn('courseStatus')?.getFilterValue()?.[0] || ''}
+            onChange={(value) => table.getColumn('courseStatus')?.setFilterValue(value ? [value] : [])}
+            resetKey={resetKey}
+            isOpen={statusDropdownOpen}
+            setIsOpen={setStatusDropdownOpen}
+          />
+        </div>
+        <div className='flex items-center gap-2'>
+          <MultiSelect
+            options={['Basic', 'Intermediate', 'Advanced', 'Expert']}
+            placeholder='Select Level'
+            value={table.getColumn('courseLevel')?.getFilterValue()?.[0] || ''}
+            onChange={(value) => table.getColumn('courseLevel')?.setFilterValue(value ? [value] : [])}
+            resetKey={resetKey}
+            isOpen={levelDropdownOpen}
+            setIsOpen={setLevelDropdownOpen}
+          />
+        </div>
         {hasActiveFilters() && (
           <Button variant='outline' onClick={resetFilters}>
             Reset Filters
@@ -135,7 +145,7 @@ center gap-4 py-4'
         </DropdownMenu>
       </div>
 
-      <div className='mt-2 mb-4'>
+      <div className='mt-2 mb-4 flex flex-wrap items-center'>
         <SelectedFilters column='courseStatus' table={table} />
         <SelectedFilters column='courseLevel' table={table} />
       </div>

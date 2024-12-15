@@ -41,14 +41,11 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, is
       if (activeTab === 'basic') {
         try {
           // Log giá trị content trước khi validate
-          console.log('Content value:', form2.getValues('content'))
 
           // Validate form2 trước
           const isQuestionValid = await form2.trigger(['content', 'questionLevel', 'mark'], { shouldFocus: true })
 
           // Log kết quả validate của form2
-          console.log('Question validation result:', isQuestionValid)
-          console.log('Question form errors:', form2.formState.errors)
 
           // Validate form chính
           const isValid = await trigger(
@@ -67,9 +64,7 @@ export default function BottomTabs({ activeTab, setActiveTab, isSaveTemplate, is
           )
 
           // Log để debug
-          console.log('Main form errors:', errors)
-          console.log('Question form errors:', form2.formState.errors)
-          console.log('Validation results:', { isValid, isQuestionValid })
+          
 
           if (!isValid || !isQuestionValid) {
             let errorMessage = 'Please check the following fields:\n'

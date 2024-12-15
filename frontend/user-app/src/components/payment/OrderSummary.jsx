@@ -14,6 +14,12 @@ const OrderSummary = ({ summary }) => {
           <span>Discount rate:</span>
           <span>${summary.discountRate.toLocaleString()}</span>
         </div>
+        {summary.remainingPoints > 0 && (
+          <div className='flex justify-between text-green-600'>
+            <span>Remaining points:</span>
+            <span>{summary.remainingPoints} points</span>
+          </div>
+        )}
         <div className='border-t pt-4 mt-4'>
           <div className='flex justify-between font-bold'>
             <span>Total:</span>

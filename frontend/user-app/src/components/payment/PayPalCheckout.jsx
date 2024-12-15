@@ -132,10 +132,9 @@ const PayPalCheckout = () => {
   }
 
   const handleCreateOrder = async () => {
-
-    try{
-      const response = await PaymentAPI.checkPaymentEligibility(id)
-      if (!response.isAccepted) {
+    try {
+      const eligibilityResponse = await PaymentAPI.checkPaymentEligibility(id)
+      if (!eligibilityResponse.isAccepted) {
         toast({
           title: "Payment Not Allowed",
           description: "You have the order that has been created and not paid.",
@@ -144,31 +143,45 @@ const PayPalCheckout = () => {
         navigate(AUTHENTICATION_ROUTERS.COURSEDETAIL.replace(':id', id))
         return        
       }
+
+      let pointsToUse = 0
+      if (usePointsRef.current) {
+        const pointValue = userPoint / 1000
+        const minimumPrice = 0.01
+        const potentialNewTotal = courseDetail.price - pointValue
+        
+        if (potentialNewTotal <= minimumPrice) {
+          pointsToUse = Math.floor((courseDetail.price - minimumPrice) * 1000)
+        } else {
+          pointsToUse = userPoint
+        }
+      }
+
+      const response = await fetch(`${API_BASE_URL}/payment-service/checkout/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${Cookies.get('authToken')}` },
+        body: JSON.stringify({
+          Order: {
+            PaymentMethod: 'Paypal',
+            Point: pointsToUse,
+            Item: {
+              ProductId: courseDetail.id,
+              ProductName: courseDetail.title,
+              ProductType: 'Course',
+              Quantity: 1,
+              UnitPrice: courseDetail.price
+            }
+          }
+        })
+      })
+      const data = await response.json()
+      setOrderId(data.orderId)
+      setPaymentStatus('Order created! Awaiting payment...')
+      return data.orderId
     } catch (error) {
       console.error('Error creating order:', error)
+      throw error
     }
-
-    const response = await fetch(`${API_BASE_URL}/payment-service/checkout/orders`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${Cookies.get('authToken')}` },
-      body: JSON.stringify({
-        Order: {
-          PaymentMethod: 'Paypal',
-          Point: usePointsRef.current ? userPoint : 0,
-          Item: {
-            ProductId: courseDetail.id,
-            ProductName: courseDetail.title,
-            ProductType: 'Course',
-            Quantity: 1,
-            UnitPrice: courseDetail.price
-          }
-        }
-      })
-    })
-    const data = await response.json()
-    setOrderId(data.orderId)
-    setPaymentStatus('Order created! Awaiting payment...')
-    return data.orderId
   }
 
   const handleApprove = async (data) => {
@@ -228,19 +241,34 @@ const PayPalCheckout = () => {
     const willUsePoints = !usePoints
 
     if (willUsePoints) {
-      const newTotal = Math.max(0, courseDetail.price - pointValue).toFixed(2)
+      const minimumPrice = 0.01
+      const potentialNewTotal = courseDetail.price - pointValue
+      let newTotal, actualDiscount, remainingPoints
+
+      if (potentialNewTotal <= minimumPrice) {
+        newTotal = minimumPrice
+        actualDiscount = courseDetail.price - minimumPrice
+        remainingPoints = Math.floor((pointValue - actualDiscount) * 1000)
+      } else {
+        newTotal = potentialNewTotal
+        actualDiscount = pointValue
+        remainingPoints = 0
+      }
+
       setOrderSummaryState({
         originalPrice: courseDetail.price,
-        discountRate: pointValue.toFixed(2),
-        total: newTotal,
-        itemCount: 1
+        discountRate: actualDiscount.toFixed(2),
+        total: newTotal.toFixed(2),
+        itemCount: 1,
+        remainingPoints
       })
     } else {
       setOrderSummaryState({
         originalPrice: courseDetail.price,
         discountRate: 0,
         total: courseDetail.price,
-        itemCount: 1
+        itemCount: 1,
+        remainingPoints: 0
       })
     }
   }

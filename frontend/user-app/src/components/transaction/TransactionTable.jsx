@@ -69,6 +69,7 @@ const TransactionTable = ({ transactions, onTransactionCancelled }) => {
     }
   };
 
+
   return (
     <>
       <div className="overflow-x-auto">
@@ -91,11 +92,17 @@ const TransactionTable = ({ transactions, onTransactionCancelled }) => {
                     {transaction.items[0]?.productName || 'Unnamed Course'}
                   </div>
                   <div className="text-sm text-gray-500 truncate">
-                    ID: {transaction.items[0]?.productId}
+                    ID: {transaction.transactionId}
                   </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500 w-[120px]">
-                  {new Date(transaction.dateTime).toLocaleDateString()}
+                  {new Date(transaction.dateTime).toLocaleString('vi-VN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
                 </td>
                 <td className="px-6 py-4 w-[200px]">
                   <div className="space-y-1">

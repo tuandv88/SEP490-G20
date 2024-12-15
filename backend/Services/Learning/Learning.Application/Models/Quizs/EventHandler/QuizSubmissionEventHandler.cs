@@ -9,34 +9,42 @@ namespace Learning.Application.Models.Quizs.EventHandler;
 public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmissionRepository, ISender sender, IProblemRepository problemRepository,
     IQuizRepository quizRepository, ILogger<QuizSubmissionEventHandler> logger, IPublishEndpoint publishEndpoint) : IConsumer<QuizSubmissionEvent> {
     public async Task Consume(ConsumeContext<QuizSubmissionEvent> context) {
-        logger.LogDebug($"Start quiz submission event: {context.Message.SubmissionId}");
+        logger.LogInformation($"Start quiz submission event: {context.Message.SubmissionId}");
         //xử lí bài nộp ở đây
         var quizSubmission = await quizSubmissionRepository.GetByIdAsync(context.Message.SubmissionId);
+        logger.LogInformation($"Get quiz submission: {context.Message.SubmissionId}");
         if (quizSubmission == null) {
-            logger.LogWarning($"Submission is not found submissionId : {context.Message.SubmissionId}");
+            logger.LogInformation($"Submission is not found submissionId : {context.Message.SubmissionId}");
             return;
         }
+        logger.LogInformation($"Quiz submission status: {quizSubmission.Status.ToString()}");
         if (quizSubmission.Status == QuizSubmissionStatus.Processing) {
+            logger.LogInformation($"Quiz submission processing event: {context.Message.SubmissionId}");
             var quiz = await quizRepository.GetByIdDetailAsync(quizSubmission.QuizId.Value);
             if (quiz == null) {
-                logger.LogWarning($"quiz is not found quizId : {quizSubmission.QuizId.Value}");
+                logger.LogInformation($"quiz is not found quizId : {quizSubmission.QuizId.Value}");
                 return;
             }
             if (quizSubmission.Answers == null) {
+                logger.LogInformation($"Quiz submission answer null event: {context.Message.SubmissionId}");
                 UpdateSubmissionWithoutAnswers(quizSubmission, quiz);
             } else {
+                logger.LogInformation($"Quiz submission answer not null event: {context.Message.SubmissionId}");
                 await UpdateSubmissionWithAnswers(quizSubmission, quiz);
             }
 
             if (quiz.QuizType != QuizType.ASSESSMENT)
             {
+                logger.LogInformation($"Quiz submission successfully with domain event");
                 quizSubmission.UpdateStatus(QuizSubmissionStatus.Success);
             }
             else
             {
+                logger.LogInformation($"Quiz submission successfully with out domain event");
                 quizSubmission.Status = QuizSubmissionStatus.Success;
             }
             await quizSubmissionRepository.UpdateAsync(quizSubmission);
+            logger.LogInformation($"Quiz submission update event: {context.Message.SubmissionId}");
             //Kiểm tra nếu là kiểu ASSESSMENT thì public lên một event để AI phân tích tạo một lộ trình học
             if (quiz.QuizType == QuizType.ASSESSMENT) {
                 await publishEndpoint.Publish(new AssessmentQuizScoringCompletedEvent() {
@@ -52,9 +60,11 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
                     PassingMark = quizSubmission.PassingMark,
                     ResultAnswers = JsonConvert.SerializeObject(quizSubmission.Answers),
                 });
+                logger.LogInformation($"Quiz submission publish event AssessmentQuizScoringCompletedEvent: {context.Message.SubmissionId}");
             }
             await quizSubmissionRepository.SaveChangesAsync();
         }
+        logger.LogInformation($"End quiz submission event: {context.Message.SubmissionId}");
     }
     private void UpdateSubmissionWithoutAnswers(QuizSubmission quizSubmission, Quiz quiz) {
         quizSubmission.UpdateSubmitResult(0, quiz.Questions.Sum(q => q.Mark), quiz.Questions.Count, 0, quiz.PassingMark,

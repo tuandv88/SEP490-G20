@@ -15,7 +15,7 @@ public static class HangfireConfigurationExtensions {
 
         });
         // polling check database 5s một phát
-        services.AddHangfireServer(x => x.SchedulePollingInterval = TimeSpan.FromSeconds(15)); // tạm để theo mặc định rồi tính sau
+        services.AddHangfireServer(x => x.SchedulePollingInterval = TimeSpan.FromSeconds(5)); // tạm để theo mặc định rồi tính sau 15s
     }
 
     public static WebApplication AddHangfireDashboard(this WebApplication app) {

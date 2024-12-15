@@ -15,7 +15,7 @@ public class SubmissionQuizHandler(IQuizSubmissionRepository quizSubmissionRepos
 
         if (quiz!.HasTimeLimit) {
             var timeElapsed = DateTime.UtcNow - quizSubmission.StartTime;
-            var timeLimit = TimeSpan.FromMinutes(quiz.TimeLimit);
+            var timeLimit = TimeSpan.FromMinutes(quiz.TimeLimit + 0.04);
 
             if (timeElapsed > timeLimit) {
                 return new SubmissionQuizResult("Submission deadline has passed.");
@@ -25,7 +25,7 @@ public class SubmissionQuizHandler(IQuizSubmissionRepository quizSubmissionRepos
             quizSubmission.UpdateStatus(QuizSubmissionStatus.Processing);
             quizSubmission.SubmissionDate = DateTime.UtcNow;
             await quizSubmissionRepository.UpdateAsync(quizSubmission);
-            await publishEndpoint.Publish(new QuizSubmissionEvent(quizSubmission.Id.Value));
+            await publishEndpoint.Publish(new QuizSubmissionEvent(quizSubmission.Id.Value), cancellationToken);
             await quizSubmissionRepository.SaveChangesAsync(cancellationToken);
 
             return new SubmissionQuizResult(quizSubmission.Status.ToString());

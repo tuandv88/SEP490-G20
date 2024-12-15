@@ -213,7 +213,7 @@ export default function QuizManagement() {
                   </div>
                   <div className='space-y-1'>
                     <p className='text-sm font-medium leading-none'>Passing Mark</p>
-                    <p className='text-sm text-muted-foreground'>{quizDetail?.quiz?.passingMark}%</p>
+                    <p className='text-sm text-muted-foreground'>{quizDetail?.quiz?.passingMark}</p>
                   </div>
                 </div>
               </div>

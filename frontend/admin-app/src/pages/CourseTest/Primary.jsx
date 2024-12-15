@@ -12,7 +12,6 @@ export default function Primary({ navigationUrl, navigationTitle, lectureId, pro
   const [isSaveTemplate, setIsSaveTemplate] = useState(false)
   const { toast } = useToast();
 
-  console.log(isSaveTemplate)
   
   const form = useForm({
     defaultValues: {
@@ -47,7 +46,6 @@ export default function Primary({ navigationUrl, navigationTitle, lectureId, pro
       createProblemDto: updatedData
     }
 
-    console.log(problemData)
 
     try {
       const response = await createProblem(problemData)
@@ -56,7 +54,6 @@ export default function Primary({ navigationUrl, navigationTitle, lectureId, pro
         description: 'Create problem successfully'
       })
     } catch (error) {
-      console.error('Error creating problem:', error)
     }
 
    

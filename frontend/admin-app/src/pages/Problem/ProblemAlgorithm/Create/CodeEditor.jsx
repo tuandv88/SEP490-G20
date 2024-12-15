@@ -136,7 +136,6 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
   const { toast } = useToast()
   const { setValue } = form
 
-  console.log(testCases)
   const handleAddFile = () => {
     const lastFileNumber = Math.max(
       ...files.map((file) => {
@@ -211,7 +210,6 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
       }
     }
 
-    console.log(resource)
 
     const testCase = transformTestCases(testCases)
     const createCode = {
@@ -245,14 +243,12 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
     ]
 
     setValue('createTestScriptDto', testScriptDto)
-    console.log(testScriptDto)
     try {
       const response = await runCode(createCode)
       const hasCompileOrRuntimeErrors = response.codeExecuteDtos.some(dto =>
         dto.compileErrors || dto.runTimeErrors
       );
       
-      console.log(response)
       if (hasCompileOrRuntimeErrors) {
         toast({
           variant: 'destructive',
@@ -268,7 +264,6 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
         dto.testResults.some(testResult => !testResult.isPass)
       );
   
-      console.log(response)
       if (hasFailedTestCase) {
         toast({
           variant: 'destructive',
@@ -293,7 +288,6 @@ const CodeEditor = ({ form, setIsRunSuccess }) => {
         action: <ToastAction altText='Try again'>Try again</ToastAction>           
       })
       setIsRunSuccess(false)  
-      console.error('Error creating course:', error)
     } finally {      
       setIsRunning(false)
     }

@@ -10,7 +10,6 @@ export const getAllDiscussions = async () => {
     })
     return response.data.discussionDetailUserDtos.data
   } catch (error) {
-    console.error('Error fetching discussions:', error)
     throw error
   }
 }
@@ -28,7 +27,6 @@ export const updateDiscussionStatus = async (discussionId) => {
     )
     return response.data
   } catch (error) {
-    console.error('Error updating discussion status:', error)
     throw error
   }
 }
@@ -42,7 +40,6 @@ export const deleteDiscussion = async (discussionId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error deleting discussion:', error)
     throw error
   }
 }

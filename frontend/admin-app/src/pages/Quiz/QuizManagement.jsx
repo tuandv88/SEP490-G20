@@ -52,7 +52,6 @@ export default function QuizManagement() {
         const response = await getFullQuizDetail(quizId)
         setQuizDetail(response)
       } catch (error) {
-        console.error('Error fetching quiz detail:', error)
         toast({
           title: 'Error',
           description: 'Failed to load quiz details. Please try again.',
@@ -118,7 +117,6 @@ export default function QuizManagement() {
         })
       }
     } catch (error) {
-      console.error('Error updating quiz:', error)
       toast({
         title: 'Error',
         description: error?.response?.data?.message || 'Failed to update quiz. Please try again.',

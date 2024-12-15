@@ -56,7 +56,6 @@ const UpdateProblemAg = ({}) => {
         setProblemDetail(response.problemDetailsDto)
         setIsLoading(false)
       } catch (error) {
-        console.error('Error get problem detail:', error)
         setIsLoading(false)
       }
     }
@@ -120,7 +119,6 @@ const UpdateProblemAg = ({}) => {
           </ToastAction>
         )
       })
-      console.error('Error creating problem:', error)
     } finally {
       setIsLoadingSubmit(false)
     }

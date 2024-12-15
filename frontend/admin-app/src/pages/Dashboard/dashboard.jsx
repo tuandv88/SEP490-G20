@@ -44,7 +44,6 @@ function convertToRevenueGrowthData(apiData) {
       revenue: revenueByMonth[index + 1] || 0
     }))
   } catch (error) {
-    console.error('Error converting revenue data:', error)
     return monthNames.map((month) => ({ month, revenue: 0 }))
   }
 }

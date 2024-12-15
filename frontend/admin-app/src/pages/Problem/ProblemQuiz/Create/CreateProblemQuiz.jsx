@@ -89,7 +89,6 @@ const CreateProblemQuiz = ({ onClose, quizId, isUpdate, setIsUpdate }) => {
           </ToastAction>
         )
       })
-      console.error('Error creating question:', error)
     } finally {
       setIsLoadingSubmit(false)
     }

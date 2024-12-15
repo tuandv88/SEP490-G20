@@ -314,7 +314,6 @@ const CodeEditor = ({ form, setIsRunSuccess, testCaseUpdate, solutionUpdate }) =
         action: <ToastAction altText='Try again'>Try again</ToastAction>
       })
       setIsRunSuccess(false)
-      console.error('Error creating course:', error)
     } finally {
       setIsRunning(false)
     }

@@ -135,7 +135,6 @@ const CodeEditor = ({ form }) => {
   const { toast } = useToast()
   const { setValue } = form
 
-  console.log(testCases)
   const handleAddFile = () => {
     const lastFileNumber = Math.max(
       ...files.map((file) => {
@@ -188,7 +187,6 @@ const CodeEditor = ({ form }) => {
       }
     }
 
-    console.log(createCode)
     const testScript = transformTestScript(testCases)
     setValue('testCases', testScript.testCases)
 
@@ -209,7 +207,6 @@ const CodeEditor = ({ form }) => {
       }
     ]
 
-    console.log(testScriptDto)
     setValue('createTestScriptDto', testScriptDto)
 
     try {
@@ -220,7 +217,6 @@ const CodeEditor = ({ form }) => {
       })
       setTestResults(response.codeExecuteDtos)
     } catch (error) {
-      console.error('Error creating course:', error)
     } finally {
       setIsRunning(false)
     }

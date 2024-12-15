@@ -35,7 +35,6 @@ export default function ProblemsTable() {
     try {
       return search.page ? parseInt(search.page) : 1
     } catch (error) {
-      console.error('Error parsing page from URL:', error)
       return 1
     }
   }, [search.page])
@@ -83,16 +82,13 @@ export default function ProblemsTable() {
           DifficultyType: selectedDifficulty === 'all' ? undefined : selectedDifficulty
         }
 
-        const filteredParams = Object.fromEntries(
-          Object.entries(params).filter(([_, value]) => value !== undefined)
-        )
+        const filteredParams = Object.fromEntries(Object.entries(params).filter(([_, value]) => value !== undefined))
 
         const queryString = new URLSearchParams(filteredParams).toString()
         const response = await getProblemAg(queryString)
         setData(response.problems.data)
         setTotalCount(response.problems.count)
       } catch (error) {
-        console.error('Error fetching data: ', error)
         setError('An error occurred while fetching data. Please try again later.')
       } finally {
         setLoading(false)
@@ -106,7 +102,6 @@ export default function ProblemsTable() {
     debounceTimeout.current = setTimeout(() => {
       fetchData()
     }, 300)
-
   }, [pagination.pageIndex, pagination.pageSize, inputValue, selectedDifficulty, refreshTrigger])
 
   React.useEffect(() => {
@@ -142,7 +137,6 @@ export default function ProblemsTable() {
       setIsDeleteDialogOpen(false)
       setIsUpdate(!isUpdate)
     } catch (error) {
-      console.error('Error deleting problem:', error)
       toast({
         title: 'Error',
         description: 'An error occurred while deleting the problem.',
@@ -153,7 +147,7 @@ export default function ProblemsTable() {
   }
 
   const triggerRefetch = () => {
-    setRefreshTrigger(prev => prev + 1)
+    setRefreshTrigger((prev) => prev + 1)
   }
 
   const table = useReactTable({
@@ -271,7 +265,7 @@ export default function ProblemsTable() {
             <SelectValue placeholder='Select difficulty' />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
+            <SelectItem value='all'>All</SelectItem>
             <SelectItem value='Easy'>Easy</SelectItem>
             <SelectItem value='Medium'>Medium</SelectItem>
             <SelectItem value='Hard'>Hard</SelectItem>
@@ -279,13 +273,13 @@ export default function ProblemsTable() {
         </Select>
 
         {(inputValue || selectedDifficulty !== 'all') && (
-          <Button 
+          <Button
             onClick={() => {
               setInputValue('')
               setSelectedDifficulty('all')
               table.setPageIndex(0)
-            }} 
-            variant='outline' 
+            }}
+            variant='outline'
             size='sm'
           >
             Clear Filters
@@ -368,8 +362,8 @@ export default function ProblemsTable() {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteProblem}
-        title="Delete Problem"
-        description="Are you sure you want to delete this problem? This action cannot be undone."
+        title='Delete Problem'
+        description='Are you sure you want to delete this problem? This action cannot be undone.'
       />
     </div>
   )

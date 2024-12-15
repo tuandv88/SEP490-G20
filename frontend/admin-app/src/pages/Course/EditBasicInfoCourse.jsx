@@ -38,7 +38,6 @@ export default function EditBasicInfoCourse() {
         })
         setIsLoading(false)
       } catch (error) {
-        console.error('Error fetching course details:', error)
         setError('Failed to load course details. Please try again.')
         setIsLoading(false)
       }
@@ -80,7 +79,6 @@ export default function EditBasicInfoCourse() {
       })
       navigate({ to: COURSE_TABLE_PATH })
     } catch (error) {
-      console.error('Error updating course:', error)
       setError('There was a problem updating your course. Please try again.')
       toast({
         title: 'Error updating course',

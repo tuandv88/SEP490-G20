@@ -24,12 +24,10 @@ class AuthService {
         .then((user) => {
         })
         .catch((err) => {
-          console.error('Lỗi gia hạn token:', err)
         })
     })
 
     this.userManager.events.addSilentRenewError((err) => {
-      console.error('Gia hạn token ngầm thất bại:', err)
     })
   }
 
@@ -62,12 +60,10 @@ class AuthService {
         }
 
         xhr.onerror = function () {
-          console.error('Error while calling API')
         }
 
         xhr.send()
       } else {
-        console.error('User is not logged in')
       }
     })
   }

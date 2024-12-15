@@ -1,7 +1,6 @@
 import React from 'react'
 
 export function AlgorithmStats({ problemSolved }) {
-  console.log(problemSolved)
 
   const defaultStats = {
     easy: { solvedCount: 0, totalCount: 0 },

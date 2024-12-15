@@ -194,22 +194,13 @@ export class JavaMonacoEditor {
   }
 
   // Cleanup
-  // dispose() {
-  //   if (this.languageClient) {
-  //     this.languageClient.dispose();
-  //   }
-  //   if (this.editor) {
-  //     this.editor.dispose();
-  //   }
-  //   if (this.model) {
-  //     this.model.dispose();
-  //   }
-  // }
   dispose() {
     this.didUnmount = true
     if (this.languageClient) {
       this.languageClient.stop().then(() => {
         this.languageClient.dispose()
+      }).catch(() => {
+        // Bỏ qua lỗi nếu có
       })
     }
     if (this.model) {

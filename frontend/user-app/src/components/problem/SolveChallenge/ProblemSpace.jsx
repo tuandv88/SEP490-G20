@@ -14,6 +14,7 @@ import { NotFound } from '@/pages'
 import HeaderTabCode from './HeaderTabCode'
 import DescriptionProblem from './DescriptionProblem'
 import SubmissionHistoryProblem from '@/components/learning/submission/SubmissionHistoryProblem'
+import CourseLoadingDetail from '@/components/loading/CourseLoadingDetail'
 
 const ProblemSpace = () => {
   const navigate = useNavigate()
@@ -112,7 +113,7 @@ const ProblemSpace = () => {
   }, [problemId]);
 
   if (isInitialLoading || loading) {
-    return <ChapterLoading />
+    return <CourseLoadingDetail />
   }
 
   if (error) {

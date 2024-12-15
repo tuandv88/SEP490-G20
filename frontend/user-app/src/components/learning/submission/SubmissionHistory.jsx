@@ -18,7 +18,6 @@ const SubmissionHistory = ({ submissions }) => {
     return (bytes / 1024).toFixed(2) + ' MB'
   }
 
-  console.log(submissions)
 
   const getStatus = (submission) => {
     if (

@@ -25,7 +25,7 @@ export const useSignalRConnection = (url) => {
         .build()
 
       newConnection.on('RequestUserCode', async () => {
-        console.log('Server requested code from client.')
+
 
         let promise = new Promise(async (resolve, reject) => {
           try {
@@ -44,20 +44,20 @@ export const useSignalRConnection = (url) => {
       })
 
       newConnection.onclose(() => {
-        console.log('Connection closed. Attempting to reconnect...')
+        //console.log('Connection closed. Attempting to reconnect...')
       })
 
       newConnection.onreconnecting(() => {
-        console.log('Reconnecting...')
+        //console.log('Reconnecting...')
       })
 
       newConnection.onreconnected((connectionId) => {
-        console.log(`Reconnected. Connection ID: ${connectionId}`)
+        //console.log(`Reconnected. Connection ID: ${connectionId}`)
       })
 
       try {
         await newConnection.start()
-        console.log('Connected to SignalR server with Connection ID:', newConnection.connectionId)
+       // console.log('Connected to SignalR server with Connection ID:', newConnection.connectionId)
         setConnection(newConnection)
       } catch (error) {
         console.error('Connection failed: ', error)
@@ -69,7 +69,7 @@ export const useSignalRConnection = (url) => {
     return () => {
       if (connection) {
         connection.stop().then(() => {
-          console.log('Connection stopped.')
+          // console.log('Connection stopped.')
         })
       }
     }

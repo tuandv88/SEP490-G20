@@ -2,8 +2,8 @@ import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
 
 export function ProblemList({ problems }) {
-  console.log(problems)
-  
+
+
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
       case 'Easy':

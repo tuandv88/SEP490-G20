@@ -9,8 +9,7 @@ export const QuizAPI = {
       headers: {
         Authorization: `Bearer ${Cookies.get('authToken')}`
       }
-    })
-    console.log(response)
+    })  
     return response.data
   },
   startQuiz: async (quizId) => {

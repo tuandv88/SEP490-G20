@@ -161,8 +161,7 @@ export const DiscussApi = {
         id: idDiscussion,  // ID của discussion cần cập nhật
         imageDto: discussionImageData // Dữ liệu hình ảnh
       };
-
-      console.log(requestBody);  // Kiểm tra request body
+ // Kiểm tra request body
 
       // Gửi yêu cầu PUT để cập nhật hình ảnh
       const response = await fetch(`${API_BASE_URL}/community-service/discussions/updateimage`, {
@@ -218,7 +217,6 @@ export const DiscussApi = {
         }
       };
 
-      console.log(updateCommentDto, 1111);
 
       // Gửi yêu cầu PUT để cập nhật comment (thay vì POST, vì bạn đang chỉnh sửa comment đã có)
       const response = await axios.put(`${API_BASE_URL}/community-service/comments/update`, updateCommentDto, getAuthHeaders());
@@ -364,7 +362,7 @@ export const DiscussApi = {
   // API: Cập nhật trạng thái thông báo
   updateStatusNotificationDiscussionById: async ({ discussionId }) => {
     try {
-      console.log("Updating notification status for discussionId:", discussionId);
+
 
       // Đảm bảo URL được sử dụng đúng và hợp lệ
       const url = `${API_BASE_URL}/community-service/discussion/${discussionId}/update-status-notification`;
@@ -452,7 +450,7 @@ export const DiscussApi = {
       const response = await axios.get(`${API_BASE_URL}/community-service/discussions/top`);
       return response.data;
     } catch (error) {
-      throw error;
+      
     }
   },
 
@@ -474,7 +472,7 @@ export const DiscussApi = {
 
       // Mã hóa các tham số vào URL
       const url = `${API_BASE_URL}/community-service/discussions/byuserid?pageIndex=${pageIndex}&pageSize=${pageSize}&SearchKeyword=${encodeURIComponent(searchKeyword)}&Tags=${encodeURIComponent(tags)}`;
-      console.log('Query URL:', url);
+
 
       // Gọi API với header Authorization nếu cần
       const response = await axios.get(url, {

@@ -9,7 +9,6 @@ import { UserContext } from '@/contexts/UserContext'
 import authServiceInstance from '@/oidc/AuthService'
 import { Loading } from '@/components/ui/overlay'
 import RoadmapDashboard from '@/components/userprofile/RoadmapDashboard'
-import { ProblemAPI } from '@/services/api/problemApi'
 import DiscussionUserList from '@/components/userprofile/discussion/DiscussionUserList'
 import TransactionHistory from '@/components/transaction/TransactionHistory'
 import { AUTHENTICATION_ROUTERS } from '@/data/constants'
@@ -19,8 +18,6 @@ export function UserProfile() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const { user } = useContext(UserContext)
-  const [problemSolved, setProblemSolved] = useState([])
-  const [problems, setProblems] = useState([])
 
   const validTabs = ['account', 'roadmap', 'learning', 'algorithm', 'discussionuserlist', 'transaction']
   
@@ -36,8 +33,6 @@ export function UserProfile() {
         if (!user) {
           await authServiceInstance.login()
         }
-        const response = await ProblemAPI.getProblemSolved()
-        setProblemSolved(response.solved)
       } catch (error) {
         console.error('Error initializing user profile:', error)
       } finally {
@@ -47,18 +42,6 @@ export function UserProfile() {
 
     initializeUserProfile()
   }, [user, navigate])
-
-  useEffect(() => {
-    const fetchSolvedProblems = async () => {
-      try {
-        const solvedProblems = await ProblemAPI.getSolvedProblems()
-        setProblems(solvedProblems)
-      } catch (error) {
-        console.error('Error fetching solved problems:', error)
-      }
-    }
-    fetchSolvedProblems()
-  }, [])
 
   if (loading) {
     return <Loading />
@@ -73,7 +56,7 @@ export function UserProfile() {
       case 'learning':
         return <LearningDashboard />
       case 'algorithm':
-        return <AlgorithmDashboard problemSolved={problemSolved} problems={problems} />
+        return <AlgorithmDashboard />
       case 'discussionuserlist':
         return <DiscussionUserList />
       case 'transaction':

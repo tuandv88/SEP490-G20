@@ -4,7 +4,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
-import { X, ChevronLeft, ChevronRight, Send } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, Send, Maximize2 } from 'lucide-react'
 import { JAVA_LANGUAGE_CONFIG, JAVA_LANGUAGE_EXT_POINT, JAVA_LANGUAGE_ID } from '@/lib/code-editor/constants'
 
 import { motion, AnimatePresence } from 'framer-motion'
@@ -38,7 +38,7 @@ const calculateRemainingTime = (startTime, timeLimit) => {
 // Tách TimeDisplay thành component riêng để tránh re-render không cần thiết
 const TimeDisplay = memo(({ minutes, seconds }) => (
   <p className='text-lg font-semibold'>
-    Time left: {minutes}:{seconds} minutes
+    Time left: {minutes}:{seconds}
   </p>
 ))
 
@@ -105,9 +105,7 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, s
 
       // Submit quiz
       const response = await QuizAPI.submitQuiz(answer.quizSubmissionId);
-      console.log('response: ', response);
-      console.log('Quiz submitted successfully');
-      
+    
       // Đóng modal và cập nhật trạng thái
       setIsConfirmOpen(false);
       setIsQuizSubmitted(true);
@@ -305,7 +303,6 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, s
 
     try {
       const response = await QuizAPI.submissionAnswer(answer.quizSubmissionId, question)
-      console.log('Answer saved successfully')
     } catch (error) {
       console.error('Error saving answer:', error)
     }
@@ -326,7 +323,6 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, s
 
     try {
       const response = await QuizAPI.submitCodeSnippet(answer.quizSubmissionId, question)
-      console.log('Code snippet saved successfully')
     } catch (error) {
       console.error('Error saving code snippet:', error)
     }
@@ -544,20 +540,42 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, s
     }
   }
 
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  const handleFullscreen = () => {
+    const quizContainer = document.querySelector('.quiz-container')
+    if (!document.fullscreenElement) {
+      quizContainer.requestFullscreen()
+      setIsFullscreen(true)
+    } else {
+      document.exitFullscreen()
+      setIsFullscreen(false)
+    }
+  }
+
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-      <div className='bg-white w-[90vw] h-[90vh] rounded-lg shadow-2xl overflow-hidden flex flex-col'>
+      <div className='quiz-container bg-white w-[90vw] h-[90vh] rounded-lg shadow-2xl overflow-hidden flex flex-col'>
         <Card className='border-0 flex flex-col h-full'>
           <CardHeader className='relative'>
-            <Button
-              variant='ghost'
-              size='icon'
-              className='absolute right-4 top-4'
-              onClick={onComplete}
-              aria-label='Close quiz'
-            >
-              <X className='h-4 w-4' />
-            </Button>
+            <div className='absolute right-4 top-4 flex gap-2'>
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={handleFullscreen}
+                aria-label='Toggle fullscreen'
+              >
+                <Maximize2 className='h-4 w-4' />
+              </Button>
+              <Button
+                variant='ghost'
+                size='icon' 
+                onClick={onComplete}
+                aria-label='Close quiz'
+              >
+                <X className='h-4 w-4' />
+              </Button>
+            </div>
             <div className='flex justify-center items-center mt-2'>
               <TimeDisplay {...formattedTime} />
             </div>

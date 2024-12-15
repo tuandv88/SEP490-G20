@@ -41,7 +41,6 @@ const QuizModal = ({ isOpen, onClose, quiz, setIsQuizSubmitted }) => {
         throw new Error('Failed to fetch quiz details')
       }
       setQuizData(quizDetails)
-      console.log('Quiz Data: ', quizDetails)
     } catch (error) {
       console.error('Error starting or fetching quiz details:', error)
       setError('Failed to start quiz. Please try again.')
@@ -55,7 +54,6 @@ const QuizModal = ({ isOpen, onClose, quiz, setIsQuizSubmitted }) => {
       if (!response) {
         throw new Error('Failed to start quiz')
       }
-      console.log('Quiz Started: ', response)
       setIsQuizStarted(true)
     } catch (error) {
       console.error('Error starting quiz:', error)

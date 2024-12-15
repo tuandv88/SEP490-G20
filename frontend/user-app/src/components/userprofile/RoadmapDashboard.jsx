@@ -203,6 +203,7 @@ const RoadmapDashboard = ({ user }) => {
         await LearningPathAPI.deleteLearningPath(pathToDelete)
         setLearningPaths((prev) => prev.filter((path) => path.id !== pathToDelete))
         setIsQuizSubmitted(false)
+        setQuizAssessment(null)
       } catch (error) {
         console.error('Error deleting path:', error)
       } finally {
@@ -268,6 +269,24 @@ const RoadmapDashboard = ({ user }) => {
     }
   }
 
+  // Thêm hàm fetchQuizAssessment
+  const fetchQuizAssessment = async () => {
+    try {
+      const data = await QuizAPI.getQuizAssessment()
+      setQuizAssessment(data.quiz)
+    } catch (error) {
+      console.error('Error fetching quiz assessment:', error)
+    }
+  }
+
+  // Sửa lại phần xử lý khi bấm vào Generate Path
+  const handleAssessmentAccept = async () => {
+    setIsAssessmentPromptOpen(false)
+    // Fetch quiz assessment trước khi mở modal
+    await fetchQuizAssessment()
+    setIsQuizOpen(true)
+  }
+
   if (loading) {
     return <UserRoadMapLoading />
   }
@@ -328,10 +347,7 @@ const RoadmapDashboard = ({ user }) => {
       <AssessmentPrompt
         isOpen={isAssessmentPromptOpen}
         onClose={() => setIsAssessmentPromptOpen(false)}
-        onAccept={() => {
-          setIsAssessmentPromptOpen(false)
-          setIsQuizOpen(true)
-        }}
+        onAccept={handleAssessmentAccept}
         onDecline={() => setIsAssessmentPromptOpen(false)}
       />
 

@@ -40,7 +40,7 @@ public class CreateQuizHandler(IQuizRepository quizRepository, ILectureRepositor
                     timeLimit: createQuizDto.TimeLimit,
                     hasTimeLimit: createQuizDto.HasTimeLimit,
                     attemptLimit: createQuizDto.AttemptLimit,
-                    hasAttemptLimit: createQuizDto.HasTimeLimit,
+                    hasAttemptLimit: createQuizDto.HasAttemptLimit,
                     quizType: (QuizType)Enum.Parse(typeof(QuizType), createQuizDto.QuizType)
                     );
         return quiz;

@@ -9,7 +9,6 @@ const ProtectedRoute = ({ children }) => {
   const { user, updateUser } = useContext(UserContext);
 
   useEffect(() => {
-    console.log("IN PROTECTED ROUTE")
     const checkUser = async () => {
       if (!user) {
         try {
@@ -17,7 +16,6 @@ const ProtectedRoute = ({ children }) => {
           if (userData) {
             updateUser(userData);
           } else {
-            console.log("USER NOT FOUND")
             await AuthService.login(); // Chuyển hướng đến trang đăng nhập OIDC
           }
         } catch (error) {
@@ -30,7 +28,6 @@ const ProtectedRoute = ({ children }) => {
   }, [user, updateUser]);
 
   if (!user) {
-    // Hiển thị một loading spinner hoặc một thông báo chờ
     return <Loading />;
   }
 

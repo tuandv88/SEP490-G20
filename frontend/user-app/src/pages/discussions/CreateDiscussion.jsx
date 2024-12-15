@@ -21,7 +21,7 @@ const CreateDiscussion = () => {
         const data = await DiscussApi.getCategories();
         setCategories(data.categoryDtos); // Lưu dữ liệu categories vào state từ categoryDtos
       } catch (error) {
-        console.error("Lỗi khi lấy danh sách categories:", error);
+
       }
     };
 
@@ -60,10 +60,10 @@ const CreateDiscussion = () => {
         // Gửi API
         DiscussApi.createDiscuss(discussionData)
           .then(response => {
-            console.log("Discussion created successfully:", response);
+
           })
           .catch(error => {
-            console.error("Error creating discussion:", error);
+
           });
       };
       reader.readAsDataURL(image); // Đọc ảnh dưới dạng base64

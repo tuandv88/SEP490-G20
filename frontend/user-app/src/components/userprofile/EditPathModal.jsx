@@ -20,7 +20,10 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
   })
 
   const [availableCourses, setAvailableCourses] = useState(
-    availableCoursesList.filter((course) => !path.pathSteps.find((step) => step.courseId === course.courseId))
+    availableCoursesList.map(course => ({
+      ...course,
+      courseId: course.id
+    })).filter(course => !path.pathSteps.find(step => step.courseId === course.id))
   )
 
   const [searchTerm, setSearchTerm] = useState('')
@@ -56,7 +59,7 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
     const newStep = {
       id: `temp-${Date.now()}`,
       learningPathId: path.id,
-      courseId: course.courseId,
+      courseId: course.id,
       stepOrder: editedPath.pathSteps.length + 1,
       status: course.status || 'NotEnrolled',
       completionPercentage: course.completionPercentage || 0,
@@ -73,19 +76,25 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
       ...editedPath,
       pathSteps: [...editedPath.pathSteps, newStep]
     })
-    setAvailableCourses(availableCourses.filter((c) => c.courseId !== course.courseId))
+    
+    setAvailableCourses(prevCourses => 
+      prevCourses.filter(c => c.id !== course.id)
+    )
   }
 
   const removeCourse = (stepId) => {
-    const removedStep = editedPath.pathSteps.find((step) => step.id === stepId)
+    const removedStep = editedPath.pathSteps.find(step => step.id === stepId)
     if (removedStep) {
-      const removedCourse = courses.find((course) => course.courseId === removedStep.courseId) || 
-                           availableCoursesList.find((course) => course.courseId === removedStep.courseId)
+      const removedCourse = courses.find(course => course.id === removedStep.courseId) || 
+                           availableCoursesList.find(course => course.id === removedStep.courseId)
       
       if (removedCourse) {
-        const isAlreadyAvailable = availableCourses.some(course => course.courseId === removedCourse.courseId)
+        const isAlreadyAvailable = availableCourses.some(course => course.id === removedCourse.id)
         if (!isAlreadyAvailable) {
-          setAvailableCourses([...availableCourses, removedCourse])
+          setAvailableCourses(prev => [...prev, {
+            ...removedCourse,
+            courseId: removedCourse.id
+          }])
         }
       }
     }
@@ -93,7 +102,7 @@ export const EditPathModal = ({ path, availableCoursesList, courses, isOpen, onC
     setEditedPath({
       ...editedPath,
       pathSteps: editedPath.pathSteps
-        .filter((step) => step.id !== stepId)
+        .filter(step => step.id !== stepId)
         .map((step, index) => ({
           ...step,
           stepOrder: index + 1

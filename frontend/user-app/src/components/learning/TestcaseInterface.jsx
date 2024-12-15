@@ -62,7 +62,7 @@ const TestcaseInterface = ({ response, loading, testCase, setIsSuccessCode }) =>
   const activeTabTestcase = useStore((state) => state.activeTabTestcase)
   const setActiveTabTestcase = useStore((state) => state.setActiveTabTestcase)
 
-  console.log('testCase: ', testCase)
+
   // Thêm hàm kiểm tra testCase rỗng
   const isEmptyTestCase = (testCase) => {
     return Object.keys(testCase).length === 1 && Object.keys(testCase['0']).length === 0

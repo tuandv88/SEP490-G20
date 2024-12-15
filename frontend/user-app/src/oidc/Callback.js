@@ -13,13 +13,11 @@ function Callback() {
   useEffect(() => {
     AuthService.handleCallback()
       .then(() => {
-        console.log('Verify Auth Code - Get Access_Token & Save Storage..');
         // Điều hướng về đâu cấu hình ở đây: uriRedirect:" uri  + "/callback"   -> Redirect: " uri " + "url navigate".
         // navigate('/discussions/discuss');
         navigate('/');
       })
       .catch((error) => {
-        console.error('Error handling callback:', error);
         console.error('Verify Auth Code Failed.');
         navigate('/');
       });

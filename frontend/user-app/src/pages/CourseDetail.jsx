@@ -101,7 +101,7 @@ function CourseDetail() {
 
                 <div className='flex items-center gap-2'>
                   <span className='bg-purple-600 text-white text-sm font-semibold px-2 py-1 rounded mb-5'>
-                    Course Level: {courseDetail?.course?.courseLevel}
+                    {courseDetail?.course?.courseLevel}
                   </span>
                 </div>
               </div>

@@ -26,10 +26,18 @@ class TokenizationSupportWithLineLimit extends Disposable {
         throw ( new Error('Not supported!'));
     }
     tokenizeEncoded(line, hasEOL, state) {
-        if (line.length >= this._maxTokenizationLineLength.get()) {
-            return nullTokenizeEncoded(this._encodedLanguageId, state);
+        // if (line.length >= this._maxTokenizationLineLength.get()) {
+        //     return nullTokenizeEncoded(this._encodedLanguageId, state);
+        // }
+        // return this._actual.tokenizeEncoded(line, hasEOL, state);
+        try {
+            if (!line || line.length >= this._maxTokenizationLineLength.get()) {
+                return nullTokenizeEncoded(this._encodedLanguageId, state);
+            }
+            return this._actual.tokenizeEncoded(line, hasEOL, state);
+        } catch {
+            return nullTokenizeEncoded(this._encodedLanguageId, state); 
         }
-        return this._actual.tokenizeEncoded(line, hasEOL, state);
     }
     createBackgroundTokenizer(textModel, store) {
         if (this._actual.createBackgroundTokenizer) {

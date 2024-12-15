@@ -48,8 +48,6 @@ function Problem() {
         setProblemSolved(solvedResponse)
         setLeaderboardData(leaderboardResponse)
   
-        console.log('Solved Problems:', solvedResponse)
-        console.log('Leaderboard Data:', leaderboardResponse)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -70,7 +68,6 @@ function Problem() {
         )
         const { data, count } = response.problems
         setProblems(data)
-        console.log('Problems:', data)
         setTotalPages(Math.ceil(count / pageSize))
       } catch (error) {
         console.error('Error fetching problems:', error)

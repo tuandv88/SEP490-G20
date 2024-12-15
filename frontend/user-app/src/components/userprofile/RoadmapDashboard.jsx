@@ -98,8 +98,7 @@ const RoadmapDashboard = ({ user }) => {
       
       if (found || attempts >= maxAttempts) {
         clearInterval(pollInterval)
-        if (!found) {
-          console.log('Không tìm thấy lộ trình sau 15 giây')
+        if (!found) {          
           setPollingStatus('error')
         }
       }

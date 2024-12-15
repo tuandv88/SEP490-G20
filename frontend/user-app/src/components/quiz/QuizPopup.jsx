@@ -268,7 +268,6 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
 
     try {
       const response = await QuizAPI.submissionAnswer(answer.quizSubmissionId, question)
-      console.log('Answer saved successfully')
     } catch (error) {
       console.error('Error saving answer:', error)
     }
@@ -289,7 +288,6 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
 
     try {
       const response = await QuizAPI.submitCodeSnippet(answer.quizSubmissionId, question)
-      console.log('Code snippet saved successfully')
     } catch (error) {
       console.error('Error saving code snippet:', error)
     }
@@ -372,7 +370,6 @@ export default function QuizPopup({ quiz, answer, onClose, timeLimit, hasTimeLim
 
       // Submit quiz
       const response = await QuizAPI.submitQuiz(answer.quizSubmissionId);
-      console.log('Quiz submitted successfully');
       
       // Đóng các modal và cập nhật trạng thái
       setIsConfirmOpen(false);     

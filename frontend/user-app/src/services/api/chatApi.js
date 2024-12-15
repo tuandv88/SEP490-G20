@@ -14,14 +14,13 @@ export const ChatAPI = {
   },
   getMessage: async (conversationId) => {
     const response = await axios.get(
-      `${API_BASE_URL}/ai-service/conversations/${conversationId}/messages?PageIndex=1&PageSize=10`,
+      `${API_BASE_URL}/ai-service/conversations/${conversationId}/messages?PageIndex=1&PageSize=30`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get('authToken')}`
         }
       }
     )
-    console.log('response', response.data)
     return response.data
   },
   deleteConversation: async (conversationId) => {

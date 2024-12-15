@@ -10,13 +10,11 @@ class AuthService {
     })
 
     this.userManager.events.addUserLoaded((user) => {
-      Cookies.set('authToken', user.access_token, { expires: 7 });
-      console.log('User loaded: ', user)
+      Cookies.set('authToken', user.access_token, { expires: 7 });     
     })
 
     this.userManager.events.addUserUnloaded(() => {
       Cookies.remove('authToken');
-      console.log('User logged out')
     })
 
     //Xử lý gia hạn token tự động

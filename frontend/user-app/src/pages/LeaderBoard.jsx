@@ -80,7 +80,6 @@ const LeaderBoard = () => {
         response.ranks.data.map(async (rank, index) => {
           try {
             const userResponse = await UserAPI.getUserById(rank.userId)
-            console.log(userResponse)
             return {
               ...rank,
               rank: index + 1,
@@ -88,7 +87,6 @@ const LeaderBoard = () => {
               avatar: userResponse.urlProfilePicture || 'default-avatar-url.jpg'
             }
           } catch (error) {
-            console.error(`Error fetching user details for ${rank.userId}:`, error)
             return {
               ...rank,
               rank: index + 1,
@@ -101,7 +99,6 @@ const LeaderBoard = () => {
 
       setLeaderboardData(leaderboardWithUserDetails)
     } catch (error) {
-      console.error('Error fetching leaderboard:', error)
       setError('Failed to load leaderboard data')
     } finally {
       setLoading(false)

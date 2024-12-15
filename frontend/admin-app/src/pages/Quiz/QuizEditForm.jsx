@@ -288,17 +288,7 @@ function QuizEditForm({ isOpen, onOpenChange, onSubmit, defaultValues }) {
                     <Controller
                       name='quizType'
                       control={control}
-                      render={({ field }) => (
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <SelectTrigger className='w-full'>
-                            <SelectValue placeholder='Select quiz type' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value='PRACTICE'>Practice</SelectItem>
-                            <SelectItem value='FINAL'>Final</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
+                      render={({ field }) => <Input {...field} readOnly value={field.value} className='bg-muted' />}
                     />
                   </div>
                 </CardContent>

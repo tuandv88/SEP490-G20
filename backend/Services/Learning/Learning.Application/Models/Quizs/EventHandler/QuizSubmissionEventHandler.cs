@@ -9,7 +9,7 @@ namespace Learning.Application.Models.Quizs.EventHandler;
 public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmissionRepository, ISender sender, IProblemRepository problemRepository,
     IQuizRepository quizRepository, ILogger<QuizSubmissionEventHandler> logger, IPublishEndpoint publishEndpoint) : IConsumer<QuizSubmissionEvent> {
     public async Task Consume(ConsumeContext<QuizSubmissionEvent> context) {
-
+        logger.LogDebug($"Start quiz submission event: {context.Message.SubmissionId}");
         //xử lí bài nộp ở đây
         var quizSubmission = await quizSubmissionRepository.GetByIdAsync(context.Message.SubmissionId);
         if (quizSubmission == null) {
@@ -27,7 +27,15 @@ public class QuizSubmissionEventHandler(IQuizSubmissionRepository quizSubmission
             } else {
                 await UpdateSubmissionWithAnswers(quizSubmission, quiz);
             }
-            quizSubmission.UpdateStatus(QuizSubmissionStatus.Success);
+
+            if (quiz.QuizType != QuizType.ASSESSMENT)
+            {
+                quizSubmission.UpdateStatus(QuizSubmissionStatus.Success);
+            }
+            else
+            {
+                quizSubmission.Status = QuizSubmissionStatus.Success;
+            }
             await quizSubmissionRepository.UpdateAsync(quizSubmission);
             //Kiểm tra nếu là kiểu ASSESSMENT thì public lên một event để AI phân tích tạo một lộ trình học
             if (quiz.QuizType == QuizType.ASSESSMENT) {

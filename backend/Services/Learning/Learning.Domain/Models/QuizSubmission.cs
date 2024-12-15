@@ -17,7 +17,9 @@ public class QuizSubmission : Aggregate<QuizSubmissionId> {
 
     public void UpdateStatus(QuizSubmissionStatus status) {
         Status = status;
-        AddDomainEvent(new QuizSubmissionSuccessEvent(this));
+        if(status == QuizSubmissionStatus.Success){
+            AddDomainEvent(new QuizSubmissionSuccessEvent(this));
+        }
     }
     public void UpdateSubmitResult(long score,long totalScore, int totalQuestions, int correctAnswers,int passingMark, List<QuestionAnswer>? answers) {
         Score = score;

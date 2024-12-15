@@ -1,6 +1,8 @@
 import { lazy } from 'react'
 import React from 'react'
 import { createRouter, createRoute, createRootRoute, useNavigate } from '@tanstack/react-router'
+import NotFound from '@/pages/404NotFound/NotFound'
+
 export const DASHBOARD_PATH = '/app/dashboard'
 export const COURSE_TABLE_PATH = '/app/course-table'
 export const PROBLEM_TABLE_PATH = '/app/problem-table'
@@ -159,10 +161,19 @@ const transactionTableRoute = createRoute({
   component: lazy(() => import('@/pages/Payment/TransactionTable'))
 })
 
+// Thêm route cho 404 Not Found
+const notFoundRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: '*',
+  component: lazy(() => import('@/pages/404NotFound/NotFound'))
+})
+
+// Thêm notFoundRoute vào routeTree
 const routeTree = rootRoute.addChildren([
   loginRoute,
   callbackRoute,
   unauthorizedRoute,
+
   protectedRoute.addChildren([
     dashboardRoute,
     courseTableRoute,
@@ -180,7 +191,8 @@ const routeTree = rootRoute.addChildren([
     userTableRoute,
     userDetailRoute,
     discussionRoute,
-    transactionTableRoute
+    transactionTableRoute,
+    notFoundRoute
   ])
 ])
 

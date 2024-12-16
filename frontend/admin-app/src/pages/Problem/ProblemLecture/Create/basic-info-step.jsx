@@ -94,11 +94,7 @@ export default function BasicInfoStep({ form }) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value='Java'>Java</SelectItem>
-                  <SelectItem value='csharp'>C#</SelectItem>
-                  <SelectItem value='python'>Python</SelectItem>
-                  <SelectItem value='c'>C</SelectItem>
-                  <SelectItem value='cpp'>C++</SelectItem>
+                  <SelectItem value='Java'>Java</SelectItem>                
                 </SelectContent>
               </Select>
               <FormMessage />

@@ -85,10 +85,6 @@ export default function BasicInfoStep({ form }) {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value='Java'>Java</SelectItem>
-                  <SelectItem value='csharp'>C#</SelectItem>
-                  <SelectItem value='python'>Python</SelectItem>
-                  <SelectItem value='c'>C</SelectItem>
-                  <SelectItem value='cpp'>C++</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

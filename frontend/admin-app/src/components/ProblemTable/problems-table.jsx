@@ -135,7 +135,7 @@ export default function ProblemsTable() {
         duration: 1500
       })
       setIsDeleteDialogOpen(false)
-      setIsUpdate(!isUpdate)
+      triggerRefetch()
     } catch (error) {
       toast({
         title: 'Error',

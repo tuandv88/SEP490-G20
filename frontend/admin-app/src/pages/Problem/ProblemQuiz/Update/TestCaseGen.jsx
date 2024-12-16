@@ -98,12 +98,26 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
   const fileInputRef = React.useRef(null)
 
   const handleImportClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
     fileInputRef.current?.click()
   }
 
   const handleImportExcel = (event) => {
     const file = event.target.files[0]
-    if (!file) {
+    if (!file) return
+
+    const fileExtension = file.name.split('.').pop().toLowerCase()
+    if (!['xlsx', 'xls'].includes(fileExtension)) {
+      toast({
+        variant: 'destructive',
+        title: 'Import failed',
+        description: 'Invalid file format'
+      })
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
       return
     }
 
@@ -114,31 +128,63 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
         const workbook = XLSX.read(e.target.result, { type: 'binary' })
         const firstSheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[firstSheetName]
-        const data = XLSX.utils.sheet_to_json(worksheet)
+        const data = XLSX.utils.sheet_to_json(worksheet, {
+          defval: '', // Giá trị mặc định cho ô trống
+          raw: false // Chuyển đổi tất cả giá trị thành chuỗi
+        })
 
-        // Lấy tất cả các params từ headers của Excel
+        if (data.length === 0) {
+          toast({
+            variant: 'destructive',
+            title: 'Import failed',
+            description: 'Excel file is empty'
+          })
+          return
+        }
+
+        const excelColumns = Object.keys(data[0])
+
+        // Kiểm tra xem có ít nhất một cột Input_ không
+        const hasInputColumns = excelColumns.some((key) => key.toLowerCase().startsWith('input_'))
+
+        // Kiểm tra cột IsHidden (bắt buộc)
+        const hasIsHiddenColumn = excelColumns.some((key) => key.toLowerCase() === 'ishidden')
+
+        // Kiểm tra các cột bắt buộc
+        if (!hasInputColumns || !hasIsHiddenColumn) {
+          let missingColumns = []
+          if (!hasInputColumns) missingColumns.push('Input_*')
+          if (!hasIsHiddenColumn) missingColumns.push('IsHidden')
+
+          toast({
+            variant: 'destructive',
+            title: 'Import failed',
+            description: `File is not in the correct format. Required columns: ${missingColumns.join(', ')}`
+          })
+          return
+        }
+
         const excelParams = Object.keys(data[0])
-          .filter((key) => key.startsWith('Input_'))
+          .filter((key) => key.toLowerCase().startsWith('input_'))
           .map((key) => key.substring(6)) // Lấy phần sau "Input_"
 
-        // Xử lý dữ liệu từ Excel
         const newTestCases = data.map((row) => {
           const testCase = {}
 
-          // Lọc và xử lý các cột
-          Object.keys(row).forEach((key) => {
-            // Bỏ qua cột TestCaseId
-            if (key === 'TestCaseId') return
+          // Khởi tạo tất cả các input params với giá trị rỗng
+          excelParams.forEach((paramName) => {
+            testCase[paramName] = ''
+          })
 
-            // Xử lý các cột Input
-            if (key.startsWith('Input_')) {
-              const paramName = key.substring(6) // Lấy phần sau "Input_"
-              testCase[paramName] = row[key].toString()
-            }
-            // Xử lý cột Expected và IsHidden
-            else if (key === 'Expected') {
-              testCase.expectedOutput = row[key].toString()
-            } else if (key === 'IsHidden') {
+          Object.keys(row).forEach((key) => {
+            if (key.toLowerCase() === 'testcaseid') return
+
+            if (key.toLowerCase().startsWith('input_')) {
+              const paramName = key.substring(6)
+              testCase[paramName] = row[key]
+            } else if (key.toLowerCase() === 'expected') {
+              testCase.expectedOutput = row[key]
+            } else if (key.toLowerCase() === 'ishidden') {
               const value = row[key]
               testCase.isHidden = value === true || value === 'TRUE' || value === 'true' || value === 1 || value === '1'
             }
@@ -147,28 +193,40 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
           return testCase
         })
 
-        // Cập nhật params - gộp params hiện tại với params mới từ Excel
         const updatedParams = [...new Set([...params, ...excelParams])]
         setParams(updatedParams)
 
-        setTestCases([...testCases, ...newTestCases])
+        const allTestCases = [...testCases, ...newTestCases]
+        setTestCases(allTestCases)
+
         toast({
-          title: 'Import success',
+          title: 'Import successful',
           description: `Imported ${newTestCases.length} test cases`
         })
-
-        // Reset input file để có thể import lại file cũ
-        event.target.value = ''
       } catch (error) {
+        console.error('Import error:', error)
         toast({
           variant: 'destructive',
           title: 'Import failed',
-          description: 'Invalid file format'
+          description: 'Error reading Excel file. Please check the file format'
         })
+      } finally {
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''
+        }
       }
     }
 
     reader.onerror = (error) => {
+      console.error('FileReader error:', error)
+      toast({
+        variant: 'destructive',
+        title: 'Import failed',
+        description: 'Error reading file'
+      })
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
 
     reader.readAsBinaryString(file)
@@ -229,7 +287,7 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
                           onCheckedChange={() => toggleTestCaseHidden(testCaseIndex)}
                         />
                       </div>
-                      <Button variant='ghost' size='sm' onClick={() => removeTestCase(testCaseIndex)}>
+                      <Button type='button' variant='ghost' size='sm' onClick={() => removeTestCase(testCaseIndex)}>
                         <X className='h-4 w-4' />
                       </Button>
                     </div>
@@ -288,32 +346,10 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
                       }
                     }}
                   />
-                  <div className='flex gap-2'>
-                    <Button type='button' onClick={addParam} className='flex-shrink-0 flex-1'>
-                      <Plus className='w-4 h-4 mr-2' />
-                      Add Param
-                    </Button>
-                    <input
-                      type='file'
-                      accept='.xlsx,.xls'
-                      className='hidden'
-                      ref={fileInputRef}
-                      onChange={handleImportExcel}
-                    />
-                    <Button
-                      type='button'
-                      variant='outline'
-                      className='flex-shrink-0 flex-1'
-                      onClick={handleImportClick}
-                    >
-                      <Upload className='w-4 h-4 mr-2' />
-                      Import Excel
-                    </Button>
-                    <Button type='button' variant='outline' className='flex-shrink-0 flex-1' onClick={downloadTemplate}>
-                      <Download className='w-4 h-4 mr-2' />
-                      Template
-                    </Button>
-                  </div>
+                  <Button type='button' onClick={addParam} className='flex-shrink-0'>
+                    <Plus className='w-4 h-4 mr-2' />
+                    Add Param
+                  </Button>
                 </div>
                 <div className='flex flex-wrap gap-2'>
                   {params.map((param) => (
@@ -326,17 +362,27 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
                   ))}
                 </div>
               </CardContent>
-              <CardFooter className='flex flex-col sm:flex-row gap-2'>
-                <Button
-                  type='button'
-                  onClick={createTestCase}
-                  disabled={params.length === 0}
-                  className='w-full sm:w-auto'
-                >
+              <CardFooter className='flex flex-col gap-2'>
+                <Button type='button' onClick={createTestCase} disabled={params.length === 0} className='w-full'>
                   Create Test Case
                 </Button>
-                <Button type='button' onClick={createTestCaseNoParam} className='w-full sm:w-auto'>
+                <Button type='button' onClick={createTestCaseNoParam} className='w-full'>
                   Create No Parameters
+                </Button>
+                <input
+                  type='file'
+                  accept='.xlsx,.xls'
+                  className='hidden'
+                  ref={fileInputRef}
+                  onChange={handleImportExcel}
+                />
+                <Button type='button' variant='outline' className='w-full' onClick={handleImportClick}>
+                  <Upload className='w-4 h-4 mr-2' />
+                  Import Excel
+                </Button>
+                <Button type='button' variant='outline' className='w-full' onClick={downloadTemplate}>
+                  <Download className='w-4 h-4 mr-2' />
+                  Template
                 </Button>
               </CardFooter>
             </Card>

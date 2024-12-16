@@ -71,7 +71,10 @@ public class ConversationalAIService(
         PathwayAnswer answers = new PathwayAnswer();
 
         try {
-            string cleanedContent = Regex.Replace(result.Content!, @"```json[\s\S]*?```", "").Trim();
+            string cleanedContent = result.Content!;
+            if (result.Content!.Contains("```json")) {
+                cleanedContent = Regex.Match(result.Content, @"(?<=```json).*?(?=```)", RegexOptions.Singleline)?.Value?.Trim() ?? result.Content!;
+            }
             answers = JsonConvert.DeserializeObject<PathwayAnswer>(cleanedContent)!;
         } catch (Exception ex) {
             logger.LogError(ex, "Error deserializing the pathway answer.");
@@ -105,7 +108,10 @@ public class ConversationalAIService(
 
         var answers = new FlagAnswer();
         try {
-            string cleanedContent = Regex.Replace(fullMessage.ToString(), @"```json[\s\S]*?```", "").Trim();
+            string cleanedContent = fullMessage.ToString();
+            if (fullMessage.ToString().Contains("```json")) {
+                cleanedContent = Regex.Match(fullMessage.ToString(), @"(?<=```json).*?(?=```)", RegexOptions.Singleline)?.Value?.Trim() ?? fullMessage.ToString()!;
+            }
             answers = JsonConvert.DeserializeObject<FlagAnswer>(cleanedContent)!;
         } catch (Exception ex) {
             logger.LogError(ex, "Error deserializing the flag answer.");

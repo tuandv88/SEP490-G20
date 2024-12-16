@@ -14,7 +14,6 @@ export const createFile = async (fileData, lectureId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error creating file:', error)
     throw error
   }
 }
@@ -29,7 +28,6 @@ export const getFileById = async (fileId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error fetching file:', error)
     throw error
   }
 }
@@ -43,7 +41,6 @@ export const deleteFile = async (fileId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error deleting file:', error)
     throw error
   }
 }

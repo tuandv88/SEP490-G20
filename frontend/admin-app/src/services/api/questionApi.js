@@ -10,7 +10,6 @@ export const createQuestion = async (questionData, quizId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error creating question:', error)
     throw error
   }
 }
@@ -24,7 +23,6 @@ export const getFullQuizDetail = async (quizId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error getting full quiz detail:', error)
     throw error
   }
 }
@@ -43,7 +41,6 @@ export const updateQuestion = async (quizId, questionId, questionData) => {
     )
     return response.data
   } catch (error) {
-    console.error('Error updating question:', error)
     throw error
   }
 }
@@ -60,7 +57,6 @@ export const updateQuestionById = async (quizId, questionId, questionUpdateData)
     )
     return response.data
   } catch (error) {
-    console.error('Error updating question:', error)
     throw error
   }
 }
@@ -75,7 +71,6 @@ export const deleteQuestion = async (quizId, questionId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error deleting question:', error)
     throw error
   }
 }
@@ -89,7 +84,6 @@ export const createProblemQuestion = async (quizId, problemData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error creating problem question:', error)
     throw error
   }
 }

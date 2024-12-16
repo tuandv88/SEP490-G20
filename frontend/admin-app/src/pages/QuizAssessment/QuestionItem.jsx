@@ -46,7 +46,6 @@ export function QuestionItem({ question, onEdit, onDelete, onToggleActive, quizI
           const problem = await getProblemById(question.problemId)
           setProblem(problem)
         } catch (error) {
-          console.error('Error fetching problem details:', error)
         }
       }
       fetchProblemById()

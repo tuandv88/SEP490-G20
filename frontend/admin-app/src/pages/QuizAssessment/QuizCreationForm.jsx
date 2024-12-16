@@ -127,7 +127,6 @@ function QuizCreationForm({ isOpen, onOpenChange, onSubmit }) {
         description: 'Your quiz has been successfully created.'
       })
     } catch (error) {
-      console.error('Error creating quiz:', error)
       toast({
         title: 'Error',
         description: 'Failed to create quiz. Please try again.',

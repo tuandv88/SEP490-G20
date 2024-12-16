@@ -10,7 +10,6 @@ export const createLecture = async (chapterId, lectureData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error creating course:', error)
     throw error
   }
 }
@@ -24,7 +23,6 @@ export const getLectureDetails = async (lectureId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error creating course:', error)
     throw error
   }
 }
@@ -42,7 +40,6 @@ export const updateLecture = async (chapterId, lectureId, lectureData) => {
     )
     return response.data
   } catch (error) {
-    console.error('Error updating lecture:', error)
     throw error
   }
 }
@@ -56,7 +53,6 @@ export const deleteLecture = async (chapterId, lectureId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error deleting lecture:', error)
     throw error
   }
 }
@@ -70,7 +66,6 @@ export const deleteFileFromLecture = async (fileId, lectureId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error deleting file:', error)
     throw error
   }
 }

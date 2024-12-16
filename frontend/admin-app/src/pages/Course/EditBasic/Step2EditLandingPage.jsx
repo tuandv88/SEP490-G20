@@ -118,13 +118,11 @@ export default function Step2EditLandingPage({ onSubmit, onChange, initialData }
               variant: 'default'
             })
           } else {
-            console.error('Invalid server response:', response)
             throw new Error('Invalid response from server')
           }
         }
         reader.readAsDataURL(file)
       } catch (error) {
-        console.error('Error updating course image:', error)
         // Revert to the previous image URL
         setPreviewImage(currentImageUrl)
         toast({
@@ -165,7 +163,6 @@ export default function Step2EditLandingPage({ onSubmit, onChange, initialData }
                                 alt='Course preview'
                                 className='w-full h-full object-cover'
                                 onError={(e) => {
-                                  console.error('Image failed to load:', previewImage)
                                   setPreviewImage(null)
                                   toast({
                                     title: 'Error',

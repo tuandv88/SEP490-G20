@@ -39,8 +39,8 @@ public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextS
         double discount = 0;
         if (point > 0) {
             discount = Math.Round(point / 1000.0, 2); // 1000 points = 1 dollar discount, rounded to 2 decimal places
-            discount = Math.Min(discount, itemAmount);
-            itemAmount = Math.Max(0, Math.Round(itemAmount - discount, 2)); // Ensure the result is also rounded to 2 decimal places
+            discount = Math.Min(discount, itemAmount - 0.01); // Ensure at least $0.01 remains after discount
+            itemAmount = Math.Max(0.01, Math.Round(itemAmount - discount, 2)); // Ensure minimum payment is $0.01
         }
 
         purchaseUnits.Add(new PurchaseUnitRequest {
@@ -66,9 +66,20 @@ public class CreateOrderHandler(PayPalHttpClient payPalHttpClient, IUserContextS
         orderCreateRequest.Prefer("return=representation");
         orderCreateRequest.RequestBody(orderRequest);
         var response = await payPalHttpClient.Execute(orderCreateRequest);
+        
+        if (response.StatusCode != System.Net.HttpStatusCode.Created)
+        {
+            logger.LogError("Failed to create PayPal order. Status code: {StatusCode}", response.StatusCode);
+            return new CreateOrderResult(null!);
+        }
+
         var result = response.Result<Order>();
 
-        // Create the Transaction entity and save it
+        if (result.Status != "CREATED")
+        {
+            logger.LogError("PayPal order created with unexpected status: {Status}", result.Status);
+            return new CreateOrderResult(null!);
+        }
         var transactionId = TransactionId.Of(Guid.NewGuid());
         var transaction = new Transaction {
             Id = transactionId,

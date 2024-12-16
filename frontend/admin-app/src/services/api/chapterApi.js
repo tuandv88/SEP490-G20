@@ -9,7 +9,6 @@ export const createChapter = async (chapterData, courseId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error creating course:', error)
     throw error
   }
 }
@@ -29,7 +28,6 @@ export const updateChapter = async (chapterData, courseId, chapterId) => {
     )
     return response.data
   } catch (error) {
-    console.error('Error updating chapter:', error)
     throw error
   }
 }
@@ -43,7 +41,6 @@ export const deleteChapter = async (courseId, chapterId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error deleting chapter:', error)
     throw error
   }
 }

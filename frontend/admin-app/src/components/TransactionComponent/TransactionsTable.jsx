@@ -36,7 +36,6 @@ export function TransactionsTable() {
         }))
       }
     } catch (err) {
-      console.error('API Error:', err)
     } finally {
       setIsLoading(false)
     }
@@ -62,7 +61,6 @@ export function TransactionsTable() {
         filters: {}
       })
     } catch (error) {
-      console.error('Error clearing filters:', error)
     } finally {
       setIsLoading(false)
     }
@@ -86,7 +84,6 @@ export function TransactionsTable() {
           filters: combinedFilters
         })
       } catch (error) {
-        console.error('Error applying filters:', error)
       } finally {
         setIsLoading(false)
       }
@@ -115,7 +112,6 @@ export function TransactionsTable() {
           filters: combinedFilters
         })
       } catch (error) {
-        console.error('Error changing column filters:', error)
       } finally {
         setIsLoading(false)
       }
@@ -139,7 +135,6 @@ export function TransactionsTable() {
           filters
         })
       } catch (error) {
-        console.error('Error changing pagination:', error)
       } finally {
         setIsLoading(false)
       }
@@ -163,7 +158,6 @@ export function TransactionsTable() {
           filters: newFilters
         })
       } catch (error) {
-        console.error('Error selecting user:', error)
       } finally {
         setIsLoading(false)
       }

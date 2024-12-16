@@ -127,7 +127,6 @@ function QuizEditForm({ isOpen, onOpenChange, onSubmit, defaultValues }) {
         duration: 1500
       })
     } catch (error) {
-      console.error('Error updating quiz:', error)
       toast({
         title: 'Error',
         description: error?.response?.data?.message || 'Failed to update quiz. Please try again.',

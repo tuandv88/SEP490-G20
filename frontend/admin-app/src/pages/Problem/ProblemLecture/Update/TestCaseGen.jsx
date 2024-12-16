@@ -160,7 +160,6 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
         // Reset input file để có thể import lại file cũ
         event.target.value = ''
       } catch (error) {
-        console.error('Import error:', error)
         toast({
           variant: 'destructive',
           title: 'Import failed',
@@ -170,7 +169,6 @@ const TestCaseGen = ({ testCases, setTestCases }) => {
     }
 
     reader.onerror = (error) => {
-      console.error('FileReader error:', error)
     }
 
     reader.readAsBinaryString(file)

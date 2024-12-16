@@ -18,7 +18,7 @@ public class CourseUpdatedStatusEventHandler(IPublishEndpoint publishEndpoint, I
                 break;
             case CourseStatus.Scheduled:
                 if (scheduleTime.HasValue) {
-                    var message = await scheduler.SchedulePublish(scheduleTime.Value, new CourseScheduledEvent(notification.Course.Id.Value), cancellationToken);
+                    var message = await scheduler.SchedulePublish(scheduleTime.Value- TimeSpan.FromSeconds(10), new CourseScheduledEvent(notification.Course.Id.Value), cancellationToken);
                     var key = string.Format(RedisRepoKey.CourseTokenId, course.Id.Value);
                     await cacheService.SetAsync(key, message.TokenId, scheduleTime.Value - DateTime.UtcNow);
                 }

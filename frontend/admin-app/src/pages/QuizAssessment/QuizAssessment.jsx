@@ -66,7 +66,6 @@ export default function QuizAssessment() {
         return
       }
       // Handle other errors
-      console.error('Error fetching quiz assessment:', error)
       toast({
         title: 'Error',
         description: 'Failed to load quiz assessment. Please try again.',
@@ -85,7 +84,6 @@ export default function QuizAssessment() {
       const detailData = await getFullQuizDetail(quizId)
       setQuizDetail(detailData)
     } catch (error) {
-      console.error('Error fetching quiz detail:', error)
       toast({
         title: 'Error',
         description: 'Failed to load quiz details. Please try again.',
@@ -155,7 +153,6 @@ export default function QuizAssessment() {
         duration: 1500
       })
     } catch (error) {
-      console.error('Error creating quiz:', error)
       toast({
         title: 'Error',
         description: 'Failed to create quiz. Please try again.',
@@ -177,7 +174,6 @@ export default function QuizAssessment() {
         })
       }
     } catch (error) {
-      console.error('Error updating quiz:', error)
       toast({
         title: 'Error',
         description: error?.response?.data?.message || 'Failed to update quiz. Please try again.',
@@ -243,7 +239,7 @@ export default function QuizAssessment() {
                     </div>
                     <div className='space-y-1'>
                       <p className='text-sm font-medium leading-none'>Passing Mark</p>
-                      <p className='text-sm text-muted-foreground'>{quizDetail.quiz.passingMark}%</p>
+                      <p className='text-sm text-muted-foreground'>{quizDetail.quiz.passingMark}</p>
                     </div>
                   </div>
                 </div>
@@ -354,6 +350,9 @@ export default function QuizAssessment() {
           quizId={quizId}
           isUpdate={isUpdate}
           setIsUpdate={setIsUpdate}
+        />
+      )}
+
       {showEditQuizForm && (
         <QuizEditForm
           isOpen={showEditQuizForm}

@@ -10,7 +10,6 @@ export const getProblems = async (pageIndex, pageSize) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error create problem:', error)
     throw error
   }
 }
@@ -24,7 +23,6 @@ export const deleteProblemAg = async (problemId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error delete problem:', error)
     throw error
   }
 }
@@ -41,7 +39,6 @@ export const getProblemAg = async (queryString) => {
     )
     return response.data
   } catch (error) {
-    console.error('Error fetching problems:', error)
     throw error
   }
 }
@@ -55,7 +52,6 @@ export const createProblemAg = async (problemData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error create problem:', error)
     throw error
   }
 }
@@ -69,7 +65,6 @@ export const createProblemLecture = async (problemData, lectureId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error create problem:', error)
     throw error
   }
 }
@@ -84,7 +79,6 @@ export const getProblemDetail = async (problemId) => {
 
     return response.data
   } catch (error) {
-    console.error('Error get problem detail:', error)
     throw error
   }
 }
@@ -98,7 +92,6 @@ export const updateProblemAg = async (problemData, problemId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error update problem:', error)
     throw error
   }
 }
@@ -112,7 +105,6 @@ export const updateProblem = async (problemId, problemData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error update problem:', error)
     throw error
   }
 }
@@ -125,7 +117,6 @@ export const deleteProblem = async (problemId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error delete problem:', error)
     throw error
   }
 }
@@ -139,7 +130,6 @@ export const getProblemById = async (problemId) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error get problem by id:', error)
     throw error
   }
 }
@@ -157,7 +147,6 @@ export const changeProblemStatus = async (problemId, isActive) => {
     )
     return response.data
   } catch (error) {
-    console.error('Error changing problem status:', error)
     throw error
   }
 }

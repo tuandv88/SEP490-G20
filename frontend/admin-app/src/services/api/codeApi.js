@@ -10,7 +10,6 @@ export const runCode = async (codeData) => {
     })
     return response.data
   } catch (error) {
-    console.error('Error run code:', error)
     throw error
   }
 }

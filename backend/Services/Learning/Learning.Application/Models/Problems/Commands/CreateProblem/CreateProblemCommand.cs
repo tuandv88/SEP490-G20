@@ -129,7 +129,7 @@ public class CreateProblemSolutionDtoValidator : AbstractValidator<CreateProblem
 public class CreateTestCaseDtoValidator : AbstractValidator<CreateTestCaseDto> {
     public CreateTestCaseDtoValidator() {
         RuleFor(x => x.ExpectedOutput)
-            .NotEmpty().WithMessage("Expected output is required.");
+            .NotNull().WithMessage("Expected output is required.");
 
         RuleFor(x => x.OrderIndex)
             .GreaterThanOrEqualTo(0).WithMessage("Order index must be greater than or equal to 0.");

@@ -350,6 +350,9 @@ export default function QuizAssessment() {
           quizId={quizId}
           isUpdate={isUpdate}
           setIsUpdate={setIsUpdate}
+        />
+      )}
+
       {showEditQuizForm && (
         <QuizEditForm
           isOpen={showEditQuizForm}

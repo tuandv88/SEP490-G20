@@ -8,7 +8,7 @@ export default function Payment({ courseId, price, onClose }) {
     <Layout>
       <div className='min-h-screen bg-gray-100 py-12 mt-[70px]'>
         <PayPalScriptProvider
-          options={{ 'client-id': 'ATncYgnc0VHRxHwgBByz3OLk3Nuw4SG4KXA3sLJZkwmYVxTxXFoxlEBt-UoBmZ-U0xKTY0dBZ18li-GA' }}
+          options={{ 'client-id': import.meta.env.VITE_PAYPAL_CLIENT_ID }}
         >
           <PayPalCheckout />
         </PayPalScriptProvider>       

@@ -542,117 +542,126 @@ export default function QuizSuggestUser({ quiz, answer, timeLimit, onComplete, s
 
   const [isFullscreen, setIsFullscreen] = useState(false)
 
-  const handleFullscreen = () => {
-    const quizContainer = document.querySelector('.quiz-container')
-    if (!document.fullscreenElement) {
-      quizContainer.requestFullscreen()
-      setIsFullscreen(true)
-    } else {
-      document.exitFullscreen()
-      setIsFullscreen(false)
-    }
-  }
+  const handleFullscreen = useCallback(() => {
+    setIsFullscreen(prev => !prev)
+  }, [])
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-      <div className='quiz-container bg-white w-[90vw] h-[90vh] rounded-lg shadow-2xl overflow-hidden flex flex-col'>
-        <Card className='border-0 flex flex-col h-full'>
-          <CardHeader className='relative'>
-            <div className='absolute right-4 top-4 flex gap-2'>
-              <Button
-                variant='ghost'
-                size='icon'
-                onClick={handleFullscreen}
-                aria-label='Toggle fullscreen'
-              >
-                <Maximize2 className='h-4 w-4' />
-              </Button>
-              <Button
-                variant='ghost'
-                size='icon' 
-                onClick={onComplete}
-                aria-label='Close quiz'
-              >
-                <X className='h-4 w-4' />
-              </Button>
-            </div>
-            <div className='flex justify-center items-center mt-2'>
-              <TimeDisplay {...formattedTime} />
-            </div>
-            <CardTitle className='text-2xl font-bold text-indigo-700'>
-              Question {currentQuestionIndex + 1} of {quiz.questions.length}
-            </CardTitle>
-            <CardDescription>
-              {currentQuestion.questionType} - {currentQuestion.questionLevel}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className='flex-grow overflow-auto'>
-            <AnimatePresence mode='wait'>
-              <motion.div
-                key={currentQuestionIndex}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className='space-y-4 h-full flex flex-col'
-              >
-                {currentQuestion.questionType !== 'CodeSnippet' && (
-                  <div className='prose dark:prose-invert max-w-none mb-4'>
-                    <ReactMarkdown
-                      components={{
-                        code: CodeBlock
-                      }}
-                    >
-                      {currentQuestion.content}
-                    </ReactMarkdown>
-                  </div>
-                )}
-                <div className='flex-grow h-[100%]'>{renderQuestion()}</div>
-              </motion.div>
-            </AnimatePresence>
-          </CardContent>
-          <CardFooter className='border-t pt-4'>
-            <div className='flex justify-between w-full'>
-              <Button
-                onClick={handlePrevious}
-                disabled={currentQuestionIndex === 0}
-                variant='outline'
-                className='flex items-center'
-              >
-                <ChevronLeft className='mr-2 h-4 w-4' /> Previous
-              </Button>
-              {currentQuestionIndex === quiz.questions.length - 1 ? (
-                <Button onClick={handleSubmit} className='bg-green-600 hover:bg-green-700'>
-                  Submit <Send className='ml-2 h-4 w-4' />
+    <>
+      <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+        <div className={`quiz-container bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col transition-all duration-300 ${
+          isFullscreen 
+            ? 'w-screen h-screen m-0' 
+            : 'w-[90vw] h-[90vh] m-4'
+        }`}>
+          <Card className='border-0 flex flex-col h-full'>
+            <CardHeader className='relative'>
+              <div className='absolute right-4 top-4 flex gap-2'>
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  onClick={handleFullscreen}
+                  aria-label='Toggle fullscreen'
+                >
+                  <Maximize2 className='h-4 w-4' />
                 </Button>
-              ) : (
-                <>
+                <Button
+                  variant='ghost'
+                  size='icon' 
+                  onClick={onComplete}
+                  aria-label='Close quiz'
+                >
+                  <X className='h-4 w-4' />
+                </Button>
+              </div>
+              <div className='flex justify-center items-center mt-2'>
+                <TimeDisplay {...formattedTime} />
+              </div>
+              <CardTitle className='text-2xl font-bold text-indigo-700'>
+                Question {currentQuestionIndex + 1} of {quiz.questions.length}
+              </CardTitle>
+              <CardDescription>
+                {currentQuestion.questionType} - {currentQuestion.questionLevel}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='flex-grow overflow-auto'>
+              <AnimatePresence mode='wait'>
+                <motion.div
+                  key={currentQuestionIndex}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className='space-y-4 h-full flex flex-col'
+                >
+                  {currentQuestion.questionType !== 'CodeSnippet' && (
+                    <div className='prose dark:prose-invert max-w-none mb-4'>
+                      <ReactMarkdown
+                        components={{
+                          code: CodeBlock
+                        }}
+                      >
+                        {currentQuestion.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
+                  <div className='flex-grow h-[100%]'>{renderQuestion()}</div>
+                </motion.div>
+              </AnimatePresence>
+            </CardContent>
+            <CardFooter className='border-t pt-4'>
+              <div className='flex justify-between w-full'>
+                <Button
+                  onClick={handlePrevious}
+                  disabled={currentQuestionIndex === 0}
+                  variant='outline'
+                  className='flex items-center'
+                >
+                  <ChevronLeft className='mr-2 h-4 w-4' /> Previous
+                </Button>
+                {currentQuestionIndex === quiz.questions.length - 1 ? (
                   <Button onClick={handleSubmit} className='bg-green-600 hover:bg-green-700'>
                     Submit <Send className='ml-2 h-4 w-4' />
                   </Button>
-                  <Button onClick={handleNext} className='flex items-center'>
-                    Next <ChevronRight className='ml-2 h-4 w-4' />
-                  </Button>
-                </>
-              )}
-            </div>
-          </CardFooter>
-        </Card>
+                ) : (
+                  <>
+                    <Button onClick={handleSubmit} className='bg-green-600 hover:bg-green-700'>
+                      Submit <Send className='ml-2 h-4 w-4' />
+                    </Button>
+                    <Button onClick={handleNext} className='flex items-center'>
+                      Next <ChevronRight className='ml-2 h-4 w-4' />
+                    </Button>
+                  </>
+                )}
+              </div>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
-      <Popup
-        isOpen={isOpen}
-        onComplete={() => setIsOpen(false)}
-        message='Are you sure you want to submit your answer?'
-      />
-      <CustomConfirmModal
-        isOpen={isConfirmOpen}
-        onComplete={() => setIsConfirmOpen(false)}
-        onConfirm={handleSubmitConfirm}
-        title='Submit Quiz'
-        content='Are you sure you want to submit your answer?'
-        confirmText='Yes, I am sure'
-        cancelText='No, cancel'
-      />
-    </div>
+
+      <div className={`
+        fixed inset-0 
+        ${isFullscreen ? 'z-[10000]' : 'z-[1000]'}
+        pointer-events-none
+      `}>
+        <div className="pointer-events-auto">
+          <Popup
+            isOpen={isOpen}
+            onComplete={() => setIsOpen(false)}
+            message='Are you sure you want to submit your answer?'
+          />
+          
+          <CustomConfirmModal
+            isOpen={isConfirmOpen}
+            onComplete={() => setIsConfirmOpen(false)}
+            onConfirm={handleSubmitConfirm}
+            title='Submit Quiz'
+            content='Are you sure you want to submit your answer?'
+            confirmText='Yes, I am sure'
+            cancelText='No, cancel'
+          />
+        </div>
+      </div>
+    </>
   )
 }

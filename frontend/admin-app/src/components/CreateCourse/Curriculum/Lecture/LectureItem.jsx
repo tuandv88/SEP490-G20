@@ -318,7 +318,9 @@ export default function LectureItem({
             </AlertDialogContent>
           </AlertDialog>
           <span className='px-2 py-1 text-sm bg-gray-200 rounded'>{lecture.lectureType}</span>
-          <span className='px-2 py-1 text-sm bg-gray-200 rounded'>{lecture.point} points</span>
+          <span className='px-2 py-1 text-sm bg-gray-200 rounded'>
+            {lecture.point} {lecture.point <= 1 ? 'point' : 'points'}
+          </span>
           <span
             className={`text-sm px-2 py-1 rounded ${
               lecture.isFree ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
@@ -337,7 +339,7 @@ export default function LectureItem({
       />
       {lecture.lectureType === 'Lesson' && (
         <div className='space-y-4'>
-          <div>
+          <div className='flex gap-2 mb-4'>
             <input
               type='file'
               ref={fileInputRef}
@@ -346,7 +348,7 @@ export default function LectureItem({
               accept='.pdf,.doc,.docx,.txt'
               multiple
             />
-            <Button onClick={triggerFileUpload} size='sm' className='w-full sm:w-auto'>
+            <Button onClick={triggerFileUpload} size='sm'>
               {isRunning1 ? (
                 <>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
@@ -358,22 +360,7 @@ export default function LectureItem({
                 </>
               )}
             </Button>
-            {lectureFiles &&
-              lectureFiles.map(
-                (file, index) =>
-                  file.fileType === 'DOCUMENT' && (
-                    <div key={file.fileId} className='flex items-center p-2 mt-2 bg-white rounded-md'>
-                      <FileIcon className='w-4 h-4 mr-2 text-blue-500' />
-                      <span className='flex-grow text-sm truncate'>{file.fileName}</span>
-                      <Button onClick={() => handleFileRemove(file.fileId)} size='sm' variant='ghost' className='ml-2'>
-                        <Cross2Icon className='w-4 h-4 text-red-500' />
-                        <span className='sr-only'>Remove file</span>
-                      </Button>
-                    </div>
-                  )
-              )}
-          </div>
-          <div>
+
             <input
               type='file'
               ref={videoInputRef}
@@ -385,7 +372,6 @@ export default function LectureItem({
             <Button
               onClick={triggerVideoUpload}
               size='sm'
-              className='w-full sm:w-auto'
               disabled={lectureFiles && lectureFiles.some((file) => file.fileType === 'VIDEO')}
             >
               {isRunning2 ? (
@@ -395,31 +381,68 @@ export default function LectureItem({
                 </>
               ) : (
                 <>
-                  {' '}
                   <VideoIcon className='w-4 h-4 mr-2' /> Upload Video
                 </>
               )}
             </Button>
-            {lectureFiles &&
-              lectureFiles.map(
-                (file, index) =>
-                  file.fileType === 'VIDEO' && (
-                    <div key={index} className='flex items-center p-2 mt-2 bg-white rounded-md'>
-                      <VideoIcon className='w-4 h-4 mr-2 text-blue-500' />
-                      <span className='flex-grow text-sm truncate'>{file.fileName}</span>
-                      <Button onClick={() => handleVideoRemove(file.fileId)} size='sm' variant='ghost' className='ml-2'>
-                        <Cross2Icon className='w-4 h-4 text-red-500' />
-                        <span className='sr-only'>Remove video</span>
-                      </Button>
-                    </div>
-                  )
-              )}
+          </div>
+
+          <div className='grid grid-cols-1 gap-2'>
+            {/* Files section */}
+            {lectureFiles && lectureFiles.some((file) => file.fileType === 'DOCUMENT') && (
+              <div className='space-y-2'>
+                <h4 className='text-sm font-medium'>Uploaded Files</h4>
+                {lectureFiles.map(
+                  (file) =>
+                    file.fileType === 'DOCUMENT' && (
+                      <div key={file.fileId} className='flex items-center p-2 bg-white rounded-md'>
+                        <FileIcon className='w-4 h-4 mr-2 text-blue-500' />
+                        <span className='flex-grow text-sm truncate'>{file.fileName}</span>
+                        <Button
+                          onClick={() => handleFileRemove(file.fileId)}
+                          size='sm'
+                          variant='ghost'
+                          className='ml-2'
+                        >
+                          <Cross2Icon className='w-4 h-4 text-red-500' />
+                          <span className='sr-only'>Remove file</span>
+                        </Button>
+                      </div>
+                    )
+                )}
+              </div>
+            )}
+
+            {/* Videos section */}
+            {lectureFiles && lectureFiles.some((file) => file.fileType === 'VIDEO') && (
+              <div className='space-y-2'>
+                <h4 className='text-sm font-medium'>Uploaded Videos</h4>
+                {lectureFiles.map(
+                  (file) =>
+                    file.fileType === 'VIDEO' && (
+                      <div key={file.fileId} className='flex items-center p-2 bg-white rounded-md'>
+                        <VideoIcon className='w-4 h-4 mr-2 text-blue-500' />
+                        <span className='flex-grow text-sm truncate'>{file.fileName}</span>
+                        <Button
+                          onClick={() => handleVideoRemove(file.fileId)}
+                          size='sm'
+                          variant='ghost'
+                          className='ml-2'
+                        >
+                          <Cross2Icon className='w-4 h-4 text-red-500' />
+                          <span className='sr-only'>Remove video</span>
+                        </Button>
+                      </div>
+                    )
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
       {lecture.lectureType === 'Practice' && (
         <div className='space-y-4'>
-          <div>
+          <div className='flex gap-2 mb-4'>
             <input
               type='file'
               ref={fileInputRef}
@@ -428,7 +451,7 @@ export default function LectureItem({
               accept='.pdf,.doc,.docx,.txt'
               multiple
             />
-            <Button onClick={triggerFileUpload} size='sm' className='w-full sm:w-auto'>
+            <Button onClick={triggerFileUpload} size='sm'>
               {isRunning1 ? (
                 <>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
@@ -440,22 +463,7 @@ export default function LectureItem({
                 </>
               )}
             </Button>
-            {lectureFiles &&
-              lectureFiles.map(
-                (file, index) =>
-                  file.fileType === 'DOCUMENT' && (
-                    <div key={file.fileName} className='flex items-center p-2 mt-2 bg-white rounded-md'>
-                      <FileIcon className='w-4 h-4 mr-2 text-blue-500' />
-                      <span className='flex-grow text-sm truncate'>{file.fileName}</span>
-                      <Button onClick={() => handleFileRemove(file.fileId)} size='sm' variant='ghost' className='ml-2'>
-                        <Cross2Icon className='w-4 h-4 text-red-500' />
-                        <span className='sr-only'>Remove file</span>
-                      </Button>
-                    </div>
-                  )
-              )}
-          </div>
-          <div>
+
             <input
               type='file'
               ref={videoInputRef}
@@ -467,7 +475,6 @@ export default function LectureItem({
             <Button
               onClick={triggerVideoUpload}
               size='sm'
-              className='w-full sm:w-auto'
               disabled={lectureFiles && lectureFiles.some((file) => file.fileType === 'VIDEO')}
             >
               {isRunning2 ? (
@@ -477,55 +484,101 @@ export default function LectureItem({
                 </>
               ) : (
                 <>
-                  {' '}
                   <VideoIcon className='w-4 h-4 mr-2' /> Upload Video
                 </>
               )}
             </Button>
-            {lectureFiles &&
-              lectureFiles.map(
-                (file, index) =>
-                  file.fileType === 'VIDEO' && (
-                    <div className='flex items-center p-2 mt-2 bg-white rounded-md'>
-                      <VideoIcon className='w-4 h-4 mr-2 text-blue-500' />
-                      <span className='flex-grow text-sm truncate'>{file.fileName}</span>
-                      <Button onClick={() => handleVideoRemove(file.fileId)} size='sm' variant='ghost' className='ml-2'>
-                        <Cross2Icon className='w-4 h-4 text-red-500' />
-                        <span className='sr-only'>Remove video</span>
-                      </Button>
-                    </div>
-                  )
-              )}
+
+            <Button onClick={handleCreateCodeProblem} size='sm' disabled={codeProblem}>
+              <CodeIcon className='w-4 h-4 mr-2' /> Create Code Problem
+            </Button>
           </div>
-          <Button onClick={handleCreateCodeProblem} size='sm' className='w-full sm:w-auto' disabled={codeProblem}>
-            <CodeIcon className='w-4 h-4 mr-2' /> Create Code Problem
-          </Button>
-          {codeProblem && (
-            <div key={codeProblem.id} className='flex items-center p-2 mt-2 bg-white rounded-md'>
-              <CodeIcon className='w-4 h-4 mr-2 text-blue-500' />
-              <span className='flex-grow text-sm truncate'>{codeProblem.title}</span>
-              <Button onClick={() => handleEditCodeProblem(codeProblem)} size='sm' variant='ghost' className='ml-2'>
-                <PencilIcon className='w-4 h-4 text-blue-500' />
-                <span className='sr-only'>Edit problem</span>
-              </Button>
-              <Button
-                onClick={() => handleDeleteCodeProblem(codeProblem.id)}
-                size='sm'
-                variant='ghost'
-                className='ml-2'
-              >
-                <TrashIcon className='w-4 h-4 text-red-500' />
-                <span className='sr-only'>Delete problem</span>
-              </Button>
-            </div>
-          )}
+
+          <div className='grid grid-cols-1 gap-2'>
+            {/* Files section */}
+            {lectureFiles && lectureFiles.some((file) => file.fileType === 'DOCUMENT') && (
+              <div className='space-y-2'>
+                <h4 className='text-sm font-medium'>Uploaded Files</h4>
+                {lectureFiles.map(
+                  (file) =>
+                    file.fileType === 'DOCUMENT' && (
+                      <div key={file.fileId} className='flex items-center p-2 bg-white rounded-md'>
+                        <FileIcon className='w-4 h-4 mr-2 text-blue-500' />
+                        <span className='flex-grow text-sm truncate'>{file.fileName}</span>
+                        <Button
+                          onClick={() => handleFileRemove(file.fileId)}
+                          size='sm'
+                          variant='ghost'
+                          className='ml-2'
+                        >
+                          <Cross2Icon className='w-4 h-4 text-red-500' />
+                          <span className='sr-only'>Remove file</span>
+                        </Button>
+                      </div>
+                    )
+                )}
+              </div>
+            )}
+
+            {/* Videos section */}
+            {lectureFiles && lectureFiles.some((file) => file.fileType === 'VIDEO') && (
+              <div className='space-y-2'>
+                <h4 className='text-sm font-medium'>Uploaded Videos</h4>
+                {lectureFiles.map(
+                  (file) =>
+                    file.fileType === 'VIDEO' && (
+                      <div key={file.fileId} className='flex items-center p-2 bg-white rounded-md'>
+                        <VideoIcon className='w-4 h-4 mr-2 text-blue-500' />
+                        <span className='flex-grow text-sm truncate'>{file.fileName}</span>
+                        <Button
+                          onClick={() => handleVideoRemove(file.fileId)}
+                          size='sm'
+                          variant='ghost'
+                          className='ml-2'
+                        >
+                          <Cross2Icon className='w-4 h-4 text-red-500' />
+                          <span className='sr-only'>Remove video</span>
+                        </Button>
+                      </div>
+                    )
+                )}
+              </div>
+            )}
+
+            {/* Code Problem section */}
+            {codeProblem && (
+              <div className='space-y-2'>
+                <h4 className='text-sm font-medium'>Code Problem</h4>
+                <div className='flex items-center p-2 bg-white rounded-md'>
+                  <CodeIcon className='w-4 h-4 mr-2 text-blue-500' />
+                  <span className='flex-grow text-sm truncate'>{codeProblem.title}</span>
+                  <Button onClick={() => handleEditCodeProblem(codeProblem)} size='sm' variant='ghost' className='ml-2'>
+                    <PencilIcon className='w-4 h-4 text-blue-500' />
+                    <span className='sr-only'>Edit problem</span>
+                  </Button>
+                  <Button
+                    onClick={() => handleDeleteCodeProblem(codeProblem.id)}
+                    size='sm'
+                    variant='ghost'
+                    className='ml-2'
+                  >
+                    <TrashIcon className='w-4 h-4 text-red-500' />
+                    <span className='sr-only'>Delete problem</span>
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
       {lecture.lectureType === 'Quiz' && (
-        <div className='mt-2'>
-          <Button onClick={handleQuizFormOpen} size='sm' className='w-full sm:w-auto' disabled={createdQuiz}>
-            <QuestionMarkCircledIcon className='w-4 h-4 mr-2' /> Create Quiz
-          </Button>
+        <div className='space-y-4'>
+          <div className='flex gap-2 mb-4'>
+            <Button onClick={handleQuizFormOpen} size='sm' disabled={createdQuiz}>
+              <QuestionMarkCircledIcon className='w-4 h-4 mr-2' /> Create Quiz
+            </Button>
+          </div>
+
           {createdQuiz && (
             <div key={createdQuiz.id} className='flex items-center p-2 mt-2 bg-white rounded-md'>
               <FileQuestion className='w-4 h-4 mr-2 text-blue-500' />

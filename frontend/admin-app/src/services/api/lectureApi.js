@@ -69,3 +69,34 @@ export const deleteFileFromLecture = async (fileId, lectureId) => {
     throw error
   }
 }
+
+export const updateLectureOrder = async (chapterId, lectures) => {
+  try {
+    const response = await axiosInstance.put(`/lectures/order/${chapterId}`, {
+      lectures: lectures.map((lecture, index) => ({
+        lectureId: lecture.id,
+        newOrder: index + 1
+      }))
+    })
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const swapLectureOrder = async (firstLectureId, secondLectureId) => {
+  try {
+    const response = await axiosInstance.put(
+      `/learning-service/lectures/swap/${firstLectureId}/${secondLectureId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+      }
+    )
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}

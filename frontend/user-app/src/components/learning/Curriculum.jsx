@@ -54,7 +54,9 @@ const Curriculum = ({ courseId, chapters,
               className='flex justify-between items-center w-full text-left py-2 hover:bg-[#243b47] rounded transition-colors text-white'
               onClick={() => toggleSection(index)}
             >
-              <span className='font-medium'>{chapter.chapterDto.title}</span>
+              <span className='font-medium'>
+                Chapter {chapter.chapterDto.orderIndex || index + 1}: {chapter.chapterDto.title}
+              </span>
               {expandedSections.includes(index) ? (
                 <ChevronDown className='w-5 h-5 text-[#4a9eff]' />
               ) : (
@@ -63,7 +65,7 @@ const Curriculum = ({ courseId, chapters,
             </button>
             {expandedSections.includes(index) && chapter.lectureDtos.length > 0 && (
               <div className='ml-4 mt-2 space-y-2 cursor-pointer'>
-                {chapter.lectureDtos.map((lecture) => (
+                {chapter.lectureDtos.map((lecture, lectureIndex) => (
                   <div
                     key={lecture.id}
                     onClick={() => handleLectureClick(lecture.id)}
@@ -74,7 +76,9 @@ const Curriculum = ({ courseId, chapters,
                     } rounded-sm p-2 transition-colors`}
                   >
                     <div className='flex justify-between items-center mb-1'>
-                      <span className='text-sm text-gray-200'>{lecture.title}</span>
+                      <span className='text-sm text-gray-200'>
+                        Lecture {lecture.orderIndex || lectureIndex + 1}: {lecture.title}
+                      </span>
                       <span className='text-xs text-gray-500'>
                         {isLectureCompleted(lecture.id) ? 'Completed' : ''}
                       </span>

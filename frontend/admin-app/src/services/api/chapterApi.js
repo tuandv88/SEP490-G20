@@ -44,3 +44,20 @@ export const deleteChapter = async (courseId, chapterId) => {
     throw error
   }
 }
+
+export const swapChapterOrder = async (firstChapterId, secondChapterId) => {
+  try {
+    const response = await axiosInstance.put(
+      `/learning-service/chapters/swap/${firstChapterId}/${secondChapterId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('authToken')}`
+        }
+      }
+    )
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}

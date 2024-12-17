@@ -43,7 +43,7 @@ const CodeEditor = ({
   const handleEditorChange = lodash.debounce((value) => {
     setCode(value)
     setCodeRun(value)
-  }, 1000)
+  }, 400)
 
   const handleArrayToDictionary = (inputArray) => {
     if (!Array.isArray(inputArray)) {

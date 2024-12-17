@@ -14,13 +14,14 @@ import {
   AlertDialogAction
 } from '@/components/ui/alert-dialog'
 
+
 import { useNavigate } from '@tanstack/react-router'
 import { useForm, Controller, FormProvider, set } from 'react-hook-form'
 import { useToast } from '@/hooks/use-toast'
 import { createQuiz, deleteQuiz } from '@/services/api/quizApi'
 import { getLectureDetails, deleteLecture, deleteFileFromLecture } from '@/services/api/lectureApi'
 import { getVideoDuration } from '@/lib/utils'
-import { Loader2 } from 'lucide-react'
+import { GripVertical, Loader2 } from 'lucide-react'
 import QuizCreationForm from './QuizCreationForm'
 import { FileQuestion, PencilIcon, TrashIcon, PlusIcon } from 'lucide-react'
 import { deleteProblem } from '@/services/api/problemApi'
@@ -35,7 +36,9 @@ export default function LectureItem({
   setIsUpdateLecture,
   isUpdateLecture,
 
-  courseId
+  courseId,
+  dragHandleProps,
+  lectureIndex
 }) {
   const [isRunning1, setIsRunning1] = useState(false)
   const [isRunning2, setIsRunning2] = useState(false)
@@ -291,7 +294,14 @@ export default function LectureItem({
   return (
     <div className='flex flex-col p-4 mt-4 rounded-md shadow-sm bg-gray-50'>
       <div className='flex items-center justify-between mb-4'>
-        <span className='text-lg font-medium'>{lecture.title}</span>
+        <div className='flex items-center gap-2'>
+          <div {...dragHandleProps}>
+            <GripVertical className='w-4 h-4 text-gray-400 cursor-grab' />
+          </div>
+          <span className='text-lg font-medium'>
+            Lecture {lecture.order || lectureIndex + 1}: {lecture.title}
+          </span>
+        </div>
         <div className='flex items-center space-x-2'>
           <Button variant='ghost' size='sm' onClick={handleEdit}>
             <Pencil1Icon className='w-4 h-4' />

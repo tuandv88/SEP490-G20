@@ -12,9 +12,9 @@ export const ChatAPI = {
     })
     return response.data
   },
-  getMessage: async (conversationId) => {
+  getMessage: async (conversationId, pageIndex = 1, pageSize = 5) => {
     const response = await axios.get(
-      `${API_BASE_URL}/ai-service/conversations/${conversationId}/messages?PageIndex=1&PageSize=30`,
+      `${API_BASE_URL}/ai-service/conversations/${conversationId}/messages?PageIndex=${pageIndex}&PageSize=${pageSize}`,
       {
         headers: {
           Authorization: `Bearer ${Cookies.get('authToken')}`

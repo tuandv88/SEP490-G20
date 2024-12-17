@@ -3,9 +3,8 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { Send, Plus, X, History, Square, ArrowUp, Trash } from 'lucide-react'
+import { Send, Plus, X, History, Square, ArrowUp, Trash, ArrowDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import ReactMarkdown from 'react-markdown'
@@ -28,16 +27,17 @@ const ChatAI = ({ lectureId, problemId }) => {
   // const [selectedConversationId, setSelectedConversationId] = useState(null)
   const selectedConversationId = useStore((state) => state.selectedConversationId)
   const setSelectedConversationId = useStore((state) => state.setSelectedConversationId)
-  const messagesEndRef = useRef(null)
   const [pageIndex, setPageIndex] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [conversationToDelete, setConversationToDelete] = useState(null)
   const [totalItems, setTotalItems] = useState(0)
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+  const [messagePageIndex, setMessagePageIndex] = useState(1)
+  const [hasMoreMessages, setHasMoreMessages] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const scrollAreaRef = useRef(null)
+  const scrollPositionRef = useRef(0)
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(true)
 
   const codeRun = useStore((state) => state.codeRun)
   const codeRunRef = useRef(codeRun);
@@ -46,11 +46,30 @@ const ChatAI = ({ lectureId, problemId }) => {
     codeRunRef.current = codeRun;
   }, [codeRun]);
 
+  const fetchMessage = async (pageIndex) => {
+    try {
+      setIsLoadingMore(true);
+      const data = await ChatAPI.getMessage(selectedConversationId, pageIndex);
+      const newMessages = data.messages?.data || [];
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+      if (newMessages.length === 0) {
+        setHasMoreMessages(false);
+        return;
+      }
 
+      if (pageIndex === 1) {
+        setMessages(newMessages.reverse());
+      } else {
+        setMessages((prev) => [...newMessages.reverse(), ...prev]);
+      }
+
+      setHasMoreMessages(newMessages.length === 5);
+    } catch (error) {
+      console.error('Error fetching message:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
     const fetchConversation = async () => {
@@ -68,19 +87,11 @@ const ChatAI = ({ lectureId, problemId }) => {
       }
     }
 
-    const fetchMessage = async () => {
-      try {
-        const data = await ChatAPI.getMessage(selectedConversationId)
-        setMessages(data.messages.data.reverse())       
-        setSelectedConversationId(selectedConversationId)
-      } catch (error) {
-        console.error('Error fetching message:', error)
-      }
-    }
-    
     fetchConversation()
     if(selectedConversationId !== null) {
-      fetchMessage()
+      setMessagePageIndex(1)
+      setHasMoreMessages(true)
+      fetchMessage(1)
     }
   }, [selectedConversationId, pageIndex])
 
@@ -178,6 +189,40 @@ const ChatAI = ({ lectureId, problemId }) => {
     setPageIndex(prev => prev + 1)
   }
 
+  const handleScroll = (event) => {
+    const element = event.currentTarget;
+    
+    // Kiểm tra nếu đang ở đầu để load thêm tin nhắn cũ
+    if (element.scrollTop === 0 && !isLoadingMore && hasMoreMessages) {
+      setMessagePageIndex((prevPageIndex) => {
+        const nextPageIndex = prevPageIndex + 1;
+        fetchMessage(nextPageIndex);
+        return nextPageIndex;
+      });
+    }
+
+    // Kiểm tra nếu đang ở đáy của khu vực tin nhắn
+    const isAtBottom = element.scrollHeight - element.scrollTop === element.clientHeight;
+    setIsScrolledToBottom(isAtBottom);
+  };
+
+  useEffect(() => {
+    if(selectedConversationId !== null) {
+      setMessagePageIndex(1);
+      setHasMoreMessages(true);
+      fetchMessage(1);
+    }
+  }, [selectedConversationId]);
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   return (
     <div className='flex bg-bGprimary text-white h-[calc(100vh-3rem)]'>
       {/* Chat History Sidebar */}
@@ -202,7 +247,7 @@ const ChatAI = ({ lectureId, problemId }) => {
             <h2 className='text-lg font-semibold'>All Chats</h2>           
           </div>
         </div>
-        <ScrollArea className='h-[calc(100vh-120px)] mb-4 scroll-container pb-[200px]'>
+        <div className='h-[calc(100vh-120px)] mb-4 scroll-container pb-[200px]'>
           {chatHistory.map((chat) => (
             <div key={chat.id} className={`p-4 cursor-pointer border-b border-gray-700 ${selectedConversationId === chat.id ? 'bg-gray-500' : 'hover:bg-[#3D3D3D]'}`}>
               <div className='flex items-start gap-3 '>
@@ -232,11 +277,11 @@ const ChatAI = ({ lectureId, problemId }) => {
           )}
           
           <div className='h-5'></div>
-        </ScrollArea>
+        </div>
       </div>
 
       {/* Main Chat Area */}
-      <div className='flex-1 flex flex-col scroll-container'>
+      <div className='flex-1 flex flex-col scroll-container relative'>
         {/* Header */}
         <div className='h-[52px] border-b border-gray-700 flex items-center px-4 justify-between sticky top-0 bg-[#1f2937] z-[1]'>
         <div className='flex items-center gap-3'>
@@ -255,12 +300,34 @@ const ChatAI = ({ lectureId, problemId }) => {
           
           <div className='flex items-center gap-2'>
             <h1 className='font-semibold'>CHAT</h1>
+            
+            {/* Nút cuộn xuống */}
+            {!isScrolledToBottom && (
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={scrollToBottom}
+                className='hover:bg-[#3D3D3D] rounded'
+              >
+                <ArrowDown size={18} />
+              </Button>
+            )}
           </div>
           
         </div>
 
         {/* Chat Messages Area */}
-        <ScrollArea className='flex-1 p-4'>
+        <div
+          ref={scrollAreaRef}
+          className='flex-1 p-4 overflow-y-auto relative'
+          onScroll={handleScroll}
+        >
+          {isLoadingMore && (
+            <div className="flex justify-center mb-4">
+              <div className="w-6 h-6 border-t-2 border-green-500 rounded-full animate-spin"></div>
+            </div>
+          )}
+          
           {messages.length > 0 ? (
                         <div className='space-y-4'>
                         {messages.map((message) => (
@@ -360,12 +427,23 @@ const ChatAI = ({ lectureId, problemId }) => {
                             </div>
                           </div>
                         )}
-                        <div ref={messagesEndRef} />
                       </div>
           ) : (
             <ChatDefaultScreen />
           )}
-        </ScrollArea>
+
+          {/* Nút cuộn xuống */}
+          {!isScrolledToBottom && (
+            <Button
+              variant='ghost'
+              size='icon'
+              onClick={scrollToBottom}
+              className='hover:bg-[#3D3D3D] rounded fixed left-1/2 bottom-16 transform -translate-x-1/2 z-10'
+            >
+              <ArrowDown size={18} />
+            </Button>
+          )}
+        </div>
 
         {/* Input Area */}
         <div className='border-t border-gray-700 p-4 sticky bottom-0 bg-[#1f2937]'>        

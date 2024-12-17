@@ -222,6 +222,16 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
     })
   }
 
+  const handleReorderLectures = (chapterId, newLectures) => {
+    setCurriculum(prevCurriculum => 
+      prevCurriculum.map(chapter => 
+        chapter.chapterDto.id === chapterId 
+          ? { ...chapter, lectureDtos: newLectures }
+          : chapter
+      )
+    )
+  }
+
   return (
     <div className='w-full'>
       <h3 className='mb-4 text-2xl font-semibold'>Curriculum</h3>
@@ -239,6 +249,7 @@ const Step2Curriculum = ({ chapter, handleUpdateChapter, courseId }) => {
         onUpdateLecture={handleUpdateLecture}
         onDeleteLecture={handleDeleteLecture}
         courseId={courseId}
+        onReorderLectures={handleReorderLectures}
       />
 
       <AddLectureDialog
